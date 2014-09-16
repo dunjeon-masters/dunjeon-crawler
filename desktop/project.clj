@@ -1,4 +1,4 @@
-(defproject clj-rouje-like "0.0.1-SNAPSHOT"
+(defproject rouje-like "0.0.1-SNAPSHOT"
   :description "FIXME: write description"
   
   :dependencies [[com.badlogicgames.gdx/gdx "1.3.1"]
@@ -11,10 +11,14 @@
                   :classifier "natives-desktop"]
                  [com.badlogicgames.gdx/gdx-platform "1.3.1"
                   :classifier "natives-desktop"]
+
                  [org.clojure/clojure "1.6.0"]
-                 [play-clj "0.3.11"]]
+
+                 [play-clj "0.3.11"]
+                 [brute "0.3.0"]]
   
-  :source-paths ["src" "src-common"]
+  :source-paths ["src" "src-common" ]
+
   :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]
-  :aot [clj-rouje-like.core.desktop-launcher]
-  :main clj-rouje-like.core.desktop-launcher)
+  :aot [rouje-like.core.desktop-launcher]
+  :main rouje-like.core.desktop-launcher)

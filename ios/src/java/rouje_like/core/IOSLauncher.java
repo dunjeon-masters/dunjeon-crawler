@@ -1,4 +1,4 @@
-package clj_rouje_like.core;
+package rouje_like.core;
 
 import clojure.lang.RT;
 import clojure.lang.Symbol;
@@ -12,9 +12,9 @@ import org.robovm.apple.uikit.*;
 public class IOSLauncher extends IOSApplication.Delegate {
 	protected IOSApplication createApplication() {
 		IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-		RT.var("clojure.core", "require").invoke(Symbol.intern("clj-rouje-like.core"));
+		RT.var("clojure.core", "require").invoke(Symbol.intern("rouje-like.core"));
 		try {
-			Game game = (Game) RT.var("clj-rouje-like.core", "clj-rouje-like").deref();
+			Game game = (Game) RT.var("rouje-like.core", "rouje-like").deref();
 			return new IOSApplication(game, config);
 		} catch (Exception e) {
 			e.printStackTrace();
