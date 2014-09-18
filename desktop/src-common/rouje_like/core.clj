@@ -21,11 +21,14 @@
 
 (def ^:private sys (atom 0))
 
+(def block-size 27)
+(def world-sizes [20 20])
+
 (defn ^:private start
   [system]
   (let [e-board  (br.e/create-entity)
         e-player (br.e/create-entity)
-        world (rj.wr/generate-random-world)] ;atom!
+        world (rj.wr/generate-random-world block-size world-sizes)] ;atom!
     (-> system
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/->Player world))
