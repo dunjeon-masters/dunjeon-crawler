@@ -19,14 +19,14 @@
     (rj.c/->Tile x y
                  type)))
 
-(defn init-treasure [world percent-treasure]
+(defn init-treasure
+  [world treasure-count
+   block-size [width height]]
   (loop [world world
-         treasure-count (* (* (- (world-sizes 0) 2)
-                              (- (world-sizes 1) 2))
-                           (/ percent-treasure 100))]
+         treasure-count treasure-count]
     (if (pos? treasure-count)
-      (recur (let [x (inc (rand-int (- (world-sizes 0) 2)))
-                   y (inc (rand-int (- (world-sizes 1) 2)))]
+      (recur (let [x (inc (rand-int (- width 2)))
+                   y (inc (rand-int (- height 2)))]
                (update-in world [x y]
                           (fn [_] (new-tile (* x block-size)
                                             (* y block-size)
@@ -55,7 +55,9 @@
                                 (fn [_] tile)))))
     ;; GENERATE-TREASURE
     (swap! board (fn [old]
-                   (init-treasure old 50)))
+                   (init-treasure old (* (* width height)
+                                         (/ 50 100))
+                                  block-size [width height])))
     ;; ADD-PLAYER, hardcoded at [10, 10]
     (swap! board (fn [old]
                    (update-in old [10 10]
@@ -66,14 +68,15 @@
 
 (defn render-world!
   [system entity]
-  #_(println "rj.wr/render-world!")
   (let [renderer (new SpriteBatch)
         c-world (rj.e/get-c system entity :world)
         board @(:tiles c-world)]
     (.begin renderer)
     (doseq [col board
             row col]
-      (let [texture-region (:object (get-texture (:type row)))]
+      (let [texture-region (-> (:type row)
+                               (get-texture)
+                               (:object))]
         (.draw renderer
                texture-region
                (float (:x row))
