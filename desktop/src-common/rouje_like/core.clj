@@ -84,15 +84,7 @@
   (fn [screen _]
     (let [x-vel (:velocity-x screen)
           y-vel (:velocity-y screen)]
-      (if (< (* x-vel x-vel)
-             (* y-vel y-vel))
-        (if (pos? y-vel)
-          (rj.pl/move-player! @sys :down)
-          (rj.pl/move-player! @sys :up))
-        (if (pos? x-vel)
-          (rj.pl/move-player! @sys :right)
-          (rj.pl/move-player! @sys :left))))
-    _))
+      (rj.in/process-fling-input @sys x-vel y-vel))))
 
 (defgame rouje-like
   :on-create

@@ -19,3 +19,13 @@
     (rj.pl/move-player! system :right)
 
     :else system))
+(defn process-fling-input
+  [system x-vel y-vel]
+  (if (< (* x-vel x-vel)
+         (* y-vel y-vel))
+    (if (pos? y-vel)
+      (rj.pl/move-player! system :down)
+      (rj.pl/move-player! system :up))
+    (if (pos? x-vel)
+      (rj.pl/move-player! system :right)
+      (rj.pl/move-player! system :left))))
