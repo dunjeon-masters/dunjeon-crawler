@@ -64,21 +64,11 @@
                                         (graphics! :get-delta-time)))
     nil)
 
+  ;; TODO: Maybe switch to on-key-up?
   :on-key-down
   (fn [screen _]
-    (rj.in/process-keyboard-input @sys))
-
-  ;:on-touch-down
-  ;(fn [screen _]
-  ;  (cond
-  ;    (> (game :point-y) (* (game :height) (/ 2 3)))
-  ;    (rj.pl/move-player! @sys :up)
-  ;    (< (game :point-y) (/ (game :height) 3))
-  ;    (rj.pl/move-player! @sys :down)
-  ;    (> (game :point-x) (* (game :width) (/ 2 3)))
-  ;    (rj.pl/move-player! @sys :right)
-  ;    (< (game :point-x) (/ (game :width) 3))
-  ;    (rj.pl/move-player! @sys :left)))
+    (let [key-code (:key screen)]
+      (rj.in/process-keyboard-input @sys key-code)))
 
   :on-fling
   (fn [screen _]

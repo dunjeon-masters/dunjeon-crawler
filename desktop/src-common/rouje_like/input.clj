@@ -1,24 +1,23 @@
 (ns rouje-like.input
-  (:require [play-clj.core :refer :all]
+  (:require [play-clj.core :as play]
 
             [rouje-like.player :as rj.pl]))
 
 (defn process-keyboard-input
-  [system]
+  [system key-code]
   (cond
-    (key-pressed? :dpad-up)
+    (= key-code (play/key-code :dpad-up))
     (rj.pl/move-player! system :up)
 
-    (key-pressed? :dpad-down)
+    (= key-code (play/key-code :dpad-down))
     (rj.pl/move-player! system :down)
 
-    (key-pressed? :dpad-left)
+    (= key-code (play/key-code :dpad-left))
     (rj.pl/move-player! system :left)
 
-    (key-pressed? :dpad-right)
-    (rj.pl/move-player! system :right)
+    (= key-code (play/key-code :dpad-right))
+    (rj.pl/move-player! system :right)))
 
-    :else system))
 (defn process-fling-input
   [system x-vel y-vel]
   (if (< (* x-vel x-vel)
