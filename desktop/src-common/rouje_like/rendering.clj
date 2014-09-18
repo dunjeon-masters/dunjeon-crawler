@@ -11,8 +11,8 @@
 
 (defn process-one-game-tick
   [system _]
-  (let [entities (rj.e/all-e system :renderable)]
-        (doseq [entity entities]
+  (let [renderable-entities (rj.e/all-e system :renderable)]
+        (doseq [entity renderable-entities]
           (let [component (rj.e/get-c system entity :renderable)]
             ((:fn component) system entity))))
   system)

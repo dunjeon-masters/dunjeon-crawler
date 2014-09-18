@@ -57,11 +57,14 @@
                                         (fn [x] (assoc x :type :player))))))
           (reset! x-pos (target-coords 0))
           (reset! y-pos (target-coords 1))
-          system))))
-  system)
+          system)))))
 
 (defn process-one-game-tick
   [system _]
   #_(process player#moves-left)
+  (let [e-score (first (rj.e/all-e system :score))
+        c-score (rj.e/get-c system e-score :score)
+        score (:score c-score)];atom!
+    )
   #_(process player#score)
   system)

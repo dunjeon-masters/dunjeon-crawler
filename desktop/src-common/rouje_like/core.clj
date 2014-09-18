@@ -52,8 +52,7 @@
     (-> (br.e/create-system)
         (start)
         (register-system-fns)
-        (as-> s (reset! sys s)))
-    nil)
+        (as-> s (reset! sys s))))
   
   :on-render
   (fn [screen _]
@@ -61,8 +60,7 @@
     (render! screen)
     (reset! sys
             (br.s/process-one-game-tick @sys
-                                        (graphics! :get-delta-time)))
-    nil)
+                                        (graphics! :get-delta-time))))
 
   ;; TODO: Maybe switch to on-key-up?
   :on-key-down
