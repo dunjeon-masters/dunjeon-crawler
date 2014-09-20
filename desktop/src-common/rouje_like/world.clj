@@ -60,31 +60,39 @@
           (recur world treasure-count)))
       world)))
 
+(defn block-coords-d1
+  [x y]
+  (for [dx [-1 0 1]
+        dy [-1 0 1]]
+    [(+ x dx) (+ y dy)]))
+
+(defn block-coords-d2
+  [x y]
+  (for [dx [-2 -1 0 1 2]
+        dy [-2 -1 0 1 2]
+        :when (or (= 2 (math/abs dx))
+                  (= 2 (math/abs dy)))]
+    [(+ x dx) (+ y dy)]))
+
+(defn get-block-d1
+  [tiles x y]
+  (map (fn [[x y]]
+         (get-in tiles [x y]
+                 (new-tile x y
+                           {:type :wall})))
+       (block-coords-d1 x y)))
+
+(defn get-block-d2
+  [tiles x y]
+  (map (fn [[x y]]
+         (get-in tiles [x y]
+                 (new-tile x y
+                           {:type :wall})))
+       (block-coords-d2 x y)))
+
 (defn smooth-world-d2
   [world]
-  (let [block-coords-d1 (fn [x y]
-                          (for [dx [-1 0 1]
-                                dy [-1 0 1]]
-                            [(+ x dx) (+ y dy)]))
-        block-coords-d2 (fn [x y]
-                          (for [dx [-2 -1 0 1 2]
-                                dy [-2 -1 0 1 2]
-                                :when (or (= 2 (math/abs dx))
-                                          (= 2 (math/abs dy)))]
-                            [(+ x dx) (+ y dy)]))
-        get-block-d1 (fn [tiles x y]
-                       (map (fn [[x y]]
-                              (get-in tiles [x y]
-                                      (new-tile x y
-                                                {:type :wall})))
-                            (block-coords-d1 x y)))
-        get-block-d2 (fn [tiles x y]
-                       (map (fn [[x y]]
-                              (get-in tiles [x y]
-                                      (new-tile x y
-                                                {:type :wall})))
-                            (block-coords-d2 x y)))
-        get-smoothed-tile (fn [block-d1 block-d2 x y]
+  (let [get-smoothed-tile (fn [block-d1 block-d2 x y]
                             (let [tile-counts-d1 (frequencies (map :type block-d1))
                                   tile-counts-d2 (frequencies (map :type block-d2))
                                   wall-threshold-d1 5
@@ -107,17 +115,7 @@
 
 (defn smooth-world-d1
   [world]
-  (let [block-coords-d1 (fn [x y]
-                          (for [dx [-1 0 1]
-                                dy [-1 0 1]]
-                            [(+ x dx) (+ y dy)]))
-        get-block-d1 (fn [tiles x y]
-                       (map (fn [[x y]]
-                              (get-in tiles [x y]
-                                      (new-tile x y
-                                                {:type :wall})))
-                            (block-coords-d1 x y)))
-        get-smoothed-tile (fn [block-d1 x y]
+  (let [get-smoothed-tile (fn [block-d1 x y]
                             (let [tile-counts-d1 (frequencies (map :type block-d1))
                                   wall-threshold-d1 5
                                   wall-count-d1 (get tile-counts-d1 :wall 0)
