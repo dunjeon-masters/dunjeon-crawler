@@ -180,13 +180,13 @@
     world))
 
 (defn render-world
-  [system entity _]
+  [system this _]
   (let [renderer (new SpriteBatch)
         taxicab-dist (fn [[x y] [i j]]
                              (+ (math/abs (- i x))
                                 (math/abs (- j y))))
 
-        e-player (first (rj.e/all-e-with-c system :position))
+        e-player (first (rj.e/all-e-with-c system :player))
         c-position (rj.e/get-c-on-e system e-player :position)
         player-pos [@(:x c-position)
                     @(:y c-position)]
@@ -195,7 +195,7 @@
         c-sight (rj.e/get-c-on-e system e-player :sight)
         sight (math/ceil @(:distance c-sight))
 
-        c-world (rj.e/get-c-on-e system entity :world)
+        c-world (rj.e/get-c-on-e system this :world)
         world @(:tiles c-world)]
     (.begin renderer)
     (doseq [x (range (count world))
