@@ -2,25 +2,29 @@
   (:import [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont]
            [com.badlogic.gdx.scenes.scene2d.ui Label Skin])
   (:require [play-clj.core :refer :all]
-            [play-clj.ui   :refer :all]
+            [play-clj.ui :refer :all]
 
+            [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]))
 
 (defn move-player!
   [system direction]
   (let [e-player (first (rj.e/all-e-with-c system :player))
 
-        c-score (rj.e/get-c-on-e system e-player :score)
-        score (:score c-score) ;; atom!
+        c-gold (rj.e/get-c-on-e system e-player :gold)
+        gold (:gold c-gold) ;; atom!
 
         c-moves-left (rj.e/get-c-on-e system e-player :moves-left)
         moves-left (:moves-left c-moves-left) ;; atom!
 
         c-sight (rj.e/get-c-on-e system e-player :sight)
         sight-distance (:distance c-sight) ;; atom!
+        sight-decline-rate @(:decline-rate c-sight)
+        sight-lower-bound @(:lower-bound c-sight)
+        sight-upper-bound @(:upper-bound c-sight)
 
         c-player (rj.e/get-c-on-e system e-player :player)
-        board (:tiles c-player) ;; atom!
+        world (:tiles c-player) ;; atom!
 
         c-player-pos (rj.e/get-c-on-e system e-player :position)
         x-pos (:x c-player-pos) ;; atom!
@@ -31,17 +35,17 @@
                         :down  [     @x-pos (dec @y-pos)]
                         :left  [(dec @x-pos)     @y-pos]
                         :right [(inc @x-pos)     @y-pos])
-        target (get-in @board target-coords :bound)
+        target (get-in @world target-coords :bound)
         [target-x-pos target-y-pos] target-coords]
     (if (and (not= target :bound)
              (pos? @moves-left)
              (not= (:type target) :wall))
       (do
         (swap! moves-left dec)
-        (swap! sight-distance (fn [prev] (if (> prev 3)     ;lower bound on sight
-                                           (- prev (/ 1 3)) ;1 over the number of steps to lose 1 sight level
+        (swap! sight-distance (fn [prev] (if (> prev (inc sight-lower-bound))
+                                           (- prev sight-decline-rate)
                                            prev)))
-        (swap! board (fn [prev]
+        (swap! world (fn [prev]
                        (-> prev
                            (update-in [@x-pos @y-pos]
                                       (fn [x] (assoc x :type :floor)))
@@ -51,21 +55,21 @@
         (reset! y-pos target-y-pos)
         (case (:type target)
           :gold     (do
-                     (swap! score inc))
+                      (swap! gold inc))
           :torch    (do
                       (swap! sight-distance
-                             (fn [prev] (if (< prev 9)      ;upper bound on sight (ie 10)
-                                          (+ prev 2)        ;torch benefits
+                             (fn [prev] (if (<= prev (- sight-upper-bound 2))
+                                          (+ prev 2)
                                           prev))))
           nil)))))
 
 (defn render-player-stats
-  [system _ {:keys [world-sizes, block-size]}]
+  [system _ {:keys [world-sizes]}]
   (let [[_ height] world-sizes
 
-        e-score (first (rj.e/all-e-with-c system :score))
-        c-score (rj.e/get-c-on-e system e-score :score)
-        score @(:score c-score)
+        e-gold (first (rj.e/all-e-with-c system :gold))
+        c-gold (rj.e/get-c-on-e system e-gold :gold)
+        gold @(:gold c-gold)
 
         e-moves-left (first (rj.e/all-e-with-c system :moves-left))
         c-moves-left (rj.e/get-c-on-e system e-moves-left :moves-left)
@@ -73,9 +77,9 @@
 
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (str "Score: [" score "]" " - " "MovesLeft: [" moves-left "]")
+    (label! (label (str "Gold: [" gold "]" " - " "MovesLeft: [" moves-left "]")
                    (color :white)
-                   :set-y (float (* (inc height) block-size)))
+                   :set-y (float (* (inc height) rj.c/block-size)))
             :draw renderer 1.0)
     (.end renderer)))
 

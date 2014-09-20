@@ -20,34 +20,43 @@
 
 (def ^:private sys (atom 0))
 
-(def ^:private block-size 27)
-(def ^:private world-sizes [20 20])
-(def ^:private init-player-pos [(/ (world-sizes 0) 2)
-                                (/ (world-sizes 1) 2)])
-(def ^:private init-treasure-percent 30)
+(def ^:private world-sizes [30 30])
+(def ^:private init-wall% 40)
+(def ^:private init-torch% 2)
+(def ^:private init-gold% 5)
+(def ^:private init-player-x-pos (atom (/ (world-sizes 0) 2)))
+(def ^:private init-player-y-pos (atom (/ (world-sizes 1) 2)))
+(def ^:private init-player-moves 150)
+(def ^:private init-sight-distance 5.0)
+(def ^:private init-sight-decline-rate (/ 1 5))
+(def ^:private init-sight-lower-bound 4)                    ;; Inclusive
+(def ^:private init-sight-upper-bound 9)                   ;; Exclusive
 
 (defn ^:private start
   [system]
-  (let [e-board  (br.e/create-entity)
+  (let [e-world  (br.e/create-entity)
         e-player (br.e/create-entity)
         world (rj.wr/generate-random-world ;world's an atom!
-                block-size world-sizes
-                init-player-pos init-treasure-percent)]
+                world-sizes init-wall%
+                init-torch% init-gold%
+                [init-player-x-pos init-player-y-pos])]
     (-> system
         (rj.e/add-e e-player)
-        (rj.e/add-c e-player (rj.c/->Player world))
-        (rj.e/add-c e-player (rj.c/->Position (atom (init-player-pos 0))
-                                              (atom (init-player-pos 1))))
-        (rj.e/add-c e-player (rj.c/->MovesLeft (atom 100)))
-        (rj.e/add-c e-player (rj.c/->Score (atom 0)))
-        (rj.e/add-c e-player (rj.c/->Sight (atom (inc 3.0))))
+        (rj.e/add-c e-player (rj.c/->Player world (atom false)))
+        (rj.e/add-c e-player (rj.c/->Position init-player-x-pos
+                                              init-player-y-pos))
+        (rj.e/add-c e-player (rj.c/->MovesLeft (atom init-player-moves)))
+        (rj.e/add-c e-player (rj.c/->Gold (atom 0)))
+        (rj.e/add-c e-player (rj.c/map->Sight {:distance (atom (inc init-sight-distance))
+                                               :decline-rate (atom init-sight-decline-rate)
+                                               :lower-bound (atom init-sight-lower-bound)
+                                               :upper-bound (atom init-sight-upper-bound)}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:pri  1
                                                     :fn   rj.pl/render-player-stats
-                                                    :args {:world-sizes world-sizes
-                                                           :block-size block-size}}))
-        (rj.e/add-e e-board)
-        (rj.e/add-c e-board (rj.c/->World world))
-        (rj.e/add-c e-board (rj.c/map->Renderable {:pri  0
+                                                    :args {:world-sizes world-sizes}}))
+        (rj.e/add-e e-world)
+        (rj.e/add-c e-world (rj.c/->World world))
+        (rj.e/add-c e-world (rj.c/map->Renderable {:pri  0
                                                    :fn   rj.wr/render-world
                                                    :args nil})))))
 
@@ -74,7 +83,7 @@
             (br.s/process-one-game-tick @sys
                                         (graphics! :get-delta-time))))
 
-  :on-key-up
+  :on-key-down
   (fn [screen _]
     (let [key-code (:key screen)]
       (rj.in/process-keyboard-input @sys key-code)))

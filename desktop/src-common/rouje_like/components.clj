@@ -2,26 +2,29 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword]))
 
-;; FOR ENTITY E-BOARD:
-(defrecord World [^Atom tiles]) ;; atom - 2D Vector of Tile's
+(def block-size 27)
+
+;; FOR ENTITY E-WORLD:
+(defrecord World [^Atom tiles]) ;; 2D Vector of Tile's
 (defrecord Tile [^Number x ^Number y ^Keyword type])
 
 ;; FOR ENTITY E-PLAYER:
-(defrecord Player [^Atom tiles]) ;; atom - 2D Vector of Tile's
-(defrecord Position [^Atom x ^Atom y]) ;; atoms
-(defrecord MovesLeft [^Atom moves-left]) ;; atom
-(defrecord Score [^Atom score]) ;; atom
-(defrecord Sight [^Atom distance]) ;; atom
+(defrecord Player [^Atom tiles ^Atom show-world?]) ;; 2D Vector of Tile's
+(defrecord Position [^Atom x ^Atom y])
+(defrecord MovesLeft [^Atom moves-left])
+(defrecord Gold [^Atom gold])
+(defrecord Sight [^Atom distance ^Atom decline-rate
+                  ^Atom lower-bound ^Atom upper-bound])
 
 ;; FOR EVERYTHING:
-(defrecord Renderable [^Number pri ^Fn fn args])
+(defrecord Renderable [^Number pri ^Fn fn args]) ;; args is a map
 
 ;; Workaround for not being able to get record's type "statically"
 (def get-type {:world      (type (->World nil))
                :tile       (type (->Tile nil nil nil))
-               :player     (type (->Player nil))
+               :player     (type (->Player nil nil))
                :position   (type (->Position nil nil))
                :moves-left (type (->MovesLeft nil))
-               :score      (type (->Score nil))
-               :sight      (type (->Sight nil))
+               :gold       (type (->Gold nil))
+               :sight      (type (->Sight nil nil nil nil))
                :renderable (type (->Renderable nil nil nil))})

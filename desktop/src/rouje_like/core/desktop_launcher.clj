@@ -6,5 +6,5 @@
 
 (defn -main
   []
-  (LwjglApplication. rouje-like "rouje-like" 800 600)
-  (Keyboard/enableRepeatEvents true))
+  (LwjglApplication. rouje-like "rouje-like" 810 860)
+  (Keyboard/enableRepeatEvents false))
