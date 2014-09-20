@@ -62,9 +62,9 @@
 
 (defn block-coords
   [x y dist]
-  (let [dx|dy (vec (range (- 0 dist) (inc dist)))]
-    (for [dx dx|dy
-          dy dx|dy
+  (let [∆x|y (vec (range (- 0 dist) (inc dist)))]
+    (for [dx ∆x|y
+          dy ∆x|y
           :when (or (if (= dist 1)
                       true)
                     (= dist (math/abs dx))
