@@ -35,11 +35,11 @@
                         :down  [     @x-pos (dec @y-pos)]
                         :left  [(dec @x-pos)     @y-pos]
                         :right [(inc @x-pos)     @y-pos])
-        target (get-in @world target-coords :bound)
+        target (get-in @world target-coords {:type :wall})
         [target-x-pos target-y-pos] target-coords]
-    (if (and (not= target :bound)
-             (pos? @moves-left)
-             (not= (:type target) :wall))
+    (if (and (pos? @moves-left)
+             (not= (:type target)
+                   :wall))
       (do
         (swap! moves-left dec)
         (swap! sight-distance (fn [prev] (if (> prev (inc sight-lower-bound))
