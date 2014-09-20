@@ -8,16 +8,20 @@
 (defn process-keyboard-input
   [system key-code]
   (cond
-    (= key-code (play/key-code :dpad-up))
+    (or (= key-code (play/key-code :dpad-up))
+        (= key-code (play/key-code :W)))
     (rj.pl/process-input-tick! system :up)
 
-    (= key-code (play/key-code :dpad-down))
+    (or (= key-code (play/key-code :dpad-down))
+        (= key-code (play/key-code :S)))
     (rj.pl/process-input-tick! system :down)
 
-    (= key-code (play/key-code :dpad-left))
+    (or (= key-code (play/key-code :dpad-left))
+        (= key-code (play/key-code :A)))
     (rj.pl/process-input-tick! system :left)
 
-    (= key-code (play/key-code :dpad-right))
+    (or (= key-code (play/key-code :dpad-right))
+        (= key-code (play/key-code :D)))
     (rj.pl/process-input-tick! system :right)
 
     (= key-code (play/key-code :F))
