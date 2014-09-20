@@ -44,7 +44,7 @@
         (swap! board (fn [prev]
                        (-> prev
                            (update-in [@x-pos @y-pos]
-                                      (fn [x] (assoc x :type :empty)))
+                                      (fn [x] (assoc x :type :floor)))
                            (update-in target-coords
                                       (fn [x] (assoc x :type :player))))))
         (reset! x-pos target-x-pos)

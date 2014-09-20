@@ -12,7 +12,7 @@
 
 (def get-texture (memoize
                    (fn [^Keyword type]
-                     (type (zipmap [:player :wall :empty :gold :torch]
+                     (type (zipmap [:player :wall :floor :gold :torch]
                                    (map (comp texture*
                                               (fn [s] (str s ".jpg")))
                                         ["at-inverted" "percent-inverted"
@@ -82,13 +82,15 @@
                              (for [y (range height)]
                                (new-tile (* x block-size)
                                          (* y block-size)
-                                         :type :wall))))))]
+                                         {:type (if (< (rand-int 100) 45)
+                                                  :wall
+                                                  :floor)}))))))]
     ;; GENERATE-BODY
     (doseq [x (range 1 (dec width))
             y (range 1 (dec height))
             :let [tile (new-tile (* x block-size)
                                  (* y block-size)
-                                 {:type :empty})]]
+                                 {:type :floor})]]
       (swap! board (fn [prev]
                      (update-in prev [x y]
                                 (fn [_] tile)))))
