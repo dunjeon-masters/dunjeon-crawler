@@ -64,15 +64,13 @@
           nil)))))
 
 (defn render-player-stats
-  [system _ {:keys [world-sizes]}]
+  [system this {:keys [world-sizes]}]
   (let [[_ height] world-sizes
 
-        e-gold (first (rj.e/all-e-with-c system :gold))
-        c-gold (rj.e/get-c-on-e system e-gold :gold)
+        c-gold (rj.e/get-c-on-e system this :gold)
         gold @(:gold c-gold)
 
-        e-moves-left (first (rj.e/all-e-with-c system :moves-left))
-        c-moves-left (rj.e/get-c-on-e system e-moves-left :moves-left)
+        c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left @(:moves-left c-moves-left)
 
         renderer (new SpriteBatch)]
