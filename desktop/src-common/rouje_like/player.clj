@@ -71,27 +71,19 @@
                                         (fn [x] (assoc x :type :floor)))
                              (update-in target-coords
                                         (fn [x] (assoc x :type :player)))))]
+    (swap! moves-left dec)
     (case (:type target)
-      :gold (do
-              (swap! moves-left dec)
-              (swap! gold inc)
-              (swap! sight-distance dec-sight)
-              (swap! world player<->floor)
-              (reset! x-pos target-x-pos)
-              (reset! y-pos target-y-pos))
+      :gold  (do
+               (swap! gold inc)
+               (swap! sight-distance dec-sight))
       :torch (do
-               (swap! moves-left dec)
-               (swap! sight-distance inc-sight)
-               (swap! world player<->floor)
-               (reset! x-pos target-x-pos)
-               (reset! y-pos target-y-pos))
+               (swap! sight-distance inc-sight))
       :floor (do
-               (swap! moves-left dec)
-               (swap! sight-distance dec-sight)
-               (swap! world player<->floor)
-               (reset! x-pos target-x-pos)
-               (reset! y-pos target-y-pos))
-      nil)))
+               (swap! sight-distance dec-sight))
+      nil)
+    (swap! world player<->floor)
+    (reset! x-pos target-x-pos)
+    (reset! y-pos target-y-pos)))
 
 (defn process-input-tick!
   [system direction]
