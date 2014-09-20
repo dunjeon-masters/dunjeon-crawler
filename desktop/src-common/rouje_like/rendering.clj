@@ -10,10 +10,12 @@
   system)
 
 (defn process-one-game-tick
-  [system _]
-  (let [renderable-entities (sort-by :pri
-                                     (rj.e/all-e-with-c system :renderable))]
+  [system delta-time]
+  (let [renderable-entities (reverse
+                              (sort-by :pri
+                                       (rj.e/all-e-with-c system :renderable)))]
     (doseq [entity renderable-entities]
       (let [component (rj.e/get-c-on-e system entity :renderable)]
-        ((:fn component) system entity (:args component)))))
+        ((:render-fn component) system entity (assoc (:args component)
+                                                :delta-time delta-time)))))
   system)

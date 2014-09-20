@@ -28,36 +28,37 @@
 (def ^:private init-player-y-pos (atom (/ (world-sizes 1) 2)))
 (def ^:private init-player-moves 150)
 (def ^:private init-sight-distance 5.0)
-(def ^:private init-sight-decline-rate (/ 1 5))
+(def ^:private init-sight-decline-rate (/ 1 3))
 (def ^:private init-sight-lower-bound 4)                    ;; Inclusive
-(def ^:private init-sight-upper-bound 9)                   ;; Exclusive
+(def ^:private init-sight-upper-bound 9)                    ;; Exclusive
 
 (defn ^:private start
   [system]
   (let [e-world  (br.e/create-entity)
         e-player (br.e/create-entity)
-        world (rj.wr/generate-random-world ;world's an atom!
-                world-sizes init-wall%
-                init-torch% init-gold%
-                [init-player-x-pos init-player-y-pos])]
+        world (atom (rj.wr/generate-random-world
+                      world-sizes init-wall%
+                      init-torch% init-gold%
+                      [init-player-x-pos init-player-y-pos]))]
     (-> system
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/->Player world (atom false)))
-        (rj.e/add-c e-player (rj.c/->Position init-player-x-pos
-                                              init-player-y-pos))
+        (rj.e/add-c e-player (rj.c/->Position init-player-x-pos init-player-y-pos
+                                              rj.pl/can-move? rj.pl/move!))
+        (rj.e/add-c e-player (rj.c/->Digger rj.pl/can-dig? rj.pl/dig!))
         (rj.e/add-c e-player (rj.c/->MovesLeft (atom init-player-moves)))
         (rj.e/add-c e-player (rj.c/->Gold (atom 0)))
         (rj.e/add-c e-player (rj.c/map->Sight {:distance (atom (inc init-sight-distance))
                                                :decline-rate (atom init-sight-decline-rate)
                                                :lower-bound (atom init-sight-lower-bound)
                                                :upper-bound (atom init-sight-upper-bound)}))
-        (rj.e/add-c e-player (rj.c/map->Renderable {:pri  1
-                                                    :fn   rj.pl/render-player
+        (rj.e/add-c e-player (rj.c/map->Renderable {:pri 0
+                                                    :render-fn rj.pl/render-player
                                                     :args {:world-sizes world-sizes}}))
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/->World world))
-        (rj.e/add-c e-world (rj.c/map->Renderable {:pri  0
-                                                   :fn   rj.wr/render-world
+        (rj.e/add-c e-world (rj.c/map->Renderable {:pri 1
+                                                   :render-fn rj.wr/render-world
                                                    :args nil})))))
 
 (defn ^:private register-system-fns
@@ -73,7 +74,7 @@
     (-> (br.e/create-system)
         (start)
         (register-system-fns)
-        (as-> s (reset! sys s))))
+        (as-> s (reset! sys s))))                           ;; TODO: WHAT IS THIS EVEN?
   
   :on-render
   (fn [screen _]

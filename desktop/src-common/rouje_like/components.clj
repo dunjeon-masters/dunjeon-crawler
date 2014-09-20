@@ -10,20 +10,22 @@
 
 ;; FOR ENTITY E-PLAYER:
 (defrecord Player [^Atom tiles ^Atom show-world?]) ;; 2D Vector of Tile's
-(defrecord Position [^Atom x ^Atom y])
+(defrecord Digger [^Fn can-dig? ^Fn dig!])
+(defrecord Position [^Atom x ^Atom y ^Fn can-move? ^Fn move!])
 (defrecord MovesLeft [^Atom moves-left])
 (defrecord Gold [^Atom gold])
 (defrecord Sight [^Atom distance ^Atom decline-rate
                   ^Atom lower-bound ^Atom upper-bound])
 
 ;; FOR EVERYTHING:
-(defrecord Renderable [^Number pri ^Fn fn args]) ;; args is a map
+(defrecord Renderable [^Number pri ^Fn render-fn args]) ;; args is a map
 
 ;; Workaround for not being able to get record's type "statically"
 (def get-type {:world      (type (->World nil))
                :tile       (type (->Tile nil nil nil))
                :player     (type (->Player nil nil))
-               :position   (type (->Position nil nil))
+               :digger     (type (->Digger nil nil))
+               :position   (type (->Position nil nil nil nil))
                :moves-left (type (->MovesLeft nil))
                :gold       (type (->Gold nil))
                :sight      (type (->Sight nil nil nil nil))

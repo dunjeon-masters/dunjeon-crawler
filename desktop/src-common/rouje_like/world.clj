@@ -177,7 +177,7 @@
                              (update-world world [@init-player-x-pos @init-player-y-pos]
                                            {:type :player}))
                          (recur world))))))
-    world))
+    @world))
 
 (defn render-world
   [system this _]
