@@ -83,3 +83,6 @@
             :draw renderer 1.0)
     (.end renderer)))
 
+(defn render-player
+  [system this args]
+  (render-player-stats system this args))

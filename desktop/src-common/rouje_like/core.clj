@@ -52,7 +52,7 @@
                                                :lower-bound (atom init-sight-lower-bound)
                                                :upper-bound (atom init-sight-upper-bound)}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:pri  1
-                                                    :fn   rj.pl/render-player-stats
+                                                    :fn   rj.pl/render-player
                                                     :args {:world-sizes world-sizes}}))
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/->World world))
