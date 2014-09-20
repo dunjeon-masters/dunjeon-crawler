@@ -74,8 +74,7 @@
             (br.s/process-one-game-tick @sys
                                         (graphics! :get-delta-time))))
 
-  ;; TODO: Maybe switch to on-key-up?
-  :on-key-down
+  :on-key-up
   (fn [screen _]
     (let [key-code (:key screen)]
       (rj.in/process-keyboard-input @sys key-code)))
