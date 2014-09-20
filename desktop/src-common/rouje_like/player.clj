@@ -93,7 +93,7 @@
                (reset! y-pos target-y-pos))
       nil)))
 
-(defn move-player!
+(defn process-input-tick!
   [system direction]
   (let [e-player (first (rj.e/all-e-with-c system :player))
 
