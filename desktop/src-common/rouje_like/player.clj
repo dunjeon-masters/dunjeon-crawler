@@ -1,70 +1,81 @@
 (ns rouje-like.player
-  (:require [rouje-like.entity :as rj.e]))
+  (:import [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont]
+           [com.badlogic.gdx.scenes.scene2d.ui Label Skin])
+  (:require [play-clj.core :refer :all]
+            [play-clj.ui   :refer :all]
+
+            [rouje-like.entity :as rj.e]))
 
 (defn move-player!
   [system direction]
-  ;; TODO: REFACTOR SCORE & MOVES-LEFT TO THEIR RESP NS'S,
-  ;; TODO: FIRST TEST MOVING THEM TO A NEW FUNCTION
-  (let [e-score (first (rj.e/all-e system :score))
-        c-score (rj.e/get-c system e-score :score)
-        score (:score c-score) ;atom!
+  (let [e-player (first (rj.e/all-e-with-c system :player))
 
-        e-moves-left (first (rj.e/all-e system :moves-left))
-        c-moves-left (rj.e/get-c system e-moves-left :moves-left)
-        moves-left (:moves-left c-moves-left) ;atom!
+        c-score (rj.e/get-c-on-e system e-player :score)
+        score (:score c-score) ;; atom!
 
-        e-player (first (rj.e/all-e system :player))
-        c-player (rj.e/get-c system e-player :player)
-        board (:tiles c-player) ;atom!
+        c-moves-left (rj.e/get-c-on-e system e-player :moves-left)
+        moves-left (:moves-left c-moves-left) ;; atom!
 
-        position (rj.e/get-c system e-player :position)
-        x-pos (:x position) ;atom!
-        y-pos (:y position) ;atom!
+        c-sight (rj.e/get-c-on-e system e-player :sight)
+        sight-distance (:distance c-sight) ;; atom!
+
+        c-player (rj.e/get-c-on-e system e-player :player)
+        board (:tiles c-player) ;; atom!
+
+        c-player-pos (rj.e/get-c-on-e system e-player :position)
+        x-pos (:x c-player-pos) ;; atom!
+        y-pos (:y c-player-pos) ;; atom!
 
         target-coords (case direction
                         :up    [     @x-pos (inc @y-pos)]
                         :down  [     @x-pos (dec @y-pos)]
                         :left  [(dec @x-pos)     @y-pos]
                         :right [(inc @x-pos)     @y-pos])
-        target (get-in @board target-coords)]
-    (if (pos? @moves-left)
-      (case (:type target)
-        :wall    system
+        target (get-in @board target-coords :bound)
+        [target-x-pos target-y-pos] target-coords]
+    (if (and (not= target :bound)
+             (pos? @moves-left)
+             (not= (:type target) :wall))
+      (do
+        (swap! moves-left dec)
+        (swap! sight-distance (fn [prev] (if (> prev 3)     ;lower bound on sight
+                                           (- prev (/ 1 3)) ;1 over the number of steps to lose 1 sight level
+                                           prev)))
+        (swap! board (fn [prev]
+                       (-> prev
+                           (update-in [@x-pos @y-pos]
+                                      (fn [x] (assoc x :type :empty)))
+                           (update-in target-coords
+                                      (fn [x] (assoc x :type :player))))))
+        (reset! x-pos target-x-pos)
+        (reset! y-pos target-y-pos)
+        (case (:type target)
+          :gold     (do
+                     (swap! score inc))
+          :torch    (do
+                      (swap! sight-distance
+                             (fn [prev] (if (< prev 9)      ;upper bound on sight (ie 10)
+                                          (+ prev 2)        ;torch benefits
+                                          prev))))
+          nil)))))
 
-        :gold    (do
-                   (swap! score inc)
-                   (println "score: " @score)
-                   (swap! moves-left dec)
-                   (println "moves-left: " @moves-left)
-                   (swap! board (fn [old]
-                                  (-> old
-                                      (update-in [@x-pos @y-pos]
-                                                 (fn [x] (assoc x :type :empty)))
-                                      (update-in target-coords
-                                                 (fn [x] (assoc x :type :player))))))
-                   (reset! x-pos (target-coords 0))
-                   (reset! y-pos (target-coords 1))
-                   system)
+(defn render-player-stats
+  [system _ {:keys [world-sizes, block-size]}]
+  (let [[_ height] world-sizes
 
-        (do
-          (swap! moves-left dec)
-          (println "moves-left: " @moves-left)
-          (swap! board (fn [old]
-                         (-> old
-                             (update-in [@x-pos @y-pos]
-                                        (fn [x] (assoc x :type :empty)))
-                             (update-in target-coords
-                                        (fn [x] (assoc x :type :player))))))
-          (reset! x-pos (target-coords 0))
-          (reset! y-pos (target-coords 1))
-          system)))))
+        e-score (first (rj.e/all-e-with-c system :score))
+        c-score (rj.e/get-c-on-e system e-score :score)
+        score @(:score c-score)
 
-(defn process-one-game-tick
-  [system _]
-  #_(process player#moves-left)
-  (let [e-score (first (rj.e/all-e system :score))
-        c-score (rj.e/get-c system e-score :score)
-        score (:score c-score)];atom!
-    )
-  #_(process player#score)
-  system)
+        e-moves-left (first (rj.e/all-e-with-c system :moves-left))
+        c-moves-left (rj.e/get-c-on-e system e-moves-left :moves-left)
+        moves-left @(:moves-left c-moves-left)
+
+        renderer (new SpriteBatch)]
+    (.begin renderer)
+    (label! (label (str "Score: [" score "]" " - " "MovesLeft: [" moves-left "]")
+                   (color :white)
+                   :set-y (float (* (inc height) block-size)))
+            :draw renderer 1.0)
+    (.end renderer)))
+

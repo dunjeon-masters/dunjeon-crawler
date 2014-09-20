@@ -13,7 +13,6 @@
             [rouje-like.entity     :as rj.e]
             [rouje-like.rendering  :as rj.r]
             [rouje-like.input      :as rj.in]
-            [rouje-like.score      :as rj.sc]
             [rouje-like.player     :as rj.pl]
             [rouje-like.world      :as rj.wr]))
 
@@ -23,31 +22,40 @@
 
 (def ^:private block-size 27)
 (def ^:private world-sizes [20 20])
+(def ^:private init-player-pos [(/ (world-sizes 0) 2)
+                                (/ (world-sizes 1) 2)])
+(def ^:private init-treasure-percent 30)
 
 (defn ^:private start
   [system]
   (let [e-board  (br.e/create-entity)
         e-player (br.e/create-entity)
         world (rj.wr/generate-random-world ;world's an atom!
-                block-size world-sizes)]
+                block-size world-sizes
+                init-player-pos init-treasure-percent)]
     (-> system
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/->Player world))
-        (rj.e/add-c e-player (rj.c/->Position (atom 10) (atom 10)))
+        (rj.e/add-c e-player (rj.c/->Position (atom (init-player-pos 0))
+                                              (atom (init-player-pos 1))))
         (rj.e/add-c e-player (rj.c/->MovesLeft (atom 100)))
         (rj.e/add-c e-player (rj.c/->Score (atom 0)))
-
+        (rj.e/add-c e-player (rj.c/->Sight (atom (inc 3.0))))
+        (rj.e/add-c e-player (rj.c/map->Renderable {:pri  1
+                                                    :fn   rj.pl/render-player-stats
+                                                    :args {:world-sizes world-sizes
+                                                           :block-size block-size}}))
         (rj.e/add-e e-board)
         (rj.e/add-c e-board (rj.c/->World world))
-        (rj.e/add-c e-board (rj.c/->Renderable rj.wr/render-world!)))))
+        (rj.e/add-c e-board (rj.c/map->Renderable {:pri  0
+                                                   :fn   rj.wr/render-world
+                                                   :args nil})))))
 
 (defn ^:private register-system-fns
   [system]
   (-> system
       (rj.r/start)
-      (br.s/add-system-fn  rj.r/process-one-game-tick)
-      (br.s/add-system-fn rj.sc/process-one-game-tick)
-      (br.s/add-system-fn rj.pl/process-one-game-tick)))
+      (br.s/add-system-fn  rj.r/process-one-game-tick)))
 
 (defscreen main-screen
   :on-show

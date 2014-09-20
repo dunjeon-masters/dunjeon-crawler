@@ -4,11 +4,11 @@
 
             [rouje-like.components :as rj.c]))
 
-(defn all-e
+(defn all-e-with-c
   [system ^Keyword component]
   (br.e/get-all-entities-with-component system (rj.c/get-type component)))
 
-(defn get-c
+(defn get-c-on-e
   [system entity ^Keyword component]
   (br.e/get-component system entity (rj.c/get-type component)))
 
