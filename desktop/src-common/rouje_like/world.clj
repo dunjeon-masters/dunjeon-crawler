@@ -10,14 +10,14 @@
             [clojure.math.numeric-tower :as math]
             [clojure.pprint :refer :all]))
 
-(def get-texture (memoize
-                   (fn [^Keyword type]
-                     (type (zipmap [:player :wall :floor :gold :torch]
-                                   (map (comp texture*
-                                              (fn [s] (str s ".jpg")))
-                                        ["at-inverted" "percent-inverted"
-                                         "period-inverted" "dollar-inverted"
-                                         "letter_t"]))))))
+(def ^:private get-texture (memoize
+                             (fn [^Keyword type]
+                               (type (zipmap [:player :wall :floor :gold :torch]
+                                             (map (comp texture*
+                                                        (fn [s] (str s ".jpg")))
+                                                  ["at-inverted" "percent-inverted"
+                                                   "period-inverted" "dollar-inverted"
+                                                   "letter_t"]))))))
 
 (defn ^:private new-tile
   [x y args]
@@ -187,9 +187,10 @@
                                 (math/abs (- j y))))
 
         e-player (first (rj.e/all-e-with-c system :player))
-        c-position (rj.e/get-c-on-e system e-player :position)
-        player-pos [@(:x c-position)
-                    @(:y c-position)]
+
+        c-player-pos (rj.e/get-c-on-e system e-player :position)
+        player-pos [@(:x c-player-pos)
+                    @(:y c-player-pos)]
         show-world? @(:show-world? (rj.e/get-c-on-e system e-player :player))
 
         c-sight (rj.e/get-c-on-e system e-player :sight)
@@ -201,12 +202,9 @@
     (doseq [x (range (count world))
             y (range (count (first world)))
             :let [item (get-in world [x y])]]
-      (when (or #_(or (= x 0) (= y 0))
-                #_(or (= x (dec (count world)))
-                    (= y (dec (count (first world)))))
-                (or show-world?
-                     (> sight
-                        (taxicab-dist player-pos [x y]))))
+      (when (or show-world?
+                (> sight
+                   (taxicab-dist player-pos [x y])))
         (let [texture-region (-> (:type item)
                                  (get-texture)
                                  (:object))]
