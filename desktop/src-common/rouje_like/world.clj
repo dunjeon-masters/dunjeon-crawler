@@ -60,37 +60,26 @@
           (recur world treasure-count)))
       world)))
 
-(defn block-coords-d1
-  [x y]
-  (for [dx [-1 0 1]
-        dy [-1 0 1]]
-    [(+ x dx) (+ y dy)]))
+(defn block-coords
+  [x y dist]
+  (let [dx|dy (vec (range (- 0 dist) (inc dist)))]
+    (for [dx dx|dy
+          dy dx|dy
+          :when (or (if (= dist 1)
+                      true)
+                    (= dist (math/abs dx))
+                    (= dist (math/abs dy)))]
+      [(+ x dx) (+ y dy)])))
 
-(defn block-coords-d2
-  [x y]
-  (for [dx [-2 -1 0 1 2]
-        dy [-2 -1 0 1 2]
-        :when (or (= 2 (math/abs dx))
-                  (= 2 (math/abs dy)))]
-    [(+ x dx) (+ y dy)]))
-
-(defn get-block-d1
-  [tiles x y]
+(defn get-block
+  [tiles x y dist]
   (map (fn [[x y]]
          (get-in tiles [x y]
                  (new-tile x y
                            {:type :wall})))
-       (block-coords-d1 x y)))
+       (block-coords x y dist)))
 
-(defn get-block-d2
-  [tiles x y]
-  (map (fn [[x y]]
-         (get-in tiles [x y]
-                 (new-tile x y
-                           {:type :wall})))
-       (block-coords-d2 x y)))
-
-(defn smooth-world-d2
+(defn smooth-world-v1
   [world]
   (let [get-smoothed-tile (fn [block-d1 block-d2 x y]
                             (let [tile-counts-d1 (frequencies (map :type block-d1))
@@ -107,13 +96,13 @@
                                         {:type result})))
         get-smoothed-col (fn [tiles x]
                            (mapv (fn [y]
-                                   (get-smoothed-tile (get-block-d1 tiles x y) (get-block-d2 tiles x y) x y))
+                                   (get-smoothed-tile (get-block tiles x y 1) (get-block tiles x y 2) x y))
                                  (range (count (first tiles)))))]
     (mapv (fn [x]
             (get-smoothed-col world x))
           (range (count world)))))
 
-(defn smooth-world-d1
+(defn smooth-world-v2
   [world]
   (let [get-smoothed-tile (fn [block-d1 x y]
                             (let [tile-counts-d1 (frequencies (map :type block-d1))
@@ -126,7 +115,7 @@
                                         {:type result})))
         get-smoothed-col (fn [tiles x]
                            (mapv (fn [y]
-                                   (get-smoothed-tile (get-block-d1 tiles x y) x y))
+                                   (get-smoothed-tile (get-block tiles x y 1) x y))
                                  (range (count (first tiles)))))]
     (mapv (fn [x]
             (get-smoothed-col world x))
@@ -150,10 +139,10 @@
     ;; SMOOTH-WORLD
     (doseq [_ (range 4)]
       (swap! world (fn [prev]
-                     (smooth-world-d2 prev))))
+                     (smooth-world-v1 prev))))
     (doseq [_ (range 3)]
       (swap! world (fn [prev]
-                     (smooth-world-d1 prev))))
+                     (smooth-world-v2 prev))))
     ;; GENERATE-TREASURE
     (swap! world (fn [prev]
                    (init-treasure prev (* (* width height)
