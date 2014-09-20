@@ -15,7 +15,7 @@
          (#{:wall} (:type target)))))
 
 (defn dig!
-  [system this _ target-coords]
+  [system this target]
   (let [c-player (rj.e/get-c-on-e system this :player)
         world (:tiles c-player)#_(ATOM)
 
@@ -26,7 +26,7 @@
                       (update-in prev ks
                                  (fn [x] (assoc x :type :floor))))]
     (do
-      (swap! world wall->floor target-coords)
+      (swap! world wall->floor [(:x target) (:y target)])
       (swap! moves-left dec))))
 
 (defn can-move?
@@ -37,7 +37,7 @@
          (#{:floor :gold :torch} (:type target)))))
 
 (defn move!
-  [system this target target-coords]
+  [system this target]
   (let [c-gold (rj.e/get-c-on-e system this :gold)
         gold (:gold c-gold)#_(ATOM)
 
@@ -63,16 +63,15 @@
         x-pos (:x c-player-pos)#_(ATOM)
         y-pos (:y c-player-pos)#_(ATOM)
 
-        [target-x-pos target-y-pos] target-coords
-
         player<->floor (fn [prev]
                          (-> prev
                              (update-in [@x-pos @y-pos]
                                         (fn [x] (assoc x :type :floor)))
-                             (update-in target-coords
+                             (update-in [(:x target) (:y target)]
                                         (fn [x] (assoc x :type :player)))))]
     (swap! moves-left dec)
     (case (:type target)
+      ;; TODO: Try each case without a do block
       :gold  (do
                (swap! gold inc)
                (swap! sight-distance dec-sight))
@@ -82,8 +81,8 @@
                (swap! sight-distance dec-sight))
       nil)
     (swap! world player<->floor)
-    (reset! x-pos target-x-pos)
-    (reset! y-pos target-y-pos)))
+    (reset! x-pos (:x target))
+    (reset! y-pos (:y target))))
 
 (defn process-input-tick!
   [system direction]
@@ -106,10 +105,10 @@
         digger (rj.e/get-c-on-e system e-player :digger)]
     (cond
       ((:can-move? player-pos) system e-player target)
-      ((:move! player-pos) system e-player target target-coords)
+      ((:move! player-pos) system e-player target)
 
       ((:can-dig? digger) system e-player target)
-      ((:dig! digger) system e-player target target-coords))))
+      ((:dig! digger) system e-player target))))
 
 ;;RENDERING FUNCTIONS
 (defn render-player-stats

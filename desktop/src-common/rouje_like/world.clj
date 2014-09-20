@@ -22,9 +22,11 @@
 (defn ^:private new-tile
   [x y args]
   (let [{:keys [type]} args
-        x (+ (* x rj.c/block-size) (* 1 rj.c/block-size))
-        y (+ (* y rj.c/block-size) (* 1 rj.c/block-size))]
-    (rj.c/->Tile x y type)))
+        screen-x (+ (* x rj.c/block-size) (* 1 rj.c/block-size))
+        screen-y (+ (* y rj.c/block-size) (* 1 rj.c/block-size))]
+    (rj.c/map->Tile {:x x :y y
+                     :screen-x screen-x :screen-y screen-y
+                     :type type})))
 
 (defn ^:private update-world
   [world [x y] {:keys [type]}]
@@ -197,7 +199,7 @@
                                  (:object))]
           (.draw renderer
                  texture-region
-                 (float (:x item))
-                 (float (:y item))))))
+                 (float (:screen-x item))
+                 (float (:screen-y item))))))
     (.end renderer)))
 
