@@ -30,7 +30,7 @@
                                              :player))
            (fn [prev] (not prev)))))
 
-(defn process-fling-input
+(defn process-fling-input!
   [system x-vel y-vel]
   (if (< (* x-vel x-vel)
          (* y-vel y-vel))
