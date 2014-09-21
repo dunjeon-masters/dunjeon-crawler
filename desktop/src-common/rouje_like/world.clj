@@ -16,12 +16,12 @@
         screen-y (+ (* y rj.c/block-size) (* 1 rj.c/block-size))]
     (rj.c/map->Tile {:x x :y y
                      :screen-x screen-x :screen-y screen-y
-                     :type type})))
+                     :entities [(rj.c/map->Entity {:type type})]})))
 
-(defn ^:private update-world
+(defn ^:private assoc-in-world
   [world [x y] args]
-  (update-in world [x y]
-             (fn [_] (new-tile x y args))))
+  (assoc-in world [x y]
+            (new-tile x y args)))
 
 (defn ^:private init-torches
   [world torch-count
@@ -31,8 +31,8 @@
     (if (pos? torch-count)
       (let [x (+ (rand-int (- width 2)) 1)
             y (+ (rand-int (- height 2)) 1)]
-        (if (= (:type (get-in world [x y])) :floor)
-          (recur (update-world world [x y] {:type :torch})
+        (if (= (:type (first (:entities (get-in world [x y])))) :floor)
+          (recur (assoc-in-world world [x y] {:type :torch})
                  (dec torch-count))
           (recur world torch-count)))
       world)))
@@ -45,8 +45,8 @@
     (if (pos? treasure-count)
       (let [x (+ (rand-int (- width 2)) 1)
             y (+ (rand-int (- height 2)) 1)]
-        (if (= (:type (get-in world [x y])) :floor)
-          (recur (update-world world [x y] {:type :gold})
+        (if (= (:type (first (:entities (get-in world [x y])))) :floor)
+          (recur (assoc-in-world world [x y] {:type :gold})
                  (dec treasure-count))
           (recur world treasure-count)))
       world)))
@@ -73,8 +73,14 @@
 (defn ^:private smooth-world-v1
   [world]
   (let [get-smoothed-tile (fn [block-d1 block-d2 x y]
-                            (let [tile-counts-d1 (frequencies (map :type block-d1))
-                                  tile-counts-d2 (frequencies (map :type block-d2))
+                            (let [tile-counts-d1 (frequencies (map (fn [tile]
+                                                                     (:type (first (:entities
+                                                                                     tile))))
+                                                                   block-d1))
+                                  tile-counts-d2 (frequencies (map (fn [tile]
+                                                                     (:type (first (:entities
+                                                                                     tile))))
+                                                                   block-d2))
                                   wall-threshold-d1 5
                                   wall-bound-d2 2
                                   wall-count-d1 (get tile-counts-d1 :wall 0)
@@ -87,7 +93,9 @@
                                         {:type result})))
         get-smoothed-col (fn [tiles x]
                            (mapv (fn [y]
-                                   (get-smoothed-tile (get-block tiles x y 1) (get-block tiles x y 2) x y))
+                                   (get-smoothed-tile (get-block tiles x y 1)
+                                                      (get-block tiles x y 2)
+                                                      x y))
                                  (range (count (first tiles)))))]
     (mapv (fn [x]
             (get-smoothed-col world x))
@@ -96,7 +104,10 @@
 (defn ^:private smooth-world-v2
   [world]
   (let [get-smoothed-tile (fn [block-d1 x y]
-                            (let [tile-counts-d1 (frequencies (map :type block-d1))
+                            (let [tile-counts-d1 (frequencies (map (fn [tile]
+                                                                     (:type (first (:entities
+                                                                                     tile))))
+                                                                   block-d1))
                                   wall-threshold-d1 5
                                   wall-count-d1 (get tile-counts-d1 :wall 0)
                                   result (if (>= wall-count-d1 wall-threshold-d1)
@@ -106,7 +117,8 @@
                                         {:type result})))
         get-smoothed-col (fn [tiles x]
                            (mapv (fn [y]
-                                   (get-smoothed-tile (get-block tiles x y 1) x y))
+                                   (get-smoothed-tile (get-block tiles x y 1)
+                                                      x y))
                                  (range (count (first tiles)))))]
     (mapv (fn [x]
             (get-smoothed-col world x))
@@ -149,11 +161,11 @@
                    (loop [world prev]
                      (let [x (+ (rand-int (- width 2)) 1)
                            y (+ (rand-int (- height 2)) 1)]
-                       (if (not= (:type (get-in world [x y])) :wall)
+                       (if (not= (:type (first (:entities (get-in world [x y])))) :wall)
                          (do (reset! init-player-x-pos x)
                              (reset! init-player-y-pos y)
-                             (update-world world [@init-player-x-pos @init-player-y-pos]
-                                           {:type :player}))
+                             (assoc-in-world world [@init-player-x-pos @init-player-y-pos]
+                                             {:type :player}))
                          (recur world))))))
     @world))
 
@@ -188,16 +200,16 @@
     (.begin renderer)
     (doseq [x (range (count world))
             y (range (count (first world)))
-            :let [item (get-in world [x y])]]
+            :let [tile (get-in world [x y])]]
       (when (or show-world?
                 (> sight
                    (taxicab-dist player-pos [x y])))
-        (let [texture-region (-> (:type item)
+        (let [texture-region (-> (:type (first (:entities tile)))
                                  (get-texture)
                                  (:object))]
           (.draw renderer
                  texture-region
-                 (float (:screen-x item))
-                 (float (:screen-y item))))))
+                 (float (:screen-x tile))
+                 (float (:screen-y tile))))))
     (.end renderer)))
 

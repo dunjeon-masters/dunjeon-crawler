@@ -12,7 +12,7 @@
   (let [c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left @(:moves-left c-moves-left)]
     (and (pos? moves-left)
-         (#{:wall} (:type target)))))
+         (#{:wall} (:type (first (:entities target)))))))
 
 (defn dig!
   [system this target]
@@ -22,9 +22,16 @@
         c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left (:moves-left c-moves-left)#_(ATOM)
 
-        wall->floor (fn [prev ks]
-                      (update-in prev ks
-                                 (fn [x] (assoc x :type :floor))))]
+        wall->floor (fn [world ks]
+                      (update-in world ks
+                                 (fn [tile]
+                                   (update-in tile [:entities]
+                                              (fn [entities]
+                                                (map (fn [entity]
+                                                       (if (#{:wall} (:type entity))
+                                                         (rj.c/map->Entity {:type :floor})
+                                                         entity))
+                                                     entities))))))]
     (do
       (swap! world wall->floor [(:x target) (:y target)])
       (swap! moves-left dec))))
@@ -34,7 +41,7 @@
   (let [c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left @(:moves-left c-moves-left)]
     (and (pos? moves-left)
-         (#{:floor :gold :torch} (:type target)))))
+         (#{:floor :gold :torch} (:type (first (:entities target)))))))
 
 (defn move!
   [system this target]
@@ -61,14 +68,28 @@
         x-pos (:x c-position)#_(ATOM)
         y-pos (:y c-position)#_(ATOM)
 
-        player<->floor (fn [prev]
-                         (-> prev
-                             (update-in [@x-pos @y-pos]
-                                        (fn [x] (assoc x :type :floor)))
+        player<->tile (fn [world ks]
+                         (-> world
+                             (update-in ks
+                                        (fn [tile]
+                                          (update-in tile [:entities]
+                                                     (fn [entities]
+                                                       (map (fn [entity]
+                                                              (if (#{:player} (:type entity))
+                                                                (rj.c/map->Entity {:type :floor})
+                                                                entity))
+                                                            entities)))))
                              (update-in [(:x target) (:y target)]
-                                        (fn [x] (assoc x :type :player)))))]
+                                        (fn [tile]
+                                          (update-in tile [:entities]
+                                                     (fn [entities]
+                                                       (map (fn [entity]
+                                                              (if (#{:floor :gold :torch} (:type entity))
+                                                                (rj.c/map->Entity {:type :player})
+                                                                entity))
+                                                            entities)))))))]
     (swap! moves-left dec)
-    (case (:type target)
+    (case (:type (first (:entities target)))
       ;; TODO: Try each case without a do block
       :gold  (do
                (swap! gold inc)
@@ -78,7 +99,7 @@
       :floor (do
                (swap! sight-distance dec-sight))
       nil)
-    (swap! world player<->floor)
+    (swap! world player<->tile [@x-pos @y-pos])
     (reset! x-pos (:x target))
     (reset! y-pos (:y target))))
 
@@ -98,7 +119,7 @@
                         :down  [     @x-pos (dec @y-pos)]
                         :left  [(dec @x-pos)     @y-pos]
                         :right [(inc @x-pos)     @y-pos])
-        target (get-in @world target-coords {:type :bound})
+        target (get-in @world target-coords {:entities [{:type :bound}]})
 
         digger (rj.e/get-c-on-e system this :digger)]
     (cond

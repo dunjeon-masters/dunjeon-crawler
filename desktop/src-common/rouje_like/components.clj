@@ -1,31 +1,32 @@
 (ns rouje-like.components
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
-           [clojure.lang Atom Fn Keyword]))
+           [clojure.lang Atom Fn Keyword PersistentVector]))
 
 (def block-size 27)
 
-;; FOR ENTITY E-WORLD:
-(defrecord World [^Atom world]) ;; 2D Vector of Tile's
+(defrecord World [^Atom world])
 (defrecord Tile [^Number x ^Number y
                  ^Number screen-x ^Number screen-y
-                 ^Keyword type])
+                 ^PersistentVector entities])
+(defrecord Entity [^Keyword Type])
 
-;; FOR ENTITY E-PLAYER:
 (defrecord Player [^Atom show-world?])
 (defrecord Digger [^Fn can-dig? ^Fn dig!])
-(defrecord Position [^Atom world ^Atom x ^Atom y])
-(defrecord Mobile [^Fn can-move? ^Fn move!])
 (defrecord MovesLeft [^Atom moves-left])
 (defrecord Gold [^Atom gold])
 (defrecord Sight [^Atom distance ^Atom decline-rate
                   ^Atom lower-bound ^Atom upper-bound])
 
+(defrecord Position [^Atom world ^Atom x ^Atom y])
+(defrecord Mobile [^Fn can-move? ^Fn move!])
+
 ;; FOR EVERYTHING:
-(defrecord Renderable [^Number pri ^Fn render-fn args])#_(args-type=map)
+(defrecord Renderable [^Number pri ^Fn render-fn args]) #_(args-type=map)
 
 ;; Workaround for not being able to get record's type "statically"
 (def get-type {:world      (type (->World nil))
                :tile       (type (->Tile nil nil nil nil nil))
+               :entity     (type (->Entity nil))
                :player     (type (->Player nil))
                :digger     (type (->Digger nil nil))
                :position   (type (->Position nil nil nil))
@@ -34,3 +35,4 @@
                :gold       (type (->Gold nil))
                :sight      (type (->Sight nil nil nil nil))
                :renderable (type (->Renderable nil nil nil))})
+
