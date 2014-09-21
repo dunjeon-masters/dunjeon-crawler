@@ -16,8 +16,8 @@
 
 (defn dig!
   [system this target]
-  (let [c-player (rj.e/get-c-on-e system this :player)
-        world (:tiles c-player)#_(ATOM)
+  (let [c-position (rj.e/get-c-on-e system this :position)
+        world (:world c-position)#_(ATOM)
 
         c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left (:moves-left c-moves-left)#_(ATOM)
@@ -56,12 +56,10 @@
                                (+ prev 2)
                                prev))
 
-        c-player (rj.e/get-c-on-e system this :player)
-        world (:tiles c-player)#_(ATOM)
-
-        c-player-pos (rj.e/get-c-on-e system this :position)
-        x-pos (:x c-player-pos)#_(ATOM)
-        y-pos (:y c-player-pos)#_(ATOM)
+        c-position (rj.e/get-c-on-e system this :position)
+        world (:world c-position)#_(ATOM)
+        x-pos (:x c-position)#_(ATOM)
+        y-pos (:y c-position)#_(ATOM)
 
         player<->floor (fn [prev]
                          (-> prev
@@ -86,14 +84,14 @@
 
 (defn process-input-tick!
   [system direction]
-  (let [e-player (first (rj.e/all-e-with-c system :player))
+  (let [this (first (rj.e/all-e-with-c system :player))
 
-        c-player (rj.e/get-c-on-e system e-player :player)
-        world (:tiles c-player) ;; atom!
+        c-position (rj.e/get-c-on-e system this :position)
+        world (:world c-position) ;; atom!
+        x-pos (:x c-position) ;; atom!
+        y-pos (:y c-position) ;; atom!
 
-        player-pos (rj.e/get-c-on-e system e-player :position)
-        x-pos (:x player-pos) ;; atom!
-        y-pos (:y player-pos) ;; atom!
+        c-mobile (rj.e/get-c-on-e system this :mobile)
 
         target-coords (case direction
                         :up    [     @x-pos (inc @y-pos)]
@@ -102,13 +100,13 @@
                         :right [(inc @x-pos)     @y-pos])
         target (get-in @world target-coords {:type :bound})
 
-        digger (rj.e/get-c-on-e system e-player :digger)]
+        digger (rj.e/get-c-on-e system this :digger)]
     (cond
-      ((:can-move? player-pos) system e-player target)
-      ((:move! player-pos) system e-player target)
+      ((:can-move? c-mobile) system this target)
+      ((:move! c-mobile) system this target)
 
-      ((:can-dig? digger) system e-player target)
-      ((:dig! digger) system e-player target))))
+      ((:can-dig? digger) system this target)
+      ((:dig! digger) system this target))))
 
 ;;RENDERING FUNCTIONS
 (defn render-player-stats

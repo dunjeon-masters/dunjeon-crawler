@@ -10,29 +10,18 @@
             [clojure.math.numeric-tower :as math]
             [clojure.pprint :refer :all]))
 
-(def ^:private get-texture (memoize
-                             (fn [^Keyword type]
-                               (type (zipmap [:player :wall :floor :gold :torch]
-                                             (map (comp texture*
-                                                        (fn [s] (str s ".jpg")))
-                                                  ["at-inverted" "percent-inverted"
-                                                   "period-inverted" "dollar-inverted"
-                                                   "letter_t"]))))))
-
 (defn ^:private new-tile
-  [x y args]
-  (let [{:keys [type]} args
-        screen-x (+ (* x rj.c/block-size) (* 1 rj.c/block-size))
+  [x y {:keys [type]}]
+  (let [screen-x (+ (* x rj.c/block-size) (* 1 rj.c/block-size))
         screen-y (+ (* y rj.c/block-size) (* 1 rj.c/block-size))]
     (rj.c/map->Tile {:x x :y y
                      :screen-x screen-x :screen-y screen-y
                      :type type})))
 
 (defn ^:private update-world
-  [world [x y] {:keys [type]}]
+  [world [x y] args]
   (update-in world [x y]
-             (fn [_] (new-tile x y
-                               {:type type}))))
+             (fn [_] (new-tile x y args))))
 
 (defn ^:private init-torches
   [world torch-count
@@ -62,7 +51,7 @@
           (recur world treasure-count)))
       world)))
 
-(defn block-coords
+(defn ^:private block-coords
   [x y dist]
   (let [∆x|y (vec (range (- 0 dist) (inc dist)))]
     (for [dx ∆x|y
@@ -73,7 +62,7 @@
                     (= dist (math/abs dy)))]
       [(+ x dx) (+ y dy)])))
 
-(defn get-block
+(defn ^:private get-block
   [tiles x y dist]
   (map (fn [[x y]]
          (get-in tiles [x y]
@@ -81,7 +70,7 @@
                            {:type :wall})))
        (block-coords x y dist)))
 
-(defn smooth-world-v1
+(defn ^:private smooth-world-v1
   [world]
   (let [get-smoothed-tile (fn [block-d1 block-d2 x y]
                             (let [tile-counts-d1 (frequencies (map :type block-d1))
@@ -104,7 +93,7 @@
             (get-smoothed-col world x))
           (range (count world)))))
 
-(defn smooth-world-v2
+(defn ^:private smooth-world-v2
   [world]
   (let [get-smoothed-tile (fn [block-d1 x y]
                             (let [tile-counts-d1 (frequencies (map :type block-d1))
@@ -168,6 +157,15 @@
                          (recur world))))))
     @world))
 
+(def ^:private get-texture (memoize
+                             (fn [^Keyword type]
+                               (type (zipmap [:player :wall :floor :gold :torch]
+                                             (map (comp texture*
+                                                        (fn [s] (str s ".jpg")))
+                                                  ["at-inverted" "percent-inverted"
+                                                   "period-inverted" "dollar-inverted"
+                                                   "letter_t"]))))))
+
 (defn render-world
   [system this _]
   (let [renderer (new SpriteBatch)
@@ -186,7 +184,7 @@
         sight (math/ceil @(:distance c-sight))
 
         c-world (rj.e/get-c-on-e system this :world)
-        world @(:tiles c-world)]
+        world @(:world c-world)]
     (.begin renderer)
     (doseq [x (range (count world))
             y (range (count (first world)))

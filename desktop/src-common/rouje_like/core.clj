@@ -28,9 +28,9 @@
 (def ^:private init-player-y-pos (atom (/ (world-sizes 1) 2)))
 (def ^:private init-player-moves 150)
 (def ^:private init-sight-distance 5.0)
-(def ^:private init-sight-decline-rate (/ 1 3))
-(def ^:private init-sight-lower-bound 4)                    ;; Inclusive
-(def ^:private init-sight-upper-bound 9)                    ;; Exclusive
+(def ^:private init-sight-decline-rate (/ 1 4))
+(def ^:private init-sight-lower-bound 3)                    ;; Inclusive
+(def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 
 (defn ^:private start
   [system]
@@ -42,12 +42,16 @@
                       [init-player-x-pos init-player-y-pos]))]
     (-> system
         (rj.e/add-e e-player)
-        (rj.e/add-c e-player (rj.c/->Player world (atom false)))
-        (rj.e/add-c e-player (rj.c/->Position init-player-x-pos init-player-y-pos
-                                              rj.pl/can-move? rj.pl/move!))
-        (rj.e/add-c e-player (rj.c/->Digger rj.pl/can-dig? rj.pl/dig!))
-        (rj.e/add-c e-player (rj.c/->MovesLeft (atom init-player-moves)))
-        (rj.e/add-c e-player (rj.c/->Gold (atom 0)))
+        (rj.e/add-c e-player (rj.c/map->Player {:show-world? (atom false)}))
+        (rj.e/add-c e-player (rj.c/map->Position {:world world
+                                                  :x     init-player-x-pos
+                                                  :y     init-player-y-pos}))
+        (rj.e/add-c e-player (rj.c/map->Mobile {:can-move? rj.pl/can-move?
+                                                :move! rj.pl/move!}))
+        (rj.e/add-c e-player (rj.c/map->Digger {:can-dig? rj.pl/can-dig?
+                                                :dig! rj.pl/dig!}))
+        (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left (atom init-player-moves)}))
+        (rj.e/add-c e-player (rj.c/map->Gold {:gold (atom 0)}))
         (rj.e/add-c e-player (rj.c/map->Sight {:distance (atom (inc init-sight-distance))
                                                :decline-rate (atom init-sight-decline-rate)
                                                :lower-bound (atom init-sight-lower-bound)
@@ -56,7 +60,7 @@
                                                     :render-fn rj.pl/render-player
                                                     :args {:world-sizes world-sizes}}))
         (rj.e/add-e e-world)
-        (rj.e/add-c e-world (rj.c/->World world))
+        (rj.e/add-c e-world (rj.c/map->World {:world world}))
         (rj.e/add-c e-world (rj.c/map->Renderable {:pri 1
                                                    :render-fn rj.wr/render-world
                                                    :args nil})))))
@@ -74,7 +78,7 @@
     (-> (br.e/create-system)
         (start)
         (register-system-fns)
-        (as-> s (reset! sys s))))                           ;; TODO: WHAT IS THIS EVEN?
+        (as-> s (reset! sys s))))
   
   :on-render
   (fn [screen _]
