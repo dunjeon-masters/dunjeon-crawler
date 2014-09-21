@@ -33,7 +33,8 @@
       (let [x (+ (rand-int (- width 2)) 1)
             y (+ (rand-int (- height 2)) 1)]
         ;; TODO: Add padding of torches, ie space them out
-        (if (every? #(#{:floor} (:type %)) (:entities (get-in world [x y])))
+        (if (every? #(#{:floor} (:type %))
+                    (:entities (get-in world [x y])))
           (recur (assoc-in-world world [x y] {:type :torch})
                  (dec torch-count))
           (recur world torch-count)))
@@ -47,7 +48,8 @@
     (if (pos? treasure-count)
       (let [x (+ (rand-int (- width 2)) 1)
             y (+ (rand-int (- height 2)) 1)]
-        (if (every? #(#{:floor} (:type %)) (:entities (get-in world [x y])))
+        (if (every? #(#{:floor} (:type %))
+                    (:entities (get-in world [x y])))
           (recur (assoc-in-world world [x y] {:type :gold})
                  (dec treasure-count))
           (recur world treasure-count)))

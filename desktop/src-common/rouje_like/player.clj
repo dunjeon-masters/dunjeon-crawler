@@ -40,7 +40,7 @@
         c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left (:moves-left c-moves-left)#_(ATOM)
 
-        wall->floor (fn [world ks]
+        wall->floor-at (fn [world ks]
                       (update-in world ks
                                  (fn [tile]
                                    (update-in tile [:entities]
@@ -52,7 +52,7 @@
                                                          entity))
                                                      entities))))))]
     (do
-      (swap! world wall->floor [(:x target) (:y target)])
+      (swap! world wall->floor-at [(:x target) (:y target)])
       (swap! moves-left dec))))
 
 (defn can-move?
@@ -88,9 +88,9 @@
         x-pos (:x c-position)#_(ATOM)
         y-pos (:y c-position)#_(ATOM)
 
-        player<->tile (fn [world ks]
+        player<->tile-at (fn [world player-loc target-loc]
                          (-> world
-                             (update-in ks
+                             (update-in player-loc
                                         (fn [tile]
                                           (update-in tile [:entities]
                                                      (fn [entities]
@@ -100,7 +100,7 @@
                                                                 (rj.c/map->Entity {:type :floor})
                                                                 entity))
                                                             entities)))))
-                             (update-in [(:x target) (:y target)]
+                             (update-in target-loc
                                         (fn [tile]
                                           (update-in tile [:entities]
                                                      (fn [entities]
@@ -120,7 +120,7 @@
       :floor (do
                (swap! sight-distance dec-sight))
       nil)
-    (swap! world player<->tile [@x-pos @y-pos])
+    (swap! world player<->tile-at [@x-pos @y-pos] [(:x target) (:y target)])
     (reset! x-pos (:x target))
     (reset! y-pos (:y target))))
 
