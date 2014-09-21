@@ -179,7 +179,7 @@
                                                    "letter_t"]))))))
 
 (defn render-world
-  [system this _]
+  [system this args]
   (let [renderer (new SpriteBatch)
         taxicab-dist (fn [[x y] [i j]]
                              (+ (math/abs (- i x))
@@ -196,10 +196,25 @@
         sight (math/ceil @(:distance c-sight))
 
         c-world (rj.e/get-c-on-e system this :world)
-        world @(:world c-world)]
+        world @(:world c-world)
+
+        {:keys [view-port-sizes]} args
+        [vp-size-x vp-size-y] view-port-sizes
+
+        start-x (max 0 (- @(:x c-player-pos) (int (/ vp-size-x 2))))
+        start-y (max 0 (- @(:y c-player-pos) (int (/ vp-size-y 2))))
+
+        end-x (+ start-x vp-size-x)
+        end-x (min end-x (count world))
+
+        end-y (+ start-y vp-size-y)
+        end-y (min end-y (count (first world)))
+
+        start-x (- end-x vp-size-x)
+        start-y (- end-y vp-size-y)]
     (.begin renderer)
-    (doseq [x (range (count world))
-            y (range (count (first world)))
+    (doseq [x (range start-x end-x)
+            y (range start-y end-y)
             :let [tile (get-in world [x y])]]
       (when (or show-world?
                 (> sight
@@ -209,7 +224,7 @@
                                  (:object))]
           (.draw renderer
                  texture-region
-                 (float (:screen-x tile))
-                 (float (:screen-y tile))))))
+                 (float (* (- x start-x) rj.c/block-size))
+                 (float (* (- y start-y) rj.c/block-size))))))
     (.end renderer)))
 

@@ -131,8 +131,8 @@
 
 ;;RENDERING FUNCTIONS
 (defn render-player-stats
-  [system this {:keys [world-sizes]}]
-  (let [[_ height] world-sizes
+  [system this {:keys [view-port-sizes]}]
+  (let [[_ vheight] view-port-sizes
 
         c-gold (rj.e/get-c-on-e system this :gold)
         gold @(:gold c-gold)
@@ -144,7 +144,7 @@
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]" " - " "MovesLeft: [" moves-left "]")
                    (color :white)
-                   :set-y (float (* (+ height 2) rj.c/block-size)))
+                   :set-y (float (* (+ vheight 2) rj.c/block-size)))
             :draw renderer 1.0)
     (.end renderer)))
 

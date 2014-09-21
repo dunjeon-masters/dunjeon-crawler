@@ -20,7 +20,8 @@
 
 (def ^:private sys (atom 0))
 
-(def ^:private world-sizes [30 30])
+(def ^:private world-sizes [40 40])
+(def ^:private view-port-sizes [20 20])
 (def ^:private init-wall% 40)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
@@ -58,12 +59,12 @@
                                                :upper-bound (atom init-sight-upper-bound)}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:pri 0
                                                     :render-fn rj.pl/render-player
-                                                    :args {:world-sizes world-sizes}}))
+                                                    :args {:view-port-sizes view-port-sizes}}))
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/map->World {:world world}))
         (rj.e/add-c e-world (rj.c/map->Renderable {:pri 1
                                                    :render-fn rj.wr/render-world
-                                                   :args nil})))))
+                                                   :args {:view-port-sizes view-port-sizes}})))))
 
 (defn ^:private register-system-fns
   [system]

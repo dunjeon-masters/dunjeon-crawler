@@ -7,5 +7,5 @@
 
 (defn -main
   []
-  (LwjglApplication. rouje-like "rouje-like" (* 32 block-size) (* 33 block-size))
+  (LwjglApplication. rouje-like "rouje-like" (* 22 block-size) (* 23 block-size))
   (Keyboard/enableRepeatEvents false))
