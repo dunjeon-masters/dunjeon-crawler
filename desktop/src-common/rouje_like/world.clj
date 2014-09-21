@@ -183,6 +183,19 @@
                                                    "period-inverted" "dollar-inverted"
                                                    "letter_t" "at"]))))))
 
+(def ^:private time-counter (atom 0))
+(def ^:private nth-counter (atom 0))
+(add-watch nth-counter :key
+           (fn [_ atom _ new]
+             (when (<= 11 new)
+               (reset! atom 0))))
+
+(defn get-alternating
+  [coll]
+  (if (<= (count coll) 2)
+    (nth (flatten (repeat coll)) @nth-counter)
+    (first coll)))
+
 (defn render-world
   [system this args]
   (let [renderer (new SpriteBatch)
@@ -203,7 +216,12 @@
         c-world (rj.e/get-c-on-e system this :world)
         world @(:world c-world)
 
-        {:keys [view-port-sizes]} args
+        {:keys [view-port-sizes, delta-time]} args
+        _ (if (< 0.5 @time-counter)
+            (do
+              (reset! time-counter delta-time)
+              (swap! nth-counter inc))
+            (swap! time-counter + delta-time))
         [vp-size-x vp-size-y] view-port-sizes
 
         start-x (max 0 (- @(:x c-player-pos)
@@ -226,7 +244,7 @@
       (when (or show-world?
                 (> sight
                    (taxicab-dist player-pos [x y])))
-        (let [texture-region (-> (:type (first (:entities tile)))
+        (let [texture-region (-> (:type (get-alternating (:entities tile)))
                                  (get-texture)
                                  (:object))]
           (.draw renderer
