@@ -16,7 +16,8 @@
         screen-y (+ (* y rj.c/block-size) (* 1 rj.c/block-size))]
     (rj.c/map->Tile {:x x :y y
                      :screen-x screen-x :screen-y screen-y
-                     :entities [(rj.c/map->Entity {:type type})]})))
+                     :entities [(rj.c/map->Entity {:id nil
+                                                   :type type})]})))
 
 (defn ^:private assoc-in-world
   [world [x y] args]
@@ -31,7 +32,8 @@
     (if (pos? torch-count)
       (let [x (+ (rand-int (- width 2)) 1)
             y (+ (rand-int (- height 2)) 1)]
-        (if (= (:type (first (:entities (get-in world [x y])))) :floor)
+        ;; TODO: Add padding of torches, ie space them out
+        (if (every? #(#{:floor} (:type %)) (:entities (get-in world [x y])))
           (recur (assoc-in-world world [x y] {:type :torch})
                  (dec torch-count))
           (recur world torch-count)))
@@ -45,7 +47,7 @@
     (if (pos? treasure-count)
       (let [x (+ (rand-int (- width 2)) 1)
             y (+ (rand-int (- height 2)) 1)]
-        (if (= (:type (first (:entities (get-in world [x y])))) :floor)
+        (if (every? #(#{:floor} (:type %)) (:entities (get-in world [x y])))
           (recur (assoc-in-world world [x y] {:type :gold})
                  (dec treasure-count))
           (recur world treasure-count)))
@@ -169,14 +171,15 @@
                          (recur world))))))
     @world))
 
+;; TODO: Rename *-inverted to *-dark, or create better naming convention
 (def ^:private get-texture (memoize
                              (fn [^Keyword type]
-                               (type (zipmap [:player :wall :floor :gold :torch]
+                               (type (zipmap [:player :wall :floor :gold :torch :lichen]
                                              (map (comp texture*
                                                         (fn [s] (str s ".jpg")))
                                                   ["at-inverted" "percent-inverted"
                                                    "period-inverted" "dollar-inverted"
-                                                   "letter_t"]))))))
+                                                   "letter_t" "at"]))))))
 
 (defn render-world
   [system this args]
@@ -201,8 +204,10 @@
         {:keys [view-port-sizes]} args
         [vp-size-x vp-size-y] view-port-sizes
 
-        start-x (max 0 (- @(:x c-player-pos) (int (/ vp-size-x 2))))
-        start-y (max 0 (- @(:y c-player-pos) (int (/ vp-size-y 2))))
+        start-x (max 0 (- @(:x c-player-pos)
+                          (int (/ vp-size-x 2))))
+        start-y (max 0 (- @(:y c-player-pos)
+                          (int (/ vp-size-y 2))))
 
         end-x (+ start-x vp-size-x)
         end-x (min end-x (count world))
@@ -224,7 +229,7 @@
                                  (:object))]
           (.draw renderer
                  texture-region
-                 (float (* (- x start-x) rj.c/block-size))
-                 (float (* (- y start-y) rj.c/block-size))))))
+                 (float (* (inc (- x start-x)) rj.c/block-size))
+                 (float (* (inc (- y start-y)) rj.c/block-size))))))
     (.end renderer)))
 

@@ -5,7 +5,7 @@
             [rouje-like.world  :as rj.w]
             [rouje-like.player :as rj.pl]))
 
-(defn process-keyboard-input
+(defn process-keyboard-input!
   [system key-code]
   (cond
     (or (= key-code (play/key-code :dpad-up))

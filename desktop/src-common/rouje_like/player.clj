@@ -7,12 +7,30 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]))
 
+(defn can-attack?
+  [system this target]
+  (let [c-moves-left (rj.e/get-c-on-e system this :moves-left)
+        moves-left @(:moves-left c-moves-left)]
+    (and (pos? moves-left)
+         ;; TODO: Refactor to check for Destructible component
+         (some #(= (:type %) :lichen) (:entities target)))))
+
+(defn attack!
+  [system this target]
+  (let [damage @(:attack (rj.e/get-c-on-e system this :attacker))
+
+        e-enemy (:id (first (filter #(#{:lichen} (:type %))
+                                    (:entities target))))
+        take-damage! (:take-damage! (rj.e/get-c-on-e system e-enemy :destructible))]
+    (take-damage! system e-enemy damage)))
+
 (defn can-dig?
   [system this target]
   (let [c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left @(:moves-left c-moves-left)]
     (and (pos? moves-left)
-         (#{:wall} (:type (first (:entities target)))))))
+         ;; TODO: Refactor to filter for only the :wall
+         (#{:wall} (-> target (:entities) (first) (:type))))))
 
 (defn dig!
   [system this target]
@@ -28,7 +46,8 @@
                                    (update-in tile [:entities]
                                               (fn [entities]
                                                 (map (fn [entity]
-                                                       (if (#{:wall} (:type entity))
+                                                       (if (#{:wall}
+                                                            (:type entity))
                                                          (rj.c/map->Entity {:type :floor})
                                                          entity))
                                                      entities))))))]
@@ -41,7 +60,8 @@
   (let [c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left @(:moves-left c-moves-left)]
     (and (pos? moves-left)
-         (#{:floor :gold :torch} (:type (first (:entities target)))))))
+         ;; TODO: Refactor to filter for only the :floor/:gold/:torch
+         (#{:floor :gold :torch} (-> target (:entities) (first) (:type))))))
 
 (defn move!
   [system this target]
@@ -75,7 +95,8 @@
                                           (update-in tile [:entities]
                                                      (fn [entities]
                                                        (map (fn [entity]
-                                                              (if (#{:player} (:type entity))
+                                                              (if (#{:player}
+                                                                   (:type entity))
                                                                 (rj.c/map->Entity {:type :floor})
                                                                 entity))
                                                             entities)))))
@@ -84,13 +105,13 @@
                                           (update-in tile [:entities]
                                                      (fn [entities]
                                                        (map (fn [entity]
-                                                              (if (#{:floor :gold :torch} (:type entity))
+                                                              (if (#{:floor :gold :torch}
+                                                                   (:type entity))
                                                                 (rj.c/map->Entity {:type :player})
                                                                 entity))
                                                             entities)))))))]
     (swap! moves-left dec)
     (case (:type (first (:entities target)))
-      ;; TODO: Try each case without a do block
       :gold  (do
                (swap! gold inc)
                (swap! sight-distance dec-sight))
@@ -108,26 +129,31 @@
   (let [this (first (rj.e/all-e-with-c system :player))
 
         c-position (rj.e/get-c-on-e system this :position)
-        world (:world c-position) ;; atom!
-        x-pos (:x c-position) ;; atom!
-        y-pos (:y c-position) ;; atom!
+        world @(:world c-position)
+        x-pos @(:x c-position)
+        y-pos @(:y c-position)
 
         c-mobile (rj.e/get-c-on-e system this :mobile)
+        c-attacker (rj.e/get-c-on-e system this :attacker)
 
         target-coords (case direction
-                        :up    [     @x-pos (inc @y-pos)]
-                        :down  [     @x-pos (dec @y-pos)]
-                        :left  [(dec @x-pos)     @y-pos]
-                        :right [(inc @x-pos)     @y-pos])
-        target (get-in @world target-coords {:entities [{:type :bound}]})
+                        :up    [     x-pos (inc y-pos)]
+                        :down  [     x-pos (dec y-pos)]
+                        :left  [(dec x-pos)     y-pos]
+                        :right [(inc x-pos)     y-pos])
+        target (get-in world target-coords nil)
 
-        digger (rj.e/get-c-on-e system this :digger)]
-    (cond
-      ((:can-move? c-mobile) system this target)
-      ((:move! c-mobile) system this target)
+        c-digger (rj.e/get-c-on-e system this :digger)]
+    (if (not (nil? target))
+      (cond
+        ((:can-move? c-mobile) system this target)
+        ((:move! c-mobile) system this target)
 
-      ((:can-dig? digger) system this target)
-      ((:dig! digger) system this target))))
+        ((:can-dig? c-digger) system this target)
+        ((:dig! c-digger) system this target)
+
+        ((:can-attack? c-attacker) system this target)
+        ((:attack! c-attacker) system this target)))))
 
 ;;RENDERING FUNCTIONS
 (defn render-player-stats
