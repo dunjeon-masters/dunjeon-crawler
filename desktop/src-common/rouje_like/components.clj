@@ -5,7 +5,7 @@
 (def block-size 27)
 
 
-(defrecord World [^Atom world])
+(defrecord World [world])
 
 (defrecord Tile [^Number x ^Number y
                  ^PersistentVector entities])
@@ -13,39 +13,37 @@
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
-(defrecord Player [^Atom show-world?])
+(defrecord Player [show-world?])
 
 (defrecord Digger [^Fn can-dig?
                    ^Fn dig!])
 
-(defrecord MovesLeft [^Atom moves-left])
+(defrecord MovesLeft [moves-left])
 
-(defrecord Gold [^Atom gold])
+(defrecord Gold [gold])
 
-(defrecord Sight [^Atom distance
-                  ^Atom decline-rate
-                  ^Atom lower-bound
-                  ^Atom upper-bound])
+(defrecord Sight [distance
+                  decline-rate
+                  lower-bound
+                  upper-bound])
 
-(defrecord Position [^Atom world
-                     ^Atom x
-                     ^Atom y])
+(defrecord Position [x y])
 
 (defrecord Mobile [^Fn can-move?
                    ^Fn move!])
 
-(defrecord Attacker [^Atom attack
+(defrecord Attacker [attack
                      ^Fn attack!
                      ^Fn can-attack?])
 
-(defrecord Destructible [^Atom hp
-                         ^Atom defense
+(defrecord Destructible [hp
+                         defense
                          ^Fn take-damage!])
 
 (defrecord Tickable [^Fn tick-fn
                      args])
 
-(defrecord Lichen [^Atom grow-chance%])
+(defrecord Lichen [grow-chance%])
 
 (defrecord Renderable [^Number pri
                        ^Fn render-fn
@@ -57,7 +55,7 @@
                :entity       (type (->Entity nil nil))
                :player       (type (->Player nil))
                :digger       (type (->Digger nil nil))
-               :position     (type (->Position nil nil nil))
+               :position     (type (->Position nil nil))
                :mobile       (type (->Mobile nil nil))
                :moves-left   (type (->MovesLeft nil))
                :gold         (type (->Gold nil))
@@ -70,9 +68,9 @@
 
 (def get-pri {:floor 1
               :torch 2
-              :gold 2
+              :gold 3
               :lichen 3
-              :wall 3
+              :wall 4
               :player 10})
 
 (defn sort-by-pri [coll]

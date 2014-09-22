@@ -5,15 +5,16 @@
   (:require [play-clj.g2d :refer :all]
 
             [rouje-like.components :as rj.c]
-            [rouje-like.entity     :as rj.e]
+            [rouje-like.entity :as rj.e]
+            [rouje-like.lichen :as rj.lc]
 
             [clojure.math.numeric-tower :as math]
-            [clojure.pprint :refer :all]))
+            [brute.entity :as br.e]))
 
 (defn ^:private new-tile
-  [x y {:keys [type]}]
+  [x y {:keys [type, id] :or {type nil}}]
   (rj.c/map->Tile {:x x :y y
-                   :entities [(rj.c/map->Entity {:id   nil
+                   :entities [(rj.c/map->Entity {:id   id
                                                  :type type})]}))
 
 (defn ^:private assoc-in-world
@@ -133,9 +134,7 @@
   [[width height]
    init-wall%
    init-torch%
-   init-treasure%
-   [^Atom init-player-x-pos
-    ^Atom init-player-y-pos]]
+   init-treasure%]
   (let [world (atom (vec
                       (map vec
                            (for [x (range width)]
@@ -161,17 +160,6 @@
                    (init-torches prev (* (* width height)
                                          (/ init-torch% 100))
                                  [width height])))
-    ;; ADD-PLAYER
-    (swap! world (fn [prev]
-                   (loop [world prev]
-                     (let [x (+ (rand-int (- width 2)) 1)
-                           y (+ (rand-int (- height 2)) 1)]
-                       (if (not= (:type (first (:entities (get-in world [x y])))) :wall)
-                         (do (reset! init-player-x-pos x)
-                             (reset! init-player-y-pos y)
-                             (assoc-in-world world [@init-player-x-pos @init-player-y-pos]
-                                             {:type :player}))
-                         (recur world))))))
     @world))
 
 ;; TODO: Rename *-inverted to *-dark, or create better naming convention
@@ -194,27 +182,22 @@
         e-player (first (rj.e/all-e-with-c system :player))
 
         c-player-pos (rj.e/get-c-on-e system e-player :position)
-        player-pos [@(:x c-player-pos)
-                    @(:y c-player-pos)]
-        show-world? @(:show-world? (rj.e/get-c-on-e system e-player :player))
+        player-pos [(:x c-player-pos)
+                    (:y c-player-pos)]
+        show-world? (:show-world? (rj.e/get-c-on-e system e-player :player))
 
         c-sight (rj.e/get-c-on-e system e-player :sight)
-        sight (math/ceil @(:distance c-sight))
+        sight (math/ceil (:distance c-sight))
 
         c-world (rj.e/get-c-on-e system this :world)
-        world @(:world c-world)
+        world (:world c-world)
 
         {:keys [view-port-sizes]} args
-        #__ #_(if (< 0.3 @time-counter)
-            (do
-              (reset! time-counter delta-time)
-              (swap! nth-counter inc))
-            (swap! time-counter + delta-time))
         [vp-size-x vp-size-y] view-port-sizes
 
-        start-x (max 0 (- @(:x c-player-pos)
+        start-x (max 0 (- (:x c-player-pos)
                           (int (/ vp-size-x 2))))
-        start-y (max 0 (- @(:y c-player-pos)
+        start-y (max 0 (- (:y c-player-pos)
                           (int (/ vp-size-y 2))))
 
         end-x (+ start-x vp-size-x)
@@ -243,4 +226,3 @@
                  (float (* (inc (- x start-x)) rj.c/block-size))
                  (float (* (inc (- y start-y)) rj.c/block-size))))))
     (.end renderer)))
-

@@ -20,3 +20,13 @@
   [system entity c-instance]
   (br.e/add-component system entity c-instance))
 
+(defn upd-c
+  ([system entity ^Keyword component fn]
+   (br.e/update-component system entity (rj.c/get-type component) fn))
+  ([system entity ^Keyword component fn & args]
+   (br.e/update-component system entity (rj.c/get-type component) fn args)))
+
+(defn kill-e
+  [system entity]
+  (br.e/kill-entity system entity))
+

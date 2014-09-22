@@ -2,8 +2,9 @@
   (:require [play-clj.core :as play]
 
             [rouje-like.entity :as rj.e]
-            [rouje-like.world  :as rj.w]
-            [rouje-like.player :as rj.pl]))
+            [rouje-like.world :as rj.w]
+            [rouje-like.player :as rj.pl]
+            [rouje-like.components :as rj.c]))
 
 (defn process-keyboard-input!
   [system key-code]
@@ -25,12 +26,13 @@
         (rj.pl/process-input-tick! system :right)
 
         (= key-code (play/key-code :F))
-        (do (swap! (:show-world? (rj.e/get-c-on-e system
-                                                  (first (rj.e/all-e-with-c system :player))
-                                                  :player))
-                   (fn [prev] (not prev)))
-            system))
-      (as-> system
+        (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
+                    :player (fn [c-player]
+                              (update-in c-player [:show-world?]
+                                         (fn [prev]
+                                           (not prev)))))
+        :else system)
+      #_(as-> system
             (let [entities (rj.e/all-e-with-c system :tickable)]
               ;; TODO: Refactor using reduce
               (loop [system system
