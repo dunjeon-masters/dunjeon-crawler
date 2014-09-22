@@ -184,19 +184,6 @@
                                                    "period-inverted" "dollar-inverted"
                                                    "letter_t" "at"]))))))
 
-(def ^:private time-counter (atom 0))
-(def ^:private nth-counter (atom 0))
-(add-watch nth-counter :key
-           (fn [_ atom _ new]
-             (when (<= 11 new)
-               (reset! atom 0))))
-
-(defn get-alternating
-  [coll]
-  (if (<= (count coll) 2)
-    (nth (flatten (repeat coll)) @nth-counter)
-    (first coll)))
-
 (defn render-world
   [system this args]
   (let [renderer (new SpriteBatch)
