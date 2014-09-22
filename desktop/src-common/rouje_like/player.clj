@@ -178,7 +178,7 @@
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]" " - " "MovesLeft: [" moves-left "]")
-                   (color :white)
+                   (color :green)
                    :set-y (float (* (+ vheight 2) rj.c/block-size)))
             :draw renderer 1.0)
     (.end renderer)))

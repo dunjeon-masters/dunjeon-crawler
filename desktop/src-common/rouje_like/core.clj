@@ -3,19 +3,20 @@
            [com.badlogic.gdx.graphics.g2d TextureRegion])
 
   (:require [play-clj.core :refer :all]
-            [play-clj.ui   :refer :all]
-            [play-clj.g2d  :refer :all]
+            [play-clj.core :as play]
+            [play-clj.ui :refer :all]
+            [play-clj.g2d :refer :all]
 
             [brute.entity :as br.e]
             [brute.system :as br.s]
 
             [rouje-like.components :as rj.c]
-            [rouje-like.entity     :as rj.e]
-            [rouje-like.rendering  :as rj.r]
-            [rouje-like.input      :as rj.in]
-            [rouje-like.lichen     :as rj.lc]
-            [rouje-like.player     :as rj.pl]
-            [rouje-like.world      :as rj.wr]))
+            [rouje-like.entity :as rj.e]
+            [rouje-like.rendering :as rj.r]
+            [rouje-like.input :as rj.in]
+            [rouje-like.lichen :as rj.lc]
+            [rouje-like.player :as rj.pl]
+            [rouje-like.world :as rj.wr]))
 
 (declare main-screen rouje-like)
 
@@ -32,14 +33,14 @@
 (def ^:private init-player-pos [init-player-x-pos init-player-y-pos])
 (def ^:private init-player-moves 250)
 (def ^:private init-sight-distance 5.0)
-(def ^:private init-sight-decline-rate (/ 1 4))
+(def ^:private init-sight-decline-rate (/ 1 5))
 (def ^:private init-sight-lower-bound 3)                    ;; Inclusive
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 
 (defn ^:private init-entities
   [system]
   (let [e-world  (br.e/create-entity)
-        e-player (br.e/create-entity) ]
+        e-player (br.e/create-entity)]
     (-> system
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
@@ -113,7 +114,11 @@
   (fn [screen _]
     (let [key-code (:key screen)]
       (reset! sys
-              (rj.in/process-keyboard-input! @sys key-code))))
+              (if (= key-code (play/key-code :f5))
+                (-> (br.e/create-system)
+                    (init-entities)
+                    (register-system-fns))
+                (rj.in/process-keyboard-input! @sys key-code)))))
 
   :on-fling
   (fn [screen _]
