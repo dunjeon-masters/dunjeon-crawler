@@ -17,9 +17,27 @@
                    :entities [(rj.c/map->Entity {:id   id
                                                  :type type})]}))
 
+(defn ^:private radial-distance
+  [[x1 y1] [x2 y2]]
+  (max (math/abs (- x1 x2))
+       (math/abs (- y1 y2))))
+
+(defn ^:private get-entities-around
+  ([world coords]
+   (get-entities-around world coords 1))
+  ([world coords radius]
+   (filter #(<= (radial-distance coords [(:x %) (:y %)])
+                radius)
+           (flatten world))))
+
 (defn ^:private check-block
-  [x y dist]
-  true)
+  [world coords dist type]
+  (not-any? (fn [tile] (#{type} (->> (:entities tile)
+                                    (rj.c/sort-by-pri {:torch 2
+                                                       :else 1})
+                                    (first)
+                                    (:type))))
+            (get-entities-around world coords dist)))
 
 (defn ^:private add-torch
   [world]
@@ -27,8 +45,9 @@
     (let [x (rand-int (count world))
           y (rand-int (count (first world)))]
       ;; TODO: Add padding of torches, ie space them out
-      (if (every? #(#{:floor} (:type %))
-                  (:entities (get-in world [x y])))
+      (if (and (check-block world [x y] 3 :torch)
+               (every? #(#{:floor} (:type %))
+                       (:entities (get-in world [x y]))))
         (assoc-in world [x y] (new-tile x y {:type :torch}))
         (recur world)))))
 
@@ -131,8 +150,8 @@
     ;; SMOOTH-WORLD
     (-> world
         (as-> world
-              (nth (iterate smooth-world-v1 world) 4)
-              (nth (iterate smooth-world-v2 world) 3)
+              (nth (iterate smooth-world-v1 world) 2)
+              (nth (iterate smooth-world-v2 world) 1 world)
               (nth (iterate add-gold world) (* (* width height)
                                                (/ init-treasure% 100)))
               (nth (iterate add-torch world) (* (* width height)

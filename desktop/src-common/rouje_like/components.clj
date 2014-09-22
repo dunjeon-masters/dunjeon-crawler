@@ -71,13 +71,21 @@
               :gold 3
               :lichen 3
               :wall 4
-              :player 10})
+              :player 10
+              :else 1})
 
-(defn sort-by-pri [coll]
-  (sort (fn [arg1 arg2]
-          (let [t1 (:type arg1)
-                t2 (:type arg2)]
-            (if (= t1 t2)
-              0
-              (- (get-pri t2) (get-pri t1)))))
-        coll))
+(defn sort-by-pri
+  ([coll]
+   (sort-by-pri get-pri coll))
+
+  ([get-pri coll]
+   (sort (fn [arg1 arg2]
+           (let [t1 (:type arg1)
+                 t2 (:type arg2)]
+             (if (= t1 t2)
+               0
+               (- (get get-pri t2
+                       (get get-pri :else 1))
+                  (get get-pri t1
+                       (get get-pri :else 1))))))
+         coll)))

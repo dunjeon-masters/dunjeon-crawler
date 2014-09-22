@@ -22,13 +22,14 @@
 (def ^:private sys (atom 0))
 
 (def ^:private world-sizes [40 40])
-(def ^:private view-port-sizes [20 20])
-(def ^:private init-wall% 40)
+(def view-port-sizes [20 20])
+(def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
 (def ^:private init-player-x-pos (/ (world-sizes 0) 2))
 (def ^:private init-player-y-pos (/ (world-sizes 1) 2))
-(def ^:private init-player-moves 100)
+(def ^:private init-player-pos [init-player-x-pos init-player-y-pos])
+(def ^:private init-player-moves 250)
 (def ^:private init-sight-distance 5.0)
 (def ^:private init-sight-decline-rate (/ 1 4))
 (def ^:private init-sight-lower-bound 3)                    ;; Inclusive
@@ -72,7 +73,7 @@
                     (fn [c-world]
                       (update-in c-world [:world]
                                  (fn [world]
-                                   (update-in world [init-player-x-pos init-player-y-pos]
+                                   (update-in world init-player-pos
                                               (fn [tile] (update-in tile [:entities]
                                                                     (fn [entities]
                                                                       (vec (conj entities

@@ -162,8 +162,8 @@
         target (get-in world target-coords nil)]
     (if (and (pos? moves-left)
              (not (nil? target)))
-      (let [c-mobile (rj.e/get-c-on-e system this :mobile)
-            c-digger (rj.e/get-c-on-e system this :digger)
+      (let [c-mobile   (rj.e/get-c-on-e system this :mobile)
+            c-digger   (rj.e/get-c-on-e system this :digger)
             c-attacker (rj.e/get-c-on-e system this :attacker)]
         (if (not (nil? target))
           (cond
