@@ -8,7 +8,6 @@
 (defrecord World [^Atom world])
 
 (defrecord Tile [^Number x ^Number y
-                 ^Number screen-x ^Number screen-y
                  ^PersistentVector entities])
 
 (defrecord Entity [^Keyword id
@@ -54,7 +53,7 @@
 
 ;; Workaround for not being able to get record's type "statically"
 (def get-type {:world        (type (->World nil))
-               :tile         (type (->Tile nil nil nil nil nil))
+               :tile         (type (->Tile nil nil nil))
                :entity       (type (->Entity nil nil))
                :player       (type (->Player nil))
                :digger       (type (->Digger nil nil))
@@ -69,3 +68,18 @@
                :tickable     (type (->Tickable nil nil))
                :lichen       (type (->Lichen nil))})
 
+(def get-pri {:floor 1
+              :torch 2
+              :gold 2
+              :lichen 3
+              :wall 3
+              :player 10})
+
+(defn sort-by-pri [coll]
+  (sort (fn [arg1 arg2]
+          (let [t1 (:type arg1)
+                t2 (:type arg2)]
+            (if (= t1 t2)
+              0
+              (- (get-pri t2) (get-pri t1)))))
+        coll))

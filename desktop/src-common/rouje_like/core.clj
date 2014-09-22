@@ -73,9 +73,9 @@
                                                    :args {:view-port-sizes view-port-sizes}}))
 
         (rj.e/add-e e-lichen)
-        (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% (atom 1)}))
+        (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% (atom 10)}))
 
-        (as-> s (do (swap! world (fn [world]
+        (as-> system (do (swap! world (fn [world]
                                    (update-in world [(inc @init-player-x-pos) (inc @init-player-y-pos)]
                                               (fn [tile]
                                                 (update-in tile [:entities]
@@ -84,7 +84,7 @@
                                                                                  :id e-lichen})
                                                               (rj.c/map->Entity {:type :floor
                                                                                  :id nil})]))))))
-                    s))
+                    system))
 
         ;(TEMPORARY: Move lichen gen to a function)
 
@@ -124,13 +124,15 @@
   :on-key-down
   (fn [screen _]
     (let [key-code (:key screen)]
-      (rj.in/process-keyboard-input! @sys key-code)))
+      (reset! sys
+              (rj.in/process-keyboard-input! @sys key-code))))
 
   :on-fling
   (fn [screen _]
     (let [x-vel (:velocity-x screen)
           y-vel (:velocity-y screen)]
-      (rj.in/process-fling-input! @sys x-vel y-vel))))
+      (reset! sys
+              (rj.in/process-fling-input! @sys x-vel y-vel)))))
 
 (defgame rouje-like
   :on-create

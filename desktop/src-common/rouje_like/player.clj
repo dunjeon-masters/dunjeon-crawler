@@ -11,9 +11,15 @@
   [system this target]
   (let [c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left @(:moves-left c-moves-left)]
+    (do (println (:entities target))
+        (println (some #(#{:lichen} (:type %)) (:entities target))))
     (and (pos? moves-left)
          ;; TODO: Refactor to check for Destructible component
-         (some #(= (:type %) :lichen) (:entities target)))))
+         (#{:lichen} (-> target
+                       (:entities)
+                       (rj.c/sort-by-pri)
+                       (first)
+                       (:type))))))
 
 (defn attack!
   [system this target]
@@ -30,7 +36,11 @@
         moves-left @(:moves-left c-moves-left)]
     (and (pos? moves-left)
          ;; TODO: Refactor to filter for only the :wall
-         (#{:wall} (-> target (:entities) (first) (:type))))))
+         (#{:wall} (-> target
+                       (:entities)
+                       (rj.c/sort-by-pri)
+                       (first)
+                       (:type))))))
 
 (defn dig!
   [system this target]
@@ -53,7 +63,8 @@
                                                      entities))))))]
     (do
       (swap! world wall->floor-at [(:x target) (:y target)])
-      (swap! moves-left dec))))
+      (swap! moves-left dec)
+      system)))
 
 (defn can-move?
   [system this target]
@@ -61,7 +72,11 @@
         moves-left @(:moves-left c-moves-left)]
     (and (pos? moves-left)
          ;; TODO: Refactor to filter for only the :floor/:gold/:torch
-         (#{:floor :gold :torch} (-> target (:entities) (first) (:type))))))
+         (#{:floor :gold :torch} (-> target
+                                     (:entities)
+                                     (rj.c/sort-by-pri)
+                                     (first)
+                                     (:type))))))
 
 (defn move!
   [system this target]
@@ -94,22 +109,22 @@
                                         (fn [tile]
                                           (update-in tile [:entities]
                                                      (fn [entities]
-                                                       (map (fn [entity]
-                                                              (if (#{:player}
-                                                                   (:type entity))
-                                                                (rj.c/map->Entity {:type :floor})
-                                                                entity))
-                                                            entities)))))
+                                                       (vec (map (fn [entity]
+                                                                   (if (#{:player}
+                                                                        (:type entity))
+                                                                     (rj.c/map->Entity {:type :floor})
+                                                                     entity))
+                                                                 entities))))))
                              (update-in target-loc
                                         (fn [tile]
                                           (update-in tile [:entities]
                                                      (fn [entities]
-                                                       (map (fn [entity]
-                                                              (if (#{:floor :gold :torch}
-                                                                   (:type entity))
-                                                                (rj.c/map->Entity {:type :player})
-                                                                entity))
-                                                            entities)))))))]
+                                                       (vec (map (fn [entity]
+                                                                   (if (#{:floor :gold :torch}
+                                                                        (:type entity))
+                                                                     (rj.c/map->Entity {:type :player})
+                                                                     entity))
+                                                                 entities))))))))]
     (swap! moves-left dec)
     (case (:type (first (:entities target)))
       :gold  (do
@@ -122,7 +137,8 @@
       nil)
     (swap! world player<->tile-at [@x-pos @y-pos] [(:x target) (:y target)])
     (reset! x-pos (:x target))
-    (reset! y-pos (:y target))))
+    (reset! y-pos (:y target))
+    system))
 
 (defn process-input-tick!
   [system direction]
@@ -142,6 +158,7 @@
                         :left  [(dec x-pos)     y-pos]
                         :right [(inc x-pos)     y-pos])
         target (get-in world target-coords nil)
+        _ (do (println target))
 
         c-digger (rj.e/get-c-on-e system this :digger)]
     (if (not (nil? target))

@@ -12,17 +12,18 @@
 
 (defn ^:private new-tile
   [x y {:keys [type]}]
-  (let [screen-x (+ (* x rj.c/block-size) (* 1 rj.c/block-size))
-        screen-y (+ (* y rj.c/block-size) (* 1 rj.c/block-size))]
-    (rj.c/map->Tile {:x x :y y
-                     :screen-x screen-x :screen-y screen-y
-                     :entities [(rj.c/map->Entity {:id nil
-                                                   :type type})]})))
+  (rj.c/map->Tile {:x x :y y
+                   :entities [(rj.c/map->Entity {:id   nil
+                                                 :type type})]}))
 
 (defn ^:private assoc-in-world
   [world [x y] args]
   (assoc-in world [x y]
             (new-tile x y args)))
+
+(defn ^:private check-block
+  [x y dist]
+  true)
 
 (defn ^:private init-torches
   [world torch-count
@@ -216,8 +217,8 @@
         c-world (rj.e/get-c-on-e system this :world)
         world @(:world c-world)
 
-        {:keys [view-port-sizes, delta-time]} args
-        _ (if (< 0.5 @time-counter)
+        {:keys [view-port-sizes]} args
+        #__ #_(if (< 0.3 @time-counter)
             (do
               (reset! time-counter delta-time)
               (swap! nth-counter inc))
@@ -244,7 +245,10 @@
       (when (or show-world?
                 (> sight
                    (taxicab-dist player-pos [x y])))
-        (let [texture-region (-> (:type (get-alternating (:entities tile)))
+        (let [texture-region (-> (:entities tile)
+                                 (rj.c/sort-by-pri)
+                                 (first)
+                                 (:type)
                                  (get-texture)
                                  (:object))]
           (.draw renderer
