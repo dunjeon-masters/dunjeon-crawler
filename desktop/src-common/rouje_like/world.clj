@@ -12,50 +12,35 @@
             [brute.entity :as br.e]))
 
 (defn ^:private new-tile
-  [x y {:keys [type, id] :or {type nil}}]
+  [x y {:keys [type, id]}]
   (rj.c/map->Tile {:x x :y y
                    :entities [(rj.c/map->Entity {:id   id
                                                  :type type})]}))
-
-(defn ^:private assoc-in-world
-  [world [x y] args]
-  (assoc-in world [x y]
-            (new-tile x y args)))
 
 (defn ^:private check-block
   [x y dist]
   true)
 
-(defn ^:private init-torches
-  [world torch-count
-   [width height]]
-  (loop [world world
-         torch-count torch-count]
-    (if (pos? torch-count)
-      (let [x (+ (rand-int (- width 2)) 1)
-            y (+ (rand-int (- height 2)) 1)]
-        ;; TODO: Add padding of torches, ie space them out
-        (if (every? #(#{:floor} (:type %))
-                    (:entities (get-in world [x y])))
-          (recur (assoc-in-world world [x y] {:type :torch})
-                 (dec torch-count))
-          (recur world torch-count)))
-      world)))
+(defn ^:private add-torch
+  [world]
+  (loop [world world]
+    (let [x (rand-int (count world))
+          y (rand-int (count (first world)))]
+      ;; TODO: Add padding of torches, ie space them out
+      (if (every? #(#{:floor} (:type %))
+                  (:entities (get-in world [x y])))
+        (assoc-in world [x y] (new-tile x y {:type :torch}))
+        (recur world)))))
 
-(defn ^:private init-treasure
-  [world treasure-count
-   [width height]]
-  (loop [world world
-         treasure-count treasure-count]
-    (if (pos? treasure-count)
-      (let [x (+ (rand-int (- width 2)) 1)
-            y (+ (rand-int (- height 2)) 1)]
-        (if (every? #(#{:floor} (:type %))
-                    (:entities (get-in world [x y])))
-          (recur (assoc-in-world world [x y] {:type :gold})
-                 (dec treasure-count))
-          (recur world treasure-count)))
-      world)))
+(defn ^:private add-gold
+  [world]
+  (loop [world world]
+    (let [x (rand-int (count world))
+          y (rand-int (count (first world)))]
+      (if (every? #(#{:floor} (:type %))
+                  (:entities (get-in world [x y])))
+        (assoc-in world [x y] (new-tile x y {:type :gold}))
+        (recur world)))))
 
 (defn ^:private block-coords
   [x y dist]
@@ -135,32 +120,23 @@
    init-wall%
    init-torch%
    init-treasure%]
-  (let [world (atom (vec
-                      (map vec
-                           (for [x (range width)]
-                             (for [y (range height)]
-                               (new-tile x y
-                                         {:type (if (< (rand-int 100) init-wall%)
-                                                  :wall
-                                                  :floor)}))))))]
+  (let [world (vec
+                (map vec
+                     (for [x (range width)]
+                       (for [y (range height)]
+                         (new-tile x y
+                                   {:type (if (< (rand-int 100) init-wall%)
+                                            :wall
+                                            :floor)})))))]
     ;; SMOOTH-WORLD
-    (doseq [_ (range 4)]
-      (swap! world (fn [prev]
-                     (smooth-world-v1 prev))))
-    (doseq [_ (range 3)]
-      (swap! world (fn [prev]
-                     (smooth-world-v2 prev))))
-    ;; GENERATE-TREASURE
-    (swap! world (fn [prev]
-                   (init-treasure prev (* (* width height)
-                                         (/ init-treasure% 100))
-                                  [width height])))
-    ;; GENERATE-TORCHES
-    (swap! world (fn [prev]
-                   (init-torches prev (* (* width height)
-                                         (/ init-torch% 100))
-                                 [width height])))
-    @world))
+    (-> world
+        (as-> world
+              (nth (iterate smooth-world-v1 world) 4)
+              (nth (iterate smooth-world-v2 world) 3)
+              (nth (iterate add-gold world) (* (* width height)
+                                               (/ init-treasure% 100)))
+              (nth (iterate add-torch world) (* (* width height)
+                                                (/ init-torch% 100)))))))
 
 ;; TODO: Rename *-inverted to *-dark, or create better naming convention
 (def ^:private get-texture (memoize
