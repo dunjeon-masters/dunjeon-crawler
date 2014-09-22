@@ -8,42 +8,54 @@
 
 (defn process-keyboard-input!
   [system key-code]
-  (-> (cond
-        (or (= key-code (play/key-code :dpad-up))
-            (= key-code (play/key-code :W)))
-        (rj.pl/process-input-tick! system :up)
+  (if (cond
+        (or (= key-code (play/key-code :equals))
+            (= key-code (play/key-code :f))) true
+        :else false)
+    (cond
+      (= key-code (play/key-code :f))
+      (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
+                  :player (fn [c-player]
+                            (update-in c-player [:show-world?]
+                                       (fn [prev]
+                                         (not prev)))))
+      (= key-code (play/key-code :equals))
+      (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
+                  :moves-left (fn [c-moves-left]
+                                (update-in c-moves-left [:moves-left]
+                                           (fn [moves-left]
+                                             (+ 10 moves-left)))))
+      :else system)
 
-        (or (= key-code (play/key-code :dpad-down))
-            (= key-code (play/key-code :S)))
-        (rj.pl/process-input-tick! system :down)
+    (let [this (first (rj.e/all-e-with-c system :player))
+          c-moves-left (rj.e/get-c-on-e system this :moves-left)
+          moves-left (:moves-left c-moves-left)]
+      (if (or (pos? moves-left))
+        (-> (cond
+              (or (= key-code (play/key-code :dpad-up))
+                  (= key-code (play/key-code :W)))
+              (rj.pl/process-input-tick! system :up)
 
-        (or (= key-code (play/key-code :dpad-left))
-            (= key-code (play/key-code :A)))
-        (rj.pl/process-input-tick! system :left)
+              (or (= key-code (play/key-code :dpad-down))
+                  (= key-code (play/key-code :S)))
+              (rj.pl/process-input-tick! system :down)
 
-        (or (= key-code (play/key-code :dpad-right))
-            (= key-code (play/key-code :D)))
-        (rj.pl/process-input-tick! system :right)
+              (or (= key-code (play/key-code :dpad-left))
+                  (= key-code (play/key-code :A)))
+              (rj.pl/process-input-tick! system :left)
 
-        (= key-code (play/key-code :F))
-        (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
-                    :player (fn [c-player]
-                              (update-in c-player [:show-world?]
-                                         (fn [prev]
-                                           (not prev)))))
-        :else system)
-      #_(as-> system
-            (let [entities (rj.e/all-e-with-c system :tickable)]
-              ;; TODO: Refactor using reduce
-              (loop [system system
-                     tickable-entities (rest entities)
-                     entity (first entities)]
-                (if (not (nil? entity))
-                  (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
-                    (recur ((:tick-fn c-tickable) system entity (:args c-tickable))
-                           (rest tickable-entities)
-                           (first tickable-entities)))
-                  system))))))
+              (or (= key-code (play/key-code :dpad-right))
+                  (= key-code (play/key-code :D)))
+              (rj.pl/process-input-tick! system :right)
+
+              :else system)
+            (as-> system
+                  (let [entities (rj.e/all-e-with-c system :tickable)]
+                    (reduce (fn [system entity]
+                              (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
+                                ((:tick-fn c-tickable) system entity (:args c-tickable))))
+                            system entities))))
+        system))))
 
 (defn process-fling-input!
   [system x-vel y-vel]

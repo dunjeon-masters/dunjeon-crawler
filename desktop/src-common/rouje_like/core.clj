@@ -23,6 +23,7 @@
 
 (def ^:private world-sizes [40 40])
 (def view-port-sizes [20 20])
+(def padding-sizes [2 3])
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
@@ -38,9 +39,7 @@
 (defn ^:private init-entities
   [system]
   (let [e-world  (br.e/create-entity)
-        e-player (br.e/create-entity)
-        world (rj.wr/generate-random-world world-sizes
-                init-wall% init-torch% init-gold%)]
+        e-player (br.e/create-entity) ]
     (-> system
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
@@ -64,11 +63,18 @@
                                                     :args      {:view-port-sizes view-port-sizes}}))
 
         (rj.e/add-e e-world)
-        (rj.e/add-c e-world (rj.c/map->World {:world world}))
+        (rj.e/add-c e-world (rj.c/map->World {:world (rj.wr/generate-random-world
+                                                       world-sizes init-wall%
+                                                       init-torch% init-gold%)}))
         (rj.e/add-c e-world (rj.c/map->Renderable {:pri       1
                                                    :render-fn rj.wr/render-world
                                                    :args      {:view-port-sizes view-port-sizes}}))
 
+        ;; Spawn lichens
+        (as-> system
+              (nth (iterate rj.lc/add-lichen system) 10))
+
+        ;; Add player
         (rj.e/upd-c e-world :world
                     (fn [c-world]
                       (update-in c-world [:world]

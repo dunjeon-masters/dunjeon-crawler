@@ -1,9 +1,9 @@
 (ns rouje-like.lichen
   (:import [clojure.lang Atom])
   (:require [rouje-like.components :as rj.c]
-            [rouje-like.entity :as rj.e]))
+            [rouje-like.entity :as rj.e]
+            [brute.entity :as br.e]))
 
-;TODO FIXME
 (defn take-damage!
   [system this damage]
   (let [c-destructible (rj.e/get-c-on-e system this :destructible)
@@ -11,7 +11,7 @@
 
         c-position (rj.e/get-c-on-e system this :position)
 
-        e-world (first (rj.e/all-e-with-c system (rj.c/get-type :world)))]
+        e-world (first (rj.e/all-e-with-c system :world))]
     (if (pos? (- hp damage))
       (-> system
           (rj.e/upd-c this :destructible
@@ -20,12 +20,14 @@
       (-> system
           (rj.e/upd-c e-world :world
                       (fn [c-world]
-                        (update-in c-world [(:x c-position) (:y c-position)]
-                                   (fn [tile]
-                                     (update-in tile [:entities]
-                                                (fn [entities]
-                                                  (vec (remove #(#{:lichen} (:type %))
-                                                               entities))))))))
+                        (update-in c-world [:world]
+                                   (fn [world]
+                                     (update-in world [(:x c-position) (:y c-position)]
+                                                (fn [tile]
+                                                  (update-in tile [:entities]
+                                                             (fn [entities]
+                                                               (vec (remove #(#{:lichen} (:type %))
+                                                                            entities))))))))))
           (rj.e/kill-e this)))))
 
 (def directions
@@ -61,43 +63,42 @@
 
 (declare process-input-tick!)
 
-;TODO FIXME
-#_(defn add-lichen
-  [{:keys [system]}]
-  (loop [system system]
-    (println "add-lichen: " (type system))
-    (let [world (:world (first (rj.e/all-e-with-c system (rj.c/get-type :world))))
-          x (+ (rand-int (- (count world) 2)) 1)
-          y (+ (rand-int (- (count (first world)) 2)) 1)
-          first-open-space (get-empty-neighbor world x y)]
-      (if (nil? first-open-space)
-        (recur system)
-        (let [e-lichen (brute.entity/create-entity)
-              new-system (-> system
-                             (rj.e/add-e e-lichen)
-                             (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% (atom 10)}))
-                             (rj.e/add-c e-lichen (rj.c/map->Position {:world world
-                                                                       :x (atom (:x first-open-space))
-                                                                       :y (atom (:y first-open-space))}))
-                             (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp (atom 1)
-                                                                           :defense (atom 1)
-                                                                           :take-damage! rouje-like.lichen/take-damage!}))
-                             (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn rouje-like.lichen/process-input-tick!
-                                                                       :args nil})))
-              _ (do (println (brute.entity/get-all-entities-with-component new-system :lichen)))]
-          (swap! world (fn [world]
-                         (update-in world [(:x first-open-space) (:y first-open-space)]
-                                    (fn [tile]
-                                      (update-in tile [:entities]
-                                                 (fn [entities]
-                                                   (conj entities
-                                                         (rj.c/map->Entity {:type :lichen
-                                                                            :id   e-lichen}))))))))
-          new-system)))))
+(defn add-lichen
+  ([system]
+   (let [e-world (first (rj.e/all-e-with-c system :world))
+         c-world (rj.e/get-c-on-e system e-world :world)
+         world (:world c-world)]
+     (add-lichen system (get-in world [(rand-int (count world))
+                                     (rand-int (count (first world)))]))))
+  ([system target]
+   (let [e-world (first (rj.e/all-e-with-c system :world))
+         e-lichen (br.e/create-entity)]
+     (-> system
+         (rj.e/upd-c e-world :world
+                     (fn [c-world]
+                       (update-in c-world [:world]
+                                  (fn [world]
+                                    (update-in world [(:x target) (:y target)]
+                                               (fn [tile]
+                                                 (update-in tile [:entities]
+                                                            (fn [entities]
+                                                              (vec (conj entities
+                                                                         (rj.c/map->Entity {:id   e-lichen
+                                                                                            :type :lichen})))))))))))
+         (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 1}))
+         (rj.e/add-c e-lichen (rj.c/map->Position {:x (:x target)
+                                                   :y (:y target)}))
+         (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      1
+                                                       :defense 1
+                                                       :take-damage! take-damage!}))
+         (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick!
+                                                   :args    nil}))))))
 
 (defn process-input-tick!
   [system this _]
-  (let [world (:world (first (rj.e/all-e-with-c system (rj.c/get-type :world))))
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        world (:world c-world)
 
         c-position (rj.e/get-c-on-e system this :position)
         x-pos (:x c-position)
@@ -107,9 +108,6 @@
         first-open-space (get-empty-neighbor world x-pos y-pos)
         should-grow (and (not (nil? first-open-space))
                          (< (rand-int 100) grow-chance%))]
-    (do (println "tick lichen"))
     (if should-grow
-      (println "growing")
-      #_(add-lichen {:system system
-                   :world world})
+      (add-lichen system first-open-space)
       system)))

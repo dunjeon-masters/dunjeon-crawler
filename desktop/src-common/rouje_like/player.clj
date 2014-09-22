@@ -9,31 +9,26 @@
 
 (defn can-attack?
   [_ _ target]
-  (#{:lichen} (-> target
-                  (:entities)
+  (#{:lichen} (-> target (:entities)
                   (rj.c/sort-by-pri)
-                  (first)
-                  (:type))))
+                  (first) (:type))))
 
 (defn attack!
   [system this target]
   (let [damage (:attack (rj.e/get-c-on-e system this :attacker))
 
-        e-enemy (:id (first (filter #(#{:lichen} (:type %))
-                                    (:entities target))))
+        e-enemy (:id (-> target (:entities)
+                         (rj.c/sort-by-pri)
+                         (first)))
 
-        take-damage! (:take-damage! (rj.e/get-c-on-e system e-enemy :destructible))
-
-        _ (do (println "attack!: " (brute.entity/get-all-components-on-entity system e-enemy)))]
+        take-damage! (:take-damage! (rj.e/get-c-on-e system e-enemy :destructible))]
     (take-damage! system e-enemy damage)))
 
 (defn can-dig?
   [_ _ target]
-  (#{:wall} (-> target
-                (:entities)
-                (rj.c/sort-by-pri)
-                (first)
-                (:type))))
+  (#{:wall} (:type (-> target (:entities)
+                       (rj.c/sort-by-pri)
+                       (first)))))
 
 (defn dig!
   [system this target]
@@ -44,12 +39,11 @@
                                  (fn [tile]
                                    (update-in tile [:entities]
                                               (fn [entities]
-                                                (map (fn [entity]
-                                                       (if (#{:wall}
-                                                            (:type entity))
-                                                         (rj.c/map->Entity {:type :floor})
-                                                         entity))
-                                                     entities))))))]
+                                                (conj
+                                                  (remove #(#{:wall} (:type %))
+                                                          entities)
+                                                  (rj.c/map->Entity {:type :floor
+                                                                     :id   nil})))))))]
     (-> system
         (rj.e/upd-c e-world :world
                     (fn [c-world]
@@ -57,16 +51,13 @@
                                  wall->floor [(:x target) (:y target)])))
         (rj.e/upd-c this :moves-left
                     (fn [c-moves-left]
-                      (update-in c-moves-left [:moves-left]
-                                 dec))))))
+                      (update-in c-moves-left [:moves-left] dec))))))
 
 (defn can-move?
   [_ _ target]
-  (#{:floor :gold :torch} (-> target
-                              (:entities)
-                              (rj.c/sort-by-pri)
-                              (first)
-                              (:type))))
+  (#{:floor :gold :torch} (:type (-> target (:entities)
+                                     (rj.c/sort-by-pri)
+                                     (first)))))
 
 (defn move!
   [system this target]
@@ -144,8 +135,6 @@
 (defn process-input-tick!
   [system direction]
   (let [this (first (rj.e/all-e-with-c system :player))
-        c-moves-left (rj.e/get-c-on-e system this :moves-left)
-        moves-left (:moves-left c-moves-left)
 
         c-position (rj.e/get-c-on-e system this :position)
         x-pos (:x c-position)
@@ -160,22 +149,19 @@
                         :left  [(dec x-pos)     y-pos]
                         :right [(inc x-pos)     y-pos])
         target (get-in world target-coords nil)]
-    (if (and (pos? moves-left)
-             (not (nil? target)))
+    (if (and (not (nil? target)))
       (let [c-mobile   (rj.e/get-c-on-e system this :mobile)
             c-digger   (rj.e/get-c-on-e system this :digger)
             c-attacker (rj.e/get-c-on-e system this :attacker)]
-        (if (not (nil? target))
-          (cond
-            ((:can-move? c-mobile) system this target)
-            ((:move! c-mobile) system this target)
+        (cond
+          ((:can-move? c-mobile) system this target)
+          ((:move! c-mobile) system this target)
 
-            ((:can-dig? c-digger) system this target)
-            ((:dig! c-digger) system this target)
+          ((:can-dig? c-digger) system this target)
+          ((:dig! c-digger) system this target)
 
-            ((:can-attack? c-attacker) system this target)
-            ((:attack! c-attacker) system this target))
-          system))
+          ((:can-attack? c-attacker) system this target)
+          ((:attack! c-attacker) system this target)))
       system)))
 
 ;;RENDERING FUNCTIONS

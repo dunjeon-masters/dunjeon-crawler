@@ -69,10 +69,10 @@
 (def get-pri {:floor 1
               :torch 2
               :gold 3
-              :lichen 3
               :wall 4
-              :player 10
-              :else 1})
+              :lichen 5
+              :else 6
+              :player 7})
 
 (defn sort-by-pri
   ([coll]
