@@ -129,8 +129,11 @@
                                                     (fn [tile]
                                                       (update-in tile [:entities]
                                                                  (fn [entities]
-                                                                   (vec (remove #(#{:player} (:type %))
-                                                                                entities))))))))))))
+                                                                   (vec (conj
+                                                                          (remove #(#{:player :floor} (:type %))
+                                                                                  entities)
+                                                                          (rj.c/map->Entity {:type :floor
+                                                                                             :id   nil})))))))))))))
 
         (rj.e/upd-c this :position
                     (fn [c-position]
