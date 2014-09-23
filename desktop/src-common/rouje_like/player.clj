@@ -40,11 +40,8 @@
                                  (fn [tile]
                                    (update-in tile [:entities]
                                               (fn [entities]
-                                                (conj
-                                                  (remove #(#{:wall} (:type %))
-                                                          entities)
-                                                  (rj.c/map->Entity {:type :floor
-                                                                     :id   nil})))))))]
+                                                (remove #(#{:wall} (:type %))
+                                                        entities))))))]
     (-> system
         (rj.e/upd-c e-world :world
                     (fn [c-world]
@@ -122,11 +119,8 @@
                                                     (fn [tile]
                                                       (update-in tile [:entities]
                                                                  (fn [entities]
-                                                                   (vec (conj
-                                                                          (remove #(#{:player :floor} (:type %))
-                                                                                  entities)
-                                                                          (rj.c/map->Entity {:type :floor
-                                                                                             :id   nil})))))))))))))
+                                                                   (vec (remove #(#{:player} (:type %))
+                                                                                entities))))))))))))
 
         (rj.e/upd-c this :position
                     (fn [c-position]
