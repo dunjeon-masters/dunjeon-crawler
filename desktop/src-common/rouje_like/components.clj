@@ -16,7 +16,7 @@
 (defrecord Player [show-world?])
 
 (defrecord Digger [^Fn can-dig?
-                   ^Fn dig!])
+                   ^Fn dig])
 
 (defrecord MovesLeft [moves-left])
 
@@ -31,24 +31,27 @@
 (defrecord Position [x y])
 
 (defrecord Mobile [^Fn can-move?
-                   ^Fn move!])
+                   ^Fn move])
 
-(defrecord Attacker [attack
-                     ^Fn attack!
+(defrecord Attacker [atk
+                     ^Fn attack
                      ^Fn can-attack?])
 
 (defrecord Destructible [hp
                          defense
-                         ^Fn take-damage!])
+                         ^Fn take-damage])
 
 (defrecord Tickable [^Fn tick-fn
                      args])
 
-(defrecord Lichen [grow-chance%])
-
 (defrecord Renderable [^Number pri
                        ^Fn render-fn
                        args #_(args-type=map)])
+
+(defrecord Lichen [grow-chance%
+                   max-blob-size])
+
+(defrecord Bat [])
 
 ;; Workaround for not being able to get record's type "statically"
 (def get-type {:world        (type (->World nil))
@@ -65,15 +68,17 @@
                :attacker     (type (->Attacker nil nil nil))
                :destructible (type (->Destructible nil nil nil))
                :tickable     (type (->Tickable nil nil))
-               :lichen       (type (->Lichen nil))})
+               :lichen       (type (->Lichen nil nil))
+               :bat          (type (->Bat))})
 
 (def get-pri {:floor 1
               :torch 2
               :gold 3
               :wall 4
               :lichen 5
-              :else 6
-              :player 7})
+              :bat 6
+              :else 7
+              :player 8})
 
 (defn sort-by-pri
   ([coll]

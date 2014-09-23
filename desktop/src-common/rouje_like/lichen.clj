@@ -5,7 +5,7 @@
             [brute.entity :as br.e]
             [clojure.pprint :refer [pprint]]))
 
-(defn take-damage!
+(defn take-damage
   [system this damage]
   (let [c-destructible (rj.e/get-c-on-e system this :destructible)
         hp (:hp c-destructible)
@@ -52,22 +52,16 @@
   (map (fn [vec] (get-in world vec nil))
        (get-neighbors-coords origin)))
 
-(defn get-empty-neighbor
-  [world x y]
-  (let [neighbors (get-neighbors world [x y])
-        empty-neighbors (filter #(and (not (nil? %))
-                                      (#{:floor :gold :torch}
-                                       (-> %
-                                           (:entities)
-                                           (rj.c/sort-by-pri)
-                                           (first)
-                                           (:type))))
-                                neighbors)]
-    (if (empty? empty-neighbors)
-      nil
-      (rand-nth empty-neighbors))))
+(defn get-neighbors-of-type
+  [world origin type]
+  (->> (get-neighbors world origin)
+       (filter #(and (not (nil? %))
+                     ((into #{} type)
+                      (-> % (:entities)
+                          (rj.c/sort-by-pri)
+                          (first) (:type)))))))
 
-(declare process-input-tick!)
+(declare process-input-tick)
 
 (defn add-lichen
   ([system]
@@ -75,6 +69,11 @@
          c-world (rj.e/get-c-on-e system e-world :world)
          world (:world c-world)]
      ;; TODO: Only add lichen if !:wall, use remove
+     #_(rand-nth (remove #(#{:wall}
+                           (-> % (:entities)
+                               (rj.c/sort-by-pri)
+                               (first) (:type)))
+                         world))
      (add-lichen system (get-in world [(rand-int (count world))
                                        (rand-int (count (first world)))]))))
   ([system target]
@@ -94,46 +93,34 @@
                                                                                             :type :floor})
                                                                          (rj.c/map->Entity {:id   e-lichen
                                                                                             :type :lichen})))))))))))
-         (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 8
+         (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 7
                                                  :max-blob-size 10}))
          (rj.e/add-c e-lichen (rj.c/map->Position {:x (:x target)
                                                    :y (:y target)}))
          (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      1
                                                        :defense 1
-                                                       :take-damage! take-damage!}))
-         (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick!
+                                                       :take-damage take-damage}))
+         (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick
                                                    :args    nil}))))))
-
-(defn get-neighbors-of-type
-  [world origin type]
-  (filter #(and (not (nil? %))
-                (#{type} (-> % (:entities)
-                             (rj.c/sort-by-pri {:else 1
-                                                :lichen 2})
-                             (first) (:type))))
-          (get-neighbors world origin)))
 
 (defn get-size-of-lichen-blob
   [world origin]
-  (let [explored (loop [current (get-in world origin)
-                        explored #{}
-                        un-explored (into #{} (get-neighbors-of-type world origin :lichen))]
-                   (if (empty? un-explored)
-                     explored
-                     (recur (first un-explored)
-                            (conj explored current)
-                            (into (rest un-explored)
-                                  (remove #(or (#{current} %)
-                                               (explored %))
-                                          (get-neighbors-of-type world
-                                                                 [(:x (first un-explored))
-                                                                  (:y (first un-explored))]
-                                                                 :lichen))))))]
-    (do #_(println "[" (origin 0) "," (origin 1) "] = ")
-        #_(pprint explored)
-        (count explored))))
+  (loop [current (get-in world origin)
+         explored #{}
+         un-explored (into #{} (get-neighbors-of-type world origin [:lichen]))]
+    (if (empty? un-explored)
+      (count explored)
+      (recur (first un-explored)
+             (conj explored current)
+             (into (rest un-explored)
+                   (remove #(or (#{current} %)
+                                (explored %))
+                           (get-neighbors-of-type world
+                                                  [(:x (first un-explored))
+                                                   (:y (first un-explored))]
+                                                  [:lichen])))))))
 
-(defn process-input-tick!
+(defn process-input-tick
   [system this _]
   (let [c-position (rj.e/get-c-on-e system this :position)
         x (:x c-position)
@@ -147,11 +134,11 @@
         grow-chance% (:grow-chance% c-lichen)
         max-blob-size (:max-blob-size c-lichen)
 
-        first-open-space (get-empty-neighbor world x y)
-        can-grow (and (not (nil? first-open-space))
-                         (< (rand 100) grow-chance%))
-        should-grow (< (get-size-of-lichen-blob world [x y]) max-blob-size)]
-    (if (and can-grow
-             should-grow)
-      (add-lichen system first-open-space)
+        empty-neighbors (get-neighbors-of-type world [x y]
+                                               [:floor :torch :gold])]
+    (if (and (seq empty-neighbors)
+             (< (rand 100) grow-chance%)
+             (< (get-size-of-lichen-blob world [x y])
+                max-blob-size))
+      (add-lichen system (rand-nth empty-neighbors))
       system)))

@@ -163,13 +163,6 @@
               (nth (iterate add-torch world) (* (* width height)
                                                 (/ init-torch% 100)))))))
 
-#_(let [texture-region (:object (texture "grim_12x12.png"
-                                           :set-region (* 12 15) (* 12 5) 12 12))]
-      (.draw renderer
-             texture-region
-             (float 0) (float 0)
-             (float 24) (float 24)))
-
 (def ^:private get-texture
   (memoize
     (fn [^Keyword type]
@@ -190,6 +183,9 @@
                            :tile-sheet "grim_12x12.png"}
                   :torch  {:x 1 :y 2
                            :color [255 1 1 255]
+                           :tile-sheet "grim_12x12.png"}
+                  :bat    {:x 14 :y 5
+                           :color [255 255 255 128]
                            :tile-sheet "grim_12x12.png"}}]
         (assoc (texture (:tile-sheet (asdf type))
                         :set-region (* 12 (:x (asdf type))) (* 12 (:y (asdf type))) 12 12)

@@ -10,19 +10,19 @@
 
 (defn can-attack?
   [_ _ target]
-  (#{:lichen} (-> target (:entities)
-                  (rj.c/sort-by-pri)
-                  (first) (:type))))
+  (#{:lichen :bat} (-> target (:entities)
+                       (rj.c/sort-by-pri)
+                       (first) (:type))))
 
-(defn attack!
+(defn attack
   [system this target]
-  (let [damage (:attack (rj.e/get-c-on-e system this :attacker))
+  (let [damage (:atk (rj.e/get-c-on-e system this :attacker))
 
         e-enemy (:id (-> target (:entities)
                          (rj.c/sort-by-pri)
                          (first)))
 
-        take-damage! (:take-damage! (rj.e/get-c-on-e system e-enemy :destructible))]
+        take-damage! (:take-damage (rj.e/get-c-on-e system e-enemy :destructible))]
     (take-damage! system e-enemy damage)))
 
 (defn can-dig?
@@ -31,7 +31,7 @@
                        (rj.c/sort-by-pri)
                        (first)))))
 
-(defn dig!
+(defn dig
   [system this target]
   (let [e-world (first (rj.e/all-e-with-c system :world))
 
@@ -60,7 +60,7 @@
                                      (rj.c/sort-by-pri)
                                      (first)))))
 
-(defn move!
+(defn move
   [system this target]
   (let [c-sight (rj.e/get-c-on-e system this :sight)
         sight-decline-rate (:decline-rate c-sight)
@@ -157,13 +157,13 @@
             c-attacker (rj.e/get-c-on-e system this :attacker)]
         (cond
           ((:can-move? c-mobile) system this target)
-          ((:move! c-mobile) system this target)
+          ((:move c-mobile) system this target)
 
           ((:can-dig? c-digger) system this target)
-          ((:dig! c-digger) system this target)
+          ((:dig c-digger) system this target)
 
           ((:can-attack? c-attacker) system this target)
-          ((:attack! c-attacker) system this target)))
+          ((:attack c-attacker) system this target)))
       system)))
 
 ;;RENDERING FUNCTIONS

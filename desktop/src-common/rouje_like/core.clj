@@ -13,6 +13,7 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]
             [rouje-like.rendering :as rj.r]
+            [rouje-like.bat :as rj.bt]
             [rouje-like.input :as rj.in]
             [rouje-like.lichen :as rj.lc]
             [rouje-like.player :as rj.pl]
@@ -49,12 +50,12 @@
         (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
                                                   :y init-player-y-pos}))
         (rj.e/add-c e-player (rj.c/map->Mobile {:can-move? rj.pl/can-move?
-                                                :move!     rj.pl/move!}))
+                                                :move      rj.pl/move}))
         (rj.e/add-c e-player (rj.c/map->Digger {:can-dig? rj.pl/can-dig?
-                                                :dig!     rj.pl/dig!}))
-        (rj.e/add-c e-player (rj.c/map->Attacker {:attack      1
+                                                :dig      rj.pl/dig}))
+        (rj.e/add-c e-player (rj.c/map->Attacker {:atk      1
                                                   :can-attack? rj.pl/can-attack?
-                                                  :attack!     rj.pl/attack!}))
+                                                  :attack      rj.pl/attack}))
         (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))
         (rj.e/add-c e-player (rj.c/map->Gold {:gold 0}))
         (rj.e/add-c e-player (rj.c/map->Sight {:distance     (inc init-sight-distance)
@@ -76,10 +77,17 @@
 
         ;; Spawn lichens
         (as-> system
-              (nth (iterate rj.lc/add-lichen system) (* (/ init-lichen% 100)
-                                                        (apply * world-sizes))))
+              (nth (iterate rj.lc/add-lichen system)
+                   (* (/ init-lichen% 100)
+                      (apply * world-sizes))))
 
-        ;; Add player ;; TODO: Refactor to a fn, upd-world [e-world target (fn [entities] ...)]
+        ;; Spawn bats
+        (as-> system
+              (nth (iterate rj.bt/add-bat system)
+                   10))
+
+        ;; Add player
+        ;; TODO: Refactor to a fn, upd-world [e-world target (fn [entities] ...)]
         (rj.e/upd-c e-world :world
                     (fn [c-world]
                       (update-in c-world [:world]
