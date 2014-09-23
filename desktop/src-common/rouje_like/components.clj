@@ -2,7 +2,7 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
-(def block-size 27)
+(def block-size 24)
 
 
 (defrecord World [world])
@@ -25,7 +25,8 @@
 (defrecord Sight [distance
                   decline-rate
                   lower-bound
-                  upper-bound])
+                  upper-bound
+                  torch-power])
 
 (defrecord Position [x y])
 
@@ -59,7 +60,7 @@
                :mobile       (type (->Mobile nil nil))
                :moves-left   (type (->MovesLeft nil))
                :gold         (type (->Gold nil))
-               :sight        (type (->Sight nil nil nil nil))
+               :sight        (type (->Sight nil nil nil nil nil))
                :renderable   (type (->Renderable nil nil nil))
                :attacker     (type (->Attacker nil nil nil))
                :destructible (type (->Destructible nil nil nil))
@@ -76,9 +77,9 @@
 
 (defn sort-by-pri
   ([coll]
-   (sort-by-pri get-pri coll))
+   (sort-by-pri coll get-pri))
 
-  ([get-pri coll]
+  ([coll get-pri]
    (sort (fn [arg1 arg2]
            (let [t1 (:type arg1)
                  t2 (:type arg2)]

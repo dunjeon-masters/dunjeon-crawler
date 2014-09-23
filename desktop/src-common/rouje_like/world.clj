@@ -1,8 +1,11 @@
 (ns rouje-like.world
-  (:import [com.badlogic.gdx.graphics.g2d SpriteBatch]
-           [clojure.lang Keyword Atom])
+  (:import [com.badlogic.gdx.graphics.g2d SpriteBatch TextureRegion]
+           [clojure.lang Keyword Atom]
+           [com.badlogic.gdx.graphics Texture Pixmap Color]
+           [com.badlogic.gdx.files FileHandle])
 
   (:require [play-clj.g2d :refer :all]
+            [play-clj.core :refer :all]
 
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]
@@ -30,9 +33,9 @@
                 radius)
            (flatten world))))
 
-(defn ^:private check-block
+(defn ^:private check-radially
   [world coords dist type]
-  (not-any? (fn [tile] (#{type} (->> (:entities tile)
+  (not-any? (fn [tile] (#{type} (-> (:entities tile)
                                     (rj.c/sort-by-pri {:torch 2
                                                        :else 1})
                                     (first)
@@ -44,8 +47,7 @@
   (loop [world world]
     (let [x (rand-int (count world))
           y (rand-int (count (first world)))]
-      ;; TODO: Add padding of torches, ie space them out
-      (if (and (check-block world [x y] 3 :torch)
+      (if (and (check-radially world [x y] 3 :torch)
                (every? #(#{:floor} (:type %))
                        (:entities (get-in world [x y]))))
         (assoc-in world [x y] (new-tile x y {:type :torch}))
@@ -80,6 +82,8 @@
                            {:type :wall})))
        (block-coords x y dist)))
 
+;; TODO: Try to refactor v1 & v2 into (1?) method
+;; TODO: use sort-by-pri
 (defn ^:private smooth-world-v1
   [world]
   (let [get-smoothed-tile (fn [block-d1 block-d2 x y]
@@ -111,6 +115,7 @@
             (get-smoothed-col world x))
           (range (count world)))))
 
+;; TODO: use sort-by-pri
 (defn ^:private smooth-world-v2
   [world]
   (let [get-smoothed-tile (fn [block-d1 x y]
@@ -143,6 +148,7 @@
                 (map vec
                      (for [x (range width)]
                        (for [y (range height)]
+                         ;; TODO: Add :floor's everywhere, then add walls randomly
                          (new-tile x y
                                    {:type (if (< (rand-int 100) init-wall%)
                                             :wall
@@ -157,20 +163,41 @@
               (nth (iterate add-torch world) (* (* width height)
                                                 (/ init-torch% 100)))))))
 
-;; TODO: Rename *-inverted to *-dark, or create better naming convention
-(def ^:private get-texture (memoize
-                             (fn [^Keyword type]
-                               (type (zipmap [:player :wall :floor :gold :torch :lichen]
-                                             (map (comp texture*
-                                                        (fn [s] (str s ".jpg")))
-                                                  ["at-inverted" "percent-inverted"
-                                                   "period-inverted" "dollar-inverted"
-                                                   "letter_t" "at"]))))))
+#_(let [texture-region (:object (texture "grim_12x12.png"
+                                           :set-region (* 12 15) (* 12 5) 12 12))]
+      (.draw renderer
+             texture-region
+             (float 0) (float 0)
+             (float 24) (float 24)))
+
+(def ^:private get-texture
+  (memoize
+    (fn [^Keyword type]
+      (let [asdf {:player {:x 0 :y 4
+                           :color [255 255 255 255]
+                           :tile-sheet "grim_12x12.png"}
+                  :wall   {:x 3 :y 2
+                           :color [255 255 255 128]
+                           :tile-sheet "grim_12x12.png"}
+                  :gold   {:x 1 :y 9
+                           :color [255 255 1 255]
+                           :tile-sheet "grim_12x12.png"}
+                  :lichen {:x 15 :y 0
+                           :color [1 255 1 255]
+                           :tile-sheet "grim_12x12.png"}
+                  :floor  {:x 14 :y 2
+                           :color [255 255 255 64]
+                           :tile-sheet "grim_12x12.png"}
+                  :torch  {:x 1 :y 2
+                           :color [255 1 1 255]
+                           :tile-sheet "grim_12x12.png"}}]
+        (assoc (texture (:tile-sheet (asdf type))
+                        :set-region (* 12 (:x (asdf type))) (* 12 (:y (asdf type))) 12 12)
+          :color (:color (asdf type)))))))
 
 (defn render-world
   [system this args]
-  (let [renderer (new SpriteBatch)
-        taxicab-dist (fn [[x y] [i j]]
+  (let [taxicab-dist (fn [[x y] [i j]]
                              (+ (math/abs (- i x))
                                 (math/abs (- j y))))
 
@@ -202,7 +229,9 @@
         end-y (min end-y (count (first world)))
 
         start-x (- end-x vp-size-x)
-        start-y (- end-y vp-size-y)]
+        start-y (- end-y vp-size-y)
+
+        renderer (new SpriteBatch)]
     (.begin renderer)
     (doseq [x (range start-x end-x)
             y (range start-y end-y)
@@ -210,14 +239,19 @@
       (when (or show-world?
                 (> sight
                    (taxicab-dist player-pos [x y])))
-        (let [texture-region (-> (:entities tile)
+        (let [texture-entity (-> (:entities tile)
                                  (rj.c/sort-by-pri)
                                  (first)
                                  (:type)
-                                 (get-texture)
-                                 (:object))]
+                                 (get-texture))]
+          (let [color-values (:color texture-entity)]
+              (.setColor renderer (Color. (float (/ (color-values 0) 255))
+                                          (float (/ (color-values 1) 255))
+                                          (float (/ (color-values 2) 255))
+                                          (float (/ (color-values 3) 255)))))
           (.draw renderer
-                 texture-region
+                 (:object texture-entity)
                  (float (* (inc (- x start-x)) rj.c/block-size))
-                 (float (* (inc (- y start-y)) rj.c/block-size))))))
+                 (float (* (inc (- y start-y)) rj.c/block-size))
+                 (float rj.c/block-size) (float rj.c/block-size)))))
     (.end renderer)))

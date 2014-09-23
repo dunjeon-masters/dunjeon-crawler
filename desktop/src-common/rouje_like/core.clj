@@ -28,14 +28,16 @@
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
+(def ^:private init-lichen% 1)
 (def ^:private init-player-x-pos (/ (world-sizes 0) 2))
 (def ^:private init-player-y-pos (/ (world-sizes 1) 2))
 (def ^:private init-player-pos [init-player-x-pos init-player-y-pos])
 (def ^:private init-player-moves 250)
 (def ^:private init-sight-distance 5.0)
 (def ^:private init-sight-decline-rate (/ 1 5))
-(def ^:private init-sight-lower-bound 3)                    ;; Inclusive
+(def ^:private init-sight-lower-bound 4)                    ;; Inclusive
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
+(def ^:private init-sight-torch-power 2)
 
 (defn ^:private init-entities
   [system]
@@ -58,7 +60,8 @@
         (rj.e/add-c e-player (rj.c/map->Sight {:distance     (inc init-sight-distance)
                                                :decline-rate init-sight-decline-rate
                                                :lower-bound  init-sight-lower-bound
-                                               :upper-bound  init-sight-upper-bound}))
+                                               :upper-bound  init-sight-upper-bound
+                                               :torch-power  init-sight-torch-power}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:pri       0
                                                     :render-fn rj.pl/render-player
                                                     :args      {:view-port-sizes view-port-sizes}}))
@@ -73,9 +76,10 @@
 
         ;; Spawn lichens
         (as-> system
-              (nth (iterate rj.lc/add-lichen system) 10))
+              (nth (iterate rj.lc/add-lichen system) (* (/ init-lichen% 100)
+                                                        (apply * world-sizes))))
 
-        ;; Add player
+        ;; Add player ;; TODO: Refactor to a fn, upd-world [e-world target (fn [entities] ...)]
         (rj.e/upd-c e-world :world
                     (fn [c-world]
                       (update-in c-world [:world]
@@ -96,6 +100,7 @@
   :on-show
   (fn [screen _]
     (update! screen :renderer (stage) :camera (orthographic))
+    (graphics! :set-continuous-rendering false)
     (-> (br.e/create-system)
         (init-entities)
         (register-system-fns)

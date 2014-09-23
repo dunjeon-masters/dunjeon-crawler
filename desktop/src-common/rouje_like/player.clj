@@ -3,6 +3,7 @@
            [com.badlogic.gdx.scenes.scene2d.ui Label Skin])
   (:require [play-clj.core :refer :all]
             [play-clj.ui :refer :all]
+            [play-clj.g2d :refer [texture texture!]]
 
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]))
@@ -65,11 +66,12 @@
         sight-decline-rate (:decline-rate c-sight)
         sight-lower-bound (:lower-bound c-sight)
         sight-upper-bound (:upper-bound c-sight)
+        sight-torch-power (:torch-power c-sight)
         dec-sight (fn [prev] (if (> prev (inc sight-lower-bound))
                                (- prev sight-decline-rate)
                                prev))
-        inc-sight (fn [prev] (if (<= prev (- sight-upper-bound 2))
-                               (+ prev 2)
+        inc-sight (fn [prev] (if (<= prev (- sight-upper-bound sight-torch-power))
+                               (+ prev sight-torch-power)
                                prev))
 
         c-position (rj.e/get-c-on-e system this :position)
@@ -169,6 +171,10 @@
   [system this {:keys [view-port-sizes]}]
   (let [[_ vheight] view-port-sizes
 
+        c-position (rj.e/get-c-on-e system this :position)
+        x (:x c-position)
+        y (:y c-position)
+
         c-gold (rj.e/get-c-on-e system this :gold)
         gold (:gold c-gold)
 
@@ -177,7 +183,7 @@
 
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (str "Gold: [" gold "]" " - " "MovesLeft: [" moves-left "]")
+    (label! (label (str "Gold: [" gold "]" " - " "MovesLeft: [" moves-left "]" " - " "Position: [" x "," y "]")
                    (color :green)
                    :set-y (float (* (+ vheight 2) rj.c/block-size)))
             :draw renderer 1.0)
