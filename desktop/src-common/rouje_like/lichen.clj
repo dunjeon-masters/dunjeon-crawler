@@ -6,9 +6,12 @@
             [clojure.pprint :refer [pprint]]))
 
 (defn take-damage
-  [system this damage]
+  [system this damage from]
   (let [c-destructible (rj.e/get-c-on-e system this :destructible)
         hp (:hp c-destructible)
+
+        c-attacker (rj.e/get-c-on-e system this :attacker)
+        attack (:attack c-attacker)
 
         c-position (rj.e/get-c-on-e system this :position)
 
@@ -17,8 +20,10 @@
       (-> system
           (rj.e/upd-c this :destructible
                       (fn [c-destructible]
-                        (update-in c-destructible [:hp] - damage))))
+                        (update-in c-destructible [:hp] - damage)))
+          (attack this from))
       (-> system
+          (attack this from)
           (rj.e/upd-c e-world :world
                       (fn [c-world]
                         (update-in c-world [:world]
@@ -30,6 +35,19 @@
                                                                (vec (remove #(#{:lichen} (:type %))
                                                                             entities))))))))))
           (rj.e/kill-e this)))))
+
+(defn can-attack?
+  [_ _ target]
+  (#{:player} (-> target (:entities)
+                  (rj.c/sort-by-pri)
+                  (first) (:type))))
+
+(defn attack
+  [system this target]
+  (let [damage (:atk (rj.e/get-c-on-e system this :attacker))
+
+        take-damage (:take-damage (rj.e/get-c-on-e system target :destructible))]
+    (take-damage system target damage this)))
 
 (def directions
   {:left  [-1 0]
@@ -93,13 +111,16 @@
                                                                                             :type :floor})
                                                                          (rj.c/map->Entity {:id   e-lichen
                                                                                             :type :lichen})))))))))))
-         (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 7
+         (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 6
                                                  :max-blob-size 10}))
          (rj.e/add-c e-lichen (rj.c/map->Position {:x (:x target)
                                                    :y (:y target)}))
          (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      1
                                                        :defense 1
                                                        :take-damage take-damage}))
+         (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk 1
+                                                   :can-attack? can-attack?
+                                                   :attack      attack}))
          (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick
                                                    :args    nil}))))))
 

@@ -2,8 +2,7 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
-(def block-size 24)
-
+(def block-size 48)
 
 (defrecord World [world])
 

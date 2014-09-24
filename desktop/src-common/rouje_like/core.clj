@@ -40,7 +40,7 @@
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-power 2)
 
-(defn ^:private init-entities
+(defn init-entities
   [system]
   (let [e-world  (br.e/create-entity)
         e-player (br.e/create-entity)]
@@ -66,6 +66,9 @@
         (rj.e/add-c e-player (rj.c/map->Renderable {:pri       0
                                                     :render-fn rj.pl/render-player
                                                     :args      {:view-port-sizes view-port-sizes}}))
+        (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
+                                                      :defense 1
+                                                      :take-damage rj.pl/take-damage}))
 
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/map->World {:world (rj.wr/generate-random-world
@@ -84,7 +87,7 @@
         ;; Spawn bats
         (as-> system
               (nth (iterate rj.bt/add-bat system)
-                   10))
+                   20))
 
         ;; Add player
         ;; TODO: Refactor to a fn, upd-world [e-world target (fn [entities] ...)]
@@ -99,7 +102,7 @@
                                                                                  (rj.c/map->Entity {:id   e-player
                                                                                                     :type :player}))))))))))))))
 
-(defn ^:private register-system-fns
+(defn register-system-fns
   [system]
   (-> system
       (br.s/add-system-fn  rj.r/process-one-game-tick)))
@@ -131,7 +134,13 @@
                 (-> (br.e/create-system)
                     (init-entities)
                     (register-system-fns))
-                (rj.in/process-keyboard-input! @sys key-code)))))
+                (-> (rj.in/process-keyboard-input! @sys key-code)
+                    (as-> system
+                          (if (empty? (rj.e/all-e-with-c system :player))
+                            (-> (br.e/create-system)
+                                (init-entities)
+                                (register-system-fns))
+                            system)))))))
 
   :on-fling
   (fn [screen _]

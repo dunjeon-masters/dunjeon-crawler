@@ -8,6 +8,32 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]))
 
+(defn take-damage
+  [system this damage _]
+  (let [c-destructible (rj.e/get-c-on-e system this :destructible)
+        hp (:hp c-destructible)
+
+        c-position (rj.e/get-c-on-e system this :position)
+
+        e-world (first (rj.e/all-e-with-c system :world))]
+    (if (pos? (- hp damage))
+      (-> system
+          (rj.e/upd-c this :destructible
+                      (fn [c-destructible]
+                        (update-in c-destructible [:hp] - damage))))
+      (-> system
+          (rj.e/upd-c e-world :world
+                      (fn [c-world]
+                        (update-in c-world [:world]
+                                   (fn [world]
+                                     (update-in world [(:x c-position) (:y c-position)]
+                                                (fn [tile]
+                                                  (update-in tile [:entities]
+                                                             (fn [entities]
+                                                               (vec (remove #(#{:player} (:type %))
+                                                                            entities))))))))))
+          (rj.e/kill-e this)))))
+
 (defn can-attack?
   [_ _ target]
   (#{:lichen :bat} (-> target (:entities)
@@ -22,8 +48,8 @@
                          (rj.c/sort-by-pri)
                          (first)))
 
-        take-damage! (:take-damage (rj.e/get-c-on-e system e-enemy :destructible))]
-    (take-damage! system e-enemy damage)))
+        take-damage (:take-damage (rj.e/get-c-on-e system e-enemy :destructible))]
+    (take-damage system e-enemy damage this)))
 
 (defn can-dig?
   [_ _ target]
@@ -175,9 +201,13 @@
         c-moves-left (rj.e/get-c-on-e system this :moves-left)
         moves-left (:moves-left c-moves-left)
 
+        c-destructible (rj.e/get-c-on-e system this :destructible)
+        hp (:hp c-destructible)
+
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (str "Gold: [" gold "]" " - " "MovesLeft: [" moves-left "]" " - " "Position: [" x "," y "]")
+    (label! (label (str "Gold: [" gold "]" " - " "MovesLeft: [" moves-left "]"
+                        " - " "Position: [" x "," y "]" " - " "HP: [" hp "]")
                    (color :green)
                    :set-y (float (* (+ vheight 2) rj.c/block-size)))
             :draw renderer 1.0)

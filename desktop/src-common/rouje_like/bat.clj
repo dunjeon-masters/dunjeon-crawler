@@ -6,7 +6,7 @@
 (declare process-input-tick!)
 
 (defn take-damage
-  [system this damage]
+  [system this damage _]
   (let [c-destructible (rj.e/get-c-on-e system this :destructible)
         hp (:hp c-destructible)
 
@@ -105,25 +105,16 @@
         valid-targets (get-neighbors-of-type world [(:x c-position) (:y c-position)]
                                              [:floor :gold :torch])
         target (if (seq valid-targets)
-                 (rand-nth valid-targets)
-                 nil)
-
-        valid-targets-d2 (if (not (nil? target))
-                           (get-neighbors-of-type world [(:x target) (:y target)]
-                                                  [:floor :gold :torch])
-                           [])
-
-        target-d2 (if (seq valid-targets-d2)
-                    (rand-nth valid-targets-d2)
-                    nil)]
-    (if (not (nil? target-d2))
+                 (rand-nth (conj valid-targets nil))
+                 nil)]
+    (if (not (nil? target))
       (-> system
         (rj.e/upd-c e-world :world
                     (fn [c-world]
                       (update-in c-world [:world]
                                  (fn [world]
                                    (let [bat-pos [(:x c-position) (:y c-position)]
-                                         target-pos [(:x target-d2) (:y target-d2)]]
+                                         target-pos [(:x target) (:y target)]]
                                      (-> world
                                          (update-in target-pos
                                                     (fn [tile]
@@ -142,6 +133,6 @@
         (rj.e/upd-c this :position
                     (fn [c-position]
                       (-> c-position
-                          (assoc-in [:x] (:x target-d2))
-                          (assoc-in [:y] (:y target-d2))))))
+                          (assoc-in [:x] (:x target))
+                          (assoc-in [:y] (:y target))))))
       system)))

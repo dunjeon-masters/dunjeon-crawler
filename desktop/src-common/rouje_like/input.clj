@@ -50,11 +50,12 @@
 
               :else system)
             (as-> system
-                  (let [entities (rj.e/all-e-with-c system :tickable)]
-                    (reduce (fn [system entity]
-                              (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
-                                ((:tick-fn c-tickable) system entity (:args c-tickable))))
-                            system entities))))
+                  (if (not (nil? system))
+                    (let [entities (rj.e/all-e-with-c system :tickable)]
+                      (reduce (fn [system entity]
+                                (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
+                                  ((:tick-fn c-tickable) system entity (:args c-tickable))))
+                              system entities)))))
         system))))
 
 (defn process-fling-input!
