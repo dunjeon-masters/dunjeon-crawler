@@ -50,9 +50,7 @@
                                                (fn [tile]
                                                  (update-in tile [:entities]
                                                             (fn [entities]
-                                                              (vec (conj (remove #(#{:wall :floor} (:type %)) entities)
-                                                                         (rj.c/map->Entity {:id nil
-                                                                                            :type :floor})
+                                                              (vec (conj (remove #(#{:wall} (:type %)) entities)
                                                                          (rj.c/map->Entity {:id   e-bat
                                                                                             :type :bat})))))))))))
          (rj.e/add-c e-bat (rj.c/map->Bat {}))

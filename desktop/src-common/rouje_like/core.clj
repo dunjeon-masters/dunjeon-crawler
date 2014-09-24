@@ -51,7 +51,7 @@
                                                 :move      rj.pl/move}))
         (rj.e/add-c e-player (rj.c/map->Digger {:can-dig? rj.pl/can-dig?
                                                 :dig      rj.pl/dig}))
-        (rj.e/add-c e-player (rj.c/map->Attacker {:atk      1
+        (rj.e/add-c e-player (rj.c/map->Attacker {:atk         1
                                                   :can-attack? rj.pl/can-attack?
                                                   :attack      rj.pl/attack}))
         (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))

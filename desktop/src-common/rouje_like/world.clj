@@ -196,33 +196,49 @@
               (nth (iterate add-torch world) (* (* width height)
                                                 (/ init-torch% 100)))))))
 
+(def ^:private get-tile-info
+  {:player {:x 0 :y 4
+            :width 12 :height 12
+            :color {:r 255 :g 255 :b 255 :a 255}
+            :tile-sheet "grim_12x12.png"}
+   :wall   {:x 3 :y 2
+            :width 12 :height 12
+            :color {:r 255 :g 255 :b 255 :a 128}
+            :tile-sheet "grim_12x12.png"}
+   :gold   {:x 1 :y 9
+            :width 12 :height 12
+            :color {:r 255 :g 255 :b 1 :a 255}
+            :tile-sheet "grim_12x12.png"}
+   :lichen {:x 15 :y 0
+            :width 12 :height 12
+            :color {:r 1 :g 255 :b 1 :a 255}
+            :tile-sheet "grim_12x12.png"}
+   :floor  {:x 14 :y 2
+            :width 12 :height 12
+            :color {:r 255 :g 255 :b 255 :a 64}
+            :tile-sheet "grim_12x12.png"}
+   :torch  {:x 1 :y 2
+            :width 12 :height 12
+            :color {:r 255 :g 1 :b 1 :a 255}
+            :tile-sheet "grim_12x12.png"}
+   :bat    {:x 14 :y 5
+            :width 12 :height 12
+            :color {:r 255 :g 255 :b 255 :a 128}
+            :tile-sheet "grim_12x12.png"}})
+
 (def ^:private get-texture
   (memoize
     (fn [^Keyword type]
-      (let [asdf {:player {:x 0 :y 4
-                           :color [255 255 255 255]
-                           :tile-sheet "grim_12x12.png"}
-                  :wall   {:x 3 :y 2
-                           :color [255 255 255 128]
-                           :tile-sheet "grim_12x12.png"}
-                  :gold   {:x 1 :y 9
-                           :color [255 255 1 255]
-                           :tile-sheet "grim_12x12.png"}
-                  :lichen {:x 15 :y 0
-                           :color [1 255 1 255]
-                           :tile-sheet "grim_12x12.png"}
-                  :floor  {:x 14 :y 2
-                           :color [255 255 255 64]
-                           :tile-sheet "grim_12x12.png"}
-                  :torch  {:x 1 :y 2
-                           :color [255 1 1 255]
-                           :tile-sheet "grim_12x12.png"}
-                  :bat    {:x 14 :y 5
-                           :color [255 255 255 128]
-                           :tile-sheet "grim_12x12.png"}}]
-        (assoc (texture (:tile-sheet (asdf type))
-                        :set-region (* 12 (:x (asdf type))) (* 12 (:y (asdf type))) 12 12)
-          :color (:color (asdf type)))))))
+      (let [tile-info (get-tile-info type)
+            tile-sheet (:tile-sheet tile-info)
+            width (:width tile-info)
+            height (:height tile-info)
+            x (* width (:x tile-info))
+            y (* height (:y tile-info))
+            tile-color (:color tile-info)]
+        (assoc (texture tile-sheet
+                        :set-region x y width height)
+          :color tile-color)))))
 
 (defn render-world
   [system this args]
@@ -270,17 +286,21 @@
                    (taxicab-dist player-pos [x y])))
         (let [texture-entity (-> (:entities tile)
                                  (rj.c/sort-by-pri)
-                                 (first)
-                                 (:type)
+                                 (first) (:type)
                                  (get-texture))]
           (let [color-values (:color texture-entity)]
-              (.setColor renderer (Color. (float (/ (color-values 0) 255))
-                                          (float (/ (color-values 1) 255))
-                                          (float (/ (color-values 2) 255))
-                                          (float (/ (color-values 3) 255)))))
+              (.setColor renderer
+                         (Color. (float (/ (:r color-values) 255))
+                                 (float (/ (:g color-values) 255))
+                                 (float (/ (:b color-values) 255))
+                                 (float (/ (:a color-values) 255)))))
           (.draw renderer
                  (:object texture-entity)
-                 (float (* (+ (- x start-x) (:x rj.c/padding-sizes)) rj.c/block-size))
-                 (float (* (+ (- y start-y) (:y rj.c/padding-sizes)) rj.c/block-size))
+                 (float (* (+ (- x start-x)
+                              (:x rj.c/padding-sizes))
+                           rj.c/block-size))
+                 (float (* (+ (- y start-y)
+                              (:y rj.c/padding-sizes))
+                           rj.c/block-size))
                  (float rj.c/block-size) (float rj.c/block-size)))))
     (.end renderer)))

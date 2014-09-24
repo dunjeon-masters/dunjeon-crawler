@@ -4,6 +4,8 @@
 
 (def block-size 48)
 (def view-port-sizes [20 20])
+
+;; TODO: Change to :top :btm :left :right
 (def padding-sizes {:x 1 :y 1})
 
 (defrecord World [world])
