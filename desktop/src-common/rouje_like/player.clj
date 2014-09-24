@@ -209,7 +209,9 @@
     (label! (label (str "Gold: [" gold "]" " - " "MovesLeft: [" moves-left "]"
                         " - " "Position: [" x "," y "]" " - " "HP: [" hp "]")
                    (color :green)
-                   :set-y (float (* (+ vheight 2) rj.c/block-size)))
+                   :set-y (float (* (+ vheight
+                                       (dec (* 2 (:y rj.c/padding-sizes))))
+                                    rj.c/block-size)))
             :draw renderer 1.0)
     (.end renderer)))
 

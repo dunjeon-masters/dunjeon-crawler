@@ -3,6 +3,8 @@
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
 (def block-size 48)
+(def view-port-sizes [20 20])
+(def padding-sizes {:x 1 :y 1})
 
 (defrecord World [world])
 

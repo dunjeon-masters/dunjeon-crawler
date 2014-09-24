@@ -8,8 +8,8 @@
             [play-clj.core :refer :all]
 
             [rouje-like.components :as rj.c]
-            [rouje-like.entity :as rj.e]
-            [rouje-like.lichen :as rj.lc]
+            [rouje-like.entity     :as rj.e]
+            [rouje-like.lichen     :as rj.lc]
 
             [clojure.math.numeric-tower :as math]
             [brute.entity :as br.e]))
@@ -280,7 +280,7 @@
                                           (float (/ (color-values 3) 255)))))
           (.draw renderer
                  (:object texture-entity)
-                 (float (* (inc (- x start-x)) rj.c/block-size))
-                 (float (* (inc (- y start-y)) rj.c/block-size))
+                 (float (* (+ (- x start-x) (:x rj.c/padding-sizes)) rj.c/block-size))
+                 (float (* (+ (- y start-y) (:y rj.c/padding-sizes)) rj.c/block-size))
                  (float rj.c/block-size) (float rj.c/block-size)))))
     (.end renderer)))

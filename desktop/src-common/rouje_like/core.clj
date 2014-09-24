@@ -23,9 +23,7 @@
 
 (def ^:private sys (atom 0))
 
-(def ^:private world-sizes [40 40])
-(def view-port-sizes [20 20])
-(def padding-sizes [2 3])
+(def ^:private world-sizes [60 60])
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
@@ -36,8 +34,8 @@
 (def ^:private init-player-moves 250)
 (def ^:private init-sight-distance 5.0)
 (def ^:private init-sight-decline-rate (/ 1 5))
-(def ^:private init-sight-lower-bound 4)                    ;; Inclusive
-(def ^:private init-sight-upper-bound 11)                   ;; Exclusive
+(def ^:private init-sight-lower-bound 5)                    ;; Inclusive
+(def ^:private init-sight-upper-bound 13)                   ;; Exclusive
 (def ^:private init-sight-torch-power 2)
 
 (defn init-entities
@@ -65,7 +63,7 @@
                                                :torch-power  init-sight-torch-power}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:pri       0
                                                     :render-fn rj.pl/render-player
-                                                    :args      {:view-port-sizes view-port-sizes}}))
+                                                    :args      {:view-port-sizes rj.c/view-port-sizes}}))
         (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
                                                       :defense 1
                                                       :take-damage rj.pl/take-damage}))
@@ -76,7 +74,7 @@
                                                        init-torch% init-gold%)}))
         (rj.e/add-c e-world (rj.c/map->Renderable {:pri       1
                                                    :render-fn rj.wr/render-world
-                                                   :args      {:view-port-sizes view-port-sizes}}))
+                                                   :args      {:view-port-sizes rj.c/view-port-sizes}}))
 
         ;; Spawn lichens
         (as-> system
