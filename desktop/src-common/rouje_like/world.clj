@@ -37,7 +37,8 @@
   (loop [world world]
     (let [x (rand-int (count world))
           y (rand-int (count (first world)))]
-      (if (and (rj.u/not-any-radially-of-type world [x y] #(<= % 3) :torch)
+      (if (and (rj.u/not-any-radially-of-type world [x y]
+                                              #(<= % 3) [:torch])
                (every? #(#{:floor} (:type %))
                        (:entities (get-in world [x y]))))
         (update-in world [x y]

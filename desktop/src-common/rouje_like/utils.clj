@@ -58,7 +58,7 @@
   (map offset-coords
        (repeat origin) (vals directions)))
 
-(defn ^:private get-neighbors
+(defn get-neighbors
   [world origin]
   (map (fn [vec] (get-in world vec nil))
        (get-neighbors-coords origin)))
@@ -82,8 +82,11 @@
 (defn not-any-radially-of-type
   [world origin dist-fn type]
   (not-any? (fn [tile]
-              (#{type} (:type (get-top-entity tile {type 2
-                                                    :else 1}))))
+              ((into #{} type) (:type (get-top-entity tile
+                                                      (zipmap (conj type :else)
+                                                              (conj (vec
+                                                                      (repeat (count type) 2))
+                                                                    1))))))
             (get-entities-radially world origin dist-fn)))
 
 (defn ^:private ring-coords
