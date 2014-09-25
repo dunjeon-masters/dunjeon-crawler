@@ -53,71 +53,59 @@
                                                            :type :gold}))))))
         (recur world)))))
 
-;; TODO: Try to refactor v1 & v2 into (1?) method
+(defn ^:private get-block-frequencies
+  [block]
+  (frequencies
+    (map (fn [tile]
+           (:type (rj.u/get-top-entity tile)))
+         block)))
+
+(defn ^:private get-smoothed-tile
+  [block-d1 block-d2 x y]
+  (let [wall-threshold-d1 5
+        wall-bound-d2 2
+        d1-block-freqs (get-block-frequencies block-d1)
+        d2-block-freqs (if (nil? block-d2)
+                         {:wall (inc wall-bound-d2)}
+                         (get-block-frequencies block-d2))
+        wall-count-d1 (get d1-block-freqs :wall 0)
+        wall-count-d2 (get d2-block-freqs :wall 0)
+        result (if (or (>= wall-count-d1 wall-threshold-d1)
+                       (<= wall-count-d2 wall-bound-d2))
+                 :wall
+                 :floor)]
+    (update-in (rj.c/map->Tile {:x x :y y
+                                :entities [(rj.c/map->Entity {:id   nil
+                                                              :type :floor})]})
+               [:entities] (fn [entities]
+                             (if (= result :wall)
+                               (conj entities
+                                     (rj.c/map->Entity {:id   nil
+                                                        :type :wall}))
+                               entities)))))
+
+(defn ^:private get-smoothed-col
+  [world x max-dist]
+  (mapv (fn [y]
+          (get-smoothed-tile
+            (rj.u/get-ring-around world [x y] 1)
+            (if (= max-dist 2)
+              (rj.u/get-ring-around world [x y] 2)
+              nil)
+            x y))
+        (range (count (first world)))))
+
 (defn ^:private smooth-world-v1
   [world]
-  (let [get-smoothed-tile (fn [block-d1 block-d2 x y]
-                            (let [tile-counts-d1 (frequencies (map (fn [tile]
-                                                                     (:type (rj.u/get-top-entity tile)))
-                                                                   block-d1))
-                                  tile-counts-d2 (frequencies (map (fn [tile]
-                                                                     (:type (rj.u/get-top-entity tile)))
-                                                                   block-d2))
-                                  wall-threshold-d1 5
-                                  wall-bound-d2 2
-                                  wall-count-d1 (get tile-counts-d1 :wall 0)
-                                  wall-count-d2 (get tile-counts-d2 :wall 0)
-                                  result (if (or (>= wall-count-d1 wall-threshold-d1)
-                                                 (<= wall-count-d2 wall-bound-d2))
-                                           :wall
-                                           :floor)]
-                              (update-in (rj.c/map->Tile {:x x :y y
-                                                          :entities [(rj.c/map->Entity {:id   nil
-                                                                                        :type :floor})]})
-                                         [:entities] (fn [entities]
-                                                       (if (= result :wall)
-                                                         (conj entities
-                                                               (rj.c/map->Entity {:id   nil
-                                                                                  :type :wall}))
-                                                         entities)))))
-        get-smoothed-col (fn [world x]
-                           (mapv (fn [y]
-                                   (get-smoothed-tile (rj.u/get-ring-around world [x y] 1)
-                                                      (rj.u/get-ring-around world [x y] 2)
-                                                      x y))
-                                 (range (count (first world)))))]
-    (mapv (fn [x]
-            (get-smoothed-col world x))
-          (range (count world)))))
+  (mapv (fn [x]
+          (get-smoothed-col world x 2))
+        (range (count world))))
 
 (defn ^:private smooth-world-v2
   [world]
-  (let [get-smoothed-tile (fn [block-d1 x y]
-                            (let [tile-counts-d1 (frequencies (map (fn [tile]
-                                                                     (:type (rj.u/get-top-entity tile)))
-                                                                   block-d1))
-                                  wall-threshold-d1 5
-                                  wall-count-d1 (get tile-counts-d1 :wall 0)
-                                  result (if (>= wall-count-d1 wall-threshold-d1)
-                                           :wall
-                                           :floor)]
-                              (update-in (rj.c/map->Tile {:x x :y y
-                                                          :entities [(rj.c/map->Entity {:id   nil
-                                                                                        :type :floor})]})
-                                         [:entities] (fn [entities]
-                                                       (if (= result :wall)
-                                                         (conj entities
-                                                               (rj.c/map->Entity {:id   nil
-                                                                                  :type :wall}))
-                                                         entities)))))
-        get-smoothed-col (fn [world x]
-                           (mapv (fn [y]
-                                   (get-smoothed-tile (rj.u/get-ring-around world [x y] 1)
-                                                      x y))
-                                 (range (count (first world)))))]
-    (mapv (fn [x]
-            (get-smoothed-col world x))
-          (range (count world)))))
+  (mapv (fn [x]
+          (get-smoothed-col world x 1))
+        (range (count world))))
 
 (defn generate-random-world
   [[width height]
@@ -141,9 +129,9 @@
     (-> world
         (as-> world
               (nth (iterate smooth-world-v1 world)
-                   2)
+                   4)
               (nth (iterate smooth-world-v2 world)
-                   1)
+                   2)
               (nth (iterate add-gold world) (* (* width height)
                                                (/ init-treasure% 100)))
               (nth (iterate add-torch world) (* (* width height)
