@@ -45,7 +45,10 @@
 (defn attack
   [system this target]
   (if (can-attack? system this target)
-    (let [damage (:atk (rj.e/get-c-on-e system this :attacker))
+    (let [atk (:atk (rj.e/get-c-on-e system this :attacker))
+          damage (if (< (rand-int 100) 30)
+                   atk 0)
+
           take-damage (:take-damage (rj.e/get-c-on-e system target :destructible))]
       (take-damage system target damage this))
     system))
@@ -78,8 +81,8 @@
                                                               (vec (conj (remove #(#{:wall} (:type %)) entities)
                                                                          (rj.c/map->Entity {:id   e-lichen
                                                                                             :type :lichen})))))))))))
-         (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 6
-                                                 :max-blob-size 10}))
+         (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 4
+                                                 :max-blob-size 8}))
          (rj.e/add-c e-lichen (rj.c/map->Position {:x (:x target)
                                                    :y (:y target)}))
          (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      1
