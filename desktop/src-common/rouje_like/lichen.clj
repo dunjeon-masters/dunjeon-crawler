@@ -39,17 +39,16 @@
           (rj.e/kill-e this)))))
 
 (defn can-attack?
-  [_ _ target]
-  (#{:player} (:type (rj.u/get-top-entity target))))
+  [system _ target]
+  (not (nil? (rj.e/get-c-on-e system target :destructible))))
 
 (defn attack
   [system this target]
-  (let [damage (:atk (rj.e/get-c-on-e system this :attacker))
-
-        take-damage (:take-damage (rj.e/get-c-on-e system target :destructible))]
-    (if (can-attack? system this target)
-      (take-damage system target damage this)
-      system)))
+  (if (can-attack? system this target)
+    (let [damage (:atk (rj.e/get-c-on-e system this :attacker))
+          take-damage (:take-damage (rj.e/get-c-on-e system target :destructible))]
+      (take-damage system target damage this))
+    system))
 
 (declare process-input-tick)
 
