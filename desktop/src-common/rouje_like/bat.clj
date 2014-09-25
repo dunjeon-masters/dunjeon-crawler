@@ -62,12 +62,13 @@
   ([system]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
-         world (:world c-world)]
-     (loop [target (get-in world [(rand-int (count world))
-                                  (rand-int (count (first world)))])]
+         world (:world c-world)
+         get-rand-tile (fn [world]
+                         (get-in world [(rand-int (count world))
+                                        (rand-int (count (first world)))]))]
+     (loop [target (get-rand-tile world)]
        (if (#{:wall} (:type (rj.u/get-top-entity target)))
-         (recur (get-in world [(rand-int (count world))
-                               (rand-int (count (first world)))]))
+         (recur (get-rand-tile world))
          (add-bat system target)))))
   ([system target]
    (let [e-world (first (rj.e/all-e-with-c system :world))
