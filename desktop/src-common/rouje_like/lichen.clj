@@ -4,8 +4,9 @@
             [clojure.pprint :refer [pprint]]
 
             [rouje-like.components :as rj.c]
-            [rouje-like.entity     :as rj.e]
-            [rouje-like.utils      :as rj.u]))
+            [rouje-like.entity :as rj.e]
+            [rouje-like.utils :as rj.u]
+            [rouje-like.world :as rj.wr]))
 
 (defn take-damage
   [system this damage from]
@@ -26,16 +27,10 @@
           (attack this from))
       (-> system
           (attack this from)
-          (rj.e/upd-c e-world :world
-                      (fn [c-world]
-                        (update-in c-world [:world]
-                                   (fn [world]
-                                     (update-in world [(:x c-position) (:y c-position)]
-                                                (fn [tile]
-                                                  (update-in tile [:entities]
-                                                             (fn [entities]
-                                                               (vec (remove #(#{:lichen} (:type %))
-                                                                            entities))))))))))
+          (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
+                           (fn [entities _]
+                             (vec (remove #(#{:lichen} (:type %))
+                                          entities))))
           (rj.e/kill-e this)))))
 
 (defn can-attack?
@@ -70,17 +65,11 @@
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-lichen (br.e/create-entity)]
      (-> system
-         (rj.e/upd-c e-world :world
-                     (fn [c-world]
-                       (update-in c-world [:world]
-                                  (fn [world]
-                                    (update-in world [(:x target) (:y target)]
-                                               (fn [tile]
-                                                 (update-in tile [:entities]
-                                                            (fn [entities]
-                                                              (vec (conj (remove #(#{:wall} (:type %)) entities)
-                                                                         (rj.c/map->Entity {:id   e-lichen
-                                                                                            :type :lichen})))))))))))
+         (rj.wr/update-in-world e-world [(:x target) (:y target)]
+                                (fn [entities _]
+                                  (vec (conj (remove #(#{:wall} (:type %)) entities)
+                                             (rj.c/map->Entity {:id   e-lichen
+                                                                :type :lichen})))))
          (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 4
                                                  :max-blob-size 8}))
          (rj.e/add-c e-lichen (rj.c/map->Position {:x (:x target)

@@ -14,6 +14,18 @@
             [rouje-like.entity :as rj.e]
             [rouje-like.utils :as rj.u]))
 
+(defn update-in-world
+  [system e-world target-pos -fn- & args]
+  (rj.e/upd-c system e-world :world
+              (fn [c-world]
+                (update-in c-world [:world]
+                           (fn [world]
+                             (update-in world target-pos
+                                        (fn [tile]
+                                          (update-in tile [:entities]
+                                                     (fn [entities]
+                                                       (-fn- entities args))))))))))
+
 (defn ^:private new-tile
   [x y {:keys [type, id]}]
   (rj.c/map->Tile {:x x :y y

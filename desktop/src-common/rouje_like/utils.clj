@@ -45,12 +45,15 @@
    :down  [0 -1]})
 
 (defn ^:private offset-coords
-  "Offset the starting coordinate by the given amount, returning the result coordinate."
+  "Offset the first coordinate by the second,
+  returning the result coordinate."
   [[x y] [dx dy]]
   [(+ x dx) (+ y dy)])
 
 (defn ^:private get-neighbors-coords
-  "Return the coordinates of all neighboring squares of the given coord."
+  "Return the coordinates of all neighboring
+  (ie: up/down/left/right)
+  squares of the given [x y] pos."
   [origin]
   (map offset-coords
        (repeat origin) (vals directions)))
@@ -64,8 +67,7 @@
   [world origin type]
   (->> (get-neighbors world origin)
        (filter #(and (not (nil? %))
-                     ((into #{} type)
-                      (:type (get-top-entity %)))))))
+                     ((into #{} type) (:type (get-top-entity %)))))))
 
 (defn ^:private radial-distance
   [[x1 y1] [x2 y2]]
@@ -79,8 +81,9 @@
 
 (defn not-any-radially-of-type
   [world origin dist-fn type]
-  (not-any? (fn [tile] (#{type} (:type (get-top-entity tile {type 2
-                                                             :else 1}))))
+  (not-any? (fn [tile]
+              (#{type} (:type (get-top-entity tile {type 2
+                                                    :else 1}))))
             (get-entities-radially world origin dist-fn)))
 
 (defn ^:private ring-coords

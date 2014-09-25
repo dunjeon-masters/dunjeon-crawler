@@ -7,7 +7,8 @@
 
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]
-            [rouje-like.utils :as rj.u]))
+            [rouje-like.utils :as rj.u]
+            [rouje-like.world :as rj.wr]))
 
 (defn take-damage
   [system this damage _]
@@ -23,16 +24,10 @@
                       (fn [c-destructible]
                         (update-in c-destructible [:hp] - damage))))
       (-> system
-          (rj.e/upd-c e-world :world
-                      (fn [c-world]
-                        (update-in c-world [:world]
-                                   (fn [world]
-                                     (update-in world [(:x c-position) (:y c-position)]
-                                                (fn [tile]
-                                                  (update-in tile [:entities]
-                                                             (fn [entities]
-                                                               (vec (remove #(#{:player} (:type %))
-                                                                            entities))))))))))
+          (rj.e/upd-c e-world [(:x c-position) (:y c-position)]
+                      (fn [entities _]
+                        (vec (remove #(#{:player} (:type %))
+                                     entities))))
           (rj.e/kill-e this)))))
 
 (defn can-attack?
@@ -54,20 +49,12 @@
 
 (defn dig
   [system this target]
-  (let [e-world (first (rj.e/all-e-with-c system :world))
-
-        wall->floor (fn [world ks]
-                      (update-in world ks
-                                 (fn [tile]
-                                   (update-in tile [:entities]
-                                              (fn [entities]
-                                                (remove #(#{:wall} (:type %))
-                                                        entities))))))]
+  (let [e-world (first (rj.e/all-e-with-c system :world))]
     (-> system
-        (rj.e/upd-c e-world :world
-                    (fn [c-world]
-                      (update-in c-world [:world]
-                                 wall->floor [(:x target) (:y target)])))
+        (rj.wr/update-in-world e-world [(:x target) (:y target)]
+                               (fn [entities _]
+                                 (remove #(#{:wall} (:type %))
+                                         entities)))
         (rj.e/upd-c this :moves-left
                     (fn [c-moves-left]
                       (update-in c-moves-left [:moves-left] dec))))))
@@ -98,46 +85,39 @@
                     (fn [c-moves-left]
                       (update-in c-moves-left [:moves-left] dec)))
 
-        (as-> system (case (:type (rj.u/get-top-entity target))
-                       :gold  (-> system
-                                  (rj.e/upd-c this :gold
-                                              (fn [c-gold]
-                                                (update-in c-gold [:gold] inc)))
-                                  (rj.e/upd-c this :sight
-                                              (fn [c-sight]
-                                                (update-in c-sight [:distance] dec-sight))))
-                       :torch (-> system
-                                  (rj.e/upd-c this :sight
-                                              (fn [c-sight]
-                                                (update-in c-sight [:distance] inc-sight))))
-                       :floor (-> system
-                                  (rj.e/upd-c this :sight
-                                              (fn [c-sight]
-                                                (update-in c-sight [:distance] dec-sight))))
-                       system))
+        (as-> system
+              (case (:type (rj.u/get-top-entity target))
+                :gold  (-> system
+                           (rj.e/upd-c this :gold
+                                       (fn [c-gold]
+                                         (update-in c-gold [:gold] inc)))
+                           (rj.e/upd-c this :sight
+                                       (fn [c-sight]
+                                         (update-in c-sight [:distance] dec-sight))))
+                :torch (-> system
+                           (rj.e/upd-c this :sight
+                                       (fn [c-sight]
+                                         (update-in c-sight [:distance] inc-sight))))
+                :floor (-> system
+                           (rj.e/upd-c this :sight
+                                       (fn [c-sight]
+                                         (update-in c-sight [:distance] dec-sight))))
+                system))
 
-        (rj.e/upd-c e-world :world
-                    (fn [c-world]
-                      (update-in c-world [:world]
-                                 (fn [world]
-                                   (let [player-pos [(:x c-position) (:y c-position)]
-                                         target-pos [(:x target) (:y target)]]
-                                     (-> world
-                                         (update-in target-pos
-                                                    (fn [tile]
-                                                      (update-in tile [:entities]
-                                                                 (fn [entities]
-                                                                   (vec (conj
-                                                                          (remove #(#{:gold :torch} (:type %))
-                                                                                  entities)
-                                                                          (rj.c/map->Entity {:type :player
-                                                                                             :id   this})))))))
-                                         (update-in player-pos
-                                                    (fn [tile]
-                                                      (update-in tile [:entities]
-                                                                 (fn [entities]
-                                                                   (vec (remove #(#{:player} (:type %))
-                                                                                entities))))))))))))
+        (rj.wr/update-in-world e-world [(:x target) (:y target)]
+                               (fn [entities _]
+                                 (vec
+                                   (conj
+                                     (remove #(#{:gold :torch} (:type %))
+                                             entities)
+                                     (rj.c/map->Entity {:type :player
+                                                        :id   this})))))
+        (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
+                               (fn [entities _]
+                                 (vec
+                                   (remove
+                                     #(#{:player} (:type %))
+                                     entities))))
 
         (rj.e/upd-c this :position
                     (fn [c-position]
