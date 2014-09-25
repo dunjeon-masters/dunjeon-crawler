@@ -1,0 +1,75 @@
+(ns rouje-like.utils
+  (:require [clojure.math.numeric-tower :as math]
+            [clojure.pprint :refer [pprint]]
+
+            [rouje-like.components :as rj.c]))
+
+(def ^:private directions
+  {:left  [-1 0]
+   :right [1  0]
+   :up    [0  1]
+   :down  [0 -1]})
+
+(defn ^:private offset-coords
+  "Offset the starting coordinate by the given amount, returning the result coordinate."
+  [[x y] [dx dy]]
+  [(+ x dx) (+ y dy)])
+
+(defn ^:private get-neighbors-coords
+  "Return the coordinates of all neighboring squares of the given coord."
+  [origin]
+  (map offset-coords
+       (repeat origin) (vals directions)))
+
+(defn ^:private get-neighbors
+  [world origin]
+  (map (fn [vec] (get-in world vec nil))
+       (get-neighbors-coords origin)))
+
+(defn get-neighbors-of-type
+  [world origin type]
+  (->> (get-neighbors world origin)
+       (filter #(and (not (nil? %))
+                     ((into #{} type)
+                      (-> % (:entities)
+                          (rj.c/sort-by-pri)
+                          (first) (:type)))))))
+
+(defn ^:private radial-distance
+  [[x1 y1] [x2 y2]]
+  (max (math/abs (- x1 x2))
+       (math/abs (- y1 y2))))
+
+(defn get-entities-radially
+  [world origin dist-fn]
+  (filter #(dist-fn (radial-distance origin [(:x %) (:y %)]))
+          (flatten world)))
+
+(defn not-any-radially-of-type
+  [world origin dist-fn type]
+  (not-any? (fn [tile] (#{type} (-> (:entities tile)
+                                    (rj.c/sort-by-pri {type 2
+                                                       :else 1})
+                                    (first)
+                                    (:type))))
+            (get-entities-radially world origin dist-fn)))
+
+(defn ^:private ring-coords
+  [[x y] dist]
+  (let [∆x|y (vec (range (- 0 dist) (inc dist)))]
+    (for [dx ∆x|y
+          dy ∆x|y
+          :when (or (if (= dist 1)
+                      true)
+                    (= dist (math/abs dx))
+                    (= dist (math/abs dy)))]
+      [(+ x dx) (+ y dy)])))
+
+(defn get-ring-around
+  [tiles origin dist]
+  (map (fn [[x y]]
+         (get-in tiles [x y]
+                 (rj.c/map->Tile {:x x :y y
+                                  :entities [(rj.c/map->Entity {:id   nil
+                                                                :type :wall})]})))
+       (ring-coords origin dist)))

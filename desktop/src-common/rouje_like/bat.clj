@@ -1,7 +1,9 @@
 (ns rouje-like.bat
-  (:require [rouje-like.entity :as rj.e]
-            [brute.entity :as br.e]
-            [rouje-like.components :as rj.c]))
+  (:require [brute.entity :as br.e]
+
+            [rouje-like.components :as rj.c]
+            [rouje-like.entity     :as rj.e]
+            [rouje-like.utils      :as rj.u]))
 
 (declare process-input-tick!)
 
@@ -62,36 +64,6 @@
          (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick!
                                                 :args    nil}))))))
 
-(def directions
-  {:left  [-1 0]
-   :right [1 0]
-   :up    [0 1]
-   :down  [0 -1]})
-
-(defn offset-coords
-  "Offset the starting coordinate by the given amount, returning the result coordinate."
-  [[x y] [dx dy]]
-  [(+ x dx) (+ y dy)])
-
-(defn get-neighbors-coords
-  "Return the coordinates of all neighboring squares of the given coord."
-  [origin]
-  (map offset-coords (repeat origin) (vals directions)))
-
-(defn get-neighbors
-  [world origin]
-  (map (fn [vec] (get-in world vec nil))
-       (get-neighbors-coords origin)))
-
-(defn get-neighbors-of-type
-  [world origin type]
-  (->> (get-neighbors world origin)
-       (filter #(and (not (nil? %))
-                     ((into #{} type)
-                      (-> % (:entities)
-                          (rj.c/sort-by-pri)
-                          (first) (:type)))))))
-
 (defn process-input-tick!
   [system this _]
   (let [c-position (rj.e/get-c-on-e system this :position)
@@ -100,8 +72,8 @@
         c-world (rj.e/get-c-on-e system e-world :world)
         world (:world c-world)
 
-        valid-targets (get-neighbors-of-type world [(:x c-position) (:y c-position)]
-                                             [:floor :gold :torch])
+        valid-targets (rj.u/get-neighbors-of-type world [(:x c-position) (:y c-position)]
+                                                  [:floor :gold :torch])
         target (if (seq valid-targets)
                  (rand-nth (conj valid-targets nil))
                  nil)]

@@ -7,12 +7,13 @@
   (:require [play-clj.g2d :refer :all]
             [play-clj.core :refer :all]
 
-            [rouje-like.components :as rj.c]
-            [rouje-like.entity     :as rj.e]
-            [rouje-like.lichen     :as rj.lc]
-
             [clojure.math.numeric-tower :as math]
-            [brute.entity :as br.e]))
+            [brute.entity :as br.e]
+
+            [rouje-like.components :as rj.c]
+            [rouje-like.entity :as rj.e]
+            [rouje-like.lichen :as rj.lc]
+            [rouje-like.utils :as rj.u]))
 
 (defn ^:private new-tile
   [x y {:keys [type, id]}]
@@ -20,34 +21,12 @@
                    :entities [(rj.c/map->Entity {:id   id
                                                  :type type})]}))
 
-(defn ^:private radial-distance
-  [[x1 y1] [x2 y2]]
-  (max (math/abs (- x1 x2))
-       (math/abs (- y1 y2))))
-
-(defn ^:private get-entities-around
-  ([world coords]
-   (get-entities-around world coords 1))
-  ([world coords radius]
-   (filter #(<= (radial-distance coords [(:x %) (:y %)])
-                radius)
-           (flatten world))))
-
-(defn ^:private check-radially
-  [world coords dist type]
-  (not-any? (fn [tile] (#{type} (-> (:entities tile)
-                                    (rj.c/sort-by-pri {:torch 2
-                                                       :else 1})
-                                    (first)
-                                    (:type))))
-            (get-entities-around world coords dist)))
-
 (defn ^:private add-torch
   [world]
   (loop [world world]
     (let [x (rand-int (count world))
           y (rand-int (count (first world)))]
-      (if (and (check-radially world [x y] 3 :torch)
+      (if (and (rj.u/not-any-radially-of-type world [x y] #(<= % 3) :torch)
                (every? #(#{:floor} (:type %))
                        (:entities (get-in world [x y]))))
         (update-in world [x y]
@@ -75,27 +54,7 @@
                                                            :type :gold}))))))
         (recur world)))))
 
-(defn ^:private block-coords
-  [x y dist]
-  (let [∆x|y (vec (range (- 0 dist) (inc dist)))]
-    (for [dx ∆x|y
-          dy ∆x|y
-          :when (or (if (= dist 1)
-                      true)
-                    (= dist (math/abs dx))
-                    (= dist (math/abs dy)))]
-      [(+ x dx) (+ y dy)])))
-
-(defn ^:private get-block
-  [tiles x y dist]
-  (map (fn [[x y]]
-         (get-in tiles [x y]
-                 (new-tile x y
-                           {:type :wall})))
-       (block-coords x y dist)))
-
 ;; TODO: Try to refactor v1 & v2 into (1?) method
-;; TODO: use sort-by-pri
 (defn ^:private smooth-world-v1
   [world]
   (let [get-smoothed-tile (fn [block-d1 block-d2 x y]
@@ -128,15 +87,14 @@
                                                          entities)))))
         get-smoothed-col (fn [world x]
                            (mapv (fn [y]
-                                   (get-smoothed-tile (get-block world x y 1)
-                                                      (get-block world x y 2)
+                                   (get-smoothed-tile (rj.u/get-ring-around world [x y] 1)
+                                                      (rj.u/get-ring-around world [x y] 2)
                                                       x y))
                                  (range (count (first world)))))]
     (mapv (fn [x]
             (get-smoothed-col world x))
           (range (count world)))))
 
-;; TODO: use sort-by-pri
 (defn ^:private smooth-world-v2
   [world]
   (let [get-smoothed-tile (fn [block-d1 x y]
@@ -161,7 +119,7 @@
                                                          entities)))))
         get-smoothed-col (fn [world x]
                            (mapv (fn [y]
-                                   (get-smoothed-tile (get-block world x y 1)
+                                   (get-smoothed-tile (rj.u/get-ring-around world [x y] 1)
                                                       x y))
                                  (range (count (first world)))))]
     (mapv (fn [x]
@@ -189,8 +147,10 @@
     ;; SMOOTH-WORLD
     (-> world
         (as-> world
-              (nth (iterate smooth-world-v1 world) 2 world)
-              (nth (iterate smooth-world-v2 world) 1 world)
+              (nth (iterate smooth-world-v1 world)
+                   2)
+              (nth (iterate smooth-world-v2 world)
+                   1)
               (nth (iterate add-gold world) (* (* width height)
                                                (/ init-treasure% 100)))
               (nth (iterate add-torch world) (* (* width height)

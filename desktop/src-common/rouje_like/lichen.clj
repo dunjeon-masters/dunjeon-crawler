@@ -1,9 +1,11 @@
 (ns rouje-like.lichen
   (:import [clojure.lang Atom])
-  (:require [rouje-like.components :as rj.c]
-            [rouje-like.entity :as rj.e]
-            [brute.entity :as br.e]
-            [clojure.pprint :refer [pprint]]))
+  (:require [brute.entity :as br.e]
+            [clojure.pprint :refer [pprint]]
+
+            [rouje-like.components :as rj.c]
+            [rouje-like.entity     :as rj.e]
+            [rouje-like.utils      :as rj.u]))
 
 (defn take-damage
   [system this damage from]
@@ -48,36 +50,6 @@
 
         take-damage (:take-damage (rj.e/get-c-on-e system target :destructible))]
     (take-damage system target damage this)))
-
-(def directions
-  {:left  [-1 0]
-   :right [1 0]
-   :up    [0 1]
-   :down  [0 -1]})
-
-(defn offset-coords
-  "Offset the starting coordinate by the given amount, returning the result coordinate."
-  [[x y] [dx dy]]
-  [(+ x dx) (+ y dy)])
-
-(defn get-neighbors-coords
-  "Return the coordinates of all neighboring squares of the given coord."
-  [origin]
-  (map offset-coords (repeat origin) (vals directions)))
-
-(defn get-neighbors
-  [world origin]
-  (map (fn [vec] (get-in world vec nil))
-       (get-neighbors-coords origin)))
-
-(defn get-neighbors-of-type
-  [world origin type]
-  (->> (get-neighbors world origin)
-       (filter #(and (not (nil? %))
-                     ((into #{} type)
-                      (-> % (:entities)
-                          (rj.c/sort-by-pri)
-                          (first) (:type)))))))
 
 (declare process-input-tick)
 
@@ -128,7 +100,7 @@
   [world origin]
   (loop [current (get-in world origin)
          explored #{}
-         un-explored (into #{} (get-neighbors-of-type world origin [:lichen]))]
+         un-explored (into #{} (rj.u/get-neighbors-of-type world origin [:lichen]))]
     (if (empty? un-explored)
       (count explored)
       (recur (first un-explored)
@@ -136,7 +108,7 @@
              (into (rest un-explored)
                    (remove #(or (#{current} %)
                                 (explored %))
-                           (get-neighbors-of-type world
+                           (rj.u/get-neighbors-of-type world
                                                   [(:x (first un-explored))
                                                    (:y (first un-explored))]
                                                   [:lichen])))))))
@@ -155,7 +127,7 @@
         grow-chance% (:grow-chance% c-lichen)
         max-blob-size (:max-blob-size c-lichen)
 
-        empty-neighbors (get-neighbors-of-type world [x y]
+        empty-neighbors (rj.u/get-neighbors-of-type world [x y]
                                                [:floor :torch :gold])]
     (if (and (seq empty-neighbors)
              (< (rand 100) grow-chance%)
