@@ -175,10 +175,10 @@
             :width 12 :height 12
             :color {:r 255 :g 1 :b 1 :a 255}
             :tile-sheet "grim_12x12.png"}
-   :bat    {:x 14 :y 5
-            :width 12 :height 12
+   :bat    {:x 0 :y 9
+            :width 16 :height 16
             :color {:r 255 :g 255 :b 255 :a 128}
-            :tile-sheet "grim_12x12.png"}})
+            :tile-sheet "DarkondDigsDeeper_16x16.png"}})
 
 (def ^:private get-texture
   (memoize
