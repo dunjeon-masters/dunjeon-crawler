@@ -30,6 +30,10 @@
                                        entities))))
           (rj.e/kill-e this)))))
 
+(defn can-move?
+  [_ _ target]
+  (#{:floor :gold :torch} (:type (rj.u/get-top-entity target))))
+
 (defn move
   [system this target]
   (let [c-position (rj.e/get-c-on-e system this :position)
@@ -79,7 +83,7 @@
          (rj.e/add-c e-bat (rj.c/map->Bat {}))
          (rj.e/add-c e-bat (rj.c/map->Position {:x (:x target)
                                                 :y (:y target)}))
-         (rj.e/add-c e-bat (rj.c/map->Mobile {:can-move? nil
+         (rj.e/add-c e-bat (rj.c/map->Mobile {:can-move? can-move?
                                               :move      move}))
          (rj.e/add-c e-bat (rj.c/map->Destructible {:hp      1
                                                     :defense 1
@@ -95,11 +99,15 @@
         c-world (rj.e/get-c-on-e system e-world :world)
         world (:world c-world)
 
-        valid-targets (rj.u/get-neighbors-of-type world [(:x c-position) (:y c-position)]
-                                                  [:floor :gold :torch])
-        target (if (seq valid-targets)
-                 (rand-nth (conj valid-targets nil))
+        targets (rj.u/get-neighbors world [(:x c-position) (:y c-position)])
+
+        target (if (seq targets)
+                 (rand-nth (conj targets nil))
                  nil)]
     (if (not (nil? target))
-      ((:move (rj.e/get-c-on-e system this :mobile)) system this target)
+      (cond
+        ((:can-move? (rj.e/get-c-on-e system this :mobile)) system this target)
+        ((:move (rj.e/get-c-on-e system this :mobile)) system this target)
+
+        :else system)
       system)))
