@@ -4,6 +4,40 @@
 
             [rouje-like.components :as rj.c]))
 
+(def get-default-pri
+  {:floor 1
+   :torch 2
+   :gold 3
+   :wall 4
+   :lichen 5
+   :bat 6
+   :else 7
+   :player 8})
+
+(defn sort-by-pri
+  [entities get-pri]
+  (sort (fn [arg1 arg2]
+          (let [t1 (:type arg1)
+                t2 (:type arg2)]
+            (if (= t1 t2)
+              0
+              (- (get get-pri t2
+                      (get get-pri :else 1))
+                 (get get-pri t1
+                      (get get-pri :else 1))))))
+        entities))
+
+(defn get-top-entity
+  ([target]
+   (get-top-entity target get-default-pri))
+  ([target get-pri]
+   (-> target
+       (:entities)
+       (sort-by-pri get-pri)
+       (first))))
+
+
+
 (def ^:private directions
   {:left  [-1 0]
    :right [1  0]
@@ -31,9 +65,7 @@
   (->> (get-neighbors world origin)
        (filter #(and (not (nil? %))
                      ((into #{} type)
-                      (-> % (:entities)
-                          (rj.c/sort-by-pri)
-                          (first) (:type)))))))
+                      (:type (get-top-entity %)))))))
 
 (defn ^:private radial-distance
   [[x1 y1] [x2 y2]]
@@ -47,11 +79,8 @@
 
 (defn not-any-radially-of-type
   [world origin dist-fn type]
-  (not-any? (fn [tile] (#{type} (-> (:entities tile)
-                                    (rj.c/sort-by-pri {type 2
-                                                       :else 1})
-                                    (first)
-                                    (:type))))
+  (not-any? (fn [tile] (#{type} (:type (get-top-entity tile {type 2
+                                                             :else 1}))))
             (get-entities-radially world origin dist-fn)))
 
 (defn ^:private ring-coords

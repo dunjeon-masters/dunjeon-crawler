@@ -40,16 +40,16 @@
 
 (defn can-attack?
   [_ _ target]
-  (#{:player} (-> target (:entities)
-                  (rj.c/sort-by-pri)
-                  (first) (:type))))
+  (#{:player} (:type (rj.u/get-top-entity target))))
 
 (defn attack
   [system this target]
   (let [damage (:atk (rj.e/get-c-on-e system this :attacker))
 
         take-damage (:take-damage (rj.e/get-c-on-e system target :destructible))]
-    (take-damage system target damage this)))
+    (if (can-attack? system this target)
+      (take-damage system target damage this)
+      system)))
 
 (declare process-input-tick)
 
@@ -58,14 +58,12 @@
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
          world (:world c-world)]
-     ;; TODO: Only add lichen if !:wall, use remove
-     #_(rand-nth (remove #(#{:wall}
-                           (-> % (:entities)
-                               (rj.c/sort-by-pri)
-                               (first) (:type)))
-                         world))
-     (add-lichen system (get-in world [(rand-int (count world))
-                                       (rand-int (count (first world)))]))))
+     (loop [target (get-in world [(rand-int (count world))
+                                  (rand-int (count (first world)))])]
+       (if (#{:wall} (:type (rj.u/get-top-entity target)))
+         (recur (get-in world [(rand-int (count world))
+                               (rand-int (count (first world)))]))
+         (add-lichen system target)))))
   ([system target]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-lichen (br.e/create-entity)]
@@ -78,9 +76,7 @@
                                                (fn [tile]
                                                  (update-in tile [:entities]
                                                             (fn [entities]
-                                                              (vec (conj (remove #(#{:wall :floor} (:type %)) entities)
-                                                                         (rj.c/map->Entity {:id nil
-                                                                                            :type :floor})
+                                                              (vec (conj (remove #(#{:wall} (:type %)) entities)
                                                                          (rj.c/map->Entity {:id   e-lichen
                                                                                             :type :lichen})))))))))))
          (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 6

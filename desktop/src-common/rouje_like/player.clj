@@ -6,7 +6,8 @@
             [play-clj.g2d :refer [texture texture!]]
 
             [rouje-like.components :as rj.c]
-            [rouje-like.entity :as rj.e]))
+            [rouje-like.entity :as rj.e]
+            [rouje-like.utils :as rj.u]))
 
 (defn take-damage
   [system this damage _]
@@ -36,26 +37,20 @@
 
 (defn can-attack?
   [_ _ target]
-  (#{:lichen :bat} (-> target (:entities)
-                       (rj.c/sort-by-pri)
-                       (first) (:type))))
+  (#{:lichen :bat} (:type (rj.u/get-top-entity target))))
 
 (defn attack
   [system this target]
   (let [damage (:atk (rj.e/get-c-on-e system this :attacker))
 
-        e-enemy (:id (-> target (:entities)
-                         (rj.c/sort-by-pri)
-                         (first)))
+        e-enemy (:id (rj.u/get-top-entity target))
 
         take-damage (:take-damage (rj.e/get-c-on-e system e-enemy :destructible))]
     (take-damage system e-enemy damage this)))
 
 (defn can-dig?
   [_ _ target]
-  (#{:wall} (:type (-> target (:entities)
-                       (rj.c/sort-by-pri)
-                       (first)))))
+  (#{:wall} (:type (rj.u/get-top-entity target))))
 
 (defn dig
   [system this target]
@@ -79,9 +74,7 @@
 
 (defn can-move?
   [_ _ target]
-  (#{:floor :gold :torch} (:type (-> target (:entities)
-                                     (rj.c/sort-by-pri)
-                                     (first)))))
+  (#{:floor :gold :torch} (:type (rj.u/get-top-entity target))))
 
 (defn move
   [system this target]
@@ -105,9 +98,7 @@
                     (fn [c-moves-left]
                       (update-in c-moves-left [:moves-left] dec)))
 
-        (as-> system (case (-> target (:entities)
-                               (rj.c/sort-by-pri)
-                               (first) (:type))
+        (as-> system (case (:type (rj.u/get-top-entity target))
                        :gold  (-> system
                                   (rj.e/upd-c this :gold
                                               (fn [c-gold]

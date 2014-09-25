@@ -73,28 +73,3 @@
                :tickable     (type (->Tickable nil nil))
                :lichen       (type (->Lichen nil nil))
                :bat          (type (->Bat))})
-
-(def get-pri {:floor 1
-              :torch 2
-              :gold 3
-              :wall 4
-              :lichen 5
-              :bat 6
-              :else 7
-              :player 8})
-
-(defn sort-by-pri
-  ([coll]
-   (sort-by-pri coll get-pri))
-
-  ([coll get-pri]
-   (sort (fn [arg1 arg2]
-           (let [t1 (:type arg1)
-                 t2 (:type arg2)]
-             (if (= t1 t2)
-               0
-               (- (get get-pri t2
-                       (get get-pri :else 1))
-                  (get get-pri t1
-                       (get get-pri :else 1))))))
-         coll)))

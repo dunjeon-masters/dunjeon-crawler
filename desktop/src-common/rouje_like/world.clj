@@ -12,7 +12,6 @@
 
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]
-            [rouje-like.lichen :as rj.lc]
             [rouje-like.utils :as rj.u]))
 
 (defn ^:private new-tile
@@ -59,14 +58,10 @@
   [world]
   (let [get-smoothed-tile (fn [block-d1 block-d2 x y]
                             (let [tile-counts-d1 (frequencies (map (fn [tile]
-                                                                     (-> tile (:entities)
-                                                                         (rj.c/sort-by-pri)
-                                                                         (first) (:type)))
+                                                                     (:type (rj.u/get-top-entity tile)))
                                                                    block-d1))
                                   tile-counts-d2 (frequencies (map (fn [tile]
-                                                                     (-> tile (:entities)
-                                                                         (rj.c/sort-by-pri)
-                                                                         (first) (:type)))
+                                                                     (:type (rj.u/get-top-entity tile)))
                                                                    block-d2))
                                   wall-threshold-d1 5
                                   wall-bound-d2 2
@@ -99,9 +94,7 @@
   [world]
   (let [get-smoothed-tile (fn [block-d1 x y]
                             (let [tile-counts-d1 (frequencies (map (fn [tile]
-                                                                     (-> tile (:entities)
-                                                                         (rj.c/sort-by-pri)
-                                                                         (first) (:type)))
+                                                                     (:type (rj.u/get-top-entity tile)))
                                                                    block-d1))
                                   wall-threshold-d1 5
                                   wall-count-d1 (get tile-counts-d1 :wall 0)
@@ -244,10 +237,8 @@
       (when (or show-world?
                 (> sight
                    (taxicab-dist player-pos [x y])))
-        (let [texture-entity (-> (:entities tile)
-                                 (rj.c/sort-by-pri)
-                                 (first) (:type)
-                                 (get-texture))]
+        (let [texture-entity (-> (rj.u/get-top-entity tile)
+                                 (:type) (get-texture))]
           (let [color-values (:color texture-entity)]
               (.setColor renderer
                          (Color. (float (/ (:r color-values) 255))
