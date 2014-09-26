@@ -8,6 +8,12 @@
 (defn -main
   []
   (LwjglApplication. rouje-like "rouje-like"
-                     (* (+ (* 2 (:x padding-sizes)) (view-port-sizes 0)) block-size)
-                     (* (+ (* 2 (:y padding-sizes)) (view-port-sizes 0)) block-size))
+                     (* (+ (+ (:left padding-sizes)
+                              (:right padding-sizes))
+                           (view-port-sizes 0))
+                        block-size)
+                     (* (+ (+ (:btm padding-sizes)
+                              (:top padding-sizes))
+                           (view-port-sizes 0))
+                        block-size))
   (Keyboard/enableRepeatEvents true))

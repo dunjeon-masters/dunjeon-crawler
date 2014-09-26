@@ -4,8 +4,10 @@
 
 (def block-size 48)
 (def view-port-sizes [20 20])
-;; TODO: Change to :top :btm :left :right
-(def padding-sizes {:x 1 :y 1})
+(def padding-sizes {:top   1
+                    :btm   1
+                    :left  1
+                    :right 1})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord Player [show-world?])

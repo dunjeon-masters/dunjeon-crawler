@@ -82,7 +82,8 @@
                         " - " "HP: [" hp "]")
                    (color :green)
                    :set-y (float (* (+ vheight
-                                       (dec (* 2 (:y rj.c/padding-sizes))))
+                                       (dec (+ (:top rj.c/padding-sizes)
+                                               (:btm rj.c/padding-sizes))))
                                     rj.c/block-size)))
             :draw renderer 1.0)
     (.end renderer)))

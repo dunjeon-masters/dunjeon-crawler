@@ -248,10 +248,10 @@
           (.draw renderer
                  (:object texture-entity)
                  (float (* (+ (- x start-x)
-                              (:x rj.c/padding-sizes))
+                              (:left rj.c/padding-sizes))
                            rj.c/block-size))
                  (float (* (+ (- y start-y)
-                              (:y rj.c/padding-sizes))
+                              (:btm rj.c/padding-sizes))
                            rj.c/block-size))
                  (float rj.c/block-size) (float rj.c/block-size)))))
     (.end renderer)))
