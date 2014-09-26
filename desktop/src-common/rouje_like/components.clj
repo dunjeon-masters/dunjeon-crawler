@@ -4,16 +4,17 @@
 
 (def block-size 48)
 (def view-port-sizes [20 20])
-
 ;; TODO: Change to :top :btm :left :right
 (def padding-sizes {:x 1 :y 1})
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defrecord Player [show-world?])
 
+(defrecord Lichen [grow-chance%
+                   max-blob-size])
 
-;;TODO
-#_(defn make-foo
-    [& {:keys [a b c] :or {a 5 c 7}}]
-    (Foo. a b c))
+(defrecord Bat [])
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defrecord World [world])
 
@@ -23,7 +24,6 @@
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
-(defrecord Player [show-world?])
 
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
@@ -41,6 +41,7 @@
 
 (defrecord Position [x y])
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IMobile
   (can-move? [this e-this target-tile system])
   (move      [this e-this target-tile system]))
@@ -51,7 +52,7 @@
     (can-move?-fn this e-this target-tile system))
   (move     [this e-this target-tile system]
     (move-fn this e-this target-tile system)))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IAttacker
   (can-attack? [this e-this target-tile system])
   (attack      [this e-this target-tile system]))
@@ -63,7 +64,7 @@
     (can-attack?-fn this e-this target-tile system))
   (attack     [this e-this target-tile system]
     (attack-fn this e-this target-tile system)))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [hp
@@ -72,14 +73,14 @@
   IDestructible
   (take-damage     [this e-this damage from system]
     (take-damage-fn this e-this damage from system)))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol ITickable
   (tick [this e-this system]))
 (defrecord Tickable [^Fn tick-fn]
   ITickable
   (tick     [this e-this system]
     (tick-fn this e-this system)))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IRenderable
   (render [this e-this args system]))
 (defrecord Renderable [^Fn render-fn
@@ -87,12 +88,7 @@
   IRenderable
   (render     [this e-this argz system]
     (render-fn this e-this argz system)))
-
-(defrecord Lichen [grow-chance%
-                   max-blob-size])
-
-(defrecord Bat [])
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Workaround for not being able to get record's type "statically"
 (def get-type {:world        (type (->World nil))
                :tile         (type (->Tile nil nil nil))
