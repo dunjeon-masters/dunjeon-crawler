@@ -94,9 +94,9 @@
 
 (defn process-input-tick
   [system direction]
-  (let [this (first (rj.e/all-e-with-c system :player))
+  (let [e-this (first (rj.e/all-e-with-c system :player))
 
-        c-position (rj.e/get-c-on-e system this :position)
+        c-position (rj.e/get-c-on-e system e-this :position)
         x-pos (:x c-position)
         y-pos (:y c-position)
 
@@ -108,18 +108,18 @@
                                             direction))
         target-tile (get-in world target-coords nil)]
     (if (and (not (nil? target-tile)))
-      (let [c-mobile   (rj.e/get-c-on-e system this :mobile)
-            c-digger   (rj.e/get-c-on-e system this :digger)
-            c-attacker (rj.e/get-c-on-e system this :attacker)]
+      (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
+            c-digger   (rj.e/get-c-on-e system e-this :digger)
+            c-attacker (rj.e/get-c-on-e system e-this :attacker)]
         (cond
-          ((:can-move? c-mobile) system this target-tile)
-          ((:move c-mobile) system this target-tile)
+          ((:can-move? c-mobile) system e-this target-tile)
+          ((:move c-mobile) system e-this target-tile)
 
-          ((:can-dig? c-digger) system this target-tile)
-          ((:dig c-digger) system this target-tile)
+          ((:can-dig? c-digger) system e-this target-tile)
+          ((:dig c-digger) system e-this target-tile)
 
-          (can-attack? c-attacker this target-tile system)
-          (attack c-attacker this target-tile system)))
+          (can-attack? c-attacker e-this target-tile system)
+          (attack c-attacker e-this target-tile system)))
       system)))
 
 ;;RENDERING FUNCTIONS

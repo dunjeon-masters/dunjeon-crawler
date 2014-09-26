@@ -3,7 +3,7 @@
   (:require [brute.entity :as br.e]
             [clojure.pprint :refer [pprint]]
 
-            [rouje-like.components :as rj.c]
+            [rouje-like.components :as rj.c :refer [can-attack? attack]]
             [rouje-like.entity :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.world :as rj.wr]
@@ -82,4 +82,9 @@
              (< (get-size-of-lichen-blob world [x y])
                 max-blob-size))
       (add-lichen system (rand-nth empty-neighbors))
-      system)))
+      (let [player-neighbors (rj.u/get-neighbors-of-type world [x y] [:player])]
+        (if (seq player-neighbors)
+          (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
+            (when (can-attack? c-attacker e-this (first player-neighbors) system)
+              (attack c-attacker e-this (first player-neighbors) system)))
+          system)))))
