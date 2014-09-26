@@ -38,13 +38,13 @@
 
 
 
-(def ^:private directions
+(def direction->offset
   {:left  [-1 0]
    :right [1  0]
    :up    [0  1]
    :down  [0 -1]})
 
-(defn ^:private offset-coords
+(defn offset-coords
   "Offset the first coordinate by the second,
   returning the result coordinate."
   [[x y] [dx dy]]
@@ -56,7 +56,7 @@
   squares of the given [x y] pos."
   [origin]
   (map offset-coords
-       (repeat origin) (vals directions)))
+       (repeat origin) (vals direction->offset)))
 
 (defn get-neighbors
   [world origin]

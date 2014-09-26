@@ -24,10 +24,12 @@
                       (fn [c-destructible]
                         (update-in c-destructible [:hp] - damage))))
       (-> system
-          (rj.e/upd-c e-world [(:x c-position) (:y c-position)]
-                      (fn [entities _]
-                        (vec (remove #(#{:player} (:type %))
-                                     entities))))
+          (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
+                                 (fn [entities _]
+                                   (vec
+                                     (remove
+                                       #(#{:player} (:type %))
+                                       entities))))
           (rj.e/kill-e this)))))
 
 (defn can-attack?
@@ -125,7 +127,7 @@
                           (assoc-in [:x] (:x target))
                           (assoc-in [:y] (:y target))))))))
 
-(defn process-input-tick!
+(defn process-input-tick
   [system direction]
   (let [this (first (rj.e/all-e-with-c system :player))
 
@@ -136,11 +138,9 @@
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         world (:world c-world)
-        target-coords (case direction
-                        :up    [     x-pos (inc y-pos)]
-                        :down  [     x-pos (dec y-pos)]
-                        :left  [(dec x-pos)     y-pos]
-                        :right [(inc x-pos)     y-pos])
+        target-coords (rj.u/offset-coords [x-pos y-pos]
+                                          (rj.u/direction->offset
+                                            direction))
         target (get-in world target-coords nil)]
     (if (and (not (nil? target)))
       (let [c-mobile   (rj.e/get-c-on-e system this :mobile)
@@ -159,20 +159,20 @@
 
 ;;RENDERING FUNCTIONS
 (defn render-player-stats
-  [system this {:keys [view-port-sizes]}]
+  [_ e-this {:keys [view-port-sizes]} system]
   (let [[_ vheight] view-port-sizes
 
-        c-position (rj.e/get-c-on-e system this :position)
+        c-position (rj.e/get-c-on-e system e-this :position)
         x (:x c-position)
         y (:y c-position)
 
-        c-gold (rj.e/get-c-on-e system this :gold)
+        c-gold (rj.e/get-c-on-e system e-this :gold)
         gold (:gold c-gold)
 
-        c-moves-left (rj.e/get-c-on-e system this :moves-left)
+        c-moves-left (rj.e/get-c-on-e system e-this :moves-left)
         moves-left (:moves-left c-moves-left)
 
-        c-destructible (rj.e/get-c-on-e system this :destructible)
+        c-destructible (rj.e/get-c-on-e system e-this :destructible)
         hp (:hp c-destructible)
 
         renderer (new SpriteBatch)]
@@ -187,5 +187,5 @@
     (.end renderer)))
 
 (defn render-player
-  [system this args]
-  (render-player-stats system this args))
+  [_ e-this args system]
+  (render-player-stats _ e-this args system))

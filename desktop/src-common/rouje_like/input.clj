@@ -34,19 +34,19 @@
         (-> (cond
               (or (= key-code (play/key-code :dpad-up))
                   (= key-code (play/key-code :W)))
-              (rj.pl/process-input-tick! system :up)
+              (rj.pl/process-input-tick system :up)
 
               (or (= key-code (play/key-code :dpad-down))
                   (= key-code (play/key-code :S)))
-              (rj.pl/process-input-tick! system :down)
+              (rj.pl/process-input-tick system :down)
 
               (or (= key-code (play/key-code :dpad-left))
                   (= key-code (play/key-code :A)))
-              (rj.pl/process-input-tick! system :left)
+              (rj.pl/process-input-tick system :left)
 
               (or (= key-code (play/key-code :dpad-right))
                   (= key-code (play/key-code :D)))
-              (rj.pl/process-input-tick! system :right)
+              (rj.pl/process-input-tick system :right)
 
               :else system)
             (as-> system
@@ -54,7 +54,8 @@
                     (let [entities (rj.e/all-e-with-c system :tickable)]
                       (reduce (fn [system entity]
                                 (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
-                                  ((:tick-fn c-tickable) system entity (:args c-tickable))))
+                                  #_((:tick-fn c-tickable) system entity (:args c-tickable))
+                                  (rj.c/tick c-tickable entity system)))
                               system entities)))))
         system))))
 
@@ -63,8 +64,8 @@
   (if (< (* x-vel x-vel)
          (* y-vel y-vel))
     (if (pos? y-vel)
-      (rj.pl/process-input-tick! system :down)
-      (rj.pl/process-input-tick! system :up))
+      (rj.pl/process-input-tick system :down)
+      (rj.pl/process-input-tick system :up))
     (if (pos? x-vel)
-      (rj.pl/process-input-tick! system :right)
-      (rj.pl/process-input-tick! system :left))))
+      (rj.pl/process-input-tick system :right)
+      (rj.pl/process-input-tick system :left))))

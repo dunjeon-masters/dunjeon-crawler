@@ -195,7 +195,7 @@
           :color tile-color)))))
 
 (defn render-world
-  [system this args]
+  [_ e-this {:keys [view-port-sizes]} system]
   (let [taxicab-dist (fn [[x y] [i j]]
                              (+ (math/abs (- i x))
                                 (math/abs (- j y))))
@@ -210,10 +210,9 @@
         c-sight (rj.e/get-c-on-e system e-player :sight)
         sight (math/ceil (:distance c-sight))
 
-        c-world (rj.e/get-c-on-e system this :world)
+        c-world (rj.e/get-c-on-e system e-this :world)
         world (:world c-world)
 
-        {:keys [view-port-sizes]} args
         [vp-size-x vp-size-y] view-port-sizes
 
         start-x (max 0 (- (:x c-player-pos)

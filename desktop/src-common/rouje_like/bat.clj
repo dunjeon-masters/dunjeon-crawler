@@ -89,12 +89,11 @@
          (rj.e/add-c e-bat (rj.c/map->Destructible {:hp      1
                                                     :defense 1
                                                     :take-damage take-damage}))
-         (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick!
-                                                :args    nil}))))))
+         (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick!}))))))
 
 (defn process-input-tick!
-  [system this _]
-  (let [c-position (rj.e/get-c-on-e system this :position)
+  [_ e-this system]
+  (let [c-position (rj.e/get-c-on-e system e-this :position)
 
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
@@ -107,8 +106,8 @@
                  nil)]
     (if (not (nil? target))
       (cond
-        ((:can-move? (rj.e/get-c-on-e system this :mobile)) system this target)
-        ((:move (rj.e/get-c-on-e system this :mobile)) system this target)
+        ((:can-move? (rj.e/get-c-on-e system e-this :mobile)) system e-this target)
+        ((:move (rj.e/get-c-on-e system e-this :mobile)) system e-this target)
 
         :else system)
       system)))

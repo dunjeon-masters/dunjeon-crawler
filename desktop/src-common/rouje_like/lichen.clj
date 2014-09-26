@@ -29,7 +29,8 @@
           (attack this from)
           (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
                            (fn [entities _]
-                             (vec (remove #(#{:lichen} (:type %))
+                             (vec
+                               (remove #(#{:lichen} (:type %))
                                           entities))))
           (rj.e/kill-e this)))))
 
@@ -80,8 +81,7 @@
          (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk 1
                                                    :can-attack? can-attack?
                                                    :attack      attack}))
-         (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick
-                                                   :args    nil}))))))
+         (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick}))))))
 
 (defn get-size-of-lichen-blob
   [world origin]
@@ -101,8 +101,8 @@
                                                   [:lichen])))))))
 
 (defn process-input-tick
-  [system this _]
-  (let [c-position (rj.e/get-c-on-e system this :position)
+  [_ e-this system]
+  (let [c-position (rj.e/get-c-on-e system e-this :position)
         x (:x c-position)
         y (:y c-position)
 
@@ -110,7 +110,7 @@
         c-world (rj.e/get-c-on-e system e-world :world)
         world (:world c-world)
 
-        c-lichen (rj.e/get-c-on-e system this :lichen)
+        c-lichen (rj.e/get-c-on-e system e-this :lichen)
         grow-chance% (:grow-chance% c-lichen)
         max-blob-size (:max-blob-size c-lichen)
 

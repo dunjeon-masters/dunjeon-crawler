@@ -8,6 +8,8 @@
 ;; TODO: Change to :top :btm :left :right
 (def padding-sizes {:x 1 :y 1})
 
+
+
 (defrecord World [world])
 
 (defrecord Tile [^Number x ^Number y
@@ -44,12 +46,20 @@
                          defense
                          ^Fn take-damage])
 
-(defrecord Tickable [^Fn tick-fn
-                     args])
+(defprotocol ITickable
+  (tick [this e-this system]))
+(defrecord Tickable [^Fn tick-fn]
+  ITickable
+  (tick [this e-this system]
+    (tick-fn this e-this system)))
 
-(defrecord Renderable [^Number pri
-                       ^Fn render-fn
-                       args #_(args-type=map)])
+(defprotocol IRenderable
+  (render [this e-this args system]))
+(defrecord Renderable [^Fn render-fn
+                       args #_(args-type=map)]
+  IRenderable
+  (render [this e-this argz system]
+    (render-fn this e-this argz system)))
 
 (defrecord Lichen [grow-chance%
                    max-blob-size])
@@ -67,9 +77,9 @@
                :moves-left   (type (->MovesLeft nil))
                :gold         (type (->Gold nil))
                :sight        (type (->Sight nil nil nil nil nil))
-               :renderable   (type (->Renderable nil nil nil))
+               :renderable   (type (->Renderable nil nil))
                :attacker     (type (->Attacker nil nil nil))
                :destructible (type (->Destructible nil nil nil))
-               :tickable     (type (->Tickable nil nil))
+               :tickable     (type (->Tickable nil))
                :lichen       (type (->Lichen nil nil))
                :bat          (type (->Bat))})
