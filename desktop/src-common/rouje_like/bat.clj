@@ -1,41 +1,14 @@
 (ns rouje-like.bat
   (:require [brute.entity :as br.e]
 
-            [rouje-like.components :as rj.c]
+            [rouje-like.components :as rj.c :refer [can-move? move]]
             [rouje-like.entity :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.world :as rj.wr]
-            [rouje-like.destructible :as rj.d]))
+            [rouje-like.destructible :as rj.d]
+            [rouje-like.mobile :as rj.m]))
 
 (declare process-input-tick!)
-
-(defn can-move?
-  [_ _ target]
-  (#{:floor :gold :torch} (:type (rj.u/get-top-entity target))))
-
-(defn move
-  [system e-this target-tile]
-  (let [c-position (rj.e/get-c-on-e system e-this :position)
-        e-world (first (rj.e/all-e-with-c system :world))
-        bat-pos [(:x c-position) (:y c-position)]
-        target-pos [(:x target-tile) (:y target-tile)]]
-    (-> system
-        (rj.wr/update-in-world e-world target-pos
-                               (fn [entities _]
-                                 (vec (conj entities
-                                            (rj.c/map->Entity {:type :bat
-                                                               :id   e-this})))))
-
-        (rj.wr/update-in-world e-world bat-pos
-                               (fn [entities _]
-                                 (vec (remove #(#{:bat} (:type %))
-                                              entities))))
-
-        (rj.e/upd-c e-this :position
-                    (fn [c-position]
-                      (-> c-position
-                          (assoc-in [:x] (:x target-tile))
-                          (assoc-in [:y] (:y target-tile))))))))
 
 (defn add-bat
   ([system]
@@ -63,8 +36,8 @@
          (rj.e/add-c e-bat (rj.c/map->Bat {}))
          (rj.e/add-c e-bat (rj.c/map->Position {:x (:x target-tile)
                                                 :y (:y target-tile)}))
-         (rj.e/add-c e-bat (rj.c/map->Mobile {:can-move? can-move?
-                                              :move      move}))
+         (rj.e/add-c e-bat (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
+                                              :move-fn      rj.m/move}))
          (rj.e/add-c e-bat (rj.c/map->Destructible {:hp      1
                                                     :defense 1
                                                     :take-damage-fn rj.d/take-damage}))
@@ -73,6 +46,7 @@
 (defn process-input-tick!
   [_ e-this system]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
+        c-mobile (rj.e/get-c-on-e system e-this :mobile)
 
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
@@ -85,8 +59,8 @@
                  nil)]
     (if (not (nil? target-tile))
       (cond
-        ((:can-move? (rj.e/get-c-on-e system e-this :mobile)) system e-this target-tile)
-        ((:move (rj.e/get-c-on-e system e-this :mobile)) system e-this target-tile)
+        (can-move? c-mobile e-this target-tile system)
+        (move c-mobile e-this target-tile system)
 
         :else system)
       system)))

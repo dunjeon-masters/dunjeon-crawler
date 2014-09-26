@@ -25,13 +25,14 @@
 
 (defrecord Player [show-world?])
 
-(defrecord Digger [^Fn can-dig?
-                   ^Fn dig])
+(defrecord Digger [^Fn can-dig?-fn
+                   ^Fn dig-fn])
 
 (defrecord MovesLeft [moves-left])
 
 (defrecord Gold [gold])
 
+;;TODO: Refactor to ~playersight~, as creatures might have sight too
 (defrecord Sight [distance
                   decline-rate
                   lower-bound
@@ -40,19 +41,27 @@
 
 (defrecord Position [x y])
 
-(defrecord Mobile [^Fn can-move?
-                   ^Fn move])
+(defprotocol IMobile
+  (can-move? [this e-this target-tile system])
+  (move      [this e-this target-tile system]))
+(defrecord Mobile [^Fn can-move?-fn
+                   ^Fn move-fn]
+  IMobile
+  (can-move?     [this e-this target-tile system]
+    (can-move?-fn this e-this target-tile system))
+  (move     [this e-this target-tile system]
+    (move-fn this e-this target-tile system)))
 
 (defprotocol IAttacker
   (can-attack? [this e-this target-tile system])
-  (attack [this e-this target-tile system]))
+  (attack      [this e-this target-tile system]))
 (defrecord Attacker [atk
                      ^Fn attack-fn
                      ^Fn can-attack?-fn]
   IAttacker
-  (can-attack? [this e-this target-tile system]
+  (can-attack?     [this e-this target-tile system]
     (can-attack?-fn this e-this target-tile system))
-  (attack [this e-this target-tile system]
+  (attack     [this e-this target-tile system]
     (attack-fn this e-this target-tile system)))
 
 (defprotocol IDestructible
@@ -61,14 +70,14 @@
                          defense
                          ^Fn take-damage-fn]
   IDestructible
-  (take-damage [this e-this damage from system]
+  (take-damage     [this e-this damage from system]
     (take-damage-fn this e-this damage from system)))
 
 (defprotocol ITickable
   (tick [this e-this system]))
 (defrecord Tickable [^Fn tick-fn]
   ITickable
-  (tick [this e-this system]
+  (tick     [this e-this system]
     (tick-fn this e-this system)))
 
 (defprotocol IRenderable
@@ -76,7 +85,7 @@
 (defrecord Renderable [^Fn render-fn
                        args]
   IRenderable
-  (render [this e-this argz system]
+  (render     [this e-this argz system]
     (render-fn this e-this argz system)))
 
 (defrecord Lichen [grow-chance%

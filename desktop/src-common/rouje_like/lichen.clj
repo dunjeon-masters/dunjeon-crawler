@@ -81,7 +81,9 @@
              (< (rand 100) grow-chance%)
              (< (get-size-of-lichen-blob world [x y])
                 max-blob-size))
+
       (add-lichen system (rand-nth empty-neighbors))
+
       (let [player-neighbors (rj.u/get-neighbors-of-type world [x y] [:player])]
         (if (seq player-neighbors)
           (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]

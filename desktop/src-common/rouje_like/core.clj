@@ -14,6 +14,7 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.entity :as rj.e]
             [rouje-like.rendering :as rj.r]
+            [rouje-like.mobile :as rj.m]
             [rouje-like.bat :as rj.bt]
             [rouje-like.input :as rj.in]
             [rouje-like.lichen :as rj.lc]
@@ -40,6 +41,7 @@
 (def ^:private init-sight-upper-bound 13)                   ;; Exclusive
 (def ^:private init-sight-torch-power 2)
 
+;;TODO: Refactor e-player stuff to player#init-player
 (defn init-entities
   [system]
   (let [e-world  (br.e/create-entity)
@@ -49,22 +51,22 @@
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
         (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
                                                   :y init-player-y-pos}))
-        (rj.e/add-c e-player (rj.c/map->Mobile {:can-move? rj.pl/can-move?
-                                                :move      rj.pl/move}))
-        (rj.e/add-c e-player (rj.c/map->Digger {:can-dig? rj.pl/can-dig?
-                                                :dig      rj.pl/dig}))
-        (rj.e/add-c e-player (rj.c/map->Attacker {:atk         1
+        (rj.e/add-c e-player (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
+                                                :move-fn      rj.m/move-player}))
+        (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn rj.pl/can-dig?
+                                                :dig-fn      rj.pl/dig}))
+        (rj.e/add-c e-player (rj.c/map->Attacker {:atk            1
                                                   :can-attack?-fn rj.atk/can-attack?
                                                   :attack-fn      rj.atk/attack}))
         (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))
         (rj.e/add-c e-player (rj.c/map->Gold {:gold 0}))
-        (rj.e/add-c e-player (rj.c/map->Sight {:distance     (inc init-sight-distance)
-                                               :decline-rate init-sight-decline-rate
-                                               :lower-bound  init-sight-lower-bound
-                                               :upper-bound  init-sight-upper-bound
-                                               :torch-power  init-sight-torch-power}))
-        (rj.e/add-c e-player (rj.c/map->Renderable {:pri       0
-                                                    :render-fn rj.pl/render-player
+        ;;TODO: Refactor to ~playersight~, as creatures might have sight too
+        (rj.e/add-c e-player (rj.c/map->Sight {:distance (inc init-sight-distance)
+                                               :decline-rate  init-sight-decline-rate
+                                               :lower-bound   init-sight-lower-bound
+                                               :upper-bound   init-sight-upper-bound
+                                               :torch-power   init-sight-torch-power}))
+        (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn rj.pl/render-player
                                                     :args      {:view-port-sizes rj.c/view-port-sizes}}))
         (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
                                                       :defense 1
@@ -74,8 +76,7 @@
         (rj.e/add-c e-world (rj.c/map->World {:world (rj.wr/generate-random-world
                                                        world-sizes init-wall%
                                                        init-torch% init-gold%)}))
-        (rj.e/add-c e-world (rj.c/map->Renderable {:pri       1
-                                                   :render-fn rj.wr/render-world
+        (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn rj.wr/render-world
                                                    :args      {:view-port-sizes rj.c/view-port-sizes}}))
 
         ;; Spawn lichens
