@@ -5,45 +5,10 @@
             [play-clj.ui :refer :all]
             [play-clj.g2d :refer [texture texture!]]
 
-            [rouje-like.components :as rj.c]
+            [rouje-like.components :as rj.c :refer [can-attack? attack]]
             [rouje-like.entity :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.world :as rj.wr]))
-
-#_(defn take-damage
-  [system this damage _]
-  (let [c-destructible (rj.e/get-c-on-e system this :destructible)
-        hp (:hp c-destructible)
-
-        c-position (rj.e/get-c-on-e system this :position)
-
-        e-world (first (rj.e/all-e-with-c system :world))]
-    (if (pos? (- hp damage))
-      (-> system
-          (rj.e/upd-c this :destructible
-                      (fn [c-destructible]
-                        (update-in c-destructible [:hp] - damage))))
-      (-> system
-          (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
-                                 (fn [entities _]
-                                   (vec
-                                     (remove
-                                       #(#{:player} (:type %))
-                                       entities))))
-          (rj.e/kill-e this)))))
-
-(defn can-attack?
-  [_ _ target-tile]
-  (#{:lichen :bat} (:type (rj.u/get-top-entity target-tile))))
-
-(defn attack
-  [system e-this target-tile]
-  (let [damage (:atk (rj.e/get-c-on-e system e-this :attacker))
-
-        e-enemy (:id (rj.u/get-top-entity target-tile))
-
-        c-destr (rj.e/get-c-on-e system e-enemy :destructible)]
-    (rj.c/take-damage c-destr e-enemy damage e-this system)))
 
 (defn can-dig?
   [_ _ target]
@@ -153,8 +118,8 @@
           ((:can-dig? c-digger) system this target-tile)
           ((:dig c-digger) system this target-tile)
 
-          ((:can-attack? c-attacker) system this target-tile)
-          ((:attack c-attacker) system this target-tile)))
+          (can-attack? c-attacker this target-tile system)
+          (attack c-attacker this target-tile system)))
       system)))
 
 ;;RENDERING FUNCTIONS

@@ -10,6 +10,11 @@
 
 
 
+;;TODO
+#_(defn make-foo
+    [& {:keys [a b c] :or {a 5 c 7}}]
+    (Foo. a b c))
+
 (defrecord World [world])
 
 (defrecord Tile [^Number x ^Number y
@@ -38,9 +43,17 @@
 (defrecord Mobile [^Fn can-move?
                    ^Fn move])
 
+(defprotocol IAttacker
+  (can-attack? [this e-this target-tile system])
+  (attack [this e-this target-tile system]))
 (defrecord Attacker [atk
-                     ^Fn attack
-                     ^Fn can-attack?])
+                     ^Fn attack-fn
+                     ^Fn can-attack?-fn]
+  IAttacker
+  (can-attack? [this e-this target-tile system]
+    (can-attack?-fn this e-this target-tile system))
+  (attack [this e-this target-tile system]
+    (attack-fn this e-this target-tile system)))
 
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))

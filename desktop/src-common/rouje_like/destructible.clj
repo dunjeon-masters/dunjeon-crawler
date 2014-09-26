@@ -12,8 +12,11 @@
       (-> system
           (rj.e/upd-c e-this :destructible
                       (fn [c-destructible]
-                        (update-in c-destructible [:hp] - damage))))
+                        (update-in c-destructible [:hp] - damage)))
+          ;TODO: IF CAN RETALIATE, DO IT HERE
+          )
       (-> system
+          ;TODO: IF CAN RETALIATE, DO IT HERE
           (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
                                  (fn [entities _]
                                    (vec

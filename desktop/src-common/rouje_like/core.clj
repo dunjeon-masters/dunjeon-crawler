@@ -18,7 +18,8 @@
             [rouje-like.input :as rj.in]
             [rouje-like.lichen :as rj.lc]
             [rouje-like.player :as rj.pl]
-            [rouje-like.world :as rj.wr]))
+            [rouje-like.world :as rj.wr]
+            [rouje-like.attacker :as rj.atk]))
 
 (declare main-screen rouje-like)
 
@@ -53,8 +54,8 @@
         (rj.e/add-c e-player (rj.c/map->Digger {:can-dig? rj.pl/can-dig?
                                                 :dig      rj.pl/dig}))
         (rj.e/add-c e-player (rj.c/map->Attacker {:atk         1
-                                                  :can-attack? rj.pl/can-attack?
-                                                  :attack      rj.pl/attack}))
+                                                  :can-attack?-fn rj.atk/can-attack?
+                                                  :attack-fn      rj.atk/attack}))
         (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))
         (rj.e/add-c e-player (rj.c/map->Gold {:gold 0}))
         (rj.e/add-c e-player (rj.c/map->Sight {:distance     (inc init-sight-distance)

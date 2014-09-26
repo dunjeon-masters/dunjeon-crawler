@@ -4,7 +4,7 @@
             [rouje-like.entity :as rj.e]
             [rouje-like.world :as rj.w]
             [rouje-like.player :as rj.pl]
-            [rouje-like.components :as rj.c]))
+            [rouje-like.components :as rj.c :refer [tick]]))
 
 (defn process-keyboard-input!
   [system key-code]
@@ -20,11 +20,11 @@
                                        (fn [prev]
                                          (not prev)))))
       (= key-code (play/key-code :equals))
-      (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
+      (rj.e/upd-c system (first (rj.e/all-e-with-c system :player) )
                   :moves-left (fn [c-moves-left]
                                 (update-in c-moves-left [:moves-left]
                                            (fn [moves-left]
-                                             (+ 10 moves-left)))))
+                                             (+ 25 moves-left)))))
       :else system)
 
     (let [this (first (rj.e/all-e-with-c system :player))
@@ -55,7 +55,7 @@
                       (reduce (fn [system entity]
                                 (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
                                   #_((:tick-fn c-tickable) system entity (:args c-tickable))
-                                  (rj.c/tick c-tickable entity system)))
+                                  (tick c-tickable entity system)))
                               system entities)))))
         system))))
 
