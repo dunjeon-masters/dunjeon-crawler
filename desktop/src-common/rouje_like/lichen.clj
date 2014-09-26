@@ -6,9 +6,10 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]
             [rouje-like.utils :as rj.u]
-            [rouje-like.world :as rj.wr]))
+            [rouje-like.world :as rj.wr]
+            [rouje-like.destructible :as rj.d]))
 
-(defn take-damage
+#_(defn take-damage
   [system this damage from]
   (let [c-destructible (rj.e/get-c-on-e system this :destructible)
         hp (:hp c-destructible)
@@ -24,9 +25,9 @@
           (rj.e/upd-c this :destructible
                       (fn [c-destructible]
                         (update-in c-destructible [:hp] - damage)))
-          (attack this from))
+>>>>>>>>>>>>>>>>>>>>>>>(attack this from))<<<<<<<<
       (-> system
-          (attack this from)
+>>>>>>>>>>>>>>>>>>>>>>>(attack this from) <<<<<<<<<<
           (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
                            (fn [entities _]
                              (vec
@@ -45,8 +46,8 @@
           damage (if (< (rand-int 100) 30)
                    atk 0)
 
-          take-damage (:take-damage (rj.e/get-c-on-e system target :destructible))]
-      (take-damage system target damage this))
+          c-destr (rj.e/get-c-on-e system target :destructible)]
+      (rj.c/take-damage c-destr target damage this system))
     system))
 
 (declare process-input-tick)
@@ -77,7 +78,7 @@
                                                    :y (:y target)}))
          (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      1
                                                        :defense 1
-                                                       :take-damage take-damage}))
+                                                       :take-damage-fn rj.d/take-damage}))
          (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk 1
                                                    :can-attack? can-attack?
                                                    :attack      attack}))

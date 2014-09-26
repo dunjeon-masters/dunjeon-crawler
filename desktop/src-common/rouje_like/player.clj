@@ -10,7 +10,7 @@
             [rouje-like.utils :as rj.u]
             [rouje-like.world :as rj.wr]))
 
-(defn take-damage
+#_(defn take-damage
   [system this damage _]
   (let [c-destructible (rj.e/get-c-on-e system this :destructible)
         hp (:hp c-destructible)
@@ -33,41 +33,41 @@
           (rj.e/kill-e this)))))
 
 (defn can-attack?
-  [_ _ target]
-  (#{:lichen :bat} (:type (rj.u/get-top-entity target))))
+  [_ _ target-tile]
+  (#{:lichen :bat} (:type (rj.u/get-top-entity target-tile))))
 
 (defn attack
-  [system this target]
-  (let [damage (:atk (rj.e/get-c-on-e system this :attacker))
+  [system e-this target-tile]
+  (let [damage (:atk (rj.e/get-c-on-e system e-this :attacker))
 
-        e-enemy (:id (rj.u/get-top-entity target))
+        e-enemy (:id (rj.u/get-top-entity target-tile))
 
-        take-damage (:take-damage (rj.e/get-c-on-e system e-enemy :destructible))]
-    (take-damage system e-enemy damage this)))
+        c-destr (rj.e/get-c-on-e system e-enemy :destructible)]
+    (rj.c/take-damage c-destr e-enemy damage e-this system)))
 
 (defn can-dig?
   [_ _ target]
   (#{:wall} (:type (rj.u/get-top-entity target))))
 
 (defn dig
-  [system this target]
+  [system e-this target-tile]
   (let [e-world (first (rj.e/all-e-with-c system :world))]
     (-> system
-        (rj.wr/update-in-world e-world [(:x target) (:y target)]
+        (rj.wr/update-in-world e-world [(:x target-tile) (:y target-tile)]
                                (fn [entities _]
                                  (remove #(#{:wall} (:type %))
                                          entities)))
-        (rj.e/upd-c this :moves-left
+        (rj.e/upd-c e-this :moves-left
                     (fn [c-moves-left]
                       (update-in c-moves-left [:moves-left] dec))))))
 
 (defn can-move?
-  [_ _ target]
-  (#{:floor :gold :torch} (:type (rj.u/get-top-entity target))))
+  [_ _ target-tile]
+  (#{:floor :gold :torch} (:type (rj.u/get-top-entity target-tile))))
 
 (defn move
-  [system this target]
-  (let [c-sight (rj.e/get-c-on-e system this :sight)
+  [system e-this target-tile]
+  (let [c-sight (rj.e/get-c-on-e system e-this :sight)
         sight-decline-rate (:decline-rate c-sight)
         sight-lower-bound (:lower-bound c-sight)
         sight-upper-bound (:upper-bound c-sight)
@@ -79,41 +79,41 @@
                                (+ prev sight-torch-power)
                                prev))
 
-        c-position (rj.e/get-c-on-e system this :position)
+        c-position (rj.e/get-c-on-e system e-this :position)
 
         e-world (first (rj.e/all-e-with-c system :world))]
     (-> system
-        (rj.e/upd-c this :moves-left
+        (rj.e/upd-c e-this :moves-left
                     (fn [c-moves-left]
                       (update-in c-moves-left [:moves-left] dec)))
 
         (as-> system
-              (case (:type (rj.u/get-top-entity target))
+              (case (:type (rj.u/get-top-entity target-tile))
                 :gold  (-> system
-                           (rj.e/upd-c this :gold
+                           (rj.e/upd-c e-this :gold
                                        (fn [c-gold]
                                          (update-in c-gold [:gold] inc)))
-                           (rj.e/upd-c this :sight
+                           (rj.e/upd-c e-this :sight
                                        (fn [c-sight]
                                          (update-in c-sight [:distance] dec-sight))))
                 :torch (-> system
-                           (rj.e/upd-c this :sight
+                           (rj.e/upd-c e-this :sight
                                        (fn [c-sight]
                                          (update-in c-sight [:distance] inc-sight))))
                 :floor (-> system
-                           (rj.e/upd-c this :sight
+                           (rj.e/upd-c e-this :sight
                                        (fn [c-sight]
                                          (update-in c-sight [:distance] dec-sight))))
                 system))
 
-        (rj.wr/update-in-world e-world [(:x target) (:y target)]
+        (rj.wr/update-in-world e-world [(:x target-tile) (:y target-tile)]
                                (fn [entities _]
                                  (vec
                                    (conj
                                      (remove #(#{:gold :torch} (:type %))
                                              entities)
                                      (rj.c/map->Entity {:type :player
-                                                        :id   this})))))
+                                                        :id   e-this})))))
         (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
                                (fn [entities _]
                                  (vec
@@ -121,11 +121,11 @@
                                      #(#{:player} (:type %))
                                      entities))))
 
-        (rj.e/upd-c this :position
+        (rj.e/upd-c e-this :position
                     (fn [c-position]
                       (-> c-position
-                          (assoc-in [:x] (:x target))
-                          (assoc-in [:y] (:y target))))))))
+                          (assoc-in [:x] (:x target-tile))
+                          (assoc-in [:y] (:y target-tile))))))))
 
 (defn process-input-tick
   [system direction]
@@ -141,20 +141,20 @@
         target-coords (rj.u/offset-coords [x-pos y-pos]
                                           (rj.u/direction->offset
                                             direction))
-        target (get-in world target-coords nil)]
-    (if (and (not (nil? target)))
+        target-tile (get-in world target-coords nil)]
+    (if (and (not (nil? target-tile)))
       (let [c-mobile   (rj.e/get-c-on-e system this :mobile)
             c-digger   (rj.e/get-c-on-e system this :digger)
             c-attacker (rj.e/get-c-on-e system this :attacker)]
         (cond
-          ((:can-move? c-mobile) system this target)
-          ((:move c-mobile) system this target)
+          ((:can-move? c-mobile) system this target-tile)
+          ((:move c-mobile) system this target-tile)
 
-          ((:can-dig? c-digger) system this target)
-          ((:dig c-digger) system this target)
+          ((:can-dig? c-digger) system this target-tile)
+          ((:dig c-digger) system this target-tile)
 
-          ((:can-attack? c-attacker) system this target)
-          ((:attack c-attacker) system this target)))
+          ((:can-attack? c-attacker) system this target-tile)
+          ((:attack c-attacker) system this target-tile)))
       system)))
 
 ;;RENDERING FUNCTIONS

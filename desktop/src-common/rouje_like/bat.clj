@@ -4,11 +4,12 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]
             [rouje-like.utils :as rj.u]
-            [rouje-like.world :as rj.wr]))
+            [rouje-like.world :as rj.wr]
+            [rouje-like.destructible :as rj.d]))
 
 (declare process-input-tick!)
 
-(defn take-damage
+#_(defn take-damage
   [system this damage _]
   (let [c-destructible (rj.e/get-c-on-e system this :destructible)
         hp (:hp c-destructible)
@@ -88,7 +89,7 @@
                                               :move      move}))
          (rj.e/add-c e-bat (rj.c/map->Destructible {:hp      1
                                                     :defense 1
-                                                    :take-damage take-damage}))
+                                                    :take-damage-fn rj.d/take-damage}))
          (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick!}))))))
 
 (defn process-input-tick!

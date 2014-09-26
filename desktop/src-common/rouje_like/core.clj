@@ -11,6 +11,7 @@
             [brute.system :as br.s]
 
             [rouje-like.components :as rj.c]
+            [rouje-like.destructible :as rj.d]
             [rouje-like.entity :as rj.e]
             [rouje-like.rendering :as rj.r]
             [rouje-like.bat :as rj.bt]
@@ -66,7 +67,7 @@
                                                     :args      {:view-port-sizes rj.c/view-port-sizes}}))
         (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
                                                       :defense 1
-                                                      :take-damage rj.pl/take-damage}))
+                                                      :take-damage-fn rj.d/take-damage}))
 
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/map->World {:world (rj.wr/generate-random-world
@@ -88,17 +89,11 @@
                    20))
 
         ;; Add player
-        ;; TODO: Refactor to a fn, upd-world [e-world target (fn [entities] ...)]
-        (rj.e/upd-c e-world :world
-                    (fn [c-world]
-                      (update-in c-world [:world]
-                                 (fn [world]
-                                   (update-in world init-player-pos
-                                              (fn [tile] (update-in tile [:entities]
-                                                                    (fn [entities]
-                                                                      (vec (conj entities
-                                                                                 (rj.c/map->Entity {:id   e-player
-                                                                                                    :type :player}))))))))))))))
+        (rj.wr/update-in-world e-world init-player-pos
+                               (fn [entities _]
+                                 (vec (conj entities
+                                            (rj.c/map->Entity {:id   e-player
+                                                               :type :player}))))))))
 
 (defn register-system-fns
   [system]

@@ -42,9 +42,14 @@
                      ^Fn attack
                      ^Fn can-attack?])
 
+(defprotocol IDestructible
+  (take-damage [this e-this damage from system]))
 (defrecord Destructible [hp
                          defense
-                         ^Fn take-damage])
+                         ^Fn take-damage-fn]
+  IDestructible
+  (take-damage [this e-this damage from system]
+    (take-damage-fn this e-this damage from system)))
 
 (defprotocol ITickable
   (tick [this e-this system]))
@@ -56,7 +61,7 @@
 (defprotocol IRenderable
   (render [this e-this args system]))
 (defrecord Renderable [^Fn render-fn
-                       args #_(args-type=map)]
+                       args]
   IRenderable
   (render [this e-this argz system]
     (render-fn this e-this argz system)))

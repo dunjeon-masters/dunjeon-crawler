@@ -2,7 +2,8 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [com.badlogic.gdx.graphics.g2d SpriteBatch TextureRegion])
 
-  (:require [rouje-like.components :as rj.c :refer [render]]
+  (:require [rouje-like.components :refer [render]]
+
             [rouje-like.entity     :as rj.e]))
 
 (defn process-one-game-tick
