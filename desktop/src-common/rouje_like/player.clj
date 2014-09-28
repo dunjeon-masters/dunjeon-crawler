@@ -44,7 +44,8 @@
     (if (and (not (nil? target-tile)))
       (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
             c-digger   (rj.e/get-c-on-e system e-this :digger)
-            c-attacker (rj.e/get-c-on-e system e-this :attacker)]
+            c-attacker (rj.e/get-c-on-e system e-this :attacker)
+            e-target (:id (rj.u/get-top-entity target-tile))]
         (cond
           (can-move? c-mobile e-this target-tile system)
           (move c-mobile e-this target-tile system)
@@ -52,8 +53,8 @@
           ((:can-dig?-fn c-digger) system e-this target-tile)
           ((:dig-fn c-digger) system e-this target-tile)
 
-          (can-attack? c-attacker e-this target-tile system)
-          (attack c-attacker e-this target-tile system)))
+          (can-attack? c-attacker e-this e-target system)
+          (attack c-attacker e-this e-target system)))
       system)))
 
 ;;RENDERING FUNCTIONS

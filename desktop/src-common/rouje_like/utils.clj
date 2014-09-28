@@ -28,10 +28,10 @@
         entities))
 
 (defn get-top-entity
-  ([target]
-   (get-top-entity target get-default-pri))
-  ([target get-pri]
-   (-> target
+  ([target-tile]
+   (get-top-entity target-tile get-default-pri))
+  ([target-tile get-pri]
+   (-> target-tile
        (:entities)
        (sort-by-pri get-pri)
        (first))))

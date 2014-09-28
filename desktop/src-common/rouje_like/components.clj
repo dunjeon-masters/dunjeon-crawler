@@ -45,15 +45,15 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IMobile
-  (can-move? [this e-this target-tile system])
-  (move      [this e-this target-tile system]))
+  (can-move? [this e-this e-target system])
+  (move      [this e-this e-target system]))
 (defrecord Mobile [^Fn can-move?-fn
                    ^Fn move-fn]
   IMobile
-  (can-move?     [this e-this target-tile system]
-    (can-move?-fn this e-this target-tile system))
-  (move     [this e-this target-tile system]
-    (move-fn this e-this target-tile system)))
+  (can-move?     [this e-this e-target system]
+    (can-move?-fn this e-this e-target system))
+  (move     [this e-this e-target system]
+    (move-fn this e-this e-target system)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IAttacker
   (can-attack? [this e-this target-tile system])
