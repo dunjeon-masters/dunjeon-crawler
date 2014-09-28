@@ -8,8 +8,8 @@
   (not (nil? (rj.e/get-c-on-e system e-target :destructible))))
 
 (defn attack
-  [_ e-this e-target system]
-  (let [damage (:atk (rj.e/get-c-on-e system e-this :attacker))
+  [c-this e-this e-target system]
+  (let [damage (:atk c-this)
 
         c-destr (rj.e/get-c-on-e system e-target :destructible)]
     (rj.c/take-damage c-destr e-target damage e-this system)))

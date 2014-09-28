@@ -40,6 +40,7 @@
                                               :move-fn      rj.m/move}))
          (rj.e/add-c e-bat (rj.c/map->Destructible {:hp      1
                                                     :defense 1
+                                                    :can-retaliate? false
                                                     :take-damage-fn rj.d/take-damage}))
          (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick!}))))))
 

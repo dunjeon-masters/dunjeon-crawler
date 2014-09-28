@@ -70,6 +70,7 @@
                                                     :args      {:view-port-sizes rj.c/view-port-sizes}}))
         (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
                                                       :defense 1
+                                                      :can-retaliate? false
                                                       :take-damage-fn rj.d/take-damage}))
 
         (rj.e/add-e e-world)

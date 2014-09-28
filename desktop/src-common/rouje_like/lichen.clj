@@ -40,8 +40,9 @@
                                                    :y (:y target)}))
          (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      1
                                                        :defense 1
+                                                       :can-retaliate? true
                                                        :take-damage-fn rj.d/take-damage}))
-         (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk (/ 1 3)
+         (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk (/ 1 4)
                                                    :can-attack?-fn rj.atk/can-attack?
                                                    :attack-fn      rj.atk/attack}))
          (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick}))))))
@@ -83,10 +84,10 @@
              (< (rand 100) grow-chance%)
              (< (get-size-of-lichen-blob world [x y])
                 max-blob-size))
-
+      ;;then
       (add-lichen system (rand-nth empty-neighbors))
-
-      (let [player-neighbors (rj.u/get-neighbors-of-type world [x y] [:player])]
+      ;;else
+      system #_(let [player-neighbors (rj.u/get-neighbors-of-type world [x y] [:player])]
         (if (seq player-neighbors)
           (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)
                 e-target (:id (rj.u/get-top-entity (first player-neighbors)))]

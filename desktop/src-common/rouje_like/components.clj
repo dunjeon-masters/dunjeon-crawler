@@ -45,32 +45,33 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IMobile
-  (can-move? [this e-this e-target system])
-  (move      [this e-this e-target system]))
+  (can-move? [this e-this target-tile system])
+  (move      [this e-this target-tile system]))
 (defrecord Mobile [^Fn can-move?-fn
                    ^Fn move-fn]
   IMobile
-  (can-move?     [this e-this e-target system]
-    (can-move?-fn this e-this e-target system))
-  (move     [this e-this e-target system]
-    (move-fn this e-this e-target system)))
+  (can-move?     [this e-this target-tile system]
+    (can-move?-fn this e-this target-tile system))
+  (move     [this e-this target-tile system]
+    (move-fn this e-this target-tile system)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IAttacker
-  (can-attack? [this e-this target-tile system])
-  (attack      [this e-this target-tile system]))
+  (can-attack? [this e-this e-target system])
+  (attack      [this e-this e-target system]))
 (defrecord Attacker [atk
                      ^Fn attack-fn
                      ^Fn can-attack?-fn]
   IAttacker
-  (can-attack?     [this e-this target-tile system]
-    (can-attack?-fn this e-this target-tile system))
-  (attack     [this e-this target-tile system]
-    (attack-fn this e-this target-tile system)))
+  (can-attack?     [this e-this e-target system]
+    (can-attack?-fn this e-this e-target system))
+  (attack     [this e-this e-target system]
+    (attack-fn this e-this e-target system)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [hp
                          defense
+                         can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible
   (take-damage     [this e-this damage from system]
@@ -104,7 +105,7 @@
                :sight        (type (->Sight nil nil nil nil nil))
                :renderable   (type (->Renderable nil nil))
                :attacker     (type (->Attacker nil nil nil))
-               :destructible (type (->Destructible nil nil nil))
+               :destructible (type (->Destructible nil nil nil nil))
                :tickable     (type (->Tickable nil))
                :lichen       (type (->Lichen nil nil))
                :bat          (type (->Bat))})
