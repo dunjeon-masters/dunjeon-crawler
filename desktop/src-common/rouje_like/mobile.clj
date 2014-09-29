@@ -10,11 +10,11 @@
 
 (defn move-player
   [_ e-this target-tile system]
-  (let [c-sight (rj.e/get-c-on-e system e-this :sight)
-        sight-decline-rate (:decline-rate c-sight)
-        sight-lower-bound (:lower-bound c-sight)
-        sight-upper-bound (:upper-bound c-sight)
-        sight-torch-power (:torch-power c-sight)
+  (let [c-playersight (rj.e/get-c-on-e system e-this :playersight)
+        sight-decline-rate (:decline-rate c-playersight)
+        sight-lower-bound (:lower-bound c-playersight)
+        sight-upper-bound (:upper-bound c-playersight)
+        sight-torch-power (:torch-power c-playersight)
         dec-sight (fn [prev] (if (> prev (inc sight-lower-bound))
                                (- prev sight-decline-rate)
                                prev))
@@ -36,15 +36,15 @@
                            (rj.e/upd-c e-this :gold
                                        (fn [c-gold]
                                          (update-in c-gold [:gold] inc)))
-                           (rj.e/upd-c e-this :sight
+                           (rj.e/upd-c e-this :playersight
                                        (fn [c-sight]
                                          (update-in c-sight [:distance] dec-sight))))
                 :torch (-> system
-                           (rj.e/upd-c e-this :sight
+                           (rj.e/upd-c e-this :playersight
                                        (fn [c-sight]
                                          (update-in c-sight [:distance] inc-sight))))
                 :floor (-> system
-                           (rj.e/upd-c e-this :sight
+                           (rj.e/upd-c e-this :playersight
                                        (fn [c-sight]
                                          (update-in c-sight [:distance] dec-sight))))
                 system))

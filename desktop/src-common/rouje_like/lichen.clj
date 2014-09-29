@@ -87,10 +87,4 @@
       ;;then
       (add-lichen system (rand-nth empty-neighbors))
       ;;else
-      system #_(let [player-neighbors (rj.u/get-neighbors-of-type world [x y] [:player])]
-        (if (seq player-neighbors)
-          (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)
-                e-target (:id (rj.u/get-top-entity (first player-neighbors)))]
-            (when (can-attack? c-attacker e-this e-target system)
-              (attack c-attacker e-this e-target system)))
-          system)))))
+      system)))

@@ -99,6 +99,7 @@
 
 (defn ^:private get-smoothed-col
   [world x max-dist]
+  {:pre [(#{1 2} max-dist)]}
   (mapv (fn [y]
           (get-smoothed-tile
             (rj.u/get-ring-around world [x y] 1)
@@ -207,7 +208,7 @@
                     (:y c-player-pos)]
         show-world? (:show-world? (rj.e/get-c-on-e system e-player :player))
 
-        c-sight (rj.e/get-c-on-e system e-player :sight)
+        c-sight (rj.e/get-c-on-e system e-player :playersight)
         sight (math/ceil (:distance c-sight))
 
         c-world (rj.e/get-c-on-e system e-this :world)

@@ -8,7 +8,6 @@
                     :btm   1
                     :left  1
                     :right 1})
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord Player [show-world?])
 
@@ -16,8 +15,9 @@
                    max-blob-size])
 
 (defrecord Bat [])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defrecord Skeleton [])
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord World [world])
 
 (defrecord Tile [^Number x ^Number y
@@ -25,8 +25,7 @@
 
 (defrecord Entity [^Keyword id
                    ^Keyword type])
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
 
@@ -34,15 +33,15 @@
 
 (defrecord Gold [gold])
 
-;;TODO: Refactor to ~playersight~, as creatures might have sight too
-(defrecord Sight [distance
-                  decline-rate
-                  lower-bound
-                  upper-bound
-                  torch-power])
-
+(defrecord PlayerSight [distance
+                        decline-rate
+                        lower-bound
+                        upper-bound
+                        torch-power])
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord Position [x y])
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defrecord Sight [distance])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IMobile
   (can-move? [this e-this target-tile system])
@@ -102,7 +101,8 @@
                :mobile       (type (->Mobile nil nil))
                :moves-left   (type (->MovesLeft nil))
                :gold         (type (->Gold nil))
-               :sight        (type (->Sight nil nil nil nil nil))
+               :playersight  (type (->PlayerSight nil nil nil nil nil))
+               :sight        (type (->Sight nil))
                :renderable   (type (->Renderable nil nil))
                :attacker     (type (->Attacker nil nil nil))
                :destructible (type (->Destructible nil nil nil nil))

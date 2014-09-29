@@ -14,17 +14,14 @@
           (rj.e/upd-c e-this :destructible
                       (fn [c-destructible]
                         (update-in c-destructible [:hp] - damage)))
-          ;TODO: IF CAN RETALIATE, DO IT HERE
           (as-> system
                 (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
                   (if (and (:can-retaliate? c-this)
                            (not (nil? c-attacker))
                            (can-attack? c-attacker e-this e-from system))
                     (attack c-attacker e-this e-from system)
-                    system)))
-          )
+                    system))))
       (-> system
-          ;TODO: IF CAN RETALIATE, DO IT HERE
           (as-> system
                 (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
                   (if (and (:can-retaliate? c-this)

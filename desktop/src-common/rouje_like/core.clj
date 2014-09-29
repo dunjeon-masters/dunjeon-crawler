@@ -61,11 +61,11 @@
         (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))
         (rj.e/add-c e-player (rj.c/map->Gold {:gold 0}))
         ;;TODO: Refactor to ~playersight~, as creatures might have sight too
-        (rj.e/add-c e-player (rj.c/map->Sight {:distance (inc init-sight-distance)
-                                               :decline-rate  init-sight-decline-rate
-                                               :lower-bound   init-sight-lower-bound
-                                               :upper-bound   init-sight-upper-bound
-                                               :torch-power   init-sight-torch-power}))
+        (rj.e/add-c e-player (rj.c/map->PlayerSight {:distance (inc init-sight-distance)
+                                                     :decline-rate  init-sight-decline-rate
+                                                     :lower-bound   init-sight-lower-bound
+                                                     :upper-bound   init-sight-upper-bound
+                                                     :torch-power   init-sight-torch-power}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn rj.pl/render-player
                                                     :args      {:view-port-sizes rj.c/view-port-sizes}}))
         (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
