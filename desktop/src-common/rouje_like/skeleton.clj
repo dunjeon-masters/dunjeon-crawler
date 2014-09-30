@@ -58,26 +58,29 @@
   (let [target-pos [(:x target-tile) (:y target-tile)]
         dist-from-target (rj.u/taxicab-dist this-pos target-pos)
 
-        shuffled-directions (shuffle [:up :down :left :right])
         offset-coords-with-dir (fn [dir]
                                  (rj.u/offset-coords this-pos (rj.u/direction->offset dir)))
+        shuffled-directions (shuffle [:up :down :left :right])
+        offset-shuffled-directions (map #(offset-coords-with-dir %)
+                                        shuffled-directions)
+
         is-valid-target? #{:floor :torch :gold :player}]
     (cond
-      (and (< (rj.u/taxicab-dist (offset-coords-with-dir (nth shuffled-directions 0)) target-pos) dist-from-target)
-           (is-valid-target? (:type (rj.u/get-top-entity (get-in world (offset-coords-with-dir (nth shuffled-directions 0)))))))
-      (get-in world (offset-coords-with-dir (nth shuffled-directions 0)))
+      (and (< (rj.u/taxicab-dist (nth offset-shuffled-directions 0) target-pos) dist-from-target)
+           (is-valid-target? (:type (rj.u/get-top-entity (get-in world (nth offset-shuffled-directions 0))))))
+      (get-in world (nth offset-shuffled-directions 0))
 
-      (and (< (rj.u/taxicab-dist (offset-coords-with-dir (nth shuffled-directions 1)) target-pos) dist-from-target)
-           (is-valid-target? (:type (rj.u/get-top-entity (get-in world (offset-coords-with-dir (nth shuffled-directions 1)))))))
-      (get-in world (offset-coords-with-dir (nth shuffled-directions 1)))
+      (and (< (rj.u/taxicab-dist (nth offset-shuffled-directions 1) target-pos) dist-from-target)
+           (is-valid-target? (:type (rj.u/get-top-entity (get-in world (nth offset-shuffled-directions 1))))))
+      (get-in world (nth offset-shuffled-directions 1))
 
-      (and (< (rj.u/taxicab-dist (offset-coords-with-dir (nth shuffled-directions 2)) target-pos) dist-from-target)
-           (is-valid-target? (:type (rj.u/get-top-entity (get-in world (offset-coords-with-dir (nth shuffled-directions 2)))))))
-      (get-in world (offset-coords-with-dir (nth shuffled-directions 2)))
+      (and (< (rj.u/taxicab-dist (nth offset-shuffled-directions 2) target-pos) dist-from-target)
+           (is-valid-target? (:type (rj.u/get-top-entity (get-in world (nth offset-shuffled-directions 2))))))
+      (get-in world (nth offset-shuffled-directions 2))
 
-      (and (< (rj.u/taxicab-dist (offset-coords-with-dir (nth shuffled-directions 3)) target-pos) dist-from-target)
-           (is-valid-target? (:type (rj.u/get-top-entity (get-in world (offset-coords-with-dir (nth shuffled-directions 3)))))))
-      (get-in world (offset-coords-with-dir (nth shuffled-directions 3)))
+      (and (< (rj.u/taxicab-dist (nth offset-shuffled-directions 3) target-pos) dist-from-target)
+           (is-valid-target? (:type (rj.u/get-top-entity (get-in world (nth offset-shuffled-directions 3))))))
+      (get-in world (nth offset-shuffled-directions 3))
 
       :else nil)))
 
