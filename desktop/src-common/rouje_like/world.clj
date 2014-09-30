@@ -152,34 +152,38 @@
                                                 (/ init-torch% 100)))))))
 
 (def ^:private get-tile-info
-  {:player {:x 0 :y 4
-            :width 12 :height 12
-            :color {:r 255 :g 255 :b 255 :a 255}
-            :tile-sheet "grim_12x12.png"}
-   :wall   {:x 3 :y 2
-            :width 12 :height 12
-            :color {:r 255 :g 255 :b 255 :a 128}
-            :tile-sheet "grim_12x12.png"}
-   :gold   {:x 1 :y 9
-            :width 12 :height 12
-            :color {:r 255 :g 255 :b 1 :a 255}
-            :tile-sheet "grim_12x12.png"}
-   :lichen {:x 15 :y 0
-            :width 12 :height 12
-            :color {:r 1 :g 255 :b 1 :a 255}
-            :tile-sheet "grim_12x12.png"}
-   :floor  {:x 14 :y 2
-            :width 12 :height 12
-            :color {:r 255 :g 255 :b 255 :a 64}
-            :tile-sheet "grim_12x12.png"}
-   :torch  {:x 1 :y 2
-            :width 12 :height 12
-            :color {:r 255 :g 1 :b 1 :a 255}
-            :tile-sheet "grim_12x12.png"}
-   :bat    {:x 0 :y 9
-            :width 16 :height 16
-            :color {:r 255 :g 255 :b 255 :a 128}
-            :tile-sheet "DarkondDigsDeeper_16x16.png"}})
+  {:player   {:x 0 :y 4
+              :width 12 :height 12
+              :color {:r 255 :g 255 :b 255 :a 255}
+              :tile-sheet "grim_12x12.png"}
+   :wall     {:x 3 :y 2
+              :width 12 :height 12
+              :color {:r 255 :g 255 :b 255 :a 128}
+              :tile-sheet "grim_12x12.png"}
+   :gold     {:x 1 :y 9
+              :width 12 :height 12
+              :color {:r 255 :g 255 :b 1 :a 255}
+              :tile-sheet "grim_12x12.png"}
+   :lichen   {:x 15 :y 0
+              :width 12 :height 12
+              :color {:r 1 :g 255 :b 1 :a 255}
+              :tile-sheet "grim_12x12.png"}
+   :floor    {:x 14 :y 2
+              :width 12 :height 12
+              :color {:r 255 :g 255 :b 255 :a 64}
+             :tile-sheet "grim_12x12.png"}
+   :torch    {:x 1 :y 2
+              :width 12 :height 12
+              :color {:r 255 :g 1 :b 1 :a 255}
+              :tile-sheet "grim_12x12.png"}
+   :bat      {:x 0 :y 9
+              :width 16 :height 16
+              :color {:r 255 :g 255 :b 255 :a 128}
+              :tile-sheet "DarkondDigsDeeper_16x16.png"}
+   :skeleton {:x 3 :y 5
+              :width 16 :height 16
+              :color {:r 255 :g 255 :b 255 :a 255}
+              :tile-sheet "DarkondDigsDeeper_16x16.png"}})
 
 (def ^:private get-texture
   (memoize
@@ -197,11 +201,7 @@
 
 (defn render-world
   [_ e-this {:keys [view-port-sizes]} system]
-  (let [taxicab-dist (fn [[x y] [i j]]
-                             (+ (math/abs (- i x))
-                                (math/abs (- j y))))
-
-        e-player (first (rj.e/all-e-with-c system :player))
+  (let [e-player (first (rj.e/all-e-with-c system :player))
 
         c-player-pos (rj.e/get-c-on-e system e-player :position)
         player-pos [(:x c-player-pos)
@@ -237,7 +237,7 @@
             :let [tile (get-in world [x y])]]
       (when (or show-world?
                 (> sight
-                   (taxicab-dist player-pos [x y])))
+                   (rj.u/taxicab-dist player-pos [x y])))
         (let [texture-entity (-> (rj.u/get-top-entity tile)
                                  (:type) (get-texture))]
           (let [color-values (:color texture-entity)]

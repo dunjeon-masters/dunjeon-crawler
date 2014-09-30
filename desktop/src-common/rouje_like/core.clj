@@ -20,7 +20,8 @@
             [rouje-like.lichen :as rj.lc]
             [rouje-like.player :as rj.pl]
             [rouje-like.world :as rj.wr]
-            [rouje-like.attacker :as rj.atk]))
+            [rouje-like.attacker :as rj.atk]
+            [rouje-like.skeleton :as rj.sk]))
 
 (declare main-screen rouje-like)
 
@@ -37,8 +38,8 @@
 (def ^:private init-player-moves 250)
 (def ^:private init-sight-distance 5.0)
 (def ^:private init-sight-decline-rate (/ 1 5))
-(def ^:private init-sight-lower-bound 5)                    ;; Inclusive
-(def ^:private init-sight-upper-bound 13)                   ;; Exclusive
+(def ^:private init-sight-lower-bound 4)                    ;; Inclusive
+(def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-power 2)
 
 ;;TODO: Refactor e-player stuff to player#init-player
@@ -50,14 +51,16 @@
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
         (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
-                                                  :y init-player-y-pos}))
+                                                  :y init-player-y-pos
+                                                  :type :player}))
         (rj.e/add-c e-player (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
                                                 :move-fn      rj.m/move-player}))
         (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn rj.pl/can-dig?
                                                 :dig-fn      rj.pl/dig}))
         (rj.e/add-c e-player (rj.c/map->Attacker {:atk            1
-                                                  :can-attack?-fn rj.atk/can-attack?
-                                                  :attack-fn      rj.atk/attack}))
+                                                  :can-attack?-fn   rj.atk/can-attack?
+                                                  :attack-fn        rj.atk/attack
+                                                  :is-valid-target? (constantly true)}))
         (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))
         (rj.e/add-c e-player (rj.c/map->Gold {:gold 0}))
         ;;TODO: Refactor to ~playersight~, as creatures might have sight too
@@ -90,6 +93,11 @@
         (as-> system
               (nth (iterate rj.bt/add-bat system)
                    20))
+
+        ;; Spawn Skeletons
+        (as-> system
+              (nth (iterate rj.sk/add-skeleton system)
+                   15))
 
         ;; Add player
         (rj.wr/update-in-world e-world init-player-pos

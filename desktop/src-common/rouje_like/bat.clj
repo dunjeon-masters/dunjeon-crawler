@@ -35,7 +35,8 @@
                                                          :type :bat})))))
          (rj.e/add-c e-bat (rj.c/map->Bat {}))
          (rj.e/add-c e-bat (rj.c/map->Position {:x (:x target-tile)
-                                                :y (:y target-tile)}))
+                                                :y (:y target-tile)
+                                                :type :bat}))
          (rj.e/add-c e-bat (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
                                               :move-fn      rj.m/move}))
          (rj.e/add-c e-bat (rj.c/map->Destructible {:hp      1

@@ -6,6 +6,7 @@
 
 (defn can-move?
   [_ _ target-tile _]
+  ;;TODO: Refactor to put is-valid-move-target? in mobile comp
   (#{:floor :gold :torch} (:type (rj.u/get-top-entity target-tile))))
 
 (defn move-player
@@ -75,20 +76,21 @@
   (let [c-position (rj.e/get-c-on-e system e-this :position)
         e-world (first (rj.e/all-e-with-c system :world))
         this-pos [(:x c-position) (:y c-position)]
-        target-pos [(:x target-tile) (:y target-tile)]]
+        target-pos [(:x target-tile) (:y target-tile)]
+        this-type (:type c-position)]
     (-> system
         (rj.wr/update-in-world e-world target-pos
                                (fn [entities _]
                                  (vec
                                    (conj entities
-                                         (rj.c/map->Entity {:type :bat
+                                         (rj.c/map->Entity {:type this-type
                                                             :id   e-this})))))
 
         (rj.wr/update-in-world e-world this-pos
                                (fn [entities _]
                                  (vec
                                    (remove
-                                     #(#{:bat} (:type %))
+                                     #(#{this-type} (:type %))
                                      entities))))
 
         (rj.e/upd-c e-this :position

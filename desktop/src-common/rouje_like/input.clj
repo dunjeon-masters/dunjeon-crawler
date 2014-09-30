@@ -30,7 +30,17 @@
     (let [this (first (rj.e/all-e-with-c system :player))
           c-moves-left (rj.e/get-c-on-e system this :moves-left)
           moves-left (:moves-left c-moves-left)]
-      (if (or (pos? moves-left))
+      (if (and (pos? moves-left)
+               (cond
+                 (or (or (= key-code (play/key-code :dpad-up))
+                         (= key-code (play/key-code :W)))
+                     (or (= key-code (play/key-code :dpad-down))
+                         (= key-code (play/key-code :S)))
+                     (or (= key-code (play/key-code :dpad-left))
+                         (= key-code (play/key-code :A)))
+                     (or (= key-code (play/key-code :dpad-right))
+                         (= key-code (play/key-code :D)))) true
+                 :else false))
         (-> (cond
               (or (= key-code (play/key-code :dpad-up))
                   (= key-code (play/key-code :W)))

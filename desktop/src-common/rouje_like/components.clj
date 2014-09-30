@@ -39,7 +39,8 @@
                         upper-bound
                         torch-power])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defrecord Position [x y])
+(defrecord Position [x y
+                     ^Keyword type])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord Sight [distance])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,7 +60,8 @@
   (attack      [this e-this e-target system]))
 (defrecord Attacker [atk
                      ^Fn attack-fn
-                     ^Fn can-attack?-fn]
+                     ^Fn can-attack?-fn
+                     is-valid-target?]
   IAttacker
   (can-attack?     [this e-this e-target system]
     (can-attack?-fn this e-this e-target system))
@@ -97,15 +99,16 @@
                :entity       (type (->Entity nil nil))
                :player       (type (->Player nil))
                :digger       (type (->Digger nil nil))
-               :position     (type (->Position nil nil))
+               :position     (type (->Position nil nil nil))
                :mobile       (type (->Mobile nil nil))
                :moves-left   (type (->MovesLeft nil))
                :gold         (type (->Gold nil))
                :playersight  (type (->PlayerSight nil nil nil nil nil))
                :sight        (type (->Sight nil))
                :renderable   (type (->Renderable nil nil))
-               :attacker     (type (->Attacker nil nil nil))
+               :attacker     (type (->Attacker nil nil nil nil))
                :destructible (type (->Destructible nil nil nil nil))
                :tickable     (type (->Tickable nil))
                :lichen       (type (->Lichen nil nil))
-               :bat          (type (->Bat))})
+               :bat          (type (->Bat))
+               :skeleton     (type (->Skeleton))})

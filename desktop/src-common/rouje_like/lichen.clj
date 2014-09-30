@@ -3,7 +3,7 @@
   (:require [brute.entity :as br.e]
             [clojure.pprint :refer [pprint]]
 
-            [rouje-like.components :as rj.c :refer [can-attack? attack]]
+            [rouje-like.components :as rj.c]
             [rouje-like.entity :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.world :as rj.wr]
@@ -37,14 +37,16 @@
          (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 4
                                                  :max-blob-size 8}))
          (rj.e/add-c e-lichen (rj.c/map->Position {:x (:x target)
-                                                   :y (:y target)}))
+                                                   :y (:y target)
+                                                   :type :lichen}))
          (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      1
                                                        :defense 1
                                                        :can-retaliate? true
                                                        :take-damage-fn rj.d/take-damage}))
          (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk (/ 1 4)
-                                                   :can-attack?-fn rj.atk/can-attack?
-                                                   :attack-fn      rj.atk/attack}))
+                                                   :can-attack?-fn   rj.atk/can-attack?
+                                                   :attack-fn        rj.atk/attack
+                                                   :is-valid-target? (constantly true)}))
          (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick}))))))
 
 (defn get-size-of-lichen-blob

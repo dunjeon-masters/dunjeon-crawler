@@ -38,6 +38,11 @@
 
 
 
+(defn taxicab-dist
+  [[x y] [i j]]
+  (+ (math/abs (- i x))
+     (math/abs (- j y))))
+
 (def direction->offset
   {:left  [-1 0]
    :right [1  0]
@@ -69,7 +74,7 @@
        (filter #(and (not (nil? %))
                      ((into #{} type) (:type (get-top-entity %)))))))
 
-(defn ^:private radial-distance
+(defn radial-distance
   [[x1 y1] [x2 y2]]
   (max (math/abs (- x1 x2))
        (math/abs (- y1 y2))))
@@ -77,6 +82,16 @@
 (defn get-entities-radially
   [world origin dist-fn]
   (filter #(dist-fn (radial-distance origin [(:x %) (:y %)]))
+          (flatten world)))
+
+(defn get-neighbors-of-type-within
+  [world origin type dist-fn]
+  (filter #(and (dist-fn (radial-distance origin [(:x %) (:y %)]))
+                ((into #{} type) (:type (get-top-entity %
+                                                        (zipmap (conj type :else)
+                                                                (conj (vec
+                                                                        (repeat (count type) 2))
+                                                                      1))))))
           (flatten world)))
 
 (defn not-any-radially-of-type
