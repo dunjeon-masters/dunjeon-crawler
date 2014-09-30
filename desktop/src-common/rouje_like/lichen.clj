@@ -22,9 +22,9 @@
                                         (rand-int (count (first world)))]))]
 
      (loop [target (get-rand-tile world)]
-       (if (#{:wall} (:type (rj.u/get-top-entity target)))
-         (recur (get-rand-tile world))
-         (add-lichen system target)))))
+       (if (#{:floor} (:type (rj.u/get-top-entity target)))
+         (add-lichen system target)
+         (recur (get-rand-tile world))))))
   ([system target]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-lichen (br.e/create-entity)]

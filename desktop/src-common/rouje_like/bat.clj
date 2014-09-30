@@ -19,9 +19,9 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:wall} (:type (rj.u/get-top-entity target-tile)))
-         (recur (get-rand-tile world))
-         (add-bat system target-tile)))))
+       (if (#{:floor} (:type (rj.u/get-top-entity target-tile)))
+         (add-bat system target-tile)
+         (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-bat (br.e/create-entity)]
