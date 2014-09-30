@@ -64,23 +64,27 @@
         offset-shuffled-directions (map #(offset-coords-with-dir %)
                                         shuffled-directions)
 
-        is-valid-target-tile? #{:floor :torch :gold :player}]
+        is-valid-target-tile? #{:floor :torch :gold :player}
+
+        nth->offset-pos (fn [-nth-]
+                            (nth offset-shuffled-directions -nth-))
+        isa-closer-tile? (fn [offset-target-pos]
+                           (and (< (rj.u/taxicab-dist offset-target-pos target-pos)
+                                   dist-from-target)
+                                (is-valid-target-tile?
+                                  (:type (rj.u/get-top-entity (get-in world offset-target-pos))))))]
     (cond
-      (and (< (rj.u/taxicab-dist (nth offset-shuffled-directions 0) target-pos) dist-from-target)
-           (is-valid-target-tile? (:type (rj.u/get-top-entity (get-in world (nth offset-shuffled-directions 0))))))
-      (get-in world (nth offset-shuffled-directions 0))
+      (isa-closer-tile? (nth->offset-pos 0))
+      (get-in world (nth->offset-pos 0))
 
-      (and (< (rj.u/taxicab-dist (nth offset-shuffled-directions 1) target-pos) dist-from-target)
-           (is-valid-target-tile? (:type (rj.u/get-top-entity (get-in world (nth offset-shuffled-directions 1))))))
-      (get-in world (nth offset-shuffled-directions 1))
+      (isa-closer-tile? (nth->offset-pos 1))
+      (get-in world (nth->offset-pos 1))
 
-      (and (< (rj.u/taxicab-dist (nth offset-shuffled-directions 2) target-pos) dist-from-target)
-           (is-valid-target-tile? (:type (rj.u/get-top-entity (get-in world (nth offset-shuffled-directions 2))))))
-      (get-in world (nth offset-shuffled-directions 2))
+      (isa-closer-tile? (nth->offset-pos 2))
+      (get-in world (nth->offset-pos 2))
 
-      (and (< (rj.u/taxicab-dist (nth offset-shuffled-directions 3) target-pos) dist-from-target)
-           (is-valid-target-tile? (:type (rj.u/get-top-entity (get-in world (nth offset-shuffled-directions 3))))))
-      (get-in world (nth offset-shuffled-directions 3))
+      (isa-closer-tile? (nth->offset-pos 3))
+      (get-in world (nth->offset-pos 3))
 
       :else nil)))
 
