@@ -30,7 +30,7 @@
          e-lichen (br.e/create-entity)]
      (-> system
          (rj.wr/update-in-world e-world [(:x target) (:y target)]
-                                (fn [entities _]
+                                (fn [entities]
                                   (vec (conj (remove #(#{:wall} (:type %)) entities)
                                              (rj.c/map->Entity {:id   e-lichen
                                                                 :type :lichen})))))

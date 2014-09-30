@@ -31,7 +31,7 @@
                     system)))
 
           (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
-                                 (fn [entities _]
+                                 (fn [entities]
                                    (vec
                                      (remove
                                        #(#{e-this} (:id %))

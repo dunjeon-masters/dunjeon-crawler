@@ -15,7 +15,7 @@
             [rouje-like.utils :as rj.u]))
 
 (defn update-in-world
-  [system e-world target-pos -fn- & args]
+  [system e-world target-pos -fn-]
   (rj.e/upd-c system e-world :world
               (fn [c-world]
                 (update-in c-world [:world]
@@ -24,7 +24,7 @@
                                         (fn [tile]
                                           (update-in tile [:entities]
                                                      (fn [entities]
-                                                       (-fn- entities args))))))))))
+                                                       (-fn- entities))))))))))
 
 (defn ^:private new-tile
   [x y {:keys [type, id]}]
@@ -171,7 +171,7 @@
    :floor    {:x 14 :y 2
               :width 12 :height 12
               :color {:r 255 :g 255 :b 255 :a 64}
-             :tile-sheet "grim_12x12.png"}
+              :tile-sheet "grim_12x12.png"}
    :torch    {:x 1 :y 2
               :width 12 :height 12
               :color {:r 255 :g 1 :b 1 :a 255}

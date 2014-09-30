@@ -25,7 +25,7 @@
 
 (declare main-screen rouje-like)
 
-(def ^:private sys (atom 0))
+(def ^:private sys (atom {}))
 
 (def ^:private world-sizes [60 60])
 (def ^:private init-wall% 45)
@@ -101,7 +101,7 @@
 
         ;; Add player
         (rj.wr/update-in-world e-world init-player-pos
-                               (fn [entities _]
+                               (fn [entities]
                                  (vec (conj entities
                                             (rj.c/map->Entity {:id   e-player
                                                                :type :player}))))))))

@@ -20,7 +20,7 @@
   (let [e-world (first (rj.e/all-e-with-c system :world))]
     (-> system
         (rj.wr/update-in-world e-world [(:x target-tile) (:y target-tile)]
-                               (fn [entities _]
+                               (fn [entities]
                                  (remove #(#{:wall} (:type %))
                                          entities)))
         (rj.e/upd-c e-this :moves-left

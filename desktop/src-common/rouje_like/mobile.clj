@@ -51,7 +51,7 @@
                 system))
 
         (rj.wr/update-in-world e-world [(:x target-tile) (:y target-tile)]
-                               (fn [entities _]
+                               (fn [entities]
                                  (vec
                                    (conj
                                      (remove #(#{:gold :torch} (:type %))
@@ -59,7 +59,7 @@
                                      (rj.c/map->Entity {:type :player
                                                         :id   e-this})))))
         (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
-                               (fn [entities _]
+                               (fn [entities]
                                  (vec
                                    (remove
                                      #(#{:player} (:type %))
@@ -80,14 +80,14 @@
         this-type (:type c-position)]
     (-> system
         (rj.wr/update-in-world e-world target-pos
-                               (fn [entities _]
+                               (fn [entities]
                                  (vec
                                    (conj entities
                                          (rj.c/map->Entity {:type this-type
                                                             :id   e-this})))))
 
         (rj.wr/update-in-world e-world this-pos
-                               (fn [entities _]
+                               (fn [entities]
                                  (vec
                                    (remove
                                      #(#{this-type} (:type %))

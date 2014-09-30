@@ -27,7 +27,7 @@
          e-bat (br.e/create-entity)]
      (-> system
          (rj.wr/update-in-world e-world [(:x target-tile) (:y target-tile)]
-                                (fn [entities _]
+                                (fn [entities]
                                   (vec
                                     (conj
                                       (remove #(#{:wall} (:type %)) entities)
