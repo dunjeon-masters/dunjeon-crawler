@@ -122,7 +122,7 @@
         (range (count world))))
 
 (defn generate-random-world
-  [[width height]
+  [{:keys [width height]}
    init-wall%
    init-torch%
    init-treasure%]
@@ -151,7 +151,7 @@
               (nth (iterate add-torch world) (* (* width height)
                                                 (/ init-torch% 100)))))))
 
-(def ^:private get-tile-info
+(def ^:private type->tile-info
   {:player   {:x 0 :y 4
               :width 12 :height 12
               :color {:r 255 :g 255 :b 255 :a 255}
@@ -185,10 +185,10 @@
               :color {:r 255 :g 255 :b 255 :a 255}
               :tile-sheet "DarkondDigsDeeper_16x16.png"}})
 
-(def ^:private get-texture
+(def ^:private type->texture
   (memoize
     (fn [^Keyword type]
-      (let [tile-info (get-tile-info type)
+      (let [tile-info (type->tile-info type)
             tile-sheet (:tile-sheet tile-info)
             width (:width tile-info)
             height (:height tile-info)
@@ -239,7 +239,7 @@
                 (> sight
                    (rj.u/taxicab-dist player-pos [x y])))
         (let [texture-entity (-> (rj.u/get-top-entity tile)
-                                 (:type) (get-texture))]
+                                 (:type) (type->texture))]
           (let [color-values (:color texture-entity)]
               (.setColor renderer
                          (Color. (float (/ (:r color-values) 255))
