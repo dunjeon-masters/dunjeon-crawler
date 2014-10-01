@@ -27,13 +27,14 @@
 
 (def ^:private sys (atom {}))
 
-(def ^:private world-sizes [60 60])
+(def ^:private world-sizes {:width  60
+                            :height 60})
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
 (def ^:private init-lichen% 1)
-(def ^:private init-player-x-pos (/ (world-sizes 0) 2))
-(def ^:private init-player-y-pos (/ (world-sizes 1) 2))
+(def ^:private init-player-x-pos (/ (:width  world-sizes) 2))
+(def ^:private init-player-y-pos (/ (:height world-sizes) 2))
 (def ^:private init-player-pos [init-player-x-pos init-player-y-pos])
 (def ^:private init-player-moves 250)
 (def ^:private init-sight-distance 5.0)
@@ -87,7 +88,7 @@
         (as-> system
               (nth (iterate rj.lc/add-lichen system)
                    (* (/ init-lichen% 100)
-                      (apply * world-sizes))))
+                      (apply * (vals world-sizes)))))
 
         ;; Spawn bats
         (as-> system
@@ -102,7 +103,7 @@
         ;; Add player
         (rj.wr/update-in-world e-world init-player-pos
                                (fn [entities]
-                                 (vec (conj entities
+                                 (vec (conj (filter #(#{:floor} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-player
                                                                :type :player}))))))))
 
