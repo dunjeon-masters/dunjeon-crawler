@@ -74,10 +74,12 @@
           (as-> system
                 (let [c-position (rj.e/get-c-on-e system e-this :position)
                       this-pos [(:x c-position) (:y c-position)]
-                      this-tile (get-in world this-pos)]
-                  ;;TODO: There might be multiple items & user might want to choose to not pickup
-                  (if-let [item (first (filter #(not (nil? (rj.e/get-c-on-e system (:id %) :item)))
-                                               (:entities this-tile)))]
+                      this-tile (get-in world this-pos)
+
+                      ;;TODO: There might be multiple items & user might want to choose to not pickup
+                      item (first (filter #(not (nil? (rj.e/get-c-on-e system (:id %) :item)))
+                                          (:entities this-tile)))]
+                  (if item
                     (let [c-item (rj.e/get-c-on-e system (:id item) :item)]
                       ((:pickup-fn c-item) system e-this this-pos (:type item)))
                     system))))
@@ -125,7 +127,8 @@
                                                       :can-retaliate? false
                                                       :take-damage-fn rj.d/take-damage})))))
 
-;;RENDERING FUNCTIONS
+
+
 (defn render-player-stats
   [_ e-this {:keys [view-port-sizes]} system]
   (let [[_ vheight] view-port-sizes

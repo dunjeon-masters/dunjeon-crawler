@@ -37,7 +37,9 @@
 
       system)))
 
-(defn item>>world
+
+
+(defn ^:private item>>world
   [system is-valid-tile? item>>entities]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         world (:world (rj.e/get-c-on-e system e-world :world))]
@@ -50,13 +52,13 @@
                                    (item>>entities entities)))
           (recur system))))))
 
-(defn only-floor?
+(defn ^:private only-floor?
   [tile]
   ;;TODO: Refactor using get-top-entity
   (every? #(#{:floor} (:type %))
           (:entities tile)))
 
-(defn item>>entities
+(defn ^:private item>>entities
   [entities e-id e-type]
   (conj entities
         (rj.c/map->Entity {:id   e-id
