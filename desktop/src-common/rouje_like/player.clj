@@ -66,7 +66,7 @@
 (def init-player-pos [init-player-x-pos init-player-y-pos])
 (def ^:private init-player-moves 250)
 (def ^:private init-sight-distance 5.0)
-(def ^:private init-sight-decline-rate (/ 1 5))
+(def ^:private init-sight-decline-rate (/ 1 4))
 (def ^:private init-sight-lower-bound 4)                    ;; Inclusive
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-power 2)

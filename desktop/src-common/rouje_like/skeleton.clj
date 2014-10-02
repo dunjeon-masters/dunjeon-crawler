@@ -41,7 +41,7 @@
                                                      :type :skeleton}))
          (rj.e/add-c e-skeleton (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
                                                    :move-fn      rj.m/move}))
-         (rj.e/add-c e-skeleton (rj.c/map->Sight {:distance 4}))
+         (rj.e/add-c e-skeleton (rj.c/map->Sight {:distance 3}))
          (rj.e/add-c e-skeleton (rj.c/map->Attacker {:atk 1
                                                      :can-attack?-fn   rj.atk/can-attack?
                                                      :attack-fn        rj.atk/attack

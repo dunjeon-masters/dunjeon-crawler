@@ -15,7 +15,7 @@
             [rouje-like.utils :as rj.u]))
 
 (defn update-in-world
-  [system e-world target-pos -fn-]
+  [system e-world target-pos fn<-entities]
   (rj.e/upd-c system e-world :world
               (fn [c-world]
                 (update-in c-world [:world]
@@ -24,47 +24,13 @@
                                         (fn [tile]
                                           (update-in tile [:entities]
                                                      (fn [entities]
-                                                       (-fn- entities))))))))))
+                                                       (fn<-entities entities))))))))))
 
 (defn ^:private new-tile
   [x y {:keys [type, id]}]
   (rj.c/map->Tile {:x x :y y
                    :entities [(rj.c/map->Entity {:id   id
                                                  :type type})]}))
-
-(defn ^:private add-torch
-  [world]
-  (loop [world world]
-    (let [x (rand-int (count world))
-          y (rand-int (count (first world)))]
-      (if (and (rj.u/not-any-radially-of-type world [x y]
-                                              #(<= % 3) [:torch])
-               (every? #(#{:floor} (:type %))
-                       (:entities (get-in world [x y]))))
-        (update-in world [x y]
-                   (fn [tile]
-                     (update-in tile [:entities]
-                                (fn [entities]
-                                  (conj entities
-                                        (rj.c/map->Entity {:id   nil
-                                                           :type :torch}))))))
-        (recur world)))))
-
-(defn ^:private add-gold
-  [world]
-  (loop [world world]
-    (let [x (rand-int (count world))
-          y (rand-int (count (first world)))]
-      (if (every? #(#{:floor} (:type %))
-                  (:entities (get-in world [x y])))
-        (update-in world [x y]
-                   (fn [tile]
-                     (update-in tile [:entities]
-                                (fn [entities]
-                                  (conj entities
-                                        (rj.c/map->Entity {:id   nil
-                                                           :type :gold}))))))
-        (recur world)))))
 
 (defn ^:private get-block-frequencies
   [block]
@@ -122,10 +88,7 @@
         (range (count world))))
 
 (defn generate-random-world
-  [{:keys [width height]}
-   init-wall%
-   init-torch%
-   init-treasure%]
+  [{:keys [width height]} init-wall%]
   (let [world (vec
                 (map vec
                      (for [x (range width)]
@@ -145,11 +108,7 @@
               (nth (iterate smooth-world-v1 world)
                    4)
               (nth (iterate smooth-world-v2 world)
-                   2)
-              (nth (iterate add-gold world) (* (* width height)
-                                               (/ init-treasure% 100)))
-              (nth (iterate add-torch world) (* (* width height)
-                                                (/ init-torch% 100)))))))
+                   2)))))
 
 (def ^:private type->tile-info
   {:player   {:x 0 :y 4

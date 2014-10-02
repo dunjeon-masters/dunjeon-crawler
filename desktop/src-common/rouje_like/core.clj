@@ -21,7 +21,8 @@
             [rouje-like.player :as rj.pl]
             [rouje-like.world :as rj.wr]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.skeleton :as rj.sk]))
+            [rouje-like.skeleton :as rj.sk]
+            [rouje-like.items :as rj.items]))
 
 (declare main-screen rouje-like)
 
@@ -31,6 +32,8 @@
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
 (def ^:private init-lichen% 1)
+(def ^:private init-bat% 1)
+(def ^:private init-skeleton% 1)
 
 ;;TODO: Refactor e-player stuff to player#init-player
 (defn init-entities
@@ -41,10 +44,20 @@
 
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/map->World {:world (rj.wr/generate-random-world
-                                                       rj.c/world-sizes init-wall%
-                                                       init-torch% init-gold%)}))
+                                                       rj.c/world-sizes init-wall%)}))
         (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn rj.wr/render-world
                                                    :args      {:view-port-sizes rj.c/view-port-sizes}}))
+
+        ;; Add Items: Gold, Torches...
+        (as-> system
+              (nth (iterate rj.items/add-gold system)
+                   (* (/ init-gold% 100)
+                      (apply * (vals rj.c/world-sizes)))))
+
+        (as-> system
+              (nth (iterate rj.items/add-torch system)
+                   (* (/ init-torch% 100)
+                      (apply * (vals rj.c/world-sizes)))))
 
         ;; Spawn lichens
         (as-> system
@@ -55,12 +68,14 @@
         ;; Spawn bats
         (as-> system
               (nth (iterate rj.bt/add-bat system)
-                   20))
+                   (* (/ init-bat% 100)
+                      (apply * (vals rj.c/world-sizes)))))
 
         ;; Spawn Skeletons
         (as-> system
               (nth (iterate rj.sk/add-skeleton system)
-                   15))
+                   (* (/ init-bat% 100)
+                      (apply * (vals rj.c/world-sizes)))))
 
         ;; Add player
         (as-> system
