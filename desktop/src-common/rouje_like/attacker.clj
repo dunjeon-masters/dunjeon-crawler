@@ -1,6 +1,6 @@
 (ns rouje-like.attacker
   (:require [rouje-like.utils :as rj.u]
-            [rouje-like.entity :as rj.e]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]))
 
 (defn can-attack?

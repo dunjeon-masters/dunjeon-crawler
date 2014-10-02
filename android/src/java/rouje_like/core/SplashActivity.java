@@ -1,4 +1,4 @@
-package clj_rouje_like.core;
+package rouje_like.core;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import clojure.lang.Symbol;
 import clojure.lang.Var;
 import clojure.lang.RT;
 
-import clj_rouje_like.core.R;
+import rouje_like.core.R;
 
 public class SplashActivity extends Activity {
 
@@ -46,7 +46,7 @@ public class SplashActivity extends Activity {
     }
 
     public void proceed() {
-        startActivity(new Intent("clj_rouje_like.core.MAIN"));
+        startActivity(new Intent("rouje_like.core.MAIN"));
         finish();
     }
 
@@ -62,7 +62,7 @@ public class SplashActivity extends Activity {
                     INIT.invoke(SplashActivity.this.getApplication());
 
                     try {
-                        Class.forName("clj_rouje_like.core.AndroidLauncher");
+                        Class.forName("rouje_like.core.AndroidLauncher");
                     } catch (ClassNotFoundException e) {
                         Log.e(TAG, "Failed loading AndroidLauncher", e);
                     }

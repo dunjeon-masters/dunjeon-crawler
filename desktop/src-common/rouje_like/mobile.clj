@@ -1,5 +1,5 @@
 (ns rouje-like.mobile
-  (:require [rouje-like.entity :as rj.e]
+  (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.world :as rj.wr]
             [rouje-like.components :as rj.c]))

@@ -1,4 +1,4 @@
-(ns rouje-like.entity
+(ns rouje-like.entity-wrapper
   (:import [clojure.lang Keyword])
   (:require [brute.entity :as br.e]
 

@@ -7,13 +7,12 @@
                  [com.badlogicgames.gdx/gdx-bullet "1.3.1"]
                  
                  [neko/neko "3.0.2"]
-                 [net.cgrand/parsley "0.9.2"] ;; unsure
                  
                  [org.clojure-android/clojure "1.6.0-RC1" :use-resources true]
                  
                  [play-clj "0.3.11"]
-                 
-                 [brute "0.3.0"]]
+
+                 [org.clojure/math.numeric-tower "0.0.4"]]
   :profiles {:dev {:dependencies [[android/tools.nrepl "0.2.0-bigstack"]
                                   [compliment "0.1.3"]]
                    :android {:aot :all-with-unused}}
@@ -36,7 +35,7 @@
             :native-libraries-paths ["libs"]
             :target-version "19"
             :aot-exclude-ns ["clojure.parallel" "clojure.core.reducers"]
-            :dex-opts ["-JXmx2048M" "--multi-dex"]}
+            :dex-opts ["-JXmx2048M"]}
   
   :source-paths ["src/clojure" "../desktop/src-common"]
   :java-source-paths ["src/java" "gen"]

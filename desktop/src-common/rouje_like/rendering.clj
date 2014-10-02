@@ -4,7 +4,7 @@
 
   (:require [rouje-like.components :refer [render]]
 
-            [rouje-like.entity     :as rj.e]))
+            [rouje-like.entity-wrapper     :as rj.e]))
 
 (defn process-one-game-tick
   [system delta-time]

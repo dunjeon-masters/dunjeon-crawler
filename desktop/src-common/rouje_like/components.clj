@@ -2,7 +2,9 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
-(def block-size 48)
+(def block-size 36)
+(def world-sizes {:width  60
+                  :height 60})
 (def view-port-sizes [20 20])
 (def padding-sizes {:top   1
                     :btm   1

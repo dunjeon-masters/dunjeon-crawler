@@ -2,7 +2,7 @@
   (:require [brute.entity :as br.e]
 
             [rouje-like.components :as rj.c :refer [can-move? move]]
-            [rouje-like.entity :as rj.e]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.world :as rj.wr]
             [rouje-like.destructible :as rj.d]

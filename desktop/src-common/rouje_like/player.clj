@@ -7,9 +7,13 @@
 
             [rouje-like.components :as rj.c :refer [can-attack? attack
                                                     can-move? move]]
-            [rouje-like.entity :as rj.e]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
-            [rouje-like.world :as rj.wr]))
+            [rouje-like.world :as rj.wr]
+            [rouje-like.destructible :as rj.d]
+            [rouje-like.attacker :as rj.atk]
+            [rouje-like.mobile :as rj.m]
+            [brute.entity :as br.e]))
 
 (defn can-dig?
   [_ _ target]
@@ -56,6 +60,48 @@
           (can-attack? c-attacker e-this e-target system)
           (attack c-attacker e-this e-target system)))
       system)))
+
+(def ^:private init-player-x-pos (/ (:width  rj.c/world-sizes) 2))
+(def ^:private init-player-y-pos (/ (:height rj.c/world-sizes) 2))
+(def init-player-pos [init-player-x-pos init-player-y-pos])
+(def ^:private init-player-moves 250)
+(def ^:private init-sight-distance 5.0)
+(def ^:private init-sight-decline-rate (/ 1 5))
+(def ^:private init-sight-lower-bound 4)                    ;; Inclusive
+(def ^:private init-sight-upper-bound 11)                   ;; Exclusive
+(def ^:private init-sight-torch-power 2)
+
+(declare render-player)
+(defn init-player
+  [system]
+  (let [e-player (br.e/create-entity)]
+    (-> system
+        (rj.e/add-e e-player)
+        (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
+        (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
+                                                  :y init-player-y-pos
+                                                  :type :player}))
+        (rj.e/add-c e-player (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
+                                                :move-fn      rj.m/move-player}))
+        (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn can-dig?
+                                                :dig-fn      dig}))
+        (rj.e/add-c e-player (rj.c/map->Attacker {:atk            1
+                                                  :can-attack?-fn   rj.atk/can-attack?
+                                                  :attack-fn        rj.atk/attack
+                                                  :is-valid-target? (constantly true)}))
+        (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))
+        (rj.e/add-c e-player (rj.c/map->Gold {:gold 0}))
+        (rj.e/add-c e-player (rj.c/map->PlayerSight {:distance (inc init-sight-distance)
+                                                     :decline-rate  init-sight-decline-rate
+                                                     :lower-bound   init-sight-lower-bound
+                                                     :upper-bound   init-sight-upper-bound
+                                                     :torch-power   init-sight-torch-power}))
+        (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn render-player
+                                                    :args      {:view-port-sizes rj.c/view-port-sizes}}))
+        (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
+                                                      :defense 1
+                                                      :can-retaliate? false
+                                                      :take-damage-fn rj.d/take-damage})))))
 
 ;;RENDERING FUNCTIONS
 (defn render-player-stats

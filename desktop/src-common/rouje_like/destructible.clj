@@ -1,5 +1,5 @@
 (ns rouje-like.destructible
-  (:require [rouje-like.entity :as rj.e]
+  (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.world :as rj.wr]
             [rouje-like.components :refer [can-attack? attack]]))
 

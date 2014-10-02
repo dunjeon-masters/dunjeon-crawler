@@ -1,7 +1,7 @@
 (ns rouje-like.input
   (:require [play-clj.core :as play]
 
-            [rouje-like.entity :as rj.e]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.world :as rj.w]
             [rouje-like.player :as rj.pl]
             [rouje-like.components :as rj.c :refer [tick]]))
@@ -63,11 +63,13 @@
 
 (defn process-fling-input!
   [system x-vel y-vel]
-  (if (< (* x-vel x-vel)
-         (* y-vel y-vel))
-    (if (pos? y-vel)
-      (rj.pl/process-input-tick system :down)
-      (rj.pl/process-input-tick system :up))
-    (if (pos? x-vel)
-      (rj.pl/process-input-tick system :right)
-      (rj.pl/process-input-tick system :left))))
+  (-> system
+      (as-> system (if (< (* x-vel x-vel)
+                          (* y-vel y-vel))
+                     (if (pos? y-vel)
+                       (rj.pl/process-input-tick system :down)
+                       (rj.pl/process-input-tick system :up))
+                     (if (pos? x-vel)
+                       (rj.pl/process-input-tick system :right)
+                       (rj.pl/process-input-tick system :left))))
+      (tick-entities)))

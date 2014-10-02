@@ -15,7 +15,7 @@
                  [org.clojure/clojure "1.6.0"]
 
                  [play-clj "0.3.11"]
-                 [brute "0.3.0"]]
+                 [org.clojure/math.numeric-tower "0.0.4"]]
   
   :source-paths ["src" "src-common" ]
 

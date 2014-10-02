@@ -11,7 +11,7 @@
             [brute.entity :as br.e]
 
             [rouje-like.components :as rj.c]
-            [rouje-like.entity :as rj.e]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]))
 
 (defn update-in-world

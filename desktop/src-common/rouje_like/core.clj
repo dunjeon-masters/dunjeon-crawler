@@ -12,7 +12,7 @@
 
             [rouje-like.components :as rj.c]
             [rouje-like.destructible :as rj.d]
-            [rouje-like.entity :as rj.e]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.rendering :as rj.r]
             [rouje-like.mobile :as rj.m]
             [rouje-like.bat :as rj.bt]
@@ -27,59 +27,21 @@
 
 (def ^:private sys (atom {}))
 
-(def ^:private world-sizes {:width  60
-                            :height 60})
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
 (def ^:private init-lichen% 1)
-(def ^:private init-player-x-pos (/ (:width  world-sizes) 2))
-(def ^:private init-player-y-pos (/ (:height world-sizes) 2))
-(def ^:private init-player-pos [init-player-x-pos init-player-y-pos])
-(def ^:private init-player-moves 250)
-(def ^:private init-sight-distance 5.0)
-(def ^:private init-sight-decline-rate (/ 1 5))
-(def ^:private init-sight-lower-bound 4)                    ;; Inclusive
-(def ^:private init-sight-upper-bound 11)                   ;; Exclusive
-(def ^:private init-sight-torch-power 2)
 
 ;;TODO: Refactor e-player stuff to player#init-player
 (defn init-entities
   [system]
-  (let [e-world  (br.e/create-entity)
-        e-player (br.e/create-entity)]
+  (let [e-world  (br.e/create-entity)]
     (-> system
-        (rj.e/add-e e-player)
-        (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
-        (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
-                                                  :y init-player-y-pos
-                                                  :type :player}))
-        (rj.e/add-c e-player (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
-                                                :move-fn      rj.m/move-player}))
-        (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn rj.pl/can-dig?
-                                                :dig-fn      rj.pl/dig}))
-        (rj.e/add-c e-player (rj.c/map->Attacker {:atk            1
-                                                  :can-attack?-fn   rj.atk/can-attack?
-                                                  :attack-fn        rj.atk/attack
-                                                  :is-valid-target? (constantly true)}))
-        (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))
-        (rj.e/add-c e-player (rj.c/map->Gold {:gold 0}))
-        ;;TODO: Refactor to ~playersight~, as creatures might have sight too
-        (rj.e/add-c e-player (rj.c/map->PlayerSight {:distance (inc init-sight-distance)
-                                                     :decline-rate  init-sight-decline-rate
-                                                     :lower-bound   init-sight-lower-bound
-                                                     :upper-bound   init-sight-upper-bound
-                                                     :torch-power   init-sight-torch-power}))
-        (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn rj.pl/render-player
-                                                    :args      {:view-port-sizes rj.c/view-port-sizes}}))
-        (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
-                                                      :defense 1
-                                                      :can-retaliate? false
-                                                      :take-damage-fn rj.d/take-damage}))
+        (rj.pl/init-player)
 
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/map->World {:world (rj.wr/generate-random-world
-                                                       world-sizes init-wall%
+                                                       rj.c/world-sizes init-wall%
                                                        init-torch% init-gold%)}))
         (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn rj.wr/render-world
                                                    :args      {:view-port-sizes rj.c/view-port-sizes}}))
@@ -88,7 +50,7 @@
         (as-> system
               (nth (iterate rj.lc/add-lichen system)
                    (* (/ init-lichen% 100)
-                      (apply * (vals world-sizes)))))
+                      (apply * (vals rj.c/world-sizes)))))
 
         ;; Spawn bats
         (as-> system
@@ -101,11 +63,13 @@
                    15))
 
         ;; Add player
-        (rj.wr/update-in-world e-world init-player-pos
-                               (fn [entities]
-                                 (vec (conj (filter #(#{:floor} (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-player
-                                                               :type :player}))))))))
+        (as-> system
+              (let [e-player (first (rj.e/all-e-with-c system :player))]
+                (rj.wr/update-in-world system e-world rj.pl/init-player-pos
+                                       (fn [entities]
+                                         (vec (conj (filter #(#{:floor} (:type %)) entities)
+                                                    (rj.c/map->Entity {:id   e-player
+                                                                       :type :player}))))))))))
 
 (defn register-system-fns
   [system]
