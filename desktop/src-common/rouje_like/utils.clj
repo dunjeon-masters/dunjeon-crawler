@@ -14,7 +14,7 @@
    :else 7
    :player 8})
 
-(defn sort-by-pri
+(defn sort-by-type
   [entities get-pri]
   (sort (fn [arg1 arg2]
           (let [t1 (:type arg1)
@@ -27,13 +27,13 @@
                       (get get-pri :else 1))))))
         entities))
 
-(defn get-top-entity
+(defn tile->top-entity
   ([target-tile]
-   (get-top-entity target-tile get-default-pri))
+   (tile->top-entity target-tile get-default-pri))
   ([target-tile get-pri]
    (-> target-tile
        (:entities)
-       (sort-by-pri get-pri)
+       (sort-by-type get-pri)
        (first))))
 
 
@@ -49,7 +49,7 @@
    :up    [0  1]
    :down  [0 -1]})
 
-(defn offset-coords
+(defn coords+offset
   "Offset the first coordinate by the second,
   returning the result coordinate."
   [[x y] [dx dy]]
@@ -60,7 +60,7 @@
   (ie: up/down/left/right)
   squares of the given [x y] pos."
   [origin]
-  (map offset-coords
+  (map coords+offset
        (repeat origin) (vals direction->offset)))
 
 (defn get-neighbors
@@ -72,7 +72,7 @@
   [world origin type]
   (->> (get-neighbors world origin)
        (filter #(and (not (nil? %))
-                     ((into #{} type) (:type (get-top-entity %)))))))
+                     ((into #{} type) (:type (tile->top-entity %)))))))
 
 (defn radial-distance
   [[x1 y1] [x2 y2]]
@@ -87,7 +87,7 @@
 (defn get-neighbors-of-type-within
   [world origin type dist-fn]
   (filter #(and (dist-fn (radial-distance origin [(:x %) (:y %)]))
-                ((into #{} type) (:type (get-top-entity %
+                ((into #{} type) (:type (tile->top-entity %
                                                         (zipmap (conj type :else)
                                                                 (conj (vec
                                                                         (repeat (count type) 2))
@@ -97,7 +97,7 @@
 (defn not-any-radially-of-type
   [world origin dist-fn type]
   (not-any? (fn [tile]
-              ((into #{} type) (:type (get-top-entity tile
+              ((into #{} type) (:type (tile->top-entity tile
                                                       (zipmap (conj type :else)
                                                               (conj (vec
                                                                       (repeat (count type) 2))

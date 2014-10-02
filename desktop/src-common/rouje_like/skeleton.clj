@@ -21,7 +21,7 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:floor} (:type (rj.u/get-top-entity target-tile)))
+       (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
          (add-skeleton system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
@@ -59,7 +59,7 @@
         dist-from-target (rj.u/taxicab-dist this-pos target-pos)
 
         offset-coords-with-dir (fn [dir]
-                                 (rj.u/offset-coords this-pos (rj.u/direction->offset dir)))
+                                 (rj.u/coords+offset this-pos (rj.u/direction->offset dir)))
         shuffled-directions (shuffle [:up :down :left :right])
         offset-shuffled-directions (map #(offset-coords-with-dir %)
                                         shuffled-directions)
@@ -72,7 +72,7 @@
                            (and (< (rj.u/taxicab-dist offset-target-pos target-pos)
                                    dist-from-target)
                                 (is-valid-target-tile?
-                                  (:type (rj.u/get-top-entity (get-in world offset-target-pos))))))]
+                                  (:type (rj.u/tile->top-entity (get-in world offset-target-pos))))))]
     (cond
       (isa-closer-tile? (nth->offset-pos 0))
       (get-in world (nth->offset-pos 0))
@@ -110,7 +110,7 @@
                       (if (seq neighbor-tiles)
                         (rand-nth (conj neighbor-tiles nil))
                         nil))
-        e-target (:id (rj.u/get-top-entity target-tile))]
+        e-target (:id (rj.u/tile->top-entity target-tile))]
     (if (not (nil? target-tile))
       (cond
         (can-move? c-mobile e-this target-tile system)

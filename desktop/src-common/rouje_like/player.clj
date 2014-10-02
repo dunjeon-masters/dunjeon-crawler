@@ -17,7 +17,7 @@
 
 (defn can-dig?
   [_ target]
-  (#{:wall} (:type (rj.u/get-top-entity target))))
+  (#{:wall} (:type (rj.u/tile->top-entity target))))
 
 (defn dig
   [system target-tile]
@@ -45,7 +45,7 @@
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         world (:world c-world)
-        target-coords (rj.u/offset-coords [x-pos y-pos]
+        target-coords (rj.u/coords+offset [x-pos y-pos]
                                           (rj.u/direction->offset
                                             direction))
         target-tile (get-in world target-coords nil)]
@@ -53,7 +53,7 @@
       (-> (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
                 c-digger   (rj.e/get-c-on-e system e-this :digger)
                 c-attacker (rj.e/get-c-on-e system e-this :attacker)
-                e-target (:id (rj.u/get-top-entity target-tile))]
+                e-target (:id (rj.u/tile->top-entity target-tile))]
             (cond
               (can-move? c-mobile e-this target-tile system)
               (move c-mobile e-this target-tile system)
@@ -77,7 +77,7 @@
                       this-tile (get-in world this-pos)
 
                       ;;TODO: There might be multiple items & user might want to choose to not pickup
-                      item (first (filter #(not (nil? (rj.e/get-c-on-e system (:id %) :item)))
+                      item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
                                           (:entities this-tile)))]
                   (if item
                     (let [c-item (rj.e/get-c-on-e system (:id item) :item)]
@@ -109,7 +109,7 @@
                                                 :move-fn      rj.m/move}))
         (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn can-dig?
                                                 :dig-fn      dig}))
-        (rj.e/add-c e-player (rj.c/map->Attacker {:atk            1
+        (rj.e/add-c e-player (rj.c/map->Attacker {:atk              1
                                                   :can-attack?-fn   rj.atk/can-attack?
                                                   :attack-fn        rj.atk/attack
                                                   :is-valid-target? (constantly true)}))

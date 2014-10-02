@@ -32,21 +32,21 @@
                    :entities [(rj.c/map->Entity {:id   id
                                                  :type type})]}))
 
-(defn ^:private get-block-frequencies
+(defn ^:private block->freqs
   [block]
   (frequencies
     (map (fn [tile]
-           (:type (rj.u/get-top-entity tile)))
+           (:type (rj.u/tile->top-entity tile)))
          block)))
 
 (defn ^:private get-smoothed-tile
   [block-d1 block-d2 x y]
   (let [wall-threshold-d1 5
         wall-bound-d2 2
-        d1-block-freqs (get-block-frequencies block-d1)
+        d1-block-freqs (block->freqs block-d1)
         d2-block-freqs (if (nil? block-d2)
                          {:wall (inc wall-bound-d2)}
-                         (get-block-frequencies block-d2))
+                         (block->freqs block-d2))
         wall-count-d1 (get d1-block-freqs :wall 0)
         wall-count-d2 (get d2-block-freqs :wall 0)
         result (if (or (>= wall-count-d1 wall-threshold-d1)
@@ -197,7 +197,7 @@
       (when (or show-world?
                 (> sight
                    (rj.u/taxicab-dist player-pos [x y])))
-        (let [texture-entity (-> (rj.u/get-top-entity tile)
+        (let [texture-entity (-> (rj.u/tile->top-entity tile)
                                  (:type) (type->texture))]
           (let [color-values (:color texture-entity)]
               (.setColor renderer

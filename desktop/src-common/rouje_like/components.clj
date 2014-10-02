@@ -3,8 +3,8 @@
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
 (def block-size 36)
-(def world-sizes {:width  20
-                  :height 20})
+(def world-sizes {:width  60
+                  :height 60})
 (def view-port-sizes [20 20])
 (def padding-sizes {:top   1
                     :btm   1
@@ -43,9 +43,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord Position [x y
                      ^Keyword type])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defrecord Sight [distance])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defrecord Item [pickup-fn])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IMobile

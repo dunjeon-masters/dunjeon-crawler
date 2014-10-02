@@ -7,7 +7,7 @@
 (defn can-move?
   [_ _ target-tile _]
   ;;TODO: Refactor to put is-valid-move-target? in mobile comp
-  (#{:floor :gold :torch} (:type (rj.u/get-top-entity target-tile))))
+  (#{:floor :gold :torch} (:type (rj.u/tile->top-entity target-tile))))
 
 (defn move
   [_ e-this target-tile system]
