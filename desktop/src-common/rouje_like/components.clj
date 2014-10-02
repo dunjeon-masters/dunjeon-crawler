@@ -46,6 +46,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord Sight [distance])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defrecord Item [pickup-fn])
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol IMobile
   (can-move? [this e-this target-tile system])
   (move      [this e-this target-tile system]))
@@ -113,4 +115,5 @@
                :tickable     (type (->Tickable nil))
                :lichen       (type (->Lichen nil nil))
                :bat          (type (->Bat))
-               :skeleton     (type (->Skeleton))})
+               :skeleton     (type (->Skeleton))
+               :item         (type (->Item nil))})

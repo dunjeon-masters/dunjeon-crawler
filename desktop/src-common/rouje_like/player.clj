@@ -16,24 +16,28 @@
             [brute.entity :as br.e]))
 
 (defn can-dig?
-  [_ _ target]
+  [_ target]
   (#{:wall} (:type (rj.u/get-top-entity target))))
 
 (defn dig
-  [system e-this target-tile]
+  [system target-tile]
   (let [e-world (first (rj.e/all-e-with-c system :world))]
     (-> system
         (rj.wr/update-in-world e-world [(:x target-tile) (:y target-tile)]
                                (fn [entities]
                                  (remove #(#{:wall} (:type %))
-                                         entities)))
-        (rj.e/upd-c e-this :moves-left
-                    (fn [c-moves-left]
-                      (update-in c-moves-left [:moves-left] dec))))))
+                                         entities))))))
 
 (defn process-input-tick
   [system direction]
   (let [e-this (first (rj.e/all-e-with-c system :player))
+
+        c-playersight (rj.e/get-c-on-e system e-this :playersight)
+        sight-decline-rate (:decline-rate c-playersight)
+        sight-lower-bound (:lower-bound c-playersight)
+        dec-sight (fn [prev] (if (> prev (inc sight-lower-bound))
+                               (- prev sight-decline-rate)
+                               prev))
 
         c-position (rj.e/get-c-on-e system e-this :position)
         x-pos (:x c-position)
@@ -46,19 +50,37 @@
                                             direction))
         target-tile (get-in world target-coords nil)]
     (if (and (not (nil? target-tile)))
-      (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
-            c-digger   (rj.e/get-c-on-e system e-this :digger)
-            c-attacker (rj.e/get-c-on-e system e-this :attacker)
-            e-target (:id (rj.u/get-top-entity target-tile))]
-        (cond
-          (can-move? c-mobile e-this target-tile system)
-          (move c-mobile e-this target-tile system)
+      (-> (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
+                c-digger   (rj.e/get-c-on-e system e-this :digger)
+                c-attacker (rj.e/get-c-on-e system e-this :attacker)
+                e-target (:id (rj.u/get-top-entity target-tile))]
+            (cond
+              (can-move? c-mobile e-this target-tile system)
+              (move c-mobile e-this target-tile system)
 
-          ((:can-dig?-fn c-digger) system e-this target-tile)
-          ((:dig-fn c-digger) system e-this target-tile)
+              ((:can-dig?-fn c-digger) system target-tile)
+              ((:dig-fn c-digger) system target-tile)
 
-          (can-attack? c-attacker e-this e-target system)
-          (attack c-attacker e-this e-target system)))
+              (can-attack? c-attacker e-this e-target system)
+              (attack c-attacker e-this e-target system)
+
+              :else system))
+          (rj.e/upd-c e-this :moves-left
+                      (fn [c-moves-left]
+                        (update-in c-moves-left [:moves-left] dec)))
+          (rj.e/upd-c e-this :playersight
+                      (fn [c-playersight]
+                        (update-in c-playersight [:distance] dec-sight)))
+          (as-> system
+                (let [c-position (rj.e/get-c-on-e system e-this :position)
+                      this-pos [(:x c-position) (:y c-position)]
+                      this-tile (get-in world this-pos)]
+                  ;;TODO: There might be multiple items & user might want to choose to not pickup
+                  (if-let [item (first (filter #(not (nil? (rj.e/get-c-on-e system (:id %) :item)))
+                                               (:entities this-tile)))]
+                    (let [c-item (rj.e/get-c-on-e system (:id item) :item)]
+                      ((:pickup-fn c-item) system e-this this-pos (:type item)))
+                    system))))
       system)))
 
 (def ^:private init-player-x-pos (/ (:width  rj.c/world-sizes) 2))
@@ -82,7 +104,7 @@
                                                   :y init-player-y-pos
                                                   :type :player}))
         (rj.e/add-c e-player (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
-                                                :move-fn      rj.m/move-player}))
+                                                :move-fn      rj.m/move}))
         (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn can-dig?
                                                 :dig-fn      dig}))
         (rj.e/add-c e-player (rj.c/map->Attacker {:atk            1

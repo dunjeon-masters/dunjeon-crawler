@@ -5,6 +5,38 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.world :as rj.wr]))
 
+(defn pickup-item
+  [system e-by this-pos item-type]
+  (let [remove-item (fn [system this-pos]
+                      (let [e-world (first (rj.e/all-e-with-c system :world))]
+                        (rj.wr/update-in-world system e-world this-pos
+                                               (fn [entities]
+                                                 (vec
+                                                   (remove
+                                                     #(#{item-type} (:type %))
+                                                     entities))))))]
+    (case item-type
+      :torch (let [c-playersight (rj.e/get-c-on-e system e-by :playersight)
+                   sight-upper-bound (:upper-bound c-playersight)
+                   sight-torch-power (:torch-power c-playersight)
+
+                   inc-sight (fn [prev] (if (<= prev (- sight-upper-bound sight-torch-power))
+                                          (+ prev sight-torch-power)
+                                          prev))]
+               (-> system
+                   (rj.e/upd-c e-by :playersight
+                               (fn [c-playersight]
+                                 (update-in c-playersight [:distance] inc-sight)))
+                   (remove-item this-pos)))
+
+      :gold (-> system
+                (rj.e/upd-c e-by :gold
+                            (fn [c-gold]
+                              (update-in c-gold [:gold] inc)))
+                (remove-item this-pos))
+
+      system)))
+
 (defn item>>world
   [system is-valid-tile? item>>entities]
   (let [e-world (first (rj.e/all-e-with-c system :world))
@@ -20,6 +52,7 @@
 
 (defn only-floor?
   [tile]
+  ;;TODO: Refactor using get-top-entity
   (every? #(#{:floor} (:type %))
           (:entities tile)))
 
@@ -44,8 +77,10 @@
 
         torch>>entities (fn [entities]
                           (item>>entities entities e-torch :torch))]
-    (item>>world system is-valid-tile?
-                 torch>>entities)))
+    (-> (item>>world system is-valid-tile?
+                     torch>>entities)
+        (rj.e/add-e e-torch)
+        (rj.e/add-c e-torch (rj.c/map->Item {:pickup-fn pickup-item})))))
 
 (defn add-gold
   [system]
@@ -56,5 +91,7 @@
 
         gold>>entities (fn [entities]
                           (item>>entities entities e-gold :gold))]
-    (item>>world system is-valid-tile?
-                 gold>>entities)))
+    (-> (item>>world system is-valid-tile?
+                     gold>>entities)
+        (rj.e/add-e e-gold)
+        (rj.e/add-c e-gold (rj.c/map->Item {:pickup-fn pickup-item})))))
