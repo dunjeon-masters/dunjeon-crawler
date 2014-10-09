@@ -58,21 +58,21 @@
   (let [target-pos [(:x target-tile) (:y target-tile)]
         dist-from-target (rj.u/taxicab-dist this-pos target-pos)
 
-        offset-coords-with-dir (fn [dir]
+        this-pos+dir-offset (fn [this-pos dir]
                                  (rj.u/coords+offset this-pos (rj.u/direction->offset dir)))
         shuffled-directions (shuffle [:up :down :left :right])
-        offset-shuffled-directions (map #(offset-coords-with-dir %)
+        offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
                                         shuffled-directions)
 
         is-valid-target-tile? #{:floor :torch :gold :player}
 
-        nth->offset-pos (fn [-nth-]
-                            (nth offset-shuffled-directions -nth-))
-        isa-closer-tile? (fn [offset-target-pos]
-                           (and (< (rj.u/taxicab-dist offset-target-pos target-pos)
+        nth->offset-pos (fn [index]
+                            (nth offset-shuffled-directions index))
+        isa-closer-tile? (fn [target-pos+offset]
+                           (and (< (rj.u/taxicab-dist target-pos+offset target-pos)
                                    dist-from-target)
                                 (is-valid-target-tile?
-                                  (:type (rj.u/tile->top-entity (get-in world offset-target-pos))))))]
+                                  (:type (rj.u/tile->top-entity (get-in world target-pos+offset))))))]
     (cond
       (isa-closer-tile? (nth->offset-pos 0))
       (get-in world (nth->offset-pos 0))
@@ -113,7 +113,8 @@
         e-target (:id (rj.u/tile->top-entity target-tile))]
     (if (not (nil? target-tile))
       (cond
-        (can-move? c-mobile e-this target-tile system)
+        (and (< (rand-int 100) 80)
+             (can-move? c-mobile e-this target-tile system))
         (move c-mobile e-this target-tile system)
 
         (can-attack? c-attacker e-this e-target system)

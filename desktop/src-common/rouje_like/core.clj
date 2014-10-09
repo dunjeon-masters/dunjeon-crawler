@@ -35,7 +35,6 @@
 (def ^:private init-bat% 1)
 (def ^:private init-skeleton% 1)
 
-;;TODO: Refactor e-player stuff to player#init-player
 (defn init-entities
   [system]
   (let [e-world  (br.e/create-entity)]

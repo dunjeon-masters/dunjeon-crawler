@@ -54,7 +54,6 @@
 
 (defn ^:private only-floor?
   [tile]
-  ;;TODO: Refactor using get-top-entity
   (every? #(#{:floor} (:type %))
           (:entities tile)))
 

@@ -26,6 +26,7 @@
                                                      (fn [entities]
                                                        (fn<-entities entities))))))))))
 
+;; Currently un-used
 (defn ^:private new-tile
   [x y {:keys [type, id]}]
   (rj.c/map->Tile {:x x :y y
