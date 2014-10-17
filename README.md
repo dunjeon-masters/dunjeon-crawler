@@ -22,6 +22,8 @@ All projects can be built using [Nightcode](https://nightcode.info/), or on the 
 
 https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing
 
+Update chart as soon as you finish a task.
+
 ## Workflow
 
 1. Find an issue you want to work on (that no one is assigned to)
