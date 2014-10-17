@@ -4,7 +4,7 @@ Will be using github and this README as a message board. Check periodically for 
 
 ## Introduction
 
-A play-clj rouje like.
+A play-clj rogue like.
 
 ## Contents
 
@@ -25,4 +25,4 @@ All projects can be built using [Nightcode](https://nightcode.info/), or on the 
 3. Work on the issue
 4. When done working for the day, unassign yourself
 
-Basically assignee = currently working on
+Basically assignee == currently working on
