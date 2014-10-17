@@ -1,3 +1,7 @@
+## Announcements
+
+Will be using github and this README as a message board. Check periodically for updates.
+
 ## Introduction
 
 A play-clj rouje like.
@@ -13,3 +17,12 @@ A play-clj rouje like.
 ## Building
 
 All projects can be built using [Nightcode](https://nightcode.info/), or on the command line using [Leiningen](https://github.com/technomancy/leiningen) with the [lein-droid](https://github.com/clojure-android/lein-droid) and [lein-fruit](https://github.com/oakes/lein-fruit) plugins.
+
+## Workflow
+
+1. Find an issue you want to work on (that no one is assigned to)
+2. Assign yourself
+3. Work on the issue
+4. When done working for the day, unassign yourself
+
+Basically assignee = currently working on
