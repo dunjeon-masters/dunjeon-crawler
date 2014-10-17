@@ -36,10 +36,10 @@ USER STORY 3: As a user, I want to be able to build my character (races and clas
 	TASK 4: Add race component. {.5 ih}
 	TASK 5: Add class component. {.5 ih}
 	TASK 6: On starting game, updates statistics (multimethod) {1.5 ih}
-	TASK 6: Add an experience field to the player. {.25 ih}
-	TASK 7: Add experience to player upon killing monsters. {.25 ih}
-	TASK 8: Implement player levelling system. {1.5 ih}
-	TASK 9: Change players' statistics upon level up (try random first then progress to prompt) {2 ih}
+	TASK 7: Add an experience field to the player. {.25 ih}
+	TASK 8: Add experience to player upon killing monsters. {.25 ih}
+	TASK 9: Implement player levelling system. {1.5 ih}
+	TASK 10: Change players' statistics upon level up (try random first then progress to prompt) {2 ih}
 	Total: 11.25 ih
 
 USER STORY 4: As a user, I want an advanced mob system [so the monsters are unique and more
