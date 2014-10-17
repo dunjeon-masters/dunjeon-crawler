@@ -13,35 +13,42 @@ USER STORIES
 
 USER STORY 1: As a user, I want a messaging/dialogue system [so that I can be informed when damage is dealt or 
 			  received].
-	TASK 1: Make relay component (contains a message buffer [tag messages with location]).
-	TASK 2: Make broadcaster component (send message to an entity that has a relay component).
-	TASK 3: Make receiver component (see if receiver is close enough to receive it).
-	TASK 4: Display message to player if applicable.
+	TASK 1: Make relay component (contains a message buffer [tag messages with location]). {.5 ih}
+	TASK 2: Make broadcaster component (send message to an entity that has a relay component). {2 ih}
+	TASK 3: Make receiver component (see if receiver is close enough to receive it). {2 ih}
+	TASK 4: Display message to player if applicable. {1 ih}
+	TASK 5: Relay's buffer should clear on last tick (entity that has relay has tickable component). {.5 ih}
+	Total: 6 ih
 
 USER STORY 2: As a user, I want to navigate multiple levels [so that the game has longer game play].
-	TASK 1: Add z field to the world (each level knows it's z component starting at 0).
-	TASK 2: On player initialization create a new z level (the next floor the player will travel to).
-	TASK 3: Add up and down controls as debug to change floors (create new z level upon moving to a new floor).
-	TASK 4: Add level loading component such as portal or ladder (create new z level upon moving to a new floor).
-	TASK 5: The level above you should always be pre-generated.
+	TASK 1: Add z field to the world (each level knows it's z component starting at 0). {.5 ih}
+	TASK 2: On player initialization create a new z level (the next floor the player will travel to). {.5 ih}
+	TASK 3: Add up and down controls as debug to change floors (create new z level upon moving to a new floor [change tick logic]). {2 ih}
+	TASK 4: Add level loading component such as portal or ladder (create new z level upon moving to a new floor). {3 ih}
+	TASK 5: The level above you should always be pre-generated. {.5 ih}
+	Total: 6.5 ih
 
 USER STORY 3: As a user, I want to be able to build my character (races and classes) and level up [so
 			  that the game feels customized and I can progress over time].
-	TASK 1: Create a main menu with a play button.
-	TASK 2: Create a character customization screen.
-	TASK 3: On click of play button, take player to customization screen.
-	TASK 4: Implement races (using a component for race).
-	TASK 5: Implement different classes (using a component for class).
-	TASK 6: Add an experience field to the player.
-	TASK 7: Add experience to player upon killing monsters.
-	TASK 8: Change player level based on amount of experience player has.
-	TASK 9: Change players' statistics upon level up
+	TASK 1: Create a main menu with a play button. {2 ih}
+	TASK 2: Create a character customization screen. {2.5 ih}
+	TASK 3: On click of play button, take player to customization screen. {.25 ih}
+	TASK 4: Add race component. {.5 ih}
+	TASK 5: Add class component. {.5 ih}
+	TASK 6: On starting game, updates statistics (multimethod) {1.5 ih}
+	TASK 6: Add an experience field to the player. {.25 ih}
+	TASK 7: Add experience to player upon killing monsters. {.25 ih}
+	TASK 8: Implement player levelling system. {1.5 ih}
+	TASK 9: Change players' statistics upon level up (try random first then progress to prompt) {2 ih}
+	Total: 11.25 ih
 
 USER STORY 4: As a user, I want an advanced mob system [so the monsters are unique and more
 			  challenging to fight].
-	TASK 1: Come up with new monster types.
-	TASK 2: Add unique features to mobs (movement pattern, appearance, weaknesses, type, etc.).
-	TASK 3: Add mobs to world (allow them to be generated and rendered).
+	TASK 1: Come up with new monster types. {1.5 ih}
+	TASK 2: Add unique features to mobs (movement pattern, appearance, quantity of experience earned upon killing, 
+		    weaknesses, type, etc.). {3 ih}
+	TASK 3: Add mobs to world (allow them to be generated and rendered). {2  ih}
+	Total: 6.5 ih
 -------------------------------------------------------------------------------------------------------------------------	
 TEAM ROLES
 	RACHELLE: Scrum Master, Developer
@@ -55,3 +62,8 @@ INITIAL TASK ASSIGNMENT
 	SCOTT: User Story 2, Task 1
 	JORDAN: User Story 4, Task 1
 -------------------------------------------------------------------------------------------------------------------------	
+INITIAL BURNUP CHART
+//TODO: Add chart url
+-------------------------------------------------------------------------------------------------------------------------	
+INITIAL SCRUM BOARD
+//TODO: Add digital scrum board url
