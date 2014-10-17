@@ -4,17 +4,54 @@ Team Name: Dunjeon Masters
 Sprint Completion Date: 10/28/2014
 Revision Number: 1
 Revision Date: 20/17/2014
+-------------------------------------------------------------------------------------------------------------------------
+GOAL
+	To implement a player messaging system, create multiple levels for the player to explore, have customizable 
+	characters, and to create more mobs by improving our mob system.
+-------------------------------------------------------------------------------------------------------------------------
+USER STORIES
 
-User Story 1: As a user, I want a messaging/dialog system [so that I can be informed when damage is dealt or received].
-  Task 1:
+USER STORY 1: As a user, I want a messaging/dialogue system [so that I can be informed when damage is dealt or 
+			  received].
+	TASK 1: Make relay component (contains a message buffer [tag messages with location]).
+	TASK 2: Make broadcaster component (send message to an entity that has a relay component).
+	TASK 3: Make receiver component (see if receiver is close enough to receive it).
+	TASK 4: Display message to player if applicable.
 
-User Story 2: As a user, I want to navigate multiple levels [so that the game has longer gameplay].
-  Task 1:
+USER STORY 2: As a user, I want to navigate multiple levels [so that the game has longer game play].
+	TASK 1: Add z field to the world (each level knows it's z component starting at 0).
+	TASK 2: On player initialization create a new z level (the next floor the player will travel to).
+	TASK 3: Add up and down controls as debug to change floors (create new z level upon moving to a new floor).
+	TASK 4: Add level loading component such as portal or ladder (create new z level upon moving to a new floor).
+	TASK 5: The level above you should always be pre-generated.
 
-User Story 3: As a user, I want to be able to build my character (races and classes) and level up [so
-that the game feels customized and I can progress over time].
-  Task 1:
+USER STORY 3: As a user, I want to be able to build my character (races and classes) and level up [so
+			  that the game feels customized and I can progress over time].
+	TASK 1: Create a main menu with a play button.
+	TASK 2: Create a character customization screen.
+	TASK 3: On click of play button, take player to customization screen.
+	TASK 4: Implement races (using a component for race).
+	TASK 5: Implement different classes (using a component for class).
+	TASK 6: Add an experience field to the player.
+	TASK 7: Add experience to player upon killing monsters.
+	TASK 8: Change player level based on amount of experience player has.
+	TASK 9: Change players' statistics upon level up
 
-User Story 4: As a user, I want an advanced mob system [so the monsters are unique and more
-challenging to fight].
-  Task 1:
+USER STORY 4: As a user, I want an advanced mob system [so the monsters are unique and more
+			  challenging to fight].
+	TASK 1: Come up with new monster types.
+	TASK 2: Add unique features to mobs (movement pattern, appearance, weaknesses, type, etc.).
+	TASK 3: Add mobs to world (allow them to be generated and rendered).
+-------------------------------------------------------------------------------------------------------------------------	
+TEAM ROLES
+	RACHELLE: Scrum Master, Developer
+	ANTHONY: Product Owner, Developer
+	SCOTT: Developer
+	JORDAN: Developer
+-------------------------------------------------------------------------------------------------------------------------	
+INITIAL TASK ASSIGNMENT
+	RACHELLE: User Story 3, Task 1
+	ANTHONY: User Story 1, Task 1
+	SCOTT: User Story 2, Task 1
+	JORDAN: User Story 4, Task 1
+-------------------------------------------------------------------------------------------------------------------------	
