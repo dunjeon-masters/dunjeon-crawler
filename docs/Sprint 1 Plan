@@ -30,12 +30,12 @@ USER STORY 2: As a user, I want to navigate multiple levels [so that the game ha
 
 USER STORY 3: As a user, I want to be able to build my character (races and classes) and level up [so
 			  that the game feels customized and I can progress over time].
-	TASK 1: Create a main menu with a play button. {2 ih}
-	TASK 2: Create a character customization screen. {2.5 ih}
-	TASK 3: On click of play button, take player to customization screen. {.25 ih}
-	TASK 4: Add race component. {.5 ih}
-	TASK 5: Add class component. {.5 ih}
-	TASK 6: On starting game, updates statistics (multimethod) {1.5 ih}
+	TASK 1: Add race component. {.5 ih}
+	TASK 2: Add class component. {.5 ih}
+	TASK 3: On starting game, updates statistics (multimethod) {1.5 ih}
+	TASK 4: Create a main menu with a play button. {2 ih}
+	TASK 5: Create a character customization screen. {2.5 ih}
+	TASK 6: On click of play button, take player to customization screen. {.25 ih} 
 	TASK 7: Add an experience field to the player. {.25 ih}
 	TASK 8: Add experience to player upon killing monsters. {.25 ih}
 	TASK 9: Implement player levelling system. {1.5 ih}

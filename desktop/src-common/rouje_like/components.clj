@@ -20,6 +20,10 @@
 
 (defrecord Skeleton [])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defrecord Class- [class])
+
+(defrecord Race [race])
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord World [world])
 
 (defrecord Tile [^Number x ^Number y

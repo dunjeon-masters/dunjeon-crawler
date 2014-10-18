@@ -95,13 +95,23 @@
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-power 2)
 
+(def all-classes [:rogue :warrior :mage])
+(def all-races [:human :orc :elf])
+(def race->stats {:human {:hp 5  :atk 0}
+                  :orc   {:hp 10 :atk 1}
+                  :elf   {:hp -5 :atk 0}})
+
 (declare render-player)
 (defn init-player
   [system]
-  (let [e-player (br.e/create-entity)]
+  (let [e-player (br.e/create-entity)
+        player-class (rand-nth all-classes)
+        player-race (rand-nth all-races)]
     (-> system
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
+        (rj.e/add-c e-player (rj.c/map->Class- {:class player-class}))
+        (rj.e/add-c e-player (rj.c/map->Race {:race player-race}))
         (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
                                                   :y init-player-y-pos
                                                   :type :player}))
@@ -109,7 +119,7 @@
                                                 :move-fn      rj.m/move}))
         (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn can-dig?
                                                 :dig-fn      dig}))
-        (rj.e/add-c e-player (rj.c/map->Attacker {:atk              1
+        (rj.e/add-c e-player (rj.c/map->Attacker {:atk              (+ 1 (:atk (race->stats player-race)))
                                                   :can-attack?-fn   rj.atk/can-attack?
                                                   :attack-fn        rj.atk/attack
                                                   :is-valid-target? (constantly true)}))
@@ -122,7 +132,7 @@
                                                      :torch-power   init-sight-torch-power}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn render-player
                                                     :args      {:view-port-sizes rj.c/view-port-sizes}}))
-        (rj.e/add-c e-player (rj.c/map->Destructible {:hp      25
+        (rj.e/add-c e-player (rj.c/map->Destructible {:hp       (+ 25 (:hp (race->stats player-race)))
                                                       :defense 1
                                                       :can-retaliate? false
                                                       :take-damage-fn rj.d/take-damage})))))
