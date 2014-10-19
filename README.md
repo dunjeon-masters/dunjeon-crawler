@@ -25,10 +25,10 @@ Update chart as soon as you finish a task.
 
 ## Links & Resources
 
-Clojure libgdx wrapper: https://github.com/oakes/play-clj
-CES library: https://github.com/markmandel/brute
-Quick Ref: http://clojuredocs.org/quickref
-Cheat Sheet: http://clojure.org/cheatsheet
+* Clojure libgdx wrapper: https://github.com/oakes/play-clj
+* CES library: https://github.com/markmandel/brute
+* Quick Ref: http://clojuredocs.org/quickref
+* Cheat Sheet: http://clojure.org/cheatsheet
 
 ### Learn clojure:
 1. http://www.braveclojure.com/
