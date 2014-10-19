@@ -16,13 +16,6 @@ https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqz
 
 Update chart as soon as you finish a task.
 
-## Workflow
-
-1. Find an issue you want to work on (that no one is assigned to)
-2. Assign yourself
-3. Work on the issue
-4. When done working for the day, unassign yourself
-
 ## Links & Resources
 
 * Clojure libgdx wrapper: https://github.com/oakes/play-clj
@@ -31,10 +24,10 @@ Update chart as soon as you finish a task.
 * Cheat Sheet: http://clojure.org/cheatsheet
 
 ### Learn clojure:
-1. http://www.braveclojure.com/
-2. http://clojure-doc.org/articles/content.html#essentials
-3. http://en.wikibooks.org/wiki/Clojure_Programming
-4. http://tryclj.com/
-5. http://www.4clojure.com/
-6. https://github.com/functional-koans/clojure-koans
-7. https://github.com/relevance/labrepl
+* http://www.braveclojure.com/
+* http://clojure-doc.org/articles/content.html#essentials
+* http://en.wikibooks.org/wiki/Clojure_Programming
+* http://tryclj.com/
+* http://www.4clojure.com/
+* https://github.com/functional-koans/clojure-koans
+* https://github.com/relevance/labrepl
