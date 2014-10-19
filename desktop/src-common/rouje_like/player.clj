@@ -95,8 +95,10 @@
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-power 2)
 
-(def all-classes [:rogue :warrior :mage])
-(def all-races [:human :orc :elf])
+(def class->stats {:rogue   {}
+                   :warrior {}
+                   :mage    {}})
+
 (def race->stats {:human {:hp 5  :atk 0}
                   :orc   {:hp 10 :atk 1}
                   :elf   {:hp -5 :atk 0}})
@@ -105,8 +107,8 @@
 (defn init-player
   [system]
   (let [e-player (br.e/create-entity)
-        player-class (rand-nth all-classes)
-        player-race (rand-nth all-races)]
+        player-class (rand-nth (keys class->stats))
+        player-race (rand-nth (keys race->stats))]
     (-> system
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
@@ -136,8 +138,6 @@
                                                       :defense 1
                                                       :can-retaliate? false
                                                       :take-damage-fn rj.d/take-damage})))))
-
-
 
 (defn render-player-stats
   [_ e-this {:keys [view-port-sizes]} system]
