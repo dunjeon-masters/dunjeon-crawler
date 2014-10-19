@@ -7,6 +7,10 @@
   [c-this e-this damage e-from system]
   (let [hp (:hp c-this)
 
+        c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)
+
+        e-relay (first (rj.e/all-e-with-c system :relay))
+
         c-position (rj.e/get-c-on-e system e-this :position)
         e-world (first (rj.e/all-e-with-c system :world))]
     (if (pos? (- hp damage))
@@ -20,8 +24,24 @@
                            (not (nil? c-attacker))
                            (can-attack? c-attacker e-this e-from system))
                     (attack c-attacker e-this e-from system)
-                    system))))
+                    system)))
+          (as-> system
+                (if (not (nil? c-broadcaster))
+                  (rj.e/upd-c system e-relay :relay
+                              (fn [c-relay]
+                                (update-in c-relay [:static]
+                                           conj (format "You dealt %d damage to the %s"
+                                                        damage (:name c-broadcaster)))))
+                  system)))
       (-> system
+          (as-> system
+                (if (not (nil? c-broadcaster))
+                  (rj.e/upd-c system e-relay :relay
+                              (fn [c-relay]
+                                (update-in c-relay [:static]
+                                           conj (format "You killed the %s"
+                                                        (:name c-broadcaster)))))
+                  system))
           (as-> system
                 (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
                   (if (and (:can-retaliate? c-this)
@@ -29,7 +49,6 @@
                            (can-attack? c-attacker e-this e-from system))
                     (attack c-attacker e-this e-from system)
                     system)))
-
           (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
                                  (fn [entities]
                                    (vec

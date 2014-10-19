@@ -10,7 +10,7 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]))
 
-(declare process-input-tick!)
+(declare process-input-tick)
 
 (defn add-skeleton
   ([system]
@@ -51,7 +51,9 @@
                                                          :defense 1
                                                          :can-retaliate? false
                                                          :take-damage-fn rj.d/take-damage}))
-         (rj.e/add-c e-skeleton (rj.c/map->Tickable {:tick-fn process-input-tick!}))))))
+         (rj.e/add-c e-skeleton (rj.c/map->Tickable {:tick-fn process-input-tick
+                                                     :pri 0}))
+         (rj.e/add-c e-skeleton (rj.c/map->Broadcaster {:name "skeleton"}))))))
 
 (defn get-closest-tile-to
   [world this-pos target-tile]
@@ -88,7 +90,7 @@
 
       :else nil)))
 
-(defn process-input-tick!
+(defn process-input-tick
   [_ e-this system]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
         this-pos [(:x c-position) (:y c-position)]

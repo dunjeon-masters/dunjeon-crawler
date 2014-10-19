@@ -22,7 +22,8 @@
             [rouje-like.world :as rj.wr]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.skeleton :as rj.sk]
-            [rouje-like.items :as rj.items]))
+            [rouje-like.items :as rj.items]
+            [rouje-like.relay :as rj.re]))
 
 (declare main-screen rouje-like)
 
@@ -40,6 +41,7 @@
   (let [e-world  (br.e/create-entity)]
     (-> system
         (rj.pl/init-player)
+        (rj.re/init-relay)
 
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/map->World {:world (rj.wr/generate-random-world
@@ -88,7 +90,7 @@
 (defn register-system-fns
   [system]
   (-> system
-      (br.s/add-system-fn  rj.r/process-one-game-tick)))
+      (br.s/add-system-fn rj.r/process-one-game-tick)))
 
 (defscreen main-screen
   :on-show
@@ -117,7 +119,7 @@
                 (-> (br.e/create-system)
                     (init-entities)
                     (register-system-fns))
-                (-> (rj.in/process-keyboard-input! @sys key-code)
+                (-> (rj.in/process-keyboard-input @sys key-code)
                     (as-> system
                           (if (empty? (rj.e/all-e-with-c system :player))
                             (-> (br.e/create-system)
@@ -130,7 +132,7 @@
     (let [x-vel (:velocity-x screen)
           y-vel (:velocity-y screen)]
       (reset! sys
-              (rj.in/process-fling-input! @sys x-vel y-vel)))))
+              (rj.in/process-fling-input @sys x-vel y-vel)))))
 
 (defgame rouje-like
   :on-create

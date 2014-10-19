@@ -137,7 +137,8 @@
         (rj.e/add-c e-player (rj.c/map->Destructible {:hp       (+ 25 (:hp (race->stats player-race)))
                                                       :defense 1
                                                       :can-retaliate? false
-                                                      :take-damage-fn rj.d/take-damage})))))
+                                                      :take-damage-fn rj.d/take-damage}))
+        #_(rj.e/add-c e-player (rj.c/map->Broadcaster {:name "You"})))))
 
 (defn render-player-stats
   [_ e-this {:keys [view-port-sizes]} system]

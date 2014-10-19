@@ -8,7 +8,7 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.mobile :as rj.m]))
 
-(declare process-input-tick!)
+(declare process-input-tick)
 
 (defn add-bat
   ([system]
@@ -43,9 +43,10 @@
                                                     :defense 1
                                                     :can-retaliate? false
                                                     :take-damage-fn rj.d/take-damage}))
-         (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick!}))))))
+         (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick
+                                                :pri 0}))))))
 
-(defn process-input-tick!
+(defn process-input-tick
   [_ e-this system]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
         c-mobile (rj.e/get-c-on-e system e-this :mobile)

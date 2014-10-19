@@ -9,7 +9,8 @@
 
 (defn tick-entities
   [system]
-  (let [entities (rj.e/all-e-with-c system :tickable)]
+  (let [entities (rj.e/all-e-with-c system :tickable)
+        entities (reverse (sort-by :pri entities))#_(SORT in decreasing order)]
     (reduce (fn [system entity]
               (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
                 (tick c-tickable entity system)))
@@ -44,7 +45,7 @@
    (play/key-code :D)          :right
    (play/key-code :dpad-right) :right})
 
-(defn process-keyboard-input!
+(defn process-keyboard-input
   [system key-code]
   (let [action (keycode->action key-code)]
     (if (not (nil? action))
@@ -61,7 +62,7 @@
               (tick-entities))
           system)))))
 
-(defn process-fling-input!
+(defn process-fling-input
   [system x-vel y-vel]
   (-> system
       (as-> system (if (< (* x-vel x-vel)
