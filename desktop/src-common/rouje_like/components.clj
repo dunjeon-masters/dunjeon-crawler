@@ -27,6 +27,8 @@
 (defrecord Relay [static
                   blocking])
 
+(defrecord Counter [turn])
+
 (defrecord Receiver [])
 
 (defrecord Broadcaster [name])
@@ -131,4 +133,5 @@
                :item         (type (->Item nil))
                :relay        (type (->Relay nil nil))
                :receiver     (type (->Receiver))
-               :broadcaster  (type (->Broadcaster nil))})
+               :broadcaster  (type (->Broadcaster nil))
+               :counter      (type (->Counter nil))})

@@ -29,18 +29,28 @@
                 (if (not (nil? c-broadcaster))
                   (rj.e/upd-c system e-relay :relay
                               (fn [c-relay]
+                                (println "adding [dealt 1 dmg] msg")
                                 (update-in c-relay [:static]
-                                           conj (format "You dealt %d damage to the %s"
-                                                        damage (:name c-broadcaster)))))
+                                           conj {:message (format "You dealt %d damage to the %s"
+                                                                  damage (:name c-broadcaster))
+                                                 :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
+                                                             c-counter (rj.e/get-c-on-e system e-counter :counter)
+                                                             current-turn (:turn c-counter)]
+                                                         current-turn)})))
                   system)))
       (-> system
           (as-> system
                 (if (not (nil? c-broadcaster))
                   (rj.e/upd-c system e-relay :relay
                               (fn [c-relay]
+                                (println "adding [killed] msg")
                                 (update-in c-relay [:static]
-                                           conj (format "You killed the %s"
-                                                        (:name c-broadcaster)))))
+                                           conj {:message (format "You killed the %s"
+                                                                  (:name c-broadcaster))
+                                                 :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
+                                                             c-counter (rj.e/get-c-on-e system e-counter :counter)
+                                                             current-turn (:turn c-counter)]
+                                                         current-turn)})))
                   system))
           (as-> system
                 (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]

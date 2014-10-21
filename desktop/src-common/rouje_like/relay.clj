@@ -8,28 +8,45 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]))
 
+(defmacro debug
+  [var]
+  (let [var# var]
+    `(println (str '~var# ": " ~var#))))
+
 (defn render-static-messages
   [_ e-this _ system]
-  (let [_ (println "render-static-messages")
-        c-relay (rj.e/get-c-on-e system e-this :relay)
-        static-messages (last (:static c-relay))
-        _ (println static-messages)
+  (let [c-relay (rj.e/get-c-on-e system e-this :relay)
+
+        e-counter (first (rj.e/all-e-with-c system :counter))
+        c-counter (rj.e/get-c-on-e system e-counter :counter)
+        current-turn (:turn c-counter)
+
+        statics (:static c-relay)
+        current-messages (filter #(= (:turn %) (dec current-turn))
+                                 statics)
+        static-messages (mapcat #(:message %)
+                                current-messages)
+
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (str static-messages)
+    (label! (label (str "MESSAGES: " (apply str (into [] static-messages)))
                    (color :green)
-                   :set-y (float (* 1 rj.c/block-size)))
+                   :set-y (float 0))
             :draw renderer 1.0)
     (.end renderer)))
 
 (defn process-input-tick
   [_ e-this system]
-  (render-static-messages nil e-this nil system)
   (-> system
-      (identity)
-      #_(rj.e/upd-c e-this :relay
+      (rj.e/upd-c e-this :relay
                   (fn [c-relay]
-                    (assoc c-relay :static [])))))
+                    (update-in c-relay [:static]
+                               (fn [static-buffer]
+                                 (let [e-counter (first (rj.e/all-e-with-c system :counter))
+                                       c-counter (rj.e/get-c-on-e system e-counter :counter)
+                                       current-turn (:turn c-counter)]
+                                   (remove #(< (:turn %) (dec current-turn))
+                                           static-buffer))))))))
 
 (defn init-relay
   [system]
