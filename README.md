@@ -10,11 +10,12 @@ A play-clj rogue like.
 
 All projects can be built using [Nightcode](https://nightcode.info/), or on the command line using [Leiningen](https://github.com/technomancy/leiningen) with the [lein-droid](https://github.com/clojure-android/lein-droid) and [lein-fruit](https://github.com/oakes/lein-fruit) plugins.
 
-## Sprint 1 Burnup Chart
+## Scrum Board and Burnup Charts
 
+The scrum board and burnup charts for all sprints can be found at the link below:
 https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing
 
-Update chart as soon as you finish a task.
+Click the tabs on the bottom to get the specified burnup chart or scrum board.
 
 ## Links & Resources
 
