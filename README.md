@@ -32,3 +32,9 @@ Click the tabs on the bottom to get the specified burnup chart or scrum board.
 * http://www.4clojure.com/
 * https://github.com/functional-koans/clojure-koans
 * https://github.com/relevance/labrepl
+
+### Monster MAsh
+
+I've gone ahead and started with some rough ideas on some enemy variety. Feel free to give it a look and send any criticisms my way. -Jordan
+
+ *https://docs.google.com/a/ucsc.edu/document/d/1a0d1LAEwrvvVeBc5wowEZIq3rvJ1BBQsOQWz686ktbs/edit?usp=sharing
