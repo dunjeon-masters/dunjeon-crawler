@@ -53,7 +53,7 @@
                                                          :take-damage-fn rj.d/take-damage}))
          (rj.e/add-c e-skeleton (rj.c/map->Tickable {:tick-fn process-input-tick
                                                      :pri 0}))
-         (rj.e/add-c e-skeleton (rj.c/map->Broadcaster {:name "skeleton"}))))))
+         (rj.e/add-c e-skeleton (rj.c/map->Broadcaster {:name "the skeleton"}))))))
 
 (defn get-closest-tile-to
   [world this-pos target-tile]

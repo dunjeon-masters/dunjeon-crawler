@@ -138,7 +138,7 @@
                                                       :defense 1
                                                       :can-retaliate? false
                                                       :take-damage-fn rj.d/take-damage}))
-        #_(rj.e/add-c e-player (rj.c/map->Broadcaster {:name "You"})))))
+        (rj.e/add-c e-player (rj.c/map->Broadcaster {:name "you"})))))
 
 (defn render-player-stats
   [_ e-this {:keys [view-port-sizes]} system]

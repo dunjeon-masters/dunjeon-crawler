@@ -24,7 +24,7 @@
         statics (:static c-relay)
         current-messages (filter #(= (:turn %) (dec current-turn))
                                  statics)
-        static-messages (mapcat #(:message %)
+        static-messages (mapcat #(str (:message %) ". ")
                                 current-messages)
 
         renderer (new SpriteBatch)]

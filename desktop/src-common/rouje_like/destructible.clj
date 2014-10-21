@@ -29,9 +29,10 @@
                 (if (not (nil? c-broadcaster))
                   (rj.e/upd-c system e-relay :relay
                               (fn [c-relay]
-                                (println "adding [dealt 1 dmg] msg")
                                 (update-in c-relay [:static]
-                                           conj {:message (format "You dealt %d damage to the %s"
+                                           conj {:message (format "%s dealt %d damage to %s"
+                                                                  (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
+                                                                    (:name atker-c-broadcaster))
                                                                   damage (:name c-broadcaster))
                                                  :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
                                                              c-counter (rj.e/get-c-on-e system e-counter :counter)
@@ -43,9 +44,10 @@
                 (if (not (nil? c-broadcaster))
                   (rj.e/upd-c system e-relay :relay
                               (fn [c-relay]
-                                (println "adding [killed] msg")
                                 (update-in c-relay [:static]
-                                           conj {:message (format "You killed the %s"
+                                           conj {:message (format "%s killed %s"
+                                                                  (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
+                                                                    (:name atker-c-broadcaster))
                                                                   (:name c-broadcaster))
                                                  :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
                                                              c-counter (rj.e/get-c-on-e system e-counter :counter)
