@@ -44,7 +44,8 @@
                                                     :can-retaliate? false
                                                     :take-damage-fn rj.d/take-damage}))
          (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick
-                                                :pri 0}))))))
+                                                :pri 0}))
+         (rj.e/add-c e-bat (rj.c/map->Broadcaster {:name "the bat"}))))))
 
 (defn process-input-tick
   [_ e-this system]

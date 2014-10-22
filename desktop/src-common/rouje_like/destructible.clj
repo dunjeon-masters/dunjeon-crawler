@@ -30,7 +30,7 @@
                   (rj.e/upd-c system e-relay :relay
                               (fn [c-relay]
                                 (update-in c-relay [:static]
-                                           conj {:message (format "%s dealt %d damage to %s"
+                                           conj {:message (format "%s dealt %s damage to %s"
                                                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
                                                                     (:name atker-c-broadcaster))
                                                                   damage (:name c-broadcaster))
