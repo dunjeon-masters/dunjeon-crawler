@@ -36,21 +36,22 @@
                                       (rj.c/map->Entity {:id   e-skeleton
                                                          :type :skeleton})))))
          (rj.e/add-c e-skeleton (rj.c/map->Skeleton {}))
-         (rj.e/add-c e-skeleton (rj.c/map->Position {:x (:x target-tile)
-                                                     :y (:y target-tile)
+         (rj.e/add-c e-skeleton (rj.c/map->Position {:x    (:x target-tile)
+                                                     :y    (:y target-tile)
                                                      :type :skeleton}))
          (rj.e/add-c e-skeleton (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
                                                    :move-fn      rj.m/move}))
          (rj.e/add-c e-skeleton (rj.c/map->Sight {:distance 4}))
-         (rj.e/add-c e-skeleton (rj.c/map->Attacker {:atk 1
+         (rj.e/add-c e-skeleton (rj.c/map->Attacker {:atk              1
                                                      :can-attack?-fn   rj.atk/can-attack?
                                                      :attack-fn        rj.atk/attack
                                                      :is-valid-target? (fn [type]
                                                                          (#{:player} type))}))
-         (rj.e/add-c e-skeleton (rj.c/map->Destructible {:hp      2
-                                                         :defense 1
+         (rj.e/add-c e-skeleton (rj.c/map->Destructible {:hp             2
+                                                         :defense        1
                                                          :can-retaliate? false
                                                          :take-damage-fn rj.d/take-damage}))
+         (rj.e/add-c e-skeleton (rj.c/map->Killable {:experience 1}))
          (rj.e/add-c e-skeleton (rj.c/map->Tickable {:tick-fn process-input-tick!}))))))
 
 (defn get-closest-tile-to

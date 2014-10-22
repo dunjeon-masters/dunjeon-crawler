@@ -114,6 +114,7 @@
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
         (rj.e/add-c e-player (rj.c/map->Class- {:class player-class}))
         (rj.e/add-c e-player (rj.c/map->Race {:race player-race}))
+        (rj.e/add-c e-player (rj.c/map->Experience {:experience 0}))
         (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
                                                   :y init-player-y-pos
                                                   :type :player}))
@@ -147,8 +148,14 @@
         x (:x c-position)
         y (:y c-position)
 
+        c-race (rj.e/get-c-on-e system e-this :race)
+        race (:race c-race)
+
         c-gold (rj.e/get-c-on-e system e-this :gold)
         gold (:gold c-gold)
+
+        c-experience (rj.e/get-c-on-e system e-this :experience)
+        experience (:experience c-experience)
 
         c-moves-left (rj.e/get-c-on-e system e-this :moves-left)
         moves-left (:moves-left c-moves-left)
@@ -161,7 +168,10 @@
     (label! (label (str "Gold: [" gold "]"
                         " - " "MovesLeft: [" moves-left "]"
                         " - " "Position: [" x "," y "]"
-                        " - " "HP: [" hp "]")
+                        " - " "HP: [" hp "]"
+                        " - " "Race: [" race "]"
+                        " - " "Experience: [" experience "]")
+
                    (color :green)
                    :set-y (float (* (+ vheight
                                        (dec (+ (:top rj.c/padding-sizes)

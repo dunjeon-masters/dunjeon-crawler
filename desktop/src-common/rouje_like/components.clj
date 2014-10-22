@@ -23,6 +23,10 @@
 (defrecord Class- [class])
 
 (defrecord Race [race])
+
+(defrecord Experience [experiece])
+
+(defrecord Killable [experience])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defrecord World [world])
 
@@ -120,4 +124,8 @@
                :lichen       (type (->Lichen nil nil))
                :bat          (type (->Bat))
                :skeleton     (type (->Skeleton))
+               :killable     (type (->Killable nil))
+               :race         (type (->Race nil))
+               :class        (type (->Class- nil))
+               :experience   (type (->Experience nil))
                :item         (type (->Item nil))})

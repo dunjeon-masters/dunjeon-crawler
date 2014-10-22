@@ -36,4 +36,10 @@
                                      (remove
                                        #(#{e-this} (:id %))
                                        entities))))
+          (as-> system (if-let [c-killable (rj.e/get-c-on-e system e-this :killable)]
+                         (rj.e/upd-c system e-from :experience
+                                     (fn [c-experience]
+                                       (update-in c-experience [:experience]
+                                                  #(+ % (:experience (rj.e/get-c-on-e system e-this :killable))))))
+                         system))
           (rj.e/kill-e e-this)))))
