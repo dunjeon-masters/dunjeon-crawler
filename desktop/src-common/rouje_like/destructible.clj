@@ -32,12 +32,11 @@
                                 (update-in c-relay [:static]
                                            conj {:message (format "%s dealt %s damage to %s"
                                                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                                                    (:name atker-c-broadcaster))
-                                                                  damage (:name c-broadcaster))
+                                                                    ((:msg-fn atker-c-broadcaster) system e-from))
+                                                                  damage ((:msg-fn c-broadcaster) system e-this))
                                                  :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
-                                                             c-counter (rj.e/get-c-on-e system e-counter :counter)
-                                                             current-turn (:turn c-counter)]
-                                                         current-turn)})))
+                                                             c-counter (rj.e/get-c-on-e system e-counter :counter)]
+                                                         (:turn c-counter))})))
                   system)))
       (-> system
           (as-> system
@@ -47,12 +46,11 @@
                                 (update-in c-relay [:static]
                                            conj {:message (format "%s killed %s"
                                                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                                                    (:name atker-c-broadcaster))
-                                                                  (:name c-broadcaster))
+                                                                    ((:msg-fn atker-c-broadcaster) system e-from))
+                                                                  ((:msg-fn c-broadcaster) system e-this))
                                                  :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
-                                                             c-counter (rj.e/get-c-on-e system e-counter :counter)
-                                                             current-turn (:turn c-counter)]
-                                                         current-turn)})))
+                                                             c-counter (rj.e/get-c-on-e system e-counter :counter)]
+                                                         (:turn c-counter))})))
                   system))
           (as-> system
                 (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]

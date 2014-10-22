@@ -10,7 +10,7 @@
                     :btm   1
                     :left  1
                     :right 1})
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defrecord Player [show-world?])
 
 (defrecord Lichen [^Number grow-chance%
@@ -19,11 +19,15 @@
 (defrecord Bat [])
 
 (defrecord Skeleton [])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defrecord Gold [value])
+
+(defrecord Torch [brightness])
+
 (defrecord Class- [class])
 
 (defrecord Race [race])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defrecord Relay [static
                   blocking])
 
@@ -31,8 +35,8 @@
 
 (defrecord Receiver [])
 
-(defrecord Broadcaster [name])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defrecord Broadcaster [msg-fn])
+
 (defrecord World [world])
 
 (defrecord Tile [^Number x ^Number y
@@ -40,27 +44,27 @@
 
 (defrecord Entity [^Keyword id
                    ^Keyword type])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
 
 (defrecord MovesLeft [^Number moves-left])
 
-(defrecord Gold [^Number gold])
+(defrecord Wallet [^Number gold])
 
 (defrecord PlayerSight [distance
                         decline-rate
                         lower-bound
                         upper-bound
-                        torch-power])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                        torch-multiplier])
+
 (defrecord Position [^Number x ^Number y
                      ^Keyword type])
 
 (defrecord Sight [^Number distance])
 
 (defrecord Item [pickup-fn])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defprotocol IMobile
   (can-move? [this e-this target-tile system])
   (move      [this e-this target-tile system]))
@@ -71,7 +75,7 @@
     (can-move?-fn this e-this target-tile system))
   (move     [this e-this target-tile system]
     (move-fn this e-this target-tile system)))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
   (attack      [this e-this e-target system]))
@@ -84,7 +88,7 @@
     (can-attack?-fn this e-this e-target system))
   (attack     [this e-this e-target system]
     (attack-fn this e-this e-target system)))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [^Number hp
@@ -94,7 +98,7 @@
   IDestructible
   (take-damage     [this e-this damage from system]
     (take-damage-fn this e-this damage from system)))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defprotocol ITickable
   (tick [this e-this system]))
 (defrecord Tickable [^Fn tick-fn
@@ -102,7 +106,7 @@
   ITickable
   (tick     [this e-this system]
     (tick-fn this e-this system)))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defprotocol IRenderable
   (render [this e-this args system]))
 (defrecord Renderable [^Fn render-fn
@@ -110,7 +114,7 @@
   IRenderable
   (render     [this e-this argz system]
     (render-fn this e-this argz system)))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Workaround for not being able to get record's type "statically"
 (def get-type {:attacker     (type (->Attacker nil nil nil nil))
                :bat          (type (->Bat))
@@ -134,4 +138,6 @@
                :skeleton     (type (->Skeleton))
                :tickable     (type (->Tickable nil nil))
                :tile         (type (->Tile nil nil nil))
+               :torch        (type (->Torch nil))
+               :wallet       (type (->Wallet nil))
                :world        (type (->World nil))})

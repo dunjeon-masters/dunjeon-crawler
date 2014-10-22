@@ -49,7 +49,7 @@
                                                    :is-valid-target? (constantly true)}))
          (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick
                                                    :pri 0}))
-         (rj.e/add-c e-lichen (rj.c/map->Broadcaster {:name "the lichen"}))))))
+         (rj.e/add-c e-lichen (rj.c/map->Broadcaster {:msg-fn (constantly "the lichen")}))))))
 
 (defn get-size-of-lichen-blob
   [world origin]

@@ -24,12 +24,12 @@
         statics (:static c-relay)
         current-messages (filter #(= (:turn %) (dec current-turn))
                                  statics)
-        static-messages (mapcat #(str (:message %) ". ")
+        static-messages (mapcat #(str (:message %) ". \n")
                                 current-messages)
 
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (str "MESSAGES: " (apply str (into [] static-messages)))
+    (label! (label (apply str (into [] static-messages))
                    (color :green)
                    :set-y (float 0))
             :draw renderer 1.0)

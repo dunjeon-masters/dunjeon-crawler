@@ -80,20 +80,21 @@
                       item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
                                           (:entities this-tile)))]
                   (if item
-                    (let [c-item (rj.e/get-c-on-e system (:id item) :item)]
-                      ((:pickup-fn c-item) system e-this this-pos (:type item)))
+                    (let [e-item (:id item)
+                          c-item (rj.e/get-c-on-e system e-item :item)]
+                      ((:pickup-fn c-item) system e-this e-item this-pos (:type item)))
                     system))))
       system)))
 
 (def ^:private init-player-x-pos (/ (:width  rj.c/world-sizes) 2))
 (def ^:private init-player-y-pos (/ (:height rj.c/world-sizes) 2))
 (def init-player-pos [init-player-x-pos init-player-y-pos])
-(def ^:private init-player-moves 250)
+(def ^:private init-player-moves-left 250)
 (def ^:private init-sight-distance 5.0)
 (def ^:private init-sight-decline-rate (/ 1 4))
 (def ^:private init-sight-lower-bound 4)                    ;; Inclusive
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
-(def ^:private init-sight-torch-power 2)
+(def ^:private init-sight-torch-multiplier 1.)
 
 (def class->stats {:rogue   {}
                    :warrior {}
@@ -125,34 +126,34 @@
                                                   :can-attack?-fn   rj.atk/can-attack?
                                                   :attack-fn        rj.atk/attack
                                                   :is-valid-target? (constantly true)}))
-        (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves}))
-        (rj.e/add-c e-player (rj.c/map->Gold {:gold 0}))
+        (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves-left}))
+        (rj.e/add-c e-player (rj.c/map->Wallet {:gold 0}))
         (rj.e/add-c e-player (rj.c/map->PlayerSight {:distance (inc init-sight-distance)
                                                      :decline-rate  init-sight-decline-rate
                                                      :lower-bound   init-sight-lower-bound
                                                      :upper-bound   init-sight-upper-bound
-                                                     :torch-power   init-sight-torch-power}))
+                                                     :torch-multiplier   init-sight-torch-multiplier}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn render-player
                                                     :args      {:view-port-sizes rj.c/view-port-sizes}}))
         (rj.e/add-c e-player (rj.c/map->Destructible {:hp       (+ 25 (:hp (race->stats player-race)))
                                                       :defense 1
                                                       :can-retaliate? false
                                                       :take-damage-fn rj.d/take-damage}))
-        (rj.e/add-c e-player (rj.c/map->Broadcaster {:name "you"})))))
+        (rj.e/add-c e-player (rj.c/map->Broadcaster {:msg-fn (constantly "you")})))))
 
 (defn render-player-stats
   [_ e-this {:keys [view-port-sizes]} system]
   (let [[_ vheight] view-port-sizes
 
-        c-position (rj.e/get-c-on-e system e-this :position)
-        x (:x c-position)
-        y (:y c-position)
-
-        c-gold (rj.e/get-c-on-e system e-this :gold)
-        gold (:gold c-gold)
+        c-wallet (rj.e/get-c-on-e system e-this :wallet)
+        gold (:gold c-wallet)
 
         c-moves-left (rj.e/get-c-on-e system e-this :moves-left)
         moves-left (:moves-left c-moves-left)
+
+        c-position (rj.e/get-c-on-e system e-this :position)
+        x (:x c-position)
+        y (:y c-position)
 
         c-destructible (rj.e/get-c-on-e system e-this :destructible)
         hp (:hp c-destructible)
