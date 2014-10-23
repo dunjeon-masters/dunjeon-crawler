@@ -2,6 +2,7 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
+;;TODO: PUT IN config.clj
 (def block-size 36)
 (def world-sizes {:width  60
                   :height 60})
@@ -13,17 +14,21 @@
 
 (defrecord Bat [])
 
-(defrecord Digger [^Fn can-dig?-fn
-                   ^Fn dig-fn])
+(defrecord Broadcaster [msg-fn])
+
+(defrecord Counter [turn])
 
 (defrecord Class- [class])
+
+(defrecord Digger [^Fn can-dig?-fn
+                   ^Fn dig-fn])
 
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
 (defrecord Experience [experience])
 
-(defrecord Gold [gold])
+(defrecord Gold [value])
 
 (defrecord Item [pickup-fn])
 
@@ -47,6 +52,11 @@
 
 (defrecord Race [race])
 
+(defrecord Receiver [])
+
+(defrecord Relay [static
+                  blocking])
+
 (defrecord Sight [distance])
 
 (defrecord Skeleton [])
@@ -54,12 +64,16 @@
 (defrecord Tile [^Number x ^Number y
                  ^PersistentVector entities])
 
+(defrecord Torch [brightness])
+
+(defrecord Wallet [^Number gold])
+
 (defrecord World [world])
 
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
   (attack      [this e-this e-target system]))
-(defrecord Attacker [atk
+(defrecord Attacker [^Number atk
                      ^Fn attack-fn
                      ^Fn can-attack?-fn
                      is-valid-target?]
@@ -71,8 +85,8 @@
 
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
-(defrecord Destructible [hp
-                         defense
+(defrecord Destructible [^Number hp
+                         ^Number defense
                          can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible
@@ -100,7 +114,7 @@
 
 (defprotocol ITickable
   (tick [this e-this system]))
-(defrecord Tickable [^Fn tick-fn]
+(defrecord Tickable [^Fn tick-fn pri]
   ITickable
   (tick     [this e-this system]
     (tick-fn this e-this system)))
@@ -108,24 +122,26 @@
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
   get-type {:attacker     (type (->Attacker nil nil nil nil))
             :bat          (type (->Bat))
-            :class        (type (->Class- nil))
+            :broadcaster  (type (->Broadcaster nil))
+            :counter      (type (->Counter nil))
             :destructible (type (->Destructible nil nil nil nil))
             :digger       (type (->Digger nil nil))
             :entity       (type (->Entity nil nil))
-            :experience   (type (->Experience nil))
             :gold         (type (->Gold nil))
             :item         (type (->Item nil))
-            :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
             :mobile       (type (->Mobile nil nil))
             :moves-left   (type (->MovesLeft nil))
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :position     (type (->Position nil nil nil))
-            :race         (type (->Race nil))
+            :receiver     (type (->Receiver))
+            :relay        (type (->Relay nil nil))
             :renderable   (type (->Renderable nil nil))
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
-            :tickable     (type (->Tickable nil))
+            :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil))
+            :torch        (type (->Torch nil))
+            :wallet       (type (->Wallet nil))
             :world        (type (->World nil))})
