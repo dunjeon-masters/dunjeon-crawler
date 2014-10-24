@@ -34,7 +34,7 @@
 (def ^:private init-gold% 5)
 (def ^:private init-lichen% 1)
 (def ^:private init-bat% 1)
-(def ^:private init-skeleton% 1)
+(def ^:private init-skeleton% 5)
 
 (defn init-entities
   [system]

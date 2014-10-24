@@ -26,7 +26,9 @@
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
-(defrecord Experience [experience])
+(defrecord Experience [experience
+                       level
+                       level-up-fn])
 
 (defrecord Gold [value])
 
@@ -123,18 +125,22 @@
   get-type {:attacker     (type (->Attacker nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
+            :class        (type (->Class- nil))
             :counter      (type (->Counter nil))
             :destructible (type (->Destructible nil nil nil nil))
             :digger       (type (->Digger nil nil))
             :entity       (type (->Entity nil nil))
+            :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
             :item         (type (->Item nil))
+            :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
             :mobile       (type (->Mobile nil nil))
             :moves-left   (type (->MovesLeft nil))
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :position     (type (->Position nil nil nil))
+            :race         (type (->Race nil))
             :receiver     (type (->Receiver))
             :relay        (type (->Relay nil nil))
             :renderable   (type (->Renderable nil nil))

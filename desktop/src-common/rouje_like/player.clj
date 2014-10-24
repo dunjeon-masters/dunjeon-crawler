@@ -13,7 +13,8 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.mobile :as rj.m]
-            [brute.entity :as br.e]))
+            [brute.entity :as br.e]
+            [rouje-like.experience :as rj.exp]))
 
 (defn can-dig?
   [_ target]
@@ -115,7 +116,9 @@
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
         (rj.e/add-c e-player (rj.c/map->Class- {:class player-class}))
         (rj.e/add-c e-player (rj.c/map->Race {:race player-race}))
-        (rj.e/add-c e-player (rj.c/map->Experience {:experience 0}))
+        (rj.e/add-c e-player (rj.c/map->Experience {:experience 0
+                                                    :level 1
+                                                    :level-up-fn rj.exp/level-up}))
         (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
                                                   :y init-player-y-pos
                                                   :type :player}))
@@ -154,6 +157,7 @@
 
         c-experience (rj.e/get-c-on-e system e-this :experience)
         experience (:experience c-experience)
+        level (:level c-experience)
 
         c-moves-left (rj.e/get-c-on-e system e-this :moves-left)
         moves-left (:moves-left c-moves-left)
@@ -172,7 +176,8 @@
                         " - " "Position: [" x "," y "]"
                         " - " "HP: [" hp "]"
                         " - " "Race: [" race "]"
-                        " - " "Experience: [" experience "]")
+                        " - " "Experience: [" experience "]"
+                        " - " "Level: [" level "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight

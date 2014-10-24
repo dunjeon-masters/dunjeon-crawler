@@ -66,9 +66,16 @@
                                        #(#{e-this} (:id %))
                                        entities))))
           (as-> system (if-let [c-killable (rj.e/get-c-on-e system e-this :killable)]
-                         (rj.e/upd-c system e-from :experience
-                                     (fn [c-experience]
-                                       (update-in c-experience [:experience]
-                                                  #(+ % (:experience (rj.e/get-c-on-e system e-this :killable))))))
+                         (let [c-exp (rj.e/get-c-on-e system e-from :experience)
+                               _ (println c-exp)
+                               level-up-fn (:level-up-fn c-exp)
+                               _ (println level-up-fn)]
+
+                           (->> (rj.e/upd-c system e-from :experience
+                                            (fn [c-experience]
+                                              (update-in c-experience [:experience]
+                                                         #(+ % (:experience c-killable)))))
+                                (level-up-fn e-from)))
                          system))
+
           (rj.e/kill-e e-this)))))
