@@ -35,15 +35,19 @@
 (def keycode->direction
   {(play/key-code :W)          :up
    (play/key-code :dpad-up)    :up
+   (play/key-code :K)          :up
 
    (play/key-code :S)          :down
    (play/key-code :dpad-down)  :down
+   (play/key-code :J)          :down
 
    (play/key-code :A)          :left
    (play/key-code :dpad-left)  :left
+   (play/key-code :H)          :left
 
    (play/key-code :D)          :right
-   (play/key-code :dpad-right) :right})
+   (play/key-code :dpad-right) :right
+   (play/key-code :L)          :right})
 
 (defn process-keyboard-input
   [system key-code]
