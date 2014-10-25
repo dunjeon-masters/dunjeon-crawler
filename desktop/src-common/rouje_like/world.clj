@@ -159,6 +159,52 @@
                         :set-region x y width height)
           :color tile-color)))))
 
+(defn points->line
+  [[x y] [i j]]
+  (let [dx (math/abs (- i x))
+        dy (math/abs (- j y))
+        sx (if (< x i) 1 -1)
+        sy (if (< y j) 1 -1)
+        err (- dx dy)]
+    (loop [points []
+           x x
+           y y
+           err err]
+      (if (and (= x i) (= y j))
+        (conj points
+              [x y])
+        (let [e2 (* err 2)]
+          (recur (conj points [x y])
+                 (if (> e2 (- dx))
+                   (+ x sx)
+                   x)
+                 (if (< e2 dx)
+                   (+ y sy)
+                   y)
+                 (if (> e2 (- dx))
+                   (if (< e2 dx)
+                     (+ (- err dy) dx)
+                     (- err dy))
+                   (if (< e2 dx)
+                     (+ err dx)
+                     err))))))))
+
+(defn can-see?
+  [world sight [x y] [i j]]
+  (let [result (if (< sight
+                     (rj.u/taxicab-dist [x y] [i j]))
+                 false
+                 (as-> (points->line [x y] [i j]) line 
+                   (filter (fn [[x y]] 
+                             (-> (get-in world [x y])
+                                 (rj.u/tile->top-entity)
+                                 (:type)
+                                 (#{:wall :lichen})))
+                           line)
+                   (every? (partial = [i j]) 
+                           line)))]
+    result))
+
 (defn render-world
   [_ e-this {:keys [view-port-sizes]} system]
   (let [e-player (first (rj.e/all-e-with-c system :player))
@@ -196,7 +242,8 @@
             y (range start-y end-y)
             :let [tile (get-in world [x y])]]
       (when (or show-world?
-                (> sight
+                (can-see? world sight player-pos [x y])
+                #_(> sight
                    (rj.u/taxicab-dist player-pos [x y])))
         (let [texture-entity (-> (rj.u/tile->top-entity tile)
                                  (:type) (type->texture))]

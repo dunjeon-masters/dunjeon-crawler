@@ -2,7 +2,7 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
-;;TODO: PUT IN config.clj
+;;TODO: PUT IN config.clj?
 (def block-size 36)
 (def world-sizes {:width  60
                   :height 60})
@@ -135,6 +135,7 @@
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :position     (type (->Position nil nil nil))
+            :race         (type (->Race nil))
             :receiver     (type (->Receiver))
             :relay        (type (->Relay nil nil))
             :renderable   (type (->Renderable nil nil))

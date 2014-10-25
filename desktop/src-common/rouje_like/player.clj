@@ -136,7 +136,7 @@
                                                      :torch-multiplier   init-sight-torch-multiplier}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn render-player
                                                     :args      {:view-port-sizes rj.c/view-port-sizes}}))
-        (rj.e/add-c e-player (rj.c/map->Destructible {:hp       (+ 25 (:hp (race->stats player-race)))
+        (rj.e/add-c e-player (rj.c/map->Destructible {:hp      (+ 25 (:hp (race->stats player-race)))
                                                       :defense 1
                                                       :can-retaliate? false
                                                       :take-damage-fn rj.d/take-damage}))

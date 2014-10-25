@@ -47,7 +47,7 @@
                                                    :tick-fn (fn [_ e-this system]
                                                               (rj.e/upd-c system e-this :counter
                                                                           (fn [c-counter]
-                                                                            (println (:turn c-counter))
+                                                                            (println "turn:" (:turn c-counter))
                                                                             (update-in c-counter [:turn]
                                                                                        inc))))}))
 
@@ -61,42 +61,41 @@
                                                    :args      {:view-port-sizes rj.c/view-port-sizes}}))
 
         ;; Add Items: Gold, Torches...
+        (as-> system 
+          (nth (iterate rj.items/add-gold system)
+               (* (/ init-gold% 100)
+                  (apply * (vals rj.c/world-sizes)))))
         (as-> system
-              (nth (iterate rj.items/add-gold system)
-                   (* (/ init-gold% 100)
-                      (apply * (vals rj.c/world-sizes)))))
-
-        (as-> system
-              (nth (iterate rj.items/add-torch system)
-                   (* (/ init-torch% 100)
-                      (apply * (vals rj.c/world-sizes)))))
+          (nth (iterate rj.items/add-torch system)
+               (* (/ init-torch% 100)
+                  (apply * (vals rj.c/world-sizes)))))
 
         ;; Spawn lichens
         (as-> system
-              (nth (iterate rj.lc/add-lichen system)
-                   (* (/ init-lichen% 100)
-                      (apply * (vals rj.c/world-sizes)))))
+          (nth (iterate rj.lc/add-lichen system)
+               (* (/ init-lichen% 100)
+                  (apply * (vals rj.c/world-sizes)))))
 
         ;; Spawn bats
         (as-> system
-              (nth (iterate rj.bt/add-bat system)
-                   (* (/ init-bat% 100)
-                      (apply * (vals rj.c/world-sizes)))))
+          (nth (iterate rj.bt/add-bat system)
+               (* (/ init-bat% 100)
+                  (apply * (vals rj.c/world-sizes)))))
 
         ;; Spawn Skeletons
         (as-> system
-              (nth (iterate rj.sk/add-skeleton system)
-                   (* (/ init-bat% 100)
-                      (apply * (vals rj.c/world-sizes)))))
+          (nth (iterate rj.sk/add-skeleton system)
+               (* (/ init-bat% 100)
+                  (apply * (vals rj.c/world-sizes)))))
 
         ;; Add player
         (as-> system
-              (let [e-player (first (rj.e/all-e-with-c system :player))]
-                (rj.wr/update-in-world system e-world rj.pl/init-player-pos
-                                       (fn [entities]
-                                         (vec (conj (filter #(#{:floor} (:type %)) entities)
-                                                    (rj.c/map->Entity {:id   e-player
-                                                                       :type :player}))))))))))
+          (let [e-player (first (rj.e/all-e-with-c system :player))]
+            (rj.wr/update-in-world system e-world rj.pl/init-player-pos
+                                   (fn [entities]
+                                     (vec (conj (filter #(#{:floor} (:type %)) entities)
+                                                (rj.c/map->Entity {:id   e-player
+                                                                   :type :player}))))))))))
 
 (defn register-system-fns
   [system]
@@ -108,11 +107,10 @@
   (fn [screen _]
     (update! screen :renderer (stage) :camera (orthographic))
     (graphics! :set-continuous-rendering false)
-    (-> (br.e/create-system)
-        (init-entities)
-        (register-system-fns)
-        (as-> system
-              (reset! sys system))))
+    (as-> (br.e/create-system) system
+      (init-entities system)
+      (register-system-fns system)
+      (reset! sys system)))
   
   :on-render
   (fn [screen _]
@@ -130,13 +128,12 @@
                 (-> (br.e/create-system)
                     (init-entities)
                     (register-system-fns))
-                (-> (rj.in/process-keyboard-input @sys key-code)
-                    (as-> system
-                          (if (empty? (rj.e/all-e-with-c system :player))
-                            (-> (br.e/create-system)
-                                (init-entities)
-                                (register-system-fns))
-                            system)))))))
+                (as-> (rj.in/process-keyboard-input @sys key-code) system
+                  (if (empty? (rj.e/all-e-with-c system :player))
+                    (-> (br.e/create-system)
+                        (init-entities)
+                        (register-system-fns))
+                    system))))))
 
   :on-fling
   (fn [screen _]

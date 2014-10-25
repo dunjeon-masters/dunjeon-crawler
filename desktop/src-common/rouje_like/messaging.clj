@@ -58,3 +58,4 @@
         (rj.e/add-c e-this (rj.c/map->Tickable {:tick-fn process-input-tick
                                                 :pri -1}))
         (rj.e/add-c e-this (rj.c/map->Renderable {:render-fn render-static-messages})))))
+
