@@ -7,13 +7,18 @@
   [c-this e-this damage e-from system]
   (let [hp (:hp c-this)
 
+        c-destructible (rj.e/get-c-on-e system e-this :destructible)
+        c-attacker (rj.e/get-c-on-e system e-from :attacker)
         c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)
 
         e-relay (first (rj.e/all-e-with-c system :relay))
 
         c-position (rj.e/get-c-on-e system e-this :position)
-        e-world (first (rj.e/all-e-with-c system :world))]
-    (if (pos? (- hp damage))
+        e-world (first (rj.e/all-e-with-c system :world))
+        atk (:atk c-attacker)
+        defense (:defense c-destructible)
+        damage (rand-int (- atk defense))]
+    (if (pos? (- hp (+ 1 damage)))
       (-> system
           (rj.e/upd-c e-this :destructible
                       (fn [c-destructible]
