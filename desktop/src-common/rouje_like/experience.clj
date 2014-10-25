@@ -10,18 +10,26 @@
 
 (defn level->exp
   [level]
-  (* level 5))
+  (* level 10))
 
 (defn level-up
   [e-this system]
   (let [c-this (rj.e/get-c-on-e system e-this :experience)
         level (:level c-this)
         experience (:experience c-this)
-        _ (debug level)
-        _ (debug experience)]
+        e-relay (first (rj.e/all-e-with-c system :relay))]
 
     (if (> experience (level->exp level))
-      (rj.e/upd-c system e-this :experience
+      (-> system
+          (rj.e/upd-c e-this :experience
                   (fn [c-level]
                     (update-in c-level [:level] inc)))
+          (rj.e/upd-c e-relay :relay
+                      (fn [c-relay]
+                        (update-in c-relay [:static]
+                                   conj {:message (format "You leveled up! You are now level %d"
+                                                          (inc level))
+                                         :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
+                                                     c-counter (rj.e/get-c-on-e system e-counter :counter)]
+                                                 (:turn c-counter))}))))
       system)))
