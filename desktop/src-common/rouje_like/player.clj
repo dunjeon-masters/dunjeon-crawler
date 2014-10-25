@@ -65,9 +65,6 @@
               (attack c-attacker e-this e-target system)
 
               :else system))
-          (rj.e/upd-c e-this :moves-left
-                      (fn [c-moves-left]
-                        (update-in c-moves-left [:moves-left] dec)))
           (rj.e/upd-c e-this :playersight
                       (fn [c-playersight]
                         (update-in c-playersight [:distance] dec-sight)))
@@ -89,7 +86,6 @@
 (def ^:private init-player-x-pos (/ (:width  rj.c/world-sizes) 2))
 (def ^:private init-player-y-pos (/ (:height rj.c/world-sizes) 2))
 (def init-player-pos [init-player-x-pos init-player-y-pos])
-(def ^:private init-player-moves-left 250)
 (def ^:private init-sight-distance 5.0)
 (def ^:private init-sight-decline-rate (/ 1 4))
 (def ^:private init-sight-lower-bound 4)                    ;; Inclusive
@@ -127,7 +123,6 @@
                                                   :can-attack?-fn   rj.atk/can-attack?
                                                   :attack-fn        rj.atk/attack
                                                   :is-valid-target? (constantly true)}))
-        (rj.e/add-c e-player (rj.c/map->MovesLeft {:moves-left init-player-moves-left}))
         (rj.e/add-c e-player (rj.c/map->Wallet {:gold 0}))
         (rj.e/add-c e-player (rj.c/map->PlayerSight {:distance (inc init-sight-distance)
                                                      :decline-rate  init-sight-decline-rate
@@ -155,9 +150,6 @@
         c-experience (rj.e/get-c-on-e system e-this :experience)
         experience (:experience c-experience)
 
-        c-moves-left (rj.e/get-c-on-e system e-this :moves-left)
-        moves-left (:moves-left c-moves-left)
-
         c-position (rj.e/get-c-on-e system e-this :position)
         x (:x c-position)
         y (:y c-position)
@@ -168,7 +160,6 @@
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
-                        " - " "MovesLeft: [" moves-left "]"
                         " - " "Position: [" x "," y "]"
                         " - " "HP: [" hp "]"
                         " - " "Race: [" race "]"

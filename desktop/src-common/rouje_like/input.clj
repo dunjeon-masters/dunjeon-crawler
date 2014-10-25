@@ -23,12 +23,6 @@
                                                    (update-in c-player [:show-world?]
                                                               (fn [prev]
                                                                 (not prev))))))
-   (play/key-code :equals) (fn [system]
-                             (rj.e/upd-c system (first (rj.e/all-e-with-c system :player) )
-                                         :moves-left (fn [c-moves-left]
-                                                       (update-in c-moves-left [:moves-left]
-                                                                  (fn [moves-left]
-                                                                    (+ 25 moves-left))))))
    (play/key-code :space)  (fn [system]
                              (tick-entities system))})
 
@@ -56,11 +50,8 @@
       (action system)
 
       (let [this (first (rj.e/all-e-with-c system :player))
-            c-moves-left (rj.e/get-c-on-e system this :moves-left)
-            moves-left (:moves-left c-moves-left)
             direction (keycode->direction key-code)]
-        (if (and (pos? moves-left)
-                 (not (nil? direction)))
+        (if (not (nil? direction)) 
           (-> system
               (rj.pl/process-input-tick direction)
               (tick-entities))
