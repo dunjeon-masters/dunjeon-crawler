@@ -8,11 +8,6 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]))
 
-(defmacro debug
-  [var]
-  (let [var# var]
-    `(println (str '~var# ": " ~var#))))
-
 (defn render-static-messages
   [_ e-this _ system]
   (let [c-relay (rj.e/get-c-on-e system e-this :relay)

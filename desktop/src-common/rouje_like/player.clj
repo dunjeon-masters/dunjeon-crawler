@@ -9,7 +9,6 @@
                                                     can-move? move]]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
-            [rouje-like.world :as rj.wr]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.mobile :as rj.m]
@@ -23,7 +22,7 @@
   [system target-tile]
   (let [e-world (first (rj.e/all-e-with-c system :world))]
     (-> system
-        (rj.wr/update-in-world e-world [(:x target-tile) (:y target-tile)]
+        (rj.u/update-in-world e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                (fn [entities]
                                  (remove #(#{:wall} (:type %))
                                          entities))))))
@@ -42,9 +41,12 @@
         c-position (rj.e/get-c-on-e system e-this :position)
         x-pos (:x c-position)
         y-pos (:y c-position)
+        z-pos (:z c-position)
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
-        world (:world c-world)
+        levels (:levels c-world)
+        world (nth levels z-pos) 
+        
         target-coords (rj.u/coords+offset [x-pos y-pos]
                                           (rj.u/direction->offset
                                             direction))
@@ -70,8 +72,9 @@
                         (update-in c-playersight [:distance] dec-sight)))
           (as-> system
                 (let [c-position (rj.e/get-c-on-e system e-this :position)
-                      this-pos [(:x c-position) (:y c-position)]
-                      this-tile (get-in world this-pos)
+                      this-pos [(:z c-position) (:x c-position) (:y c-position)]
+                      this-tile (get-in levels this-pos)
+                      _ (println :this-tile this-tile)
 
                       ;;TODO: There might be multiple items & user might want to choose to not pickup
                       item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
@@ -79,13 +82,16 @@
                   (if item
                     (let [e-item (:id item)
                           c-item (rj.e/get-c-on-e system e-item :item)]
+                      (println :e-item e-item)
+                      (println :c-item c-item) 
+                      (println :this-pos this-pos)
                       ((:pickup-fn c-item) system e-this e-item this-pos (:type item)))
                     system))))
       system)))
 
 (def ^:private init-player-x-pos (/ (:width  rj.c/world-sizes) 2))
 (def ^:private init-player-y-pos (/ (:height rj.c/world-sizes) 2))
-(def init-player-pos [init-player-x-pos init-player-y-pos])
+(def init-player-pos [0 init-player-x-pos init-player-y-pos])
 (def ^:private init-sight-distance 5.0)
 (def ^:private init-sight-decline-rate (/ 1 4))
 (def ^:private init-sight-lower-bound 4)                    ;; Inclusive
@@ -114,6 +120,7 @@
         (rj.e/add-c e-player (rj.c/map->Experience {:experience 0}))
         (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
                                                   :y init-player-y-pos
+                                                  :z 0
                                                   :type :player}))
         (rj.e/add-c e-player (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
                                                 :move-fn      rj.m/move}))
@@ -153,14 +160,14 @@
         c-position (rj.e/get-c-on-e system e-this :position)
         x (:x c-position)
         y (:y c-position)
-
+        z (:z c-position)
         c-destructible (rj.e/get-c-on-e system e-this :destructible)
         hp (:hp c-destructible)
 
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
-                        " - " "Position: [" x "," y "]"
+                        " - " "Position: [" x "," y "," z "]"
                         " - " "HP: [" hp "]"
                         " - " "Race: [" race "]"
                         " - " "Experience: [" experience "]")

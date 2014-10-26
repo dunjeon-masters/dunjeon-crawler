@@ -3,7 +3,6 @@
 
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
-            [rouje-like.world :as rj.wr]
             [rouje-like.components :as rj.c :refer [can-move? move
                                                     can-attack? attack]]
             [rouje-like.mobile :as rj.m]
@@ -13,10 +12,12 @@
 (declare process-input-tick)
 
 (defn add-skeleton
-  ([system]
+  ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
-         world (:world c-world)
+         levels (:levels c-world)
+         world (nth levels z)
+
          get-rand-tile (fn [world]
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
@@ -27,34 +28,36 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-skeleton (br.e/create-entity)]
-     (-> system
-         (rj.wr/update-in-world e-world [(:x target-tile) (:y target-tile)]
-                                (fn [entities]
-                                  (vec
-                                    (conj
-                                      (remove #(#{:wall} (:type %)) entities)
-                                      (rj.c/map->Entity {:id   e-skeleton
-                                                         :type :skeleton})))))
-         (rj.e/add-c e-skeleton (rj.c/map->Skeleton {}))
-         (rj.e/add-c e-skeleton (rj.c/map->Position {:x    (:x target-tile)
-                                                     :y    (:y target-tile)
-                                                     :type :skeleton}))
-         (rj.e/add-c e-skeleton (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
-                                                   :move-fn      rj.m/move}))
-         (rj.e/add-c e-skeleton (rj.c/map->Sight {:distance 4}))
-         (rj.e/add-c e-skeleton (rj.c/map->Attacker {:atk              1
-                                                     :can-attack?-fn   rj.atk/can-attack?
-                                                     :attack-fn        rj.atk/attack
-                                                     :is-valid-target? (fn [type]
-                                                                         (#{:player} type))}))
-         (rj.e/add-c e-skeleton (rj.c/map->Destructible {:hp             2
-                                                         :defense        1
-                                                         :can-retaliate? false
-                                                         :take-damage-fn rj.d/take-damage}))
-         (rj.e/add-c e-skeleton (rj.c/map->Killable {:experience 1}))
-         (rj.e/add-c e-skeleton (rj.c/map->Tickable {:tick-fn process-input-tick
-                                                     :pri 0}))
-         (rj.e/add-c e-skeleton (rj.c/map->Broadcaster {:msg-fn (constantly "the skeleton")}))))))
+     {:system (-> system
+                  (rj.u/update-in-world e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+                                         (fn [entities]
+                                           (vec
+                                             (conj
+                                               (remove #(#{:wall} (:type %)) entities)
+                                               (rj.c/map->Entity {:id   e-skeleton
+                                                                  :type :skeleton})))))
+                  (rj.e/add-c e-skeleton (rj.c/map->Skeleton {}))
+                  (rj.e/add-c e-skeleton (rj.c/map->Position {:x    (:x target-tile)
+                                                              :y    (:y target-tile)
+                                                              :z    (:z target-tile)
+                                                              :type :skeleton}))
+                  (rj.e/add-c e-skeleton (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
+                                                            :move-fn      rj.m/move}))
+                  (rj.e/add-c e-skeleton (rj.c/map->Sight {:distance 4}))
+                  (rj.e/add-c e-skeleton (rj.c/map->Attacker {:atk              1
+                                                              :can-attack?-fn   rj.atk/can-attack?
+                                                              :attack-fn        rj.atk/attack
+                                                              :is-valid-target? (fn [type]
+                                                                                  (#{:player} type))}))
+                  (rj.e/add-c e-skeleton (rj.c/map->Destructible {:hp             2
+                                                                  :defense        1
+                                                                  :can-retaliate? false
+                                                                  :take-damage-fn rj.d/take-damage}))
+                  (rj.e/add-c e-skeleton (rj.c/map->Killable {:experience 1}))
+                  (rj.e/add-c e-skeleton (rj.c/map->Tickable {:tick-fn process-input-tick
+                                                              :pri 0}))
+                  (rj.e/add-c e-skeleton (rj.c/map->Broadcaster {:msg-fn (constantly "the skeleton")})))
+      :z (:z target-tile)})))
 
 (defn get-closest-tile-to
   [world this-pos target-tile]
@@ -99,7 +102,8 @@
 
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
-        world (:world c-world)
+        levels (:levels c-world)
+        world (nth levels (:z c-position))
 
         neighbor-tiles (rj.u/get-neighbors world [(:x c-position) (:y c-position)])
 
@@ -125,3 +129,4 @@
 
         :else system)
       system)))
+

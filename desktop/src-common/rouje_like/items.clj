@@ -2,14 +2,13 @@
   (:require [brute.entity :as br.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.components :as rj.c]
-            [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.world :as rj.wr]))
+            [rouje-like.entity-wrapper :as rj.e]))
 
 (defn pickup-item
-  [system e-by e-this this-pos item-type]
+  [system e-by e-this [z x y] item-type]
   (let [remove-item (fn [system this-pos]
                       (let [e-world (first (rj.e/all-e-with-c system :world))]
-                        (rj.wr/update-in-world system e-world this-pos
+                        (rj.u/update-in-world system e-world [z x y]
                                                (fn [entities]
                                                  (vec
                                                    (remove
@@ -46,30 +45,32 @@
                    (rj.e/upd-c e-by :playersight
                                (fn [c-playersight]
                                  (update-in c-playersight [:distance] inc-sight)))
-                   (remove-item this-pos)
+                   (remove-item [z x y])
                    (broadcast-pickup)))
 
-      :gold (-> system
-                (rj.e/upd-c e-by :wallet
-                            (fn [c-wallet]
-                              (update-in c-wallet [:gold]
-                                         (partial + (:value (rj.e/get-c-on-e system e-this :gold))))))
-                (remove-item this-pos)
-                (broadcast-pickup))
+      :gold (as-> system system
+              (rj.e/upd-c system e-by :wallet
+                          (fn [c-wallet]
+                            (update-in c-wallet [:gold]
+                                       (partial + (:value (rj.e/get-c-on-e system e-this :gold))))))
+              (remove-item system [z x y])
+              (broadcast-pickup system))
 
       system)))
 
 
 
 (defn ^:private item>>world
-  [system is-valid-tile? item>>entities]
+  [system is-valid-tile? z item>>entities]
   (let [e-world (first (rj.e/all-e-with-c system :world))
-        world (:world (rj.e/get-c-on-e system e-world :world))]
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        world (nth levels z)]
     (loop [system system]
       (let [x (rand-int (count world))
             y (rand-int (count (first world)))]
         (if (is-valid-tile? world [x y])
-          (rj.wr/update-in-world system e-world [x y]
+          (rj.u/update-in-world system e-world [z x y]
                                  (fn [entities]
                                    (item>>entities entities)))
           (recur system))))))
@@ -86,7 +87,7 @@
                            :type e-type})))
 
 (defn add-torch
-  [system]
+  [{:keys [system z]}]
   (let [e-torch (br.e/create-entity)
 
         not-near-torches? (fn [world [x y]]
@@ -100,28 +101,30 @@
 
         torch>>entities (fn [entities]
                           (item>>entities entities e-torch :torch))]
-    (-> (item>>world system is-valid-tile?
-                     torch>>entities)
-        (rj.e/add-e e-torch)
-        (rj.e/add-c e-torch (rj.c/map->Item {:pickup-fn pickup-item}))
-        (rj.e/add-c e-torch (rj.c/map->Torch {:brightness 2}))
-        (rj.e/add-c e-torch (rj.c/map->Broadcaster {:msg-fn (constantly "a torch")})))))
+    {:system (-> (item>>world system is-valid-tile? z
+                              torch>>entities)
+                 (rj.e/add-e e-torch)
+                 (rj.e/add-c e-torch (rj.c/map->Item {:pickup-fn pickup-item}))
+                 (rj.e/add-c e-torch (rj.c/map->Torch {:brightness 2}))
+                 (rj.e/add-c e-torch (rj.c/map->Broadcaster {:msg-fn (constantly "a torch")})))
+     :z z}))
 
 (defn add-gold
-  [system]
+  [{:keys [system z]}]
   (let [e-gold (br.e/create-entity)
 
         is-valid-tile? (fn [world [x y]]
                          (only-floor? (get-in world [x y])))
 
         gold>>entities (fn [entities]
-                          (item>>entities entities e-gold :gold))]
-    (-> (item>>world system is-valid-tile?
-                     gold>>entities)
-        (rj.e/add-e e-gold)
-        (rj.e/add-c e-gold (rj.c/map->Item {:pickup-fn pickup-item}))
-        (rj.e/add-c e-gold (rj.c/map->Gold {:value 1}))
-        (rj.e/add-c e-gold (rj.c/map->Broadcaster {:msg-fn
-                                                    (fn [system e-this]
-                                                      (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
-                                                        (str value " gold")))})))))
+                         (item>>entities entities e-gold :gold))]
+    {:system (-> (item>>world system is-valid-tile? z
+                              gold>>entities)
+                 (rj.e/add-e e-gold)
+                 (rj.e/add-c e-gold (rj.c/map->Item {:pickup-fn pickup-item}))
+                 (rj.e/add-c e-gold (rj.c/map->Gold {:value 1}))
+                 (rj.e/add-c e-gold (rj.c/map->Broadcaster {:msg-fn
+                                                            (fn [system e-this]
+                                                              (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
+                                                                (str value " gold")))})))
+     :z z}))

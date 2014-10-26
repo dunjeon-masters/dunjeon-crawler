@@ -2,6 +2,7 @@
   (:require [clojure.math.numeric-tower :as math]
             [clojure.pprint :refer [pprint]]
 
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]))
 
 (def get-default-pri
@@ -65,7 +66,7 @@
 
 (defn get-neighbors
   [world origin]
-  (map (fn [vec] (get-in world vec nil))
+  (map (fn [v] (get-in world v nil))
        (get-neighbors-coords origin)))
 
 (defn get-neighbors-of-type
@@ -88,10 +89,10 @@
   [world origin type dist-fn]
   (filter #(and (dist-fn (radial-distance origin [(:x %) (:y %)]))
                 ((into #{} type) (:type (tile->top-entity %
-                                                        (zipmap (conj type :else)
-                                                                (conj (vec
-                                                                        (repeat (count type) 2))
-                                                                      1))))))
+                                                          (zipmap (conj type :else)
+                                                                  (conj (vec
+                                                                          (repeat (count type) 2))
+                                                                        1))))))
           (flatten world)))
 
 (defn not-any-radially-of-type
@@ -123,3 +124,21 @@
                                   :entities [(rj.c/map->Entity {:id   nil
                                                                 :type :wall})]})))
        (ring-coords origin dist)))
+
+(defmacro debug
+  [var]
+  (let [var# var]
+    `(println (str '~var# ": " ~var#))))
+
+(defn update-in-world
+  [system e-world [z x y] fn<-entities]
+  (rj.e/upd-c system e-world :world
+              (fn [c-world]
+                (update-in c-world [:levels]
+                           (fn [levels]
+                             (update-in levels [z x y]
+                                        (fn [tile]
+                                          (update-in tile [:entities]
+                                                     (fn [entities]
+                                                       (fn<-entities entities))))))))))
+

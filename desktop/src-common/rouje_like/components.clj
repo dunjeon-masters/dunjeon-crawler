@@ -4,8 +4,8 @@
 
 ;;TODO: PUT IN config.clj?
 (def block-size 36)
-(def world-sizes {:width  60
-                  :height 60})
+(def world-sizes {:width  20
+                  :height 20})
 (def view-port-sizes [20 20])
 (def padding-sizes {:top   1
                     :btm   1
@@ -47,7 +47,7 @@
                         upper-bound
                         torch-power])
 
-(defrecord Position [x y
+(defrecord Position [x y z
                      ^Keyword type])
 
 (defrecord Race [race])
@@ -61,14 +61,14 @@
 
 (defrecord Skeleton [])
 
-(defrecord Tile [^Number x ^Number y
+(defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
 
 (defrecord Torch [brightness])
 
 (defrecord Wallet [^Number gold])
 
-(defrecord World [world])
+(defrecord World [levels])
 
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
@@ -134,7 +134,7 @@
             :moves-left   (type (->MovesLeft nil))
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
-            :position     (type (->Position nil nil nil))
+            :position     (type (->Position nil nil nil nil))
             :race         (type (->Race nil))
             :receiver     (type (->Receiver))
             :relay        (type (->Relay nil nil))
@@ -142,7 +142,7 @@
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
             :tickable     (type (->Tickable nil nil))
-            :tile         (type (->Tile nil nil nil))
+            :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
             :wallet       (type (->Wallet nil))
             :world        (type (->World nil))})

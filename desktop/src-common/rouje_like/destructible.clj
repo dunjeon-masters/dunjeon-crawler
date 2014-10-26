@@ -1,7 +1,7 @@
 (ns rouje-like.destructible
   (:require [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.world :as rj.wr]
-            [rouje-like.components :refer [can-attack? attack]]))
+            [rouje-like.components :refer [can-attack? attack]]
+            [rouje-like.utils :as rj.u]))
 
 (defn take-damage
   [c-this e-this damage e-from system]
@@ -54,12 +54,15 @@
                   system))
           (as-> system
                 (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
+                  (println :e-this e-this)
+                  (println :e-from e-from)
+                  (println :c-attacker c-attacker)
                   (if (and (:can-retaliate? c-this)
                            (not (nil? c-attacker))
                            (can-attack? c-attacker e-this e-from system))
                     (attack c-attacker e-this e-from system)
                     system)))
-          (rj.wr/update-in-world e-world [(:x c-position) (:y c-position)]
+          (rj.u/update-in-world e-world [(:z c-position) (:x c-position) (:y c-position)]
                                  (fn [entities]
                                    (vec
                                      (remove

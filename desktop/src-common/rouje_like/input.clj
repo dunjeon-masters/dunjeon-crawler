@@ -9,22 +9,44 @@
 
 (defn tick-entities
   [system]
+  {:pre [(not (nil? system))]} 
   (let [entities (rj.e/all-e-with-c system :tickable)
         entities (reverse (sort-by :pri entities))#_(SORT in decreasing order)]
     (reduce (fn [system entity]
-              (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
-                (tick c-tickable entity system)))
+              (if-let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
+                (tick c-tickable entity system)
+                (do (println :bad-c-tick (brute.entity/get-all-components-on-entity system entity)) system)))
             system entities)))
 
 (def keycode->action
-  {(play/key-code :F)      (fn [system]
-                             (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
-                                         :player (fn [c-player]
-                                                   (update-in c-player [:show-world?]
-                                                              (fn [prev]
-                                                                (not prev))))))
-   (play/key-code :space)  (fn [system]
-                             (tick-entities system))})
+  {(play/key-code :F)          (fn [system]
+                                 (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
+                                             :player (fn [c-player]
+                                                       (update-in c-player [:show-world?]
+                                                                  (fn [prev]
+                                                                    (not prev))))))
+   (play/key-code :enter)      (fn [system]
+                                 (tick-entities system))
+   (play/key-code :space) (fn [system]
+                                 (let [e-player (first (rj.e/all-e-with-c system :player))
+                                       c-mobile (rj.e/get-c-on-e system e-player :mobile)
+                                       c-position (rj.e/get-c-on-e system e-player :position)
+
+                                       e-world (first (rj.e/all-e-with-c system :world))
+                                       c-world (rj.e/get-c-on-e system e-world :world)
+                                       levels (:levels c-world)
+                                       target-tile (get-in levels [(inc (:z c-position)) (:x c-position) (:y c-position)])]
+                                   (rj.c/move c-mobile e-player target-tile system)))
+   (play/key-code :shift-left) (fn [system]
+                                 (let [e-player (first (rj.e/all-e-with-c system :player))
+                                       c-mobile (rj.e/get-c-on-e system e-player :mobile)
+                                       c-position (rj.e/get-c-on-e system e-player :position)
+
+                                       e-world (first (rj.e/all-e-with-c system :world))
+                                       c-world (rj.e/get-c-on-e system e-world :world)
+                                       levels (:levels c-world)
+                                       target-tile (get-in levels [(dec (:z c-position)) (:x c-position) (:y c-position)])]
+                                   (rj.c/move c-mobile e-player target-tile system)))})
 
 (def keycode->direction
   {(play/key-code :W)          :up
