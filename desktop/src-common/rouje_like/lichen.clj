@@ -7,7 +7,8 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.destructible :as rj.d]
-            [rouje-like.attacker :as rj.atk]))
+            [rouje-like.attacker :as rj.atk]
+            [rouje-like.config :as rj.cfg]))
 
 (declare process-input-tick)
 
@@ -40,11 +41,11 @@
                                                             :y (:y target-tile)
                                                             :z (:z target-tile)                
                                                             :type :lichen}))
-                  (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      1
-                                                                :defense 1
+                  (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      (:hp  rj.cfg/lichen-stats)
+                                                                :defense (:def rj.cfg/lichen-stats)
                                                                 :can-retaliate? true
                                                                 :take-damage-fn rj.d/take-damage}))
-                  (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk (/ 1 4)
+                  (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk (:atk rj.cfg/lichen-stats)
                                                             :can-attack?-fn   rj.atk/can-attack?
                                                             :attack-fn        rj.atk/attack
                                                             :is-valid-target? (constantly true)}))

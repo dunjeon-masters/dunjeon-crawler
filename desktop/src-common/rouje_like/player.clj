@@ -12,7 +12,8 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.mobile :as rj.m]
-            [brute.entity :as br.e]))
+            [brute.entity :as br.e]
+            [rouje-like.config :as rj.cfg]))
 
 (defn can-dig?
   [_ target]
@@ -94,20 +95,12 @@
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-multiplier 1.)
 
-(def class->stats {:rogue   {}
-                   :warrior {}
-                   :mage    {}})
-
-(def race->stats {:human {:hp 5  :atk 0}
-                  :orc   {:hp 10 :atk 1}
-                  :elf   {:hp -5 :atk 0}})
-
 (declare render-player)
 (defn init-player
   [system]
   (let [e-player (br.e/create-entity)
-        player-class (rand-nth (keys class->stats))
-        player-race (rand-nth (keys race->stats))]
+        player-class (rand-nth (keys rj.cfg/class->stats))
+        player-race (rand-nth (keys rj.cfg/race->stats))]
     (-> system
         (rj.e/add-e e-player)
         (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
@@ -122,7 +115,7 @@
                                                 :move-fn      rj.m/move}))
         (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn can-dig?
                                                 :dig-fn      dig}))
-        (rj.e/add-c e-player (rj.c/map->Attacker {:atk              (+ 1 (:atk (race->stats player-race)))
+        (rj.e/add-c e-player (rj.c/map->Attacker {:atk              (+ (:atk rj.cfg/player-stats) (:atk (rj.cfg/race->stats player-race)))
                                                   :can-attack?-fn   rj.atk/can-attack?
                                                   :attack-fn        rj.atk/attack
                                                   :is-valid-target? (constantly true)}))
@@ -134,8 +127,8 @@
                                                      :torch-multiplier   init-sight-torch-multiplier}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn render-player
                                                     :args      {:view-port-sizes rj.c/view-port-sizes}}))
-        (rj.e/add-c e-player (rj.c/map->Destructible {:hp      (+ 25 (:hp (race->stats player-race)))
-                                                      :defense 1
+        (rj.e/add-c e-player (rj.c/map->Destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
+                                                      :defense (:def rj.cfg/player-stats)
                                                       :can-retaliate? false
                                                       :take-damage-fn rj.d/take-damage}))
         (rj.e/add-c e-player (rj.c/map->Broadcaster {:msg-fn (constantly "you")})))))

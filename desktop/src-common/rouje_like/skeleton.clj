@@ -7,7 +7,8 @@
                                                     can-attack? attack]]
             [rouje-like.mobile :as rj.m]
             [rouje-like.destructible :as rj.d]
-            [rouje-like.attacker :as rj.atk]))
+            [rouje-like.attacker :as rj.atk]
+            [rouje-like.config :as rj.cfg]))
 
 (declare process-input-tick)
 
@@ -44,13 +45,13 @@
                   (rj.e/add-c e-skeleton (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
                                                             :move-fn      rj.m/move}))
                   (rj.e/add-c e-skeleton (rj.c/map->Sight {:distance 4}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Attacker {:atk              1
+                  (rj.e/add-c e-skeleton (rj.c/map->Attacker {:atk              (:atk rj.cfg/skeleton-stats)
                                                               :can-attack?-fn   rj.atk/can-attack?
                                                               :attack-fn        rj.atk/attack
                                                               :is-valid-target? (fn [type]
                                                                                   (#{:player} type))}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Destructible {:hp             2
-                                                                  :defense        1
+                  (rj.e/add-c e-skeleton (rj.c/map->Destructible {:hp             (:hp  rj.cfg/skeleton-stats)
+                                                                  :defense        (:def rj.cfg/skeleton-stats)
                                                                   :can-retaliate? false
                                                                   :take-damage-fn rj.d/take-damage}))
                   (rj.e/add-c e-skeleton (rj.c/map->Killable {:experience 1}))
