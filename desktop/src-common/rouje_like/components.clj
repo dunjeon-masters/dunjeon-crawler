@@ -27,8 +27,6 @@
 (defrecord Lichen [grow-chance%
                    max-blob-size])
 
-(defrecord MovesLeft [moves-left])
-
 (defrecord Player [show-world?])
 
 (defrecord PlayerSight [distance
@@ -121,7 +119,6 @@
             :item         (type (->Item nil))
             :lichen       (type (->Lichen nil nil))
             :mobile       (type (->Mobile nil nil))
-            :moves-left   (type (->MovesLeft nil))
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :position     (type (->Position nil nil nil nil))

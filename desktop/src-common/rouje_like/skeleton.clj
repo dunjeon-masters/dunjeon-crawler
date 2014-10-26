@@ -2,7 +2,7 @@
   (:require [brute.entity :as br.e]
 
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.components :as rj.c :refer [can-move? move
                                                     can-attack? attack]]
             [rouje-like.mobile :as rj.m]
@@ -65,6 +65,7 @@
   (let [target-pos [(:x target-tile) (:y target-tile)]
         dist-from-target (rj.u/taxicab-dist this-pos target-pos)
 
+        _ (? target-pos)
         this-pos+dir-offset (fn [this-pos dir]
                                  (rj.u/coords+offset this-pos (rj.u/direction->offset dir)))
         shuffled-directions (shuffle [:up :down :left :right])

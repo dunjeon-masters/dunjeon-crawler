@@ -169,10 +169,15 @@
                                                                 :type :wall})]})))
        (ring-coords origin dist)))
 
-(defmacro debug
-  [var]
-  (let [var# var]
-    `(println (str '~var# ": " ~var#))))
+;;target-pos = [31 36] @([rouje_like/skeleton.clj:76])
+(defmacro ? [x]
+  (let [line  (:line (meta &form))
+        file *file*]
+    `(let [x# ~x]
+       (println (pr-str '~x) "=" (pr-str x#)
+                (str "#(" ~file ":" ~line ")")
+                (str "@[" (quot  (System/currentTimeMillis) 1000) "]"))
+       x#)))
 
 (defn update-in-world
   [system e-world [z x y] fn<-entities]

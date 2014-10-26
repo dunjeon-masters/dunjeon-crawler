@@ -3,7 +3,7 @@
 ;; WORLD CONFIG
 (def block-size 36)
 (def padding-sizes {:top   1
-                    :btm   1
+                    :btm   2
                     :left  1
                     :right 1})
 (def view-port-sizes [20 20])
@@ -35,7 +35,7 @@
    :def 1})
 
 (def skeleton-stats
-  {:hp  10
+  {:hp  9
    :def 1
-   :atk 4})
+   :atk 3})
 
