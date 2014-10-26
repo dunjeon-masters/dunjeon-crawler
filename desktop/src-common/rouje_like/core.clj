@@ -34,7 +34,7 @@
                                                    :tick-fn (fn [_ e-this system]
                                                               (rj.e/upd-c system e-this :counter
                                                                           (fn [c-counter]
-                                                                            (println "turn:" (:turn c-counter))
+                                                                            (rj.u/debug (:turn c-counter))
                                                                             (update-in c-counter [:turn]
                                                                                        inc))))}))
 

@@ -92,6 +92,4 @@
              (< (rand 100) grow-chance%)
              (< (get-size-of-lichen-blob world [x y])
                 max-blob-size))
-      (do (println :grow-lichen) 
-          (:system (add-lichen system (rand-nth empty-neighbors))))
-      system)))
+      (:system (add-lichen system (rand-nth empty-neighbors)))system)))

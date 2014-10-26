@@ -54,9 +54,6 @@
                   system))
           (as-> system
                 (let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
-                  (println :e-this e-this)
-                  (println :e-from e-from)
-                  (println :c-attacker c-attacker)
                   (if (and (:can-retaliate? c-this)
                            (not (nil? c-attacker))
                            (can-attack? c-attacker e-this e-from system))

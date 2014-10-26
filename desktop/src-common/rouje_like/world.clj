@@ -312,7 +312,7 @@
     (.begin renderer)
     (doseq [x (range start-x end-x)
             y (range start-y end-y)
-            :let [tile (get-in world [x y])]]
+            :let [tile (get-in levels [(:z c-player-pos) x y])]]
       (when (or show-world?
                 (> sight
                       (rj.u/taxicab-dist player-pos [x y]))
@@ -333,5 +333,6 @@
                  (float (* (+ (- y start-y)
                               (:btm rj.c/padding-sizes))
                            rj.c/block-size))
-                 (float rj.c/block-size) (float rj.c/block-size)))))))
+                 (float rj.c/block-size) (float rj.c/block-size)))))
+    (.end renderer)))
 

@@ -74,7 +74,6 @@
                 (let [c-position (rj.e/get-c-on-e system e-this :position)
                       this-pos [(:z c-position) (:x c-position) (:y c-position)]
                       this-tile (get-in levels this-pos)
-                      _ (println :this-tile this-tile)
 
                       ;;TODO: There might be multiple items & user might want to choose to not pickup
                       item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
@@ -82,9 +81,6 @@
                   (if item
                     (let [e-item (:id item)
                           c-item (rj.e/get-c-on-e system e-item :item)]
-                      (println :e-item e-item)
-                      (println :c-item c-item) 
-                      (println :this-pos this-pos)
                       ((:pickup-fn c-item) system e-this e-item this-pos (:type item)))
                     system))))
       system)))
