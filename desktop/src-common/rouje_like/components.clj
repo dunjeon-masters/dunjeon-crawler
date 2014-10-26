@@ -2,16 +2,6 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
-;;TODO: PUT IN config.clj?
-(def block-size 36)
-(def world-sizes {:width  60
-                  :height 60})
-(def view-port-sizes [20 20])
-(def padding-sizes {:top   1
-                    :btm   1
-                    :left  1
-                    :right 1})
-
 (defrecord Bat [])
 
 (defrecord Broadcaster [msg-fn])

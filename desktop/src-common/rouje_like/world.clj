@@ -16,7 +16,8 @@
             [rouje-like.items :as rj.items]
             [rouje-like.lichen :as rj.lc]
             [rouje-like.bat :as rj.bt]
-            [rouje-like.skeleton :as rj.sk]))
+            [rouje-like.skeleton :as rj.sk]
+            [rouje-like.config :as rj.cfg]))
 
 (defn ^:private block->freqs
   [block]
@@ -90,13 +91,13 @@
         (do (println "core::add-gold: " (not (nil? system))) system) 
         (nth (iterate rj.items/add-gold {:system system :z z})
              (* (/ init-gold% 100)
-                (apply * (vals rj.c/world-sizes))))
+                (apply * (vals rj.cfg/world-sizes))))
         (:system system))
       (as-> system
         (do (println "core::add-torch " (not (nil? system))) system)
         (nth (iterate rj.items/add-torch {:system system :z z})
              (* (/ init-torch% 100)
-                (apply * (vals rj.c/world-sizes))))
+                (apply * (vals rj.cfg/world-sizes))))
         (:system system))
 
       ;; Spawn lichens
@@ -104,7 +105,7 @@
         (do (println "core::add-lichen " (not (nil? system))) system)
         (nth (iterate rj.lc/add-lichen {:system system :z z})
              (* (/ init-lichen% 100)
-                (apply * (vals rj.c/world-sizes))))
+                (apply * (vals rj.cfg/world-sizes))))
         (:system system))
 
       ;; Spawn bats
@@ -112,7 +113,7 @@
         (do (println "core::add-bat " (not (nil? system))) system)
         (nth (iterate rj.bt/add-bat {:system system :z z})
              (* (/ init-bat% 100)
-                (apply * (vals rj.c/world-sizes))))
+                (apply * (vals rj.cfg/world-sizes))))
         (:system system))
 
       ;; Spawn Skeletons
@@ -120,7 +121,7 @@
         (do (println "core::add-skeleton " (not (nil? system))) system)
         (nth (iterate rj.sk/add-skeleton {:system system :z z})
              (* (/ init-skeleton% 100)
-                (apply * (vals rj.c/world-sizes))))
+                (apply * (vals rj.cfg/world-sizes))))
         (:system system))))
 
 (defn generate-random-level
@@ -157,9 +158,9 @@
   (let [z 0
         e-world  (br.e/create-entity)
         level0 (generate-random-level 
-                 rj.c/world-sizes z)
+                 rj.cfg/world-sizes z)
         level1 (generate-random-level
-                 rj.c/world-sizes (inc z))]
+                 rj.cfg/world-sizes (inc z))]
     (-> system 
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/map->World {:levels [level0 level1]}))
@@ -167,12 +168,12 @@
         (init-entities (inc z))
         
         (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn render-world
-                                                   :args      {:view-port-sizes rj.c/view-port-sizes}})))))
+                                                   :args      {:view-port-sizes rj.cfg/view-port-sizes}})))))
 
 (defn add-level
   [system z]
   (let [e-world (first (rj.e/all-e-with-c system :world))
-        new-level (generate-random-level rj.c/world-sizes z)]
+        new-level (generate-random-level rj.cfg/world-sizes z)]
     (-> system 
         (rj.e/upd-c e-world :world
                     (fn [c-world]
@@ -280,11 +281,11 @@
           (.draw renderer
                  (:object texture-entity)
                  (float (* (+ (- x start-x)
-                              (:left rj.c/padding-sizes))
-                           rj.c/block-size))
+                              (:left rj.cfg/padding-sizes))
+                           rj.cfg/block-size))
                  (float (* (+ (- y start-y)
-                              (:btm rj.c/padding-sizes))
-                           rj.c/block-size))
-                 (float rj.c/block-size) (float rj.c/block-size)))))
+                              (:btm rj.cfg/padding-sizes))
+                           rj.cfg/block-size))
+                 (float rj.cfg/block-size) (float rj.cfg/block-size)))))
     (.end renderer)))
 

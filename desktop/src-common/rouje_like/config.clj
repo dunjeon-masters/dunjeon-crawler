@@ -1,5 +1,16 @@
 (ns rouje-like.config)
 
+;; WORLD CONFIG
+(def block-size 36)
+(def padding-sizes {:top   1
+                    :btm   1
+                    :left  1
+                    :right 1})
+(def view-port-sizes [20 20])
+(def world-sizes {:width  60
+                  :height 60})
+
+;; PLAYER CONFIG
 (def player-stats
   {:hp  100
    :atk 4
@@ -13,17 +24,18 @@
                   :orc   {:hp 20  :atk 2}
                   :elf   {:hp -5  :atk 0}})
 
+;; CREATURE CONFIG
 (def bat-stats
-  {:hp  4
+  {:hp  2
    :def 0})
 
 (def lichen-stats
   {:hp  4
    :atk 1
-   :def 0})
+   :def 1})
 
 (def skeleton-stats
   {:hp  10
-   :def 0
+   :def 1
    :atk 4})
 

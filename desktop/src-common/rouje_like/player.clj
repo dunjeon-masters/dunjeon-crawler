@@ -86,8 +86,8 @@
                     system))))
       system)))
 
-(def ^:private init-player-x-pos (/ (:width  rj.c/world-sizes) 2))
-(def ^:private init-player-y-pos (/ (:height rj.c/world-sizes) 2))
+(def ^:private init-player-x-pos (/ (:width  rj.cfg/world-sizes) 2))
+(def ^:private init-player-y-pos (/ (:height rj.cfg/world-sizes) 2))
 (def init-player-pos [0 init-player-x-pos init-player-y-pos])
 (def ^:private init-sight-distance 5.0)
 (def ^:private init-sight-decline-rate (/ 1 4))
@@ -126,7 +126,7 @@
                                                      :upper-bound   init-sight-upper-bound
                                                      :torch-multiplier   init-sight-torch-multiplier}))
         (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn render-player
-                                                    :args      {:view-port-sizes rj.c/view-port-sizes}}))
+                                                    :args      {:view-port-sizes rj.cfg/view-port-sizes}}))
         (rj.e/add-c e-player (rj.c/map->Destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
                                                       :defense (:def rj.cfg/player-stats)
                                                       :can-retaliate? false
@@ -163,9 +163,9 @@
 
                    (color :green)
                    :set-y (float (* (+ vheight
-                                       (dec (+ (:top rj.c/padding-sizes)
-                                               (:btm rj.c/padding-sizes))))
-                                    rj.c/block-size)))
+                                       (dec (+ (:top rj.cfg/padding-sizes)
+                                               (:btm rj.cfg/padding-sizes))))
+                                    rj.cfg/block-size)))
             :draw renderer 1.0)
     (.end renderer)))
 
