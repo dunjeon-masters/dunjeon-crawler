@@ -169,6 +169,19 @@
         (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn render-world
                                                    :args      {:view-port-sizes rj.c/view-port-sizes}})))))
 
+(defn add-level
+  [system z]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        new-level (generate-random-level rj.c/world-sizes z)]
+    (-> system 
+        (rj.e/upd-c e-world :world
+                    (fn [c-world]
+                      (update-in c-world [:levels]
+                                 (fn [levels]
+                                   (conj levels
+                                         new-level)))))
+        (init-entities z))))
+
 (def ^:private type->tile-info
   {:player   {:x 0 :y 4
               :width 12 :height 12
