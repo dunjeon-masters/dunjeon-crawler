@@ -60,7 +60,7 @@
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
-  [world this-pos target-tile]
+  [level this-pos target-tile]
   (let [target-pos [(:x target-tile) (:y target-tile)]
         dist-from-target (rj.u/taxicab-dist this-pos target-pos)
 
@@ -78,19 +78,19 @@
                            (and (< (rj.u/taxicab-dist target-pos+offset target-pos)
                                    dist-from-target)
                                 (is-valid-target-tile?
-                                  (:type (rj.u/tile->top-entity (get-in world target-pos+offset))))))]
+                                  (:type (rj.u/tile->top-entity (get-in level target-pos+offset))))))]
     (cond
       (isa-closer-tile? (nth->offset-pos 0))
-      (get-in world (nth->offset-pos 0))
+      (get-in level (nth->offset-pos 0))
 
       (isa-closer-tile? (nth->offset-pos 1))
-      (get-in world (nth->offset-pos 1))
+      (get-in level (nth->offset-pos 1))
 
       (isa-closer-tile? (nth->offset-pos 2))
-      (get-in world (nth->offset-pos 2))
+      (get-in level (nth->offset-pos 2))
 
       (isa-closer-tile? (nth->offset-pos 3))
-      (get-in world (nth->offset-pos 3))
+      (get-in level (nth->offset-pos 3))
 
       :else nil)))
 
@@ -100,20 +100,26 @@
         this-pos [(:x c-position) (:y c-position)]
         c-mobile (rj.e/get-c-on-e system e-this :mobile)
 
+        e-player (first (rj.e/all-e-with-c system :player))
+        c-player-pos (rj.e/get-c-on-e system e-player :position)
+        player-pos [(:x c-player-pos) (:y c-player-pos)]
+
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels (:z c-position))
+        level (nth levels (:z c-position))
 
-        neighbor-tiles (rj.u/get-neighbors world [(:x c-position) (:y c-position)])
+        neighbor-tiles (rj.u/get-neighbors level [(:x c-position) (:y c-position)])
 
         c-sight (rj.e/get-c-on-e system e-this :sight)
-        is-player-within-range? (seq (rj.u/get-neighbors-of-type-within world this-pos [:player]
-                                                                        #(<= % (:distance c-sight))))
+        is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
+                                                                        #(<= %  (:distance c-sight))))
+        
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
-        target-tile (if is-player-within-range?
-                      (get-closest-tile-to world this-pos (first is-player-within-range?))
+        target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
+                              is-player-within-range?)
+                      (get-closest-tile-to level this-pos (first is-player-within-range?))
                       (if (seq neighbor-tiles)
                         (rand-nth (conj neighbor-tiles nil))
                         nil))

@@ -37,12 +37,56 @@
        (sort-by-type get-pri)
        (first))))
 
-
-
 (defn taxicab-dist
   [[x y] [i j]]
   (+ (math/abs (- i x))
      (math/abs (- j y))))
+
+(defn points->line
+  [[x y] [i j]]
+  (let [dx (math/abs (- i x))
+        dy (math/abs (- j y))
+        sx (if (< x i) 1 -1)
+        sy (if (< y j) 1 -1)
+        err (- dx dy)]
+    (loop [points []
+           x x
+           y y
+           err err]
+      (if (and (= x i) (= y j))
+        (conj points
+              [x y])
+        (let [e2 (* err 2)]
+          (recur (conj points [x y])
+                 (if (> e2 (- dx))
+                   (+ x sx)
+                   x)
+                 (if (< e2 dx)
+                   (+ y sy)
+                   y)
+                 (if (> e2 (- dx))
+                   (if (< e2 dx)
+                     (+ (- err dy) dx)
+                     (- err dy))
+                   (if (< e2 dx)
+                     (+ err dx)
+                     err))))))))
+
+(defn can-see?
+  [level sight [x y] [i j]]
+  (let [result (if (< sight
+                      (taxicab-dist [x y] [i j]))
+                 false
+                 (as-> (points->line [x y] [i j]) line 
+                   (filter (fn [[x y]] 
+                             (-> (get-in level [x y])
+                                 (tile->top-entity)
+                                 (:type)
+                                 (#{:wall :lichen})))
+                           line)
+                   (every? (partial = [i j]) 
+                           line)))]
+    result))
 
 (def direction->offset
   {:left  [-1 0]
