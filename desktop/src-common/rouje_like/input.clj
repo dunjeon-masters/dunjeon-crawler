@@ -25,6 +25,40 @@
                 (tick c-tickable entity system)))
             system entities)))
 
+(defn inc-level
+  [system]
+  (let [e-player (first (rj.e/all-e-with-c system :player))
+        c-mobile (rj.e/get-c-on-e system e-player :mobile)
+        c-position (rj.e/get-c-on-e system e-player :position)
+        z (:z c-position)
+
+        e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        target-tile (get-in levels [(inc z) (:x c-position) (:y c-position)]
+                            nil)]
+    (if target-tile
+      (rj.c/move c-mobile e-player target-tile system)
+      (as-> (rj.w/add-level system (inc z)) system
+        (let [levels (:levels (rj.e/get-c-on-e system e-world :world))
+              new-level (get-in levels [(inc z) (:x c-position) (:y c-position)])] 
+          (rj.c/move c-mobile e-player new-level system))))))
+
+(defn dec-level
+  [system]
+  (let [e-player (first (rj.e/all-e-with-c system :player))
+        c-mobile (rj.e/get-c-on-e system e-player :mobile)
+        c-position (rj.e/get-c-on-e system e-player :position)
+
+        e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        target-tile (get-in levels [(dec (:z c-position)) (:x c-position) (:y c-position)]
+                            nil)]
+    (if target-tile
+      (rj.c/move c-mobile e-player target-tile system)
+      system)))
+
 (def keycode->action
   {(play/key-code :F)             (fn [system]
                                     (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
@@ -34,36 +68,11 @@
                                                                        (not prev))))))
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
-   (play/key-code :right-bracket) (fn [system]
-                                    (let [e-player (first (rj.e/all-e-with-c system :player))
-                                          c-mobile (rj.e/get-c-on-e system e-player :mobile)
-                                          c-position (rj.e/get-c-on-e system e-player :position)
-                                          z (:z c-position)
+   (play/key-code :right-bracket) inc-level
+   (play/key-code :space)         inc-level
 
-                                          e-world (first (rj.e/all-e-with-c system :world))
-                                          c-world (rj.e/get-c-on-e system e-world :world)
-                                          levels (:levels c-world)
-                                          target-tile (get-in levels [(inc z) (:x c-position) (:y c-position)]
-                                                              nil)]
-                                      (if target-tile
-                                        (rj.c/move c-mobile e-player target-tile system)
-                                        (as-> (rj.w/add-level system (inc z)) system
-                                          (let [levels (:levels (rj.e/get-c-on-e system e-world :world))
-                                                new-level (get-in levels [(inc z) (:x c-position) (:y c-position)])] 
-                                            (rj.c/move c-mobile e-player new-level system))))))
-   (play/key-code :left-bracket)  (fn [system]
-                                    (let [e-player (first (rj.e/all-e-with-c system :player))
-                                          c-mobile (rj.e/get-c-on-e system e-player :mobile)
-                                          c-position (rj.e/get-c-on-e system e-player :position)
-
-                                          e-world (first (rj.e/all-e-with-c system :world))
-                                          c-world (rj.e/get-c-on-e system e-world :world)
-                                          levels (:levels c-world)
-                                          target-tile (get-in levels [(dec (:z c-position)) (:x c-position) (:y c-position)]
-                                                              nil)]
-                                      (if target-tile
-                                        (rj.c/move c-mobile e-player target-tile system)
-                                        system)))})
+   (play/key-code :left-bracket)  dec-level
+   (play/key-code :shift-left)    dec-level})
 
 (def keycode->direction
   {(play/key-code :W)          :up

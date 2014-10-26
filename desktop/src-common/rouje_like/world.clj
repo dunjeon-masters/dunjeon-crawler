@@ -314,9 +314,7 @@
             y (range start-y end-y)
             :let [tile (get-in levels [(:z c-player-pos) x y])]]
       (when (or show-world?
-                (> sight
-                      (rj.u/taxicab-dist player-pos [x y]))
-                #_(can-see? world sight player-pos [x y]))
+                (can-see? world sight player-pos [x y]))
         (let [texture-entity (-> (rj.u/tile->top-entity tile)
                                  (:type) (type->texture))]
           (let [color-values (:color texture-entity)]
