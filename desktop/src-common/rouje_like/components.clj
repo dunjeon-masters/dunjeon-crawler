@@ -8,7 +8,7 @@
 
 (defrecord Counter [turn])
 
-(defrecord Class- [class])
+(defrecord Klass [class])
 
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])

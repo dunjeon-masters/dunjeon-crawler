@@ -100,13 +100,14 @@
                                 (only-floor? tile))))
 
         torch>>entities (fn [entities]
-                          (item>>entities entities e-torch :torch))]
-    {:system (-> (item>>world system is-valid-tile? z
-                              torch>>entities)
-                 (rj.e/add-e e-torch)
-                 (rj.e/add-c e-torch (rj.c/map->Item {:pickup-fn pickup-item}))
-                 (rj.e/add-c e-torch (rj.c/map->Torch {:brightness 2}))
-                 (rj.e/add-c e-torch (rj.c/map->Broadcaster {:msg-fn (constantly "a torch")})))
+                          (item>>entities entities e-torch :torch))
+        system (item>>world system is-valid-tile? z
+                            torch>>entities)]
+    {:system (rj.e/system<<components
+               system e-torch
+               [[:item {:pickup-fn pickup-item}]
+                [:torch {:brightness 2}]
+                [:broadcaster {:msg-fn (constantly "a torch")}]])
      :z z}))
 
 (defn add-gold
@@ -117,14 +118,15 @@
                          (only-floor? (get-in world [x y])))
 
         gold>>entities (fn [entities]
-                         (item>>entities entities e-gold :gold))]
-    {:system (-> (item>>world system is-valid-tile? z
-                              gold>>entities)
-                 (rj.e/add-e e-gold)
-                 (rj.e/add-c e-gold (rj.c/map->Item {:pickup-fn pickup-item}))
-                 (rj.e/add-c e-gold (rj.c/map->Gold {:value 1}))
-                 (rj.e/add-c e-gold (rj.c/map->Broadcaster {:msg-fn
-                                                            (fn [system e-this]
-                                                              (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
-                                                                (str value " gold")))})))
+                         (item>>entities entities e-gold :gold))
+        system (item>>world system is-valid-tile? z
+                            gold>>entities)]
+    {:system (rj.e/system<<components
+               system e-gold
+               [[:item {:pickup-fn pickup-item}]
+                [:gold {:value 1}]
+                [:broadcaster {:msg-fn
+                               (fn [system e-this]
+                                 (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
+                                   (str value " gold")))}]])
      :z z}))

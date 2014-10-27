@@ -28,30 +28,31 @@
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-lichen (br.e/create-entity)]
-     {:system (-> system
-                  (rj.u/update-in-world e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
-                                         (fn [entities]
-                                           (vec (conj (remove #(#{:wall} (:type %)) entities)
-                                                      (rj.c/map->Entity {:id   e-lichen
-                                                                         :type :lichen})))))
-                  (rj.e/add-c e-lichen (rj.c/map->Lichen {:grow-chance% 4
-                                                          :max-blob-size 8}))
-                  (rj.e/add-c e-lichen (rj.c/map->Position {:x (:x target-tile)
-                                                            :y (:y target-tile)
-                                                            :z (:z target-tile)                
-                                                            :type :lichen}))
-                  (rj.e/add-c e-lichen (rj.c/map->Destructible {:hp      (:hp  rj.cfg/lichen-stats)
-                                                                :defense (:def rj.cfg/lichen-stats)
-                                                                :can-retaliate? true
-                                                                :take-damage-fn rj.d/take-damage}))
-                  (rj.e/add-c e-lichen (rj.c/map->Attacker {:atk (:atk rj.cfg/lichen-stats)
-                                                            :can-attack?-fn   rj.atk/can-attack?
-                                                            :attack-fn        rj.atk/attack
-                                                            :is-valid-target? (constantly true)}))
-                  (rj.e/add-c e-lichen (rj.c/map->Tickable {:tick-fn process-input-tick
-                                                            :pri 0}))
-                  (rj.e/add-c e-lichen (rj.c/map->Broadcaster {:msg-fn (constantly "the lichen")})))
+         e-lichen (br.e/create-entity)
+         system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+                                      (fn [entities]
+                                        (vec (conj (remove #(#{:wall} (:type %)) entities)
+                                                   (rj.c/map->Entity {:id   e-lichen
+                                                                      :type :lichen})))))]
+     {:system (rj.e/system<<components
+                system e-lichen
+                [[:lichen {:grow-chance% 4
+                           :max-blob-size 8}]
+                 [:position {:x (:x target-tile)
+                             :y (:y target-tile)
+                             :z (:z target-tile)                
+                             :type :lichen}]
+                 [:destructible {:hp      (:hp  rj.cfg/lichen-stats)
+                                 :defense (:def rj.cfg/lichen-stats)
+                                 :can-retaliate? true
+                                 :take-damage-fn rj.d/take-damage}]
+                 [:attacker {:atk (:atk rj.cfg/lichen-stats)
+                             :can-attack?-fn   rj.atk/can-attack?
+                             :attack-fn        rj.atk/attack
+                             :is-valid-target? (constantly true)}]
+                 [:tickable {:tick-fn process-input-tick
+                             :pri 0}]
+                 [:broadcaster {:msg-fn (constantly "the lichen")}]]) 
       :z (:z target-tile)})))
 
 (defn get-size-of-lichen-blob

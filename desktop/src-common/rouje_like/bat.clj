@@ -26,29 +26,30 @@
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-bat (br.e/create-entity)]
-     {:system (-> system
-                  (rj.u/update-in-world e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
-                                         (fn [entities]
-                                           (vec
-                                             (conj
-                                               (remove #(#{:wall} (:type %)) entities)
-                                               (rj.c/map->Entity {:id   e-bat
-                                                                  :type :bat})))))
-                  (rj.e/add-c e-bat (rj.c/map->Bat {}))
-                  (rj.e/add-c e-bat (rj.c/map->Position {:x (:x target-tile)
-                                                         :y (:y target-tile)
-                                                         :z (:z target-tile)
-                                                         :type :bat}))
-                  (rj.e/add-c e-bat (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
-                                                       :move-fn      rj.m/move}))
-                  (rj.e/add-c e-bat (rj.c/map->Destructible {:hp      (:hp  rj.cfg/bat-stats)
-                                                             :defense (:def rj.cfg/bat-stats)
-                                                             :can-retaliate? false
-                                                             :take-damage-fn rj.d/take-damage}))
-                  (rj.e/add-c e-bat (rj.c/map->Tickable {:tick-fn process-input-tick
-                                                         :pri 0}))
-                  (rj.e/add-c e-bat (rj.c/map->Broadcaster {:msg-fn (constantly "the bat")})))
+         e-bat (br.e/create-entity)
+         system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+                                      (fn [entities]
+                                        (vec
+                                          (conj
+                                            (remove #(#{:wall} (:type %)) entities)
+                                            (rj.c/map->Entity {:id   e-bat
+                                                               :type :bat})))))]
+     {:system (rj.e/system<<components
+                system e-bat
+                [[:bat {}]
+                 [:position {:x (:x target-tile)
+                             :y (:y target-tile)
+                             :z (:z target-tile)
+                             :type :bat}]
+                 [:mobile {:can-move?-fn rj.m/can-move?
+                           :move-fn      rj.m/move}]
+                 [:destructible {:hp      (:hp  rj.cfg/bat-stats)
+                                 :defense (:def rj.cfg/bat-stats)
+                                 :can-retaliate? false
+                                 :take-damage-fn rj.d/take-damage}]
+                 [:tickable {:tick-fn process-input-tick
+                             :pri 0}]
+                 [:broadcaster {:msg-fn (constantly "the bat")}]]) 
       :z (:z target-tile)})))
 
 (defn process-input-tick

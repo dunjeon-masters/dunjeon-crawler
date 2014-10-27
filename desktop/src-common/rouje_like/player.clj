@@ -101,37 +101,37 @@
   (let [e-player (br.e/create-entity)
         player-class (rand-nth (keys rj.cfg/class->stats))
         player-race (rand-nth (keys rj.cfg/race->stats))]
-    (-> system
-        (rj.e/add-e e-player)
-        (rj.e/add-c e-player (rj.c/map->Player {:show-world? false}))
-        (rj.e/add-c e-player (rj.c/map->Class- {:class player-class}))
-        (rj.e/add-c e-player (rj.c/map->Race {:race player-race}))
-        (rj.e/add-c e-player (rj.c/map->Experience {:experience 0}))
-        (rj.e/add-c e-player (rj.c/map->Position {:x init-player-x-pos
-                                                  :y init-player-y-pos
-                                                  :z 0
-                                                  :type :player}))
-        (rj.e/add-c e-player (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
-                                                :move-fn      rj.m/move}))
-        (rj.e/add-c e-player (rj.c/map->Digger {:can-dig?-fn can-dig?
-                                                :dig-fn      dig}))
-        (rj.e/add-c e-player (rj.c/map->Attacker {:atk              (+ (:atk rj.cfg/player-stats) (:atk (rj.cfg/race->stats player-race)))
-                                                  :can-attack?-fn   rj.atk/can-attack?
-                                                  :attack-fn        rj.atk/attack
-                                                  :is-valid-target? (constantly true)}))
-        (rj.e/add-c e-player (rj.c/map->Wallet {:gold 0}))
-        (rj.e/add-c e-player (rj.c/map->PlayerSight {:distance (inc init-sight-distance)
-                                                     :decline-rate  init-sight-decline-rate
-                                                     :lower-bound   init-sight-lower-bound
-                                                     :upper-bound   init-sight-upper-bound
-                                                     :torch-multiplier   init-sight-torch-multiplier}))
-        (rj.e/add-c e-player (rj.c/map->Renderable {:render-fn render-player
-                                                    :args      {:view-port-sizes rj.cfg/view-port-sizes}}))
-        (rj.e/add-c e-player (rj.c/map->Destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
-                                                      :defense (:def rj.cfg/player-stats)
-                                                      :can-retaliate? false
-                                                      :take-damage-fn rj.d/take-damage}))
-        (rj.e/add-c e-player (rj.c/map->Broadcaster {:msg-fn (constantly "you")})))))
+    (rj.e/system<<components
+      system e-player
+      [[:player {:show-world? false}]
+       [:klass {:class player-class}]
+       [:race {:race player-race}]
+       [:experience {:experience 0}]
+       [:position {:x init-player-x-pos
+                   :y init-player-y-pos
+                   :z 0
+                   :type :player}]
+       [:mobile {:can-move?-fn rj.m/can-move?
+                 :move-fn      rj.m/move}]
+       [:digger {:can-dig?-fn can-dig?
+                 :dig-fn      dig}]
+       [:attacker {:atk              (+ (:atk rj.cfg/player-stats) (:atk (rj.cfg/race->stats player-race)))
+                   :can-attack?-fn   rj.atk/can-attack?
+                   :attack-fn        rj.atk/attack
+                   :is-valid-target? (constantly true)}]
+       [:wallet {:gold 0}]
+       [:player-sight {:distance (inc init-sight-distance)
+                       :decline-rate  init-sight-decline-rate
+                       :lower-bound   init-sight-lower-bound
+                       :upper-bound   init-sight-upper-bound
+                       :torch-multiplier   init-sight-torch-multiplier}]
+       [:renderable {:render-fn render-player
+                     :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
+       [:destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
+                       :defense (:def rj.cfg/player-stats)
+                       :can-retaliate? false
+                       :take-damage-fn rj.d/take-damage}]
+       [:broadcaster {:msg-fn (constantly "you")}]])))
 
 (defn render-player-stats
   [_ e-this {:keys [view-port-sizes]} system]

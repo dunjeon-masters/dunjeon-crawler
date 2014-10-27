@@ -28,36 +28,36 @@
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-skeleton (br.e/create-entity)]
-     {:system (-> system
-                  (rj.u/update-in-world e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
-                                         (fn [entities]
-                                           (vec
-                                             (conj
-                                               (remove #(#{:wall} (:type %)) entities)
-                                               (rj.c/map->Entity {:id   e-skeleton
-                                                                  :type :skeleton})))))
-                  (rj.e/add-c e-skeleton (rj.c/map->Skeleton {}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Position {:x    (:x target-tile)
-                                                              :y    (:y target-tile)
-                                                              :z    (:z target-tile)
-                                                              :type :skeleton}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Mobile {:can-move?-fn rj.m/can-move?
-                                                            :move-fn      rj.m/move}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Sight {:distance 4}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Attacker {:atk              (:atk rj.cfg/skeleton-stats)
-                                                              :can-attack?-fn   rj.atk/can-attack?
-                                                              :attack-fn        rj.atk/attack
-                                                              :is-valid-target? (fn [type]
-                                                                                  (#{:player} type))}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Destructible {:hp             (:hp  rj.cfg/skeleton-stats)
-                                                                  :defense        (:def rj.cfg/skeleton-stats)
-                                                                  :can-retaliate? false
-                                                                  :take-damage-fn rj.d/take-damage}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Killable {:experience 1}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Tickable {:tick-fn process-input-tick
-                                                              :pri 0}))
-                  (rj.e/add-c e-skeleton (rj.c/map->Broadcaster {:msg-fn (constantly "the skeleton")})))
+         e-skeleton (br.e/create-entity)
+         system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+                                      (fn [entities]
+                                        (vec
+                                          (conj
+                                            (remove #(#{:wall} (:type %)) entities)
+                                            (rj.c/map->Entity {:id   e-skeleton
+                                                               :type :skeleton})))))]
+     {:system (rj.e/system<<components
+                system e-skeleton
+                [[:skeleton {}]
+                 [:position {:x    (:x target-tile)
+                             :y    (:y target-tile)
+                             :z    (:z target-tile)
+                             :type :skeleton}]
+                 [:mobile {:can-move?-fn rj.m/can-move?
+                           :move-fn      rj.m/move}]
+                 [:sight {:distance 4}]
+                 [:attacker {:atk              (:atk rj.cfg/skeleton-stats)
+                             :can-attack?-fn   rj.atk/can-attack?
+                             :attack-fn        rj.atk/attack
+                             :is-valid-target? (partial #{:player})}]
+                 [:destructible {:hp             (:hp  rj.cfg/skeleton-stats)
+                                 :defense        (:def rj.cfg/skeleton-stats)
+                                 :can-retaliate? false
+                                 :take-damage-fn rj.d/take-damage}]
+                 [:killable {:experience 1}]
+                 [:tickable {:tick-fn process-input-tick
+                             :pri 0}]
+                 [:broadcaster {:msg-fn (constantly "the skeleton")}]]) 
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -65,7 +65,6 @@
   (let [target-pos [(:x target-tile) (:y target-tile)]
         dist-from-target (rj.u/taxicab-dist this-pos target-pos)
 
-        _ (? target-pos)
         this-pos+dir-offset (fn [this-pos dir]
                                  (rj.u/coords+offset this-pos (rj.u/direction->offset dir)))
         shuffled-directions (shuffle [:up :down :left :right])
