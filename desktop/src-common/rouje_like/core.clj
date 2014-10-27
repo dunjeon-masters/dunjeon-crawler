@@ -28,21 +28,11 @@
   [system]
   (let [e-counter  (br.e/create-entity)]
     (-> system
-        (rj.e/add-e e-counter)
-        (rj.e/add-c e-counter (rj.c/map->Counter {:turn 1}))
-        (rj.e/add-c e-counter (rj.c/map->Tickable {:pri -2
-                                                   :tick-fn (fn [_ e-this system]
-                                                              (rj.e/upd-c system e-this :counter
-                                                                          (fn [c-counter]
-                                                                            (rj.u/? (:turn c-counter))
-                                                                            (update-in c-counter [:turn]
-                                                                                       inc))))}))
-
         (rj.pl/init-player)
         (rj.msg/init-relay)
         (rj.wr/init-world)
 
-        ;; add player
+        ;; Add player
         (as-> system
           (do (println "core::add-player " (not (nil? system))) system)
           (let [e-player (first (rj.e/all-e-with-c system :player))

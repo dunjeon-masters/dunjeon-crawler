@@ -35,7 +35,7 @@
    :def 1})
 
 (def skeleton-stats
-  {:hp  9
+  {:hp  8
    :def 1
    :atk 3})
 
