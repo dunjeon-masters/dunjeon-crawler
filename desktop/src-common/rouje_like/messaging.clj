@@ -45,17 +45,16 @@
 
 (defn process-input-tick
   [_ e-this system]
-  (-> system
-      (rj.e/upd-c e-this :relay
-                  (fn [c-relay]
-                    (update-in c-relay [:static]
-                               (fn [static-buffer]
-                                 (let [e-counter (first (rj.e/all-e-with-c system :counter))
-                                       c-counter (rj.e/get-c-on-e system e-counter :counter)
-                                       current-turn (:turn c-counter)]
-                                   (rj.u/? current-turn)
-                                   (remove #(< (:turn %) (dec current-turn))
-                                           static-buffer))))))))
+  (rj.e/upd-c system e-this :relay
+              (fn [c-relay]
+                (update-in c-relay [:static]
+                           (fn [static-buffer]
+                             (let [e-counter (first (rj.e/all-e-with-c system :counter))
+                                   c-counter (rj.e/get-c-on-e system e-counter :counter)
+                                   current-turn (:turn c-counter)]
+                               (rj.u/? static-buffer)
+                               (remove #(< (:turn %) (dec current-turn))
+                                       static-buffer)))))))
 
 (defn init-relay
   [system]
