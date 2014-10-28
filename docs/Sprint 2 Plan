@@ -4,10 +4,10 @@ Team Name: Dunjeon Masters
 Sprint Completion Date: 11/11/2014
 Revision Number: 2
 Revision Date: 10/28/2014
--------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 GOAL
 	To implement status effect, equipment, consumables, themed levels, traps, and monsters, and terrain interaction.  
--------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 USER STORIES
 
 USER STORY 1: As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it 
@@ -54,18 +54,18 @@ USER STORY 6: As a user, I want consumable items [so that I can heal].
   TASK 2: Allow user to pick up, view, and use consumables. {4.5 ih}
   TASK 3: Test functionality. {3 ih}
   TOTAL: 8.5 ih
--------------------------------------------------------------------------------------------------------------------------	
+------------------------------------------------------------------------------------------------------------------------	
 TEAM ROLES
 	RACHELLE: Developer
 	ANTHONY: Product Owner, Developer
 	SCOTT: Scrum Master, Developer
 	JORDAN: Designer, Play Tester
--------------------------------------------------------------------------------------------------------------------------	
+------------------------------------------------------------------------------------------------------------------------	
 INITIAL TASK ASSIGNMENT
 	RACHELLE: User Story 2, Task 2
 	ANTHONY: User Story 1, Task 1
 	SCOTT: User Story 1, Task 3
 	JORDAN: User Story 2-6, Task 1(~2 for US 4)
--------------------------------------------------------------------------------------------------------------------------	
+------------------------------------------------------------------------------------------------------------------------	
 INITIAL BURNUP CHART AND SCRUM BOARD
 	https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing
