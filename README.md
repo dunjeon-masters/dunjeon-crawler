@@ -1,6 +1,7 @@
 ## Announcements
 
 Will be using github and this README as a message board. Check periodically for updates.
+10/27: Monster Google Doc updated, have a look at what exists thus far. We can add/remove as we please, and they'll be more than enough for what we currently need even if we can't get some more variety from them (Firey/Icy/Poisoin/etc). Implementation should just require tweaks here and there.
 
 ## Introduction
 
