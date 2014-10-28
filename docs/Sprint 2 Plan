@@ -2,12 +2,11 @@ Sprint 2 Plan
 Product Name: Dunjeon Crawler
 Team Name: Dunjeon Masters
 Sprint Completion Date: 11/11/2014
-Revision Number: 1
+Revision Number: 2
 Revision Date: 10/28/2014
 -------------------------------------------------------------------------------------------------------------------------
 GOAL
-	To implement a player messaging system, create multiple levels for the player to explore, have customizable 
-	characters, and to create more mobs by improving our mob system.
+	To implement status effect, equipment, consumables, themed levels, traps, and monsters, and terrain interaction.  
 -------------------------------------------------------------------------------------------------------------------------
 USER STORIES
 
