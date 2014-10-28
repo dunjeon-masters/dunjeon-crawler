@@ -44,7 +44,7 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:destructible {:hp      (:hp  rj.cfg/bat-stats)
-                                 :defense (:def rj.cfg/bat-stats)
+                                 :def (:def rj.cfg/bat-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage}]
                  [:tickable {:tick-fn process-input-tick

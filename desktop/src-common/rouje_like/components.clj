@@ -76,7 +76,7 @@
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [^Number hp
-                         ^Number defense
+                         ^Number def
                          can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible

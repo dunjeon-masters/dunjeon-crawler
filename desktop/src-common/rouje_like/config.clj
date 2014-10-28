@@ -24,6 +24,18 @@
                   :orc   {:hp 20  :atk 2}
                   :elf   {:hp -5  :atk 0}})
 
+(def stat->comp {:hp :destructible
+                 :atk :attacker
+                 :def :destructible})
+
+(def stat->pointinc {:hp 5
+                     :atk 1
+                     :def 1})
+
+(def level-exp
+  {:exp 1
+   })
+
 ;; CREATURE CONFIG
 (def bat-stats
   {:hp  2
@@ -37,8 +49,6 @@
 (def skeleton-stats
   {:hp  8
    :def 1
-   :atk 3})
+   :atk 3
+   :exp 1})
 
-(def level-exp
-  {:exp 2
-   })

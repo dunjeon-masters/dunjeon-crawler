@@ -16,7 +16,6 @@
             [rouje-like.experience :as rj.exp]
             [rouje-like.config :as rj.cfg]))
 
-
 (defn can-dig?
   [_ target]
   (#{:wall} (:type (rj.u/tile->top-entity target))))
@@ -132,7 +131,7 @@
        [:renderable {:render-fn render-player
                      :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
        [:destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
-                       :defense (:def rj.cfg/player-stats)
+                       :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
@@ -155,14 +154,21 @@
         x (:x c-position)
         y (:y c-position)
         z (:z c-position)
+
         c-destructible (rj.e/get-c-on-e system e-this :destructible)
         hp (:hp c-destructible)
+        def (:def c-destructible)
+
+        c-attacker (rj.e/get-c-on-e system e-this :attacker)
+        attack (:atk c-attacker)
 
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
                         " - " "Position: [" x "," y "," z "]"
                         " - " "HP: [" hp "]"
+                        " - " "Attack: [" attack "]"
+                        " - " "Defense: [" def "]"
                         " - " "Race: [" race "]"
                         " - " "Experience: [" experience "]"
                         " - " "Level: [" level "]")

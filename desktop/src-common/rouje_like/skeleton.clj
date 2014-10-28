@@ -51,10 +51,10 @@
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp             (:hp  rj.cfg/skeleton-stats)
-                                 :defense        (:def rj.cfg/skeleton-stats)
+                                 :def        (:def rj.cfg/skeleton-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience 1}]
+                 [:killable {:experience (:exp rj.cfg/skeleton-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:msg-fn (constantly "the skeleton")}]]) 

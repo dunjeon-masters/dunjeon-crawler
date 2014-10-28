@@ -8,8 +8,8 @@
   [c-this e-this damage e-from system]
   (let [hp (:hp c-this)
 
-        defense (:defense (rj.e/get-c-on-e system e-this :destructible))
-        damage (inc (rand-int (- damage defense))) ;rand[1,(dmg-def)]
+        def (:def (rj.e/get-c-on-e system e-this :destructible))
+        damage (inc (rand-int (- damage def))) ;rand[1,(dmg-def)]
 
         c-position (rj.e/get-c-on-e system e-this :position)
 

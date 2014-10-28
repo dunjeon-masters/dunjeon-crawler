@@ -52,7 +52,6 @@
                              (let [e-counter (first (rj.e/all-e-with-c system :counter))
                                    c-counter (rj.e/get-c-on-e system e-counter :counter)
                                    current-turn (:turn c-counter)]
-                               (rj.u/? static-buffer)
                                (remove #(< (:turn %) (dec current-turn))
                                        static-buffer)))))))
 
@@ -74,7 +73,6 @@
                      :tick-fn (fn [_ e-this system]
                                 (rj.e/upd-c system e-this :counter
                                             (fn [c-counter]
-                                              (rj.u/? (:turn c-counter))
                                               (update-in c-counter [:turn]
                                                          inc))))}]]))))
 

@@ -43,7 +43,7 @@
                              :z (:z target-tile)                
                              :type :lichen}]
                  [:destructible {:hp      (:hp  rj.cfg/lichen-stats)
-                                 :defense (:def rj.cfg/lichen-stats)
+                                 :def (:def rj.cfg/lichen-stats)
                                  :can-retaliate? true
                                  :take-damage-fn rj.d/take-damage}]
                  [:attacker {:atk (:atk rj.cfg/lichen-stats)

@@ -1,6 +1,6 @@
 (ns rouje-like.core
-  (:import [com.badlogic.gdx.scenes.scene2d.ui Label]
-           [com.badlogic.gdx.graphics.g2d TextureRegion])
+  (:import [com.badlogic.gdx.scenes.scene2d.ui Label TextField$TextFieldListener]
+           [com.badlogic.gdx.graphics.g2d TextureRegion SpriteBatch])
 
   (:require [play-clj.core :refer :all]
             [play-clj.core :as play]
@@ -20,7 +20,7 @@
             [rouje-like.world :as rj.wr]
             [rouje-like.messaging :as rj.msg]))
 
-(declare main-screen rouje-like)
+(declare main-screen main-menu-screen rouje-like)
 
 (def ^:private sys (atom {}))
 
