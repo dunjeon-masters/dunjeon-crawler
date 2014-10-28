@@ -12,6 +12,6 @@
     (doseq [e-renderable renderable-entities]
       (let [c-renderable (rj.e/get-c-on-e system e-renderable :renderable)
             args (assoc (:args c-renderable)
-                   :delta-time delta-time)]
+                        :delta-time delta-time)]
         (render c-renderable e-renderable args system))))
   system)

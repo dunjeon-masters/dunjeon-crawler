@@ -1,6 +1,6 @@
 (ns rouje-like.core.desktop-launcher
   (:require [rouje-like.core :refer [rouje-like]]
-            [rouje-like.components :refer [block-size padding-sizes view-port-sizes]])
+            [rouje-like.config :refer [block-size padding-sizes view-port-sizes]])
   (:import [com.badlogic.gdx.backends.lwjgl LwjglApplication]
            [org.lwjgl.input Keyboard])
   (:gen-class))
@@ -14,6 +14,6 @@
                         block-size)
                      (* (+ (+ (:btm padding-sizes)
                               (:top padding-sizes))
-                           (view-port-sizes 0))
+                           (view-port-sizes 1))
                         block-size))
   (Keyboard/enableRepeatEvents true))

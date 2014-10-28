@@ -2,6 +2,7 @@
   (:require [clojure.math.numeric-tower :as math]
             [clojure.pprint :refer [pprint]]
 
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]))
 
 (def get-default-pri
@@ -36,12 +37,56 @@
        (sort-by-type get-pri)
        (first))))
 
-
-
 (defn taxicab-dist
   [[x y] [i j]]
   (+ (math/abs (- i x))
      (math/abs (- j y))))
+
+(defn points->line
+  [[x y] [i j]]
+  (let [dx (math/abs (- i x))
+        dy (math/abs (- j y))
+        sx (if (< x i) 1 -1)
+        sy (if (< y j) 1 -1)
+        err (- dx dy)]
+    (loop [points []
+           x x
+           y y
+           err err]
+      (if (and (= x i) (= y j))
+        (conj points
+              [x y])
+        (let [e2 (* err 2)]
+          (recur (conj points [x y])
+                 (if (> e2 (- dx))
+                   (+ x sx)
+                   x)
+                 (if (< e2 dx)
+                   (+ y sy)
+                   y)
+                 (if (> e2 (- dx))
+                   (if (< e2 dx)
+                     (+ (- err dy) dx)
+                     (- err dy))
+                   (if (< e2 dx)
+                     (+ err dx)
+                     err))))))))
+
+(defn can-see?
+  [level sight [x y] [i j]]
+  (let [result (if (< sight
+                      (taxicab-dist [x y] [i j]))
+                 false
+                 (as-> (points->line [x y] [i j]) line 
+                   (filter (fn [[x y]] 
+                             (-> (get-in level [x y])
+                                 (tile->top-entity)
+                                 (:type)
+                                 (#{:wall :lichen})))
+                           line)
+                   (every? (partial = [i j]) 
+                           line)))]
+    result))
 
 (def direction->offset
   {:left  [-1 0]
@@ -65,7 +110,7 @@
 
 (defn get-neighbors
   [world origin]
-  (map (fn [vec] (get-in world vec nil))
+  (map (fn [v] (get-in world v nil))
        (get-neighbors-coords origin)))
 
 (defn get-neighbors-of-type
@@ -88,10 +133,10 @@
   [world origin type dist-fn]
   (filter #(and (dist-fn (radial-distance origin [(:x %) (:y %)]))
                 ((into #{} type) (:type (tile->top-entity %
-                                                        (zipmap (conj type :else)
-                                                                (conj (vec
-                                                                        (repeat (count type) 2))
-                                                                      1))))))
+                                                          (zipmap (conj type :else)
+                                                                  (conj (vec
+                                                                          (repeat (count type) 2))
+                                                                        1))))))
           (flatten world)))
 
 (defn not-any-radially-of-type
@@ -123,3 +168,26 @@
                                   :entities [(rj.c/map->Entity {:id   nil
                                                                 :type :wall})]})))
        (ring-coords origin dist)))
+
+;;target-pos = [31 36] @([rouje_like/skeleton.clj:76])
+(defmacro ? [x]
+  (let [line  (:line (meta &form))
+        file *file*]
+    `(let [x# ~x]
+       (println (pr-str '~x) "=" (pr-str x#)
+                (str "#(" ~file ":" ~line ")")
+                (str "@[" (quot  (System/currentTimeMillis) 1000) "]"))
+       x#)))
+
+(defn update-in-world
+  [system e-world [z x y] fn<-entities]
+  (rj.e/upd-c system e-world :world
+              (fn [c-world]
+                (update-in c-world [:levels]
+                           (fn [levels]
+                             (update-in levels [z x y]
+                                        (fn [tile]
+                                          (update-in tile [:entities]
+                                                     (fn [entities]
+                                                       (fn<-entities entities))))))))))
+

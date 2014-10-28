@@ -2,23 +2,11 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
-;;TODO: PUT IN config.clj
-(def block-size 36)
-(def world-sizes {:width  60
-                  :height 60})
-(def view-port-sizes [20 20])
-(def padding-sizes {:top   1
-                    :btm   1
-                    :left  1
-                    :right 1})
-
 (defrecord Bat [])
 
 (defrecord Broadcaster [msg-fn])
 
 (defrecord Counter [turn])
-
-(defrecord Class- [class])
 
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
@@ -36,10 +24,10 @@
 
 (defrecord Killable [experience])
 
+(defrecord Klass [class])
+
 (defrecord Lichen [grow-chance%
                    max-blob-size])
-
-(defrecord MovesLeft [moves-left])
 
 (defrecord Player [show-world?])
 
@@ -49,7 +37,7 @@
                         upper-bound
                         torch-power])
 
-(defrecord Position [x y
+(defrecord Position [x y z
                      ^Keyword type])
 
 (defrecord Race [race])
@@ -63,14 +51,14 @@
 
 (defrecord Skeleton [])
 
-(defrecord Tile [^Number x ^Number y
+(defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
 
 (defrecord Torch [brightness])
 
 (defrecord Wallet [^Number gold])
 
-(defrecord World [world])
+(defrecord World [levels])
 
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
@@ -125,7 +113,7 @@
   get-type {:attacker     (type (->Attacker nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
-            :class        (type (->Class- nil))
+            :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
             :destructible (type (->Destructible nil nil nil nil))
             :digger       (type (->Digger nil nil))
@@ -136,10 +124,9 @@
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
             :mobile       (type (->Mobile nil nil))
-            :moves-left   (type (->MovesLeft nil))
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
-            :position     (type (->Position nil nil nil))
+            :position     (type (->Position nil nil nil nil))
             :race         (type (->Race nil))
             :receiver     (type (->Receiver))
             :relay        (type (->Relay nil nil))
@@ -147,7 +134,7 @@
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
             :tickable     (type (->Tickable nil nil))
-            :tile         (type (->Tile nil nil nil))
+            :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
             :wallet       (type (->Wallet nil))
             :world        (type (->World nil))})

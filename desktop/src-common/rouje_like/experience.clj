@@ -1,7 +1,8 @@
 (ns rouje-like.experience
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.world :as rj.wr]
-            [rouje-like.components :refer [can-attack? attack]]))
+            [rouje-like.components :refer [can-attack? attack]]
+            [rouje-like.config :as rj.cfg]))
 
 (defmacro debug
   [var]
@@ -10,7 +11,7 @@
 
 (defn level->exp
   [level]
-  (* level 10))
+  (* level (:exp rj.cfg/level-exp)))
 
 (defn level-up
   [e-this system]

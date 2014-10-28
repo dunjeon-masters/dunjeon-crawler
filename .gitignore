@@ -3,4 +3,5 @@ desktop/target
 .nrepl-port
 .lein-repl-history
 *.iml
+*.swp
 
