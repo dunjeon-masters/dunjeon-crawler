@@ -1,6 +1,7 @@
 (defproject rouje-like "0.0.1-SNAPSHOT"
   :description "FIXME: write description"
-  
+
+  :plugins [[cider/cider-nrepl "0.8.0-SNAPSHOT"]]
   :dependencies [[com.badlogicgames.gdx/gdx "1.3.1"]
                  [com.badlogicgames.gdx/gdx-backend-lwjgl "1.3.1"]
                  [com.badlogicgames.gdx/gdx-box2d "1.3.1"]

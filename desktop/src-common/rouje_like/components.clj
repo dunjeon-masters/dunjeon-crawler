@@ -37,6 +37,8 @@
                         upper-bound
                         torch-power])
 
+(defrecord Portal [^Number x ^Number y ^Number z])
+
 (defrecord Position [x y z
                      ^Keyword type])
 
@@ -126,6 +128,7 @@
             :mobile       (type (->Mobile nil nil))
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
+            :portal       (type (->Portal nil nil nil))
             :position     (type (->Position nil nil nil nil))
             :race         (type (->Race nil))
             :receiver     (type (->Receiver))
