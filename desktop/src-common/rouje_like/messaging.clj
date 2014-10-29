@@ -12,6 +12,7 @@
 (defn add-msg
   [system k-buffer msg]
   (let [e-relay (first (rj.e/all-e-with-c system :relay))] 
+    (rj.u/? msg)
     (rj.e/upd-c system e-relay :relay
                 (fn [c-relay]
                   (update-in c-relay [k-buffer]
@@ -29,6 +30,7 @@
         c-counter (rj.e/get-c-on-e system e-counter :counter)
         current-turn (:turn c-counter)
 
+        _ (rj.u/? current-turn)
         statics (:static c-relay)
         current-messages (filter #(= (:turn %) (dec current-turn))
                                  statics)

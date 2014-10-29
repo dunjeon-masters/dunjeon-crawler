@@ -16,7 +16,8 @@
 
                  [play-clj "0.3.11"]
                  [org.clojure/math.numeric-tower "0.0.4"]
-                 [camel-snake-kebab "0.2.5" :exclusions [org.clojure/clojure]]]
+                 [camel-snake-kebab "0.2.5" :exclusions [org.clojure/clojure]]
+                 [clojure-lanterna "0.9.4"]]
   
   :source-paths ["src" "src-common" ]
 

@@ -169,6 +169,10 @@
                                                                 :type :wall})]})))
        (ring-coords origin dist)))
 
+(defn rand-rng
+ [start end]
+ (+ (rand-int (- (inc end) start)) start))
+
 ;;target-pos = [31 36] @([rouje_like/skeleton.clj:76])
 (defmacro ? [x]
   (let [line  (:line (meta &form))
