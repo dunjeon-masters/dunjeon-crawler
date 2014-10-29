@@ -15,3 +15,4 @@
                         :delta-time delta-time)]
         (render c-renderable e-renderable args system))))
   system)
+

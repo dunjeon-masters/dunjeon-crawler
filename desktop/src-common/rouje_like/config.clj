@@ -33,8 +33,7 @@
                      :def 1})
 
 (def level-exp
-  {:exp 1
-   })
+  {:exp 1})
 
 ;; CREATURE CONFIG
 (def bat-stats
