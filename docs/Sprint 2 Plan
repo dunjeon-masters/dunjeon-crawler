@@ -1,0 +1,74 @@
+Sprint 2 Plan
+Product Name: Dunjeon Crawler
+Team Name: Dunjeon Masters
+Sprint Completion Date: 11/11/2014
+Revision Number: 3
+Revision Date: 10/28/2014
+------------------------------------------------------------------------------------------------------------------------
+GOAL
+	To implement status effect, equipment, consumables, themed levels, traps, and monsters, and terrain interaction.  
+------------------------------------------------------------------------------------------------------------------------
+USER STORIES
+
+USER STORY 1: As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it 
+              to].
+  TASK 1: Switch rendering engines (see Anthony). {4.5 ih}
+  TASK 2: Debug messaging system (see Anthony). {10 ih}
+  TASK 3: Just in case not finished, add portals/ladders (see Scott). {1.5 ih}
+  TASK 4: Indicate mob health by changing appearance (perhaps alpha or darkness). {6 ih}
+  TASK 5: Create a main menu. {4 ih}
+  TASK 6: Create a character customization screen. {4 ih}
+  TASK 7: On player interaction, take player to customization screen. {.5 ih}
+  TOTAL: 30.5 ih
+
+USER STORY 2: As a user, I want to have status effects [so that the game is more interesting].
+  TASK 1: Come up with possible status effects on paper. {1 ih}
+  TASK 2: Add component for current status effects. {1 ih}
+  TASK 3: Add functionality to system to add, apply, and remove status effects. {7.5 ih}
+  TASK 4: Implement a few status effects to debug functionality. {3 ih}
+  TOTAL: 12.5 ih
+
+USER STORY 3: As a user, I want traps and terrain interaction [so that the floors have more user interaction and are more                  interesting to play through]. 
+  TASK 1: Come up with trap and ways to interact with the world (levers, buttons, firebolt, etc.) on paper. {1 ih}
+  TASK 2: Implement one of designed traps (such as a spike trap). {3 ih}
+  TASK 3: Implement as many of your designed traps as possible. {10.5 ih}
+  TASK 4: Once we can pick up items, add room generation with traps. {6 ih}
+  TOTAL: 20.5 ih
+  
+USER STORY 4: As a user, I want themed levels with themed mobs and traps [so that the floors are unique and not so 
+              monotonous]. 
+  TASK 1: Come up with level themes on paper. {1 ih}
+  TASK 2: Come up with traps and mobs for each theme on paper. {1 ih}
+  TASK 3: Implement one themed level design without traps and monsters. {6 ih}
+  TASK 4: Implement monsters and traps for TASK 3's floor. {9 ih}
+  TASK 5: Repeat TASK 3 and 4 until all themes are done. {15 ih}
+  TOTAL: 32 ih
+  
+USER STORY 5: As a user, I want armor, weapons, and accessories [so that I can protect myself and fight monsters more                      efficiently]. 
+  TASK 1: Come up with basic weapons, armor, and accessories on paper. {1 ih}
+  TASK 2: Implement letting the player choose what to equipped when they get new item. {4.5 ih}
+  TASK 3: Keep track of what junk items player has. {1.5 ih}
+  TASK 4: Add random naming (The "great" sword "of power" or The "quick" sword "of death"). {4.5 ih}
+  TASK 5: Add effects that correlate with item name (such as quick sword increases speed). {4.5 ih}
+  TOTAL: 16 ih
+  
+USER STORY 6: As a user, I want consumable items [so that I can heal]. 
+  TASK 1: Come up with consumable items (potions, buffs, etc) on paper. {1 ih}
+  TASK 2: Allow user to pick up, view, and use consumables. {4.5 ih}
+  TASK 3: Test functionality. {3 ih}
+  TOTAL: 8.5 ih
+------------------------------------------------------------------------------------------------------------------------	
+TEAM ROLES
+	RACHELLE: Developer
+	ANTHONY: Product Owner, Developer
+	SCOTT: Scrum Master, Developer
+	JORDAN: Designer, Play Tester
+------------------------------------------------------------------------------------------------------------------------	
+INITIAL TASK ASSIGNMENT
+	RACHELLE: User Story 2, Task 2
+	ANTHONY: User Story 1, Task 1
+	SCOTT: User Story 1, Task 3
+	JORDAN: User Story 2-6, Task 1(~2 for US 4)
+------------------------------------------------------------------------------------------------------------------------	
+INITIAL BURNUP CHART AND SCRUM BOARD
+	https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing
