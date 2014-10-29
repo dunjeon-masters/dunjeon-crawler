@@ -17,6 +17,7 @@
             [rouje-like.lichen :as rj.lc]
             [rouje-like.bat :as rj.bt]
             [rouje-like.skeleton :as rj.sk]
+            [rouje-like.portal :as rj.p]
             [rouje-like.config :as rj.cfg]))
 
 (defn ^:private block->freqs
@@ -122,7 +123,13 @@
         (nth (iterate rj.sk/add-skeleton {:system system :z z})
              (* (/ init-skeleton% 100)
                 (apply * (vals rj.cfg/world-sizes))))
-        (:system system))))
+        (:system system))
+
+      ;; Add portal
+      (as-> system
+            (do (println "core::add-portal " (not (nil? system))) system)
+            (rj.p/add-portal {:system system :z z})
+            (:system system))))
 
 (defn generate-random-level
   [{:keys [width height]} z]
@@ -207,6 +214,10 @@
    :torch    {:x 1 :y 2
               :width 12 :height 12
               :color {:r 255 :g 1 :b 1 :a 255}
+              :tile-sheet "grim_12x12.png"}
+   :portal    {:x 4 :y 9
+              :width 12 :height 12
+              :color {:r 102 :g 0 :b 102 :a 255}
               :tile-sheet "grim_12x12.png"}
    :bat      {:x 0 :y 9
               :width 16 :height 16
