@@ -2,8 +2,8 @@ Sprint 2 Plan
 Product Name: Dunjeon Crawler
 Team Name: Dunjeon Masters
 Sprint Completion Date: 11/11/2014
-Revision Number: 3
-Revision Date: 10/28/2014
+Revision Number: 4
+Revision Date: 10/29/2014
 ------------------------------------------------------------------------------------------------------------------------
 GOAL
 	To implement status effect, equipment, consumables, themed levels, traps, and monsters, and terrain interaction.  
@@ -19,7 +19,8 @@ USER STORY 1: As a developer, I want to make upgrades to the system and fix bugs
   TASK 5: Create a main menu. {4 ih}
   TASK 6: Create a character customization screen. {4 ih}
   TASK 7: On player interaction, take player to customization screen. {.5 ih}
-  TOTAL: 30.5 ih
+  TASK 8: Implement variety of mobs {2 ih}
+  TOTAL: 32.5 ih
 
 USER STORY 2: As a user, I want to have status effects [so that the game is more interesting].
   TASK 1: Come up with possible status effects on paper. {1 ih}
