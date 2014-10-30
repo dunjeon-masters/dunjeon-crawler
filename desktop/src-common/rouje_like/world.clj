@@ -12,26 +12,13 @@
 
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.utils :as rj.u]))
-
-(defn update-in-world
-  [system e-world target-pos fn<-entities]
-  (rj.e/upd-c system e-world :world
-              (fn [c-world]
-                (update-in c-world [:world]
-                           (fn [world]
-                             (update-in world target-pos
-                                        (fn [tile]
-                                          (update-in tile [:entities]
-                                                     (fn [entities]
-                                                       (fn<-entities entities))))))))))
-
-;; Currently un-used
-(defn ^:private new-tile
-  [x y {:keys [type, id]}]
-  (rj.c/map->Tile {:x x :y y
-                   :entities [(rj.c/map->Entity {:id   id
-                                                 :type type})]}))
+            [rouje-like.utils :as rj.u]
+            [rouje-like.items :as rj.items]
+            [rouje-like.lichen :as rj.lc]
+            [rouje-like.bat :as rj.bt]
+            [rouje-like.skeleton :as rj.sk]
+            [rouje-like.portal :as rj.p]
+            [rouje-like.config :as rj.cfg]))
 
 (defn ^:private block->freqs
   [block]
@@ -41,7 +28,7 @@
          block)))
 
 (defn ^:private get-smoothed-tile
-  [block-d1 block-d2 x y]
+  [block-d1 block-d2 x y z]
   (let [wall-threshold-d1 5
         wall-bound-d2 2
         d1-block-freqs (block->freqs block-d1)
@@ -54,7 +41,7 @@
                        (<= wall-count-d2 wall-bound-d2))
                  :wall
                  :floor)]
-    (update-in (rj.c/map->Tile {:x x :y y
+    (update-in (rj.c/map->Tile {:x x :y y :z z
                                 :entities [(rj.c/map->Entity {:id   nil
                                                               :type :floor})]})
                [:entities] (fn [entities]
@@ -65,36 +52,92 @@
                                entities)))))
 
 (defn ^:private get-smoothed-col
-  [world x max-dist]
+  [level [x z] max-dist]
   {:pre [(#{1 2} max-dist)]}
   (mapv (fn [y]
           (get-smoothed-tile
-            (rj.u/get-ring-around world [x y] 1)
+            (rj.u/get-ring-around level [x y] 1)
             (if (= max-dist 2)
-              (rj.u/get-ring-around world [x y] 2)
+              (rj.u/get-ring-around level [x y] 2)
               nil)
-            x y))
-        (range (count (first world)))))
+            x y z))
+        (range (count (first level)))))
 
-(defn ^:private smooth-world-v1
-  [world]
-  (mapv (fn [x]
-          (get-smoothed-col world x 2))
-        (range (count world))))
+(defn ^:private smooth-level-v1
+  [{:keys [level z]}]
+  {:level (mapv (fn [x]
+                  (get-smoothed-col level [x z] 2))
+                (range (count level)))
+   :z z})
 
-(defn ^:private smooth-world-v2
-  [world]
-  (mapv (fn [x]
-          (get-smoothed-col world x 1))
-        (range (count world))))
+(defn ^:private smooth-level-v2
+  [{:keys [level z]}]
+  {:level (mapv (fn [x]
+                  (get-smoothed-col level [x z] 1))
+                (range (count level)))
+   :z z})
 
-(defn generate-random-world
-  [{:keys [width height]} init-wall%]
-  (let [world (vec
+(def ^:private init-wall% 45)
+(def ^:private init-torch% 2)
+(def ^:private init-gold% 5)
+(def ^:private init-lichen% 1)
+(def ^:private init-bat% 1)
+(def ^:private init-skeleton% 1)
+
+(defn init-entities
+  [system z]
+  (-> system
+      ;; Add Items: Gold, Torches...
+      (as-> system
+        (do (println "core::add-gold: " (not (nil? system))) system) 
+        (nth (iterate rj.items/add-gold {:system system :z z})
+             (* (/ init-gold% 100)
+                (apply * (vals rj.cfg/world-sizes))))
+        (:system system))
+      (as-> system
+        (do (println "core::add-torch " (not (nil? system))) system)
+        (nth (iterate rj.items/add-torch {:system system :z z})
+             (* (/ init-torch% 100)
+                (apply * (vals rj.cfg/world-sizes))))
+        (:system system))
+
+      ;; Spawn lichens
+      (as-> system
+        (do (println "core::add-lichen " (not (nil? system))) system)
+        (nth (iterate rj.lc/add-lichen {:system system :z z})
+             (* (/ init-lichen% 100)
+                (apply * (vals rj.cfg/world-sizes))))
+        (:system system))
+
+      ;; Spawn bats
+      (as-> system
+        (do (println "core::add-bat " (not (nil? system))) system)
+        (nth (iterate rj.bt/add-bat {:system system :z z})
+             (* (/ init-bat% 100)
+                (apply * (vals rj.cfg/world-sizes))))
+        (:system system))
+
+      ;; Spawn Skeletons
+      (as-> system
+        (do (println "core::add-skeleton " (not (nil? system))) system)
+        (nth (iterate rj.sk/add-skeleton {:system system :z z})
+             (* (/ init-skeleton% 100)
+                (apply * (vals rj.cfg/world-sizes))))
+        (:system system))
+
+      ;; Add portal
+      (as-> system
+            (do (println "core::add-portal " (not (nil? system))) system)
+            (rj.p/add-portal {:system system :z z})
+            (:system system))))
+
+(defn generate-random-level
+  [{:keys [width height]} z]
+  (let [level (vec
                 (map vec
                      (for [x (range width)]
                        (for [y (range height)]
-                         (update-in (rj.c/map->Tile {:x x :y y
+                         (update-in (rj.c/map->Tile {:x x :y y :z z
                                                      :entities [(rj.c/map->Entity {:id   nil
                                                                                    :type :floor})]})
                                     [:entities] (fn [entities]
@@ -102,14 +145,50 @@
                                                     (conj entities
                                                           (rj.c/map->Entity {:id   nil
                                                                              :type :wall}))
-                                                    entities)))))))]
-    ;; SMOOTH-WORLD
-    (-> world
-        (as-> world
-              (nth (iterate smooth-world-v1 world)
-                   4)
-              (nth (iterate smooth-world-v2 world)
-                   2)))))
+                                                    entities)))))))
+        ;; SMOOTH-WORLD
+        level (as-> level level
+                (nth (iterate smooth-level-v1 {:level level
+                                               :z z})
+                     4)
+                (:level level)
+                (nth (iterate smooth-level-v2 {:level level
+                                               :z z})
+                     2)
+                (:level level))]
+    level))
+
+(declare render-world)
+(defn init-world
+  [system]
+
+  (let [z 0
+        e-world  (br.e/create-entity)
+        level0 (generate-random-level 
+                 rj.cfg/world-sizes z)
+        level1 (generate-random-level
+                 rj.cfg/world-sizes (inc z))]
+    (-> system 
+        (rj.e/add-e e-world)
+        (rj.e/add-c e-world (rj.c/map->World {:levels [level0 level1]}))
+        (init-entities z)
+        (init-entities (inc z))
+        
+        (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn render-world
+                                                   :args      {:view-port-sizes rj.cfg/view-port-sizes}})))))
+
+(defn add-level
+  [system z]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        new-level (generate-random-level rj.cfg/world-sizes z)]
+    (-> system 
+        (rj.e/upd-c e-world :world
+                    (fn [c-world]
+                      (update-in c-world [:levels]
+                                 (fn [levels]
+                                   (conj levels
+                                         new-level)))))
+        (init-entities z))))
 
 (def ^:private type->tile-info
   {:player   {:x 0 :y 4
@@ -136,6 +215,10 @@
               :width 12 :height 12
               :color {:r 255 :g 1 :b 1 :a 255}
               :tile-sheet "grim_12x12.png"}
+   :portal    {:x 4 :y 9
+              :width 12 :height 12
+              :color {:r 102 :g 0 :b 102 :a 255}
+              :tile-sheet "grim_12x12.png"}
    :bat      {:x 0 :y 9
               :width 16 :height 16
               :color {:r 255 :g 255 :b 255 :a 128}
@@ -161,7 +244,7 @@
             tile-color (:color tile-info)]
         (assoc (texture tile-sheet
                         :set-region x y width height)
-          :color tile-color)))))
+               :color tile-color)))))
 
 (defn render-world
   [_ e-this {:keys [view-port-sizes]} system]
@@ -176,7 +259,8 @@
         sight (math/ceil (:distance c-sight))
 
         c-world (rj.e/get-c-on-e system e-this :world)
-        world (:world c-world)
+        levels (:levels c-world)
+        world (nth levels (:z c-player-pos))
 
         [vp-size-x vp-size-y] view-port-sizes
 
@@ -198,25 +282,25 @@
     (.begin renderer)
     (doseq [x (range start-x end-x)
             y (range start-y end-y)
-            :let [tile (get-in world [x y])]]
+            :let [tile (get-in levels [(:z c-player-pos) x y])]]
       (when (or show-world?
-                (> sight
-                   (rj.u/taxicab-dist player-pos [x y])))
+                (rj.u/can-see? world sight player-pos [x y]))
         (let [texture-entity (-> (rj.u/tile->top-entity tile)
                                  (:type) (type->texture))]
           (let [color-values (:color texture-entity)]
-              (.setColor renderer
-                         (Color. (float (/ (:r color-values) 255))
-                                 (float (/ (:g color-values) 255))
-                                 (float (/ (:b color-values) 255))
-                                 (float (/ (:a color-values) 255)))))
+            (.setColor renderer
+                       (Color. (float (/ (:r color-values) 255))
+                               (float (/ (:g color-values) 255))
+                               (float (/ (:b color-values) 255))
+                               (float (/ (:a color-values) 255)))))
           (.draw renderer
                  (:object texture-entity)
                  (float (* (+ (- x start-x)
-                              (:left rj.c/padding-sizes))
-                           rj.c/block-size))
+                              (:left rj.cfg/padding-sizes))
+                           rj.cfg/block-size))
                  (float (* (+ (- y start-y)
-                              (:btm rj.c/padding-sizes))
-                           rj.c/block-size))
-                 (float rj.c/block-size) (float rj.c/block-size)))))
+                              (:btm rj.cfg/padding-sizes))
+                           rj.cfg/block-size))
+                 (float rj.cfg/block-size) (float rj.cfg/block-size)))))
     (.end renderer)))
+

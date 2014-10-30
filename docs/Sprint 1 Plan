@@ -2,8 +2,8 @@ Sprint 1 Plan
 Product Name: Dunjeon Crawler
 Team Name: Dunjeon Masters
 Sprint Completion Date: 10/28/2014
-Revision Number: 1
-Revision Date: 20/17/2014
+Revision Number: 2
+Revision Date: 10/28/2014
 -------------------------------------------------------------------------------------------------------------------------
 GOAL
 	To implement a player messaging system, create multiple levels for the player to explore, have customizable 
@@ -15,10 +15,11 @@ USER STORY 1: As a user, I want a messaging/dialogue system [so that I can be in
 			  received].
 	TASK 1: Make relay component (contains a message buffer [tag messages with location]). {.5 ih}
 	TASK 2: Make broadcaster component (send message to an entity that has a relay component). {2 ih}
-	TASK 3: Make receiver component (see if receiver is close enough to receive it). {2 ih}
-	TASK 4: Display message to player if applicable. {1 ih}
-	TASK 5: Relay's buffer should clear on last tick (entity that has relay has tickable component). {.5 ih}
-	Total: 6 ih
+	TASK 3: Display message to player if applicable. {1 ih}
+	TASK 4: Relay's buffer should clear on last tick (entity that has relay has tickable component). {.5 ih}
+	TASK 5: Add broadcasting to most entities, eg gold, torch, lichen, etc. {1 ih}
+	TASK 6: (UPG/EXT) Upgrade line of sight mechanics so that the player cannot see through walls and lichens. {2 ih}
+	Total: 7 ih
 
 USER STORY 2: As a user, I want to navigate multiple levels [so that the game has longer game play].
 	TASK 1: Add z field to the world (each level knows it's z component starting at 0). {.5 ih}
@@ -33,14 +34,15 @@ USER STORY 3: As a user, I want to be able to build my character (races and clas
 	TASK 1: Add race component. {.5 ih}
 	TASK 2: Add class component. {.5 ih}
 	TASK 3: On starting game, updates statistics (multimethod) {1.5 ih}
-	TASK 4: Create a main menu with a play button. {2 ih}
+	TASK 4: Create a main menu. {2 ih}
 	TASK 5: Create a character customization screen. {2.5 ih}
-	TASK 6: On click of play button, take player to customization screen. {.25 ih} 
+	TASK 6: On player interaction, take player to customization screen. {.25 ih} 
 	TASK 7: Add an experience field to the player. {.25 ih}
 	TASK 8: Add experience to player upon killing monsters. {.25 ih}
-	TASK 9: Implement player levelling system. {1.5 ih}
-	TASK 10: Change players' statistics upon level up (try random first then progress to prompt) {2 ih}
-	Total: 11.25 ih
+	TASK 9: Implement player leveling system. {1.5 ih}
+	TASK 10: Change players' statistics upon level up randomly. {1 ih}
+	TASK 11: (UPG/EXT) Upgrade attack/defense mechanic. {.5 ih}
+	Total: 10.75 ih
 
 USER STORY 4: As a user, I want an advanced mob system [so the monsters are unique and more
 			  challenging to fight].
@@ -62,8 +64,5 @@ INITIAL TASK ASSIGNMENT
 	SCOTT: User Story 2, Task 1
 	JORDAN: User Story 4, Task 1
 -------------------------------------------------------------------------------------------------------------------------	
-INITIAL BURNUP CHART
+INITIAL BURNUP CHART AND SCRUM BOARD
 	https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing
--------------------------------------------------------------------------------------------------------------------------	
-INITIAL SCRUM BOARD
-//TODO: Add digital scrum board url

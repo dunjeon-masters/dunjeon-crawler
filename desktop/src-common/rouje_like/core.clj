@@ -1,6 +1,6 @@
 (ns rouje-like.core
-  (:import [com.badlogic.gdx.scenes.scene2d.ui Label]
-           [com.badlogic.gdx.graphics.g2d TextureRegion])
+  (:import [com.badlogic.gdx.scenes.scene2d.ui Label TextField$TextFieldListener]
+           [com.badlogic.gdx.graphics.g2d TextureRegion SpriteBatch])
 
   (:require [play-clj.core :refer :all]
             [play-clj.core :as play]
@@ -14,31 +14,26 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.rendering :as rj.r]
-            [rouje-like.mobile :as rj.m]
-            [rouje-like.bat :as rj.bt]
             [rouje-like.input :as rj.in]
-            [rouje-like.lichen :as rj.lc]
+            [rouje-like.utils :as rj.u]
             [rouje-like.player :as rj.pl]
             [rouje-like.world :as rj.wr]
+<<<<<<< HEAD
             [rouje-like.attacker :as rj.atk]
             [rouje-like.skeleton :as rj.sk]
             [rouje-like.snake :as rj.snk]
             [rouje-like.items :as rj.items]
+=======
+>>>>>>> origin/master
             [rouje-like.messaging :as rj.msg]))
 
-(declare main-screen rouje-like)
+(declare main-screen main-menu-screen rouje-like)
 
 (def ^:private sys (atom {}))
 
-(def ^:private init-wall% 45)
-(def ^:private init-torch% 2)
-(def ^:private init-gold% 5)
-(def ^:private init-lichen% 1)
-(def ^:private init-bat% 1)
-(def ^:private init-skeleton% 1)
-
 (defn init-entities
   [system]
+<<<<<<< HEAD
   (let [e-world  (br.e/create-entity)
         e-counter  (br.e/create-entity)]
     (-> system
@@ -103,6 +98,23 @@
                                          (vec (conj (filter #(#{:floor} (:type %)) entities)
                                                     (rj.c/map->Entity {:id   e-player
                                                                        :type :player}))))))))))
+=======
+  (-> system
+      (rj.pl/init-player)
+      (rj.msg/init-relay)
+      (rj.wr/init-world)
+
+      ;; Add player
+      (as-> system
+            (do (println "core::add-player " (not (nil? system))) system)
+            (let [e-player (first (rj.e/all-e-with-c system :player))
+                  e-world (first (rj.e/all-e-with-c system :world))]
+              (rj.u/update-in-world system e-world rj.pl/init-player-pos
+                                    (fn [entities]
+                                      (vec (conj (filter #(#{:floor} (:type %)) entities)
+                                                 (rj.c/map->Entity {:id   e-player
+                                                                    :type :player})))))))))
+>>>>>>> origin/master
 
 (defn register-system-fns
   [system]
@@ -114,11 +126,10 @@
   (fn [screen _]
     (update! screen :renderer (stage) :camera (orthographic))
     (graphics! :set-continuous-rendering false)
-    (-> (br.e/create-system)
-        (init-entities)
-        (register-system-fns)
-        (as-> system
-              (reset! sys system))))
+    (as-> (br.e/create-system) system
+      (init-entities system)
+      (register-system-fns system)
+      (reset! sys system)))
   
   :on-render
   (fn [screen _]
@@ -136,13 +147,12 @@
                 (-> (br.e/create-system)
                     (init-entities)
                     (register-system-fns))
-                (-> (rj.in/process-keyboard-input @sys key-code)
-                    (as-> system
-                          (if (empty? (rj.e/all-e-with-c system :player))
-                            (-> (br.e/create-system)
-                                (init-entities)
-                                (register-system-fns))
-                            system)))))))
+                (as-> (rj.in/process-keyboard-input @sys key-code) system
+                  (if (empty? (rj.e/all-e-with-c system :player))
+                    (-> (br.e/create-system)
+                        (init-entities)
+                        (register-system-fns))
+                    system))))))
 
   :on-fling
   (fn [screen _]

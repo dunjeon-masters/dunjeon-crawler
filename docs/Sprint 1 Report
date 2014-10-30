@@ -1,0 +1,44 @@
+Sprint 1 Report
+Product Name: Dunjeon Crawler
+Team Name: Dunjeon Masters
+Date: 10/29/2014
+Revision: 2
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO STOP DOING
+	-Stop missing team meetings
+		-Team members who miss team meetings fall behind on changes made and they cannot add their feedback on ideas. 		It is detrimental to their knowledge and to the quality of the product.
+	-Commiting to work on something at the scrum meeting and not doing it
+		-Team members has to be honest with what they will do so that we can trust them to finish their work.
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO START DOING
+	-Come to all planned team meetings
+		-Team meetings are important times to collaborate on how to approach problems. If you miss the meeting, you 			cannot contribute to product as efficiently as possible.
+	-Finish work we commit to at the scrum meetings
+		-Team membesr say we would do something and not actually do it. If we are waiting on someone to finish 				something, we expect them to follow through. If you can't do anything until next meeting, just say you 				can't.
+	-Play testing our game as well as other rogue likes
+		-Team members should test our game to find bugs. Playing other rogue like games is also important to gain 			more understanding of the genre and get some idea of how to balance our features.
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO KEEP DOING
+	-Getting help when you are stuck
+		-Team members should reach out to each other if they are stuck to get more insight into their problems. This 		way we can effectively work through bugs and waste less time.
+	-Committing bug free code to the master branch
+		-Team members have done a good job of only submitting bug free code to master so we always have a working 			prototype of the game.
+------------------------------------------------------------------------------------------------------------------------	WORK COMPLETED/NOT COMPLETED
+	-Completed:
+		-As a user, I want a messaging/dialogue system [so that I can be informed when damage is dealt or received].
+		-As a user, I want to be able to build my character (races and classes) and level up [so that the game feels 		customized and I can progress over time].
+	-Not Completed:
+		-As a user, I want to navigate multiple levels [so that the game has longer game play].
+		-As a user, I want an advanced mob system [so the monsters are unique and more
+------------------------------------------------------------------------------------------------------------------------
+WORK COMPLETION RATE
+	Total User Stories: 4
+	Total Story Points: 24
+	Total Tasks: 25
+	Total Days in Sprint: 14
+	Total Ideal Hours Worked: 25.25
+	Story Points/Day: 1.71
+	Ideal Hours/Day: 1.8
+------------------------------------------------------------------------------------------------------------------------
+FINAL SCRUM BOARD AND BURN UP CHART
+	https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing

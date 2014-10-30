@@ -1,6 +1,7 @@
 (defproject rouje-like "0.0.1-SNAPSHOT"
   :description "FIXME: write description"
-  
+
+  :plugins [[cider/cider-nrepl "0.8.0-SNAPSHOT"]]
   :dependencies [[com.badlogicgames.gdx/gdx "1.3.1"]
                  [com.badlogicgames.gdx/gdx-backend-lwjgl "1.3.1"]
                  [com.badlogicgames.gdx/gdx-box2d "1.3.1"]
@@ -15,7 +16,9 @@
                  [org.clojure/clojure "1.6.0"]
 
                  [play-clj "0.3.11"]
-                 [org.clojure/math.numeric-tower "0.0.4"]]
+                 [org.clojure/math.numeric-tower "0.0.4"]
+                 [camel-snake-kebab "0.2.5" :exclusions [org.clojure/clojure]]
+                 [clojure-lanterna "0.9.4"]]
   
   :source-paths ["src" "src-common" ]
 

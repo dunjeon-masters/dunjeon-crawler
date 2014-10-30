@@ -1,0 +1,47 @@
+Release Plan
+Product Name: Dunjeon Crawler				      Release Name: Dunjeon Crawler
+Team Name: Dunjeon Masters					          Release Date: 12/2014
+Revision Number: 4
+Revision Date: 10/28/2014 
+-------------------------------------------------------------------------------------------------------------------------
+High Level Goals:
+-Be able to send the player messages/dialog.
+-Be able to navigate multiple levels.
+-Be able to build characters with classes and races as well as adding an experience system.
+-Have a large variety of diverse mobs by improving our mob system.
+-Be able to add traps and terrain interaction.
+-Have themed levels by changing wall color and adding themed traps and monsters
+-Be able to use armor and weapons found throughout the levels by implementing an inventory system.
+-Be able to find and use consumables items, such as potions.
+-Be able to cast spells, such as fireball, ice-bolt, etc… 
+-Have a variety of boss levels. 
+-Be able to buy and sell items from merchants.
+-On death the player should randomly receive an item to use for future lives.
+-Have a save feature implemented on game exit.
+-Be able to come across previous characters as ghosts.
+-------------------------------------------------------------------------------------------------------------------------
+User Stories:
+Sprint 1:
+(3) As a user, I want a messaging/dialog system [so that I can be informed when damage is dealt or received].
+(5) As a user, I want to navigate multiple levels [so that the game has longer gameplay].
+(8) As a user, I want to be able to build my character (races and classes) and level up [so that the game feels customized       and I can progress over time].
+(8) As a user, I want an advanced mob system [so the monsters are unique and more challenging to fight].
+-------------------------------------------------------------------------------------------------------------------------
+Sprint 2:
+(5) As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it to].
+(3) As a user, I want to have status effects [so that the game is more interesting].
+(8) As a user, I want traps and terrain interaction [so that the floors have more user interaction and are more interesting      to play through]. 
+(5) As a user, I want themed levels with themed mobs and traps [so that the floors are unique and not so monotonous]. 
+(8) As a user, I want armor, weapons, and accessories [so that I can protect myself and fight monsters more efficiently]. 
+(2) As a user, I want consumable items [so that I can heal]. 
+-------------------------------------------------------------------------------------------------------------------------
+Sprint 3:
+(8) As a user, I want to use magic and spells [so that I can have a larger variety of attacks]. 
+(8) As a user, I want to encounter boss monsters [so that the game is more challenging]. 
+(3) As a user, I want to encounter merchants [so that I can sell my items and purchase items I would not be able to get          through other methods]. 
+(2) As a user, I want a bonus after death [so that it feels like there is some progress even though I died]. 
+(2) As a user, I want a save feature [so that I don’t have to play the whole playthrough in one sitting]. 
+(3) As a user, I want to encounter my past characters’ ghosts [so that I can be reminded of my failure and make my game          uniquely mine]. 
+-------------------------------------------------------------------------------------------------------------------------
+Product Backlog
+We believe we can accomplish all of our goals in the three sprints. We do not feel that we have over estimated our abilities in the making of this release plan.

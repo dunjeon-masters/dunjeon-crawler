@@ -2,6 +2,7 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
+<<<<<<< HEAD
 ;;TODO: PUT IN config.clj
 (def block-size 18)
 (def world-sizes {:width  60
@@ -12,13 +13,13 @@
                     :left  1
                     :right 1})
 
+=======
+>>>>>>> origin/master
 (defrecord Bat [])
 
 (defrecord Broadcaster [msg-fn])
 
 (defrecord Counter [turn])
-
-(defrecord Class- [class])
 
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
@@ -26,7 +27,9 @@
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
-(defrecord Experience [experience])
+(defrecord Experience [experience
+                       level
+                       level-up-fn])
 
 (defrecord Gold [value])
 
@@ -34,10 +37,10 @@
 
 (defrecord Killable [experience])
 
+(defrecord Klass [class])
+
 (defrecord Lichen [grow-chance%
                    max-blob-size])
-
-(defrecord MovesLeft [moves-left])
 
 (defrecord Player [show-world?])
 
@@ -47,7 +50,9 @@
                         upper-bound
                         torch-power])
 
-(defrecord Position [x y
+(defrecord Portal [^Number x ^Number y ^Number z])
+
+(defrecord Position [x y z
                      ^Keyword type])
 
 (defrecord Race [race])
@@ -61,16 +66,20 @@
 
 (defrecord Skeleton [])
 
+<<<<<<< HEAD
 (defrecord Snake [])
 
 (defrecord Tile [^Number x ^Number y
+=======
+(defrecord Tile [^Number x ^Number y ^Number z
+>>>>>>> origin/master
                  ^PersistentVector entities])
 
 (defrecord Torch [brightness])
 
 (defrecord Wallet [^Number gold])
 
-(defrecord World [world])
+(defrecord World [levels])
 
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
@@ -88,7 +97,7 @@
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [^Number hp
-                         ^Number defense
+                         ^Number def
                          can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible
@@ -125,18 +134,22 @@
   get-type {:attacker     (type (->Attacker nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
+            :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
             :destructible (type (->Destructible nil nil nil nil))
             :digger       (type (->Digger nil nil))
             :entity       (type (->Entity nil nil))
+            :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
             :item         (type (->Item nil))
+            :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
             :mobile       (type (->Mobile nil nil))
-            :moves-left   (type (->MovesLeft nil))
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
-            :position     (type (->Position nil nil nil))
+            :portal       (type (->Portal nil nil nil))
+            :position     (type (->Position nil nil nil nil))
+            :race         (type (->Race nil))
             :receiver     (type (->Receiver))
             :relay        (type (->Relay nil nil))
             :renderable   (type (->Renderable nil nil))
@@ -144,7 +157,7 @@
             :skeleton     (type (->Skeleton))
             :snake        (type (->Snake))
             :tickable     (type (->Tickable nil nil))
-            :tile         (type (->Tile nil nil nil))
+            :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
             :wallet       (type (->Wallet nil))
             :world        (type (->World nil))})
