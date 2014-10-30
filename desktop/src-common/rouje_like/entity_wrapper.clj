@@ -28,6 +28,10 @@
   [system entity]
   (br.e/kill-entity system entity))
 
+(defn all-c-on-e
+  [system entity]
+  (br.e/get-all-components-on-entity system entity))
+
 (defn ->CamelCase
   [k]
   (str (s/upper-case (first k))

@@ -79,7 +79,8 @@
                            (and (< (rj.u/taxicab-dist target-pos+offset target-pos)
                                    dist-from-target)
                                 (is-valid-target-tile?
-                                  (:type (rj.u/tile->top-entity (get-in level target-pos+offset))))))]
+                                  (:type (rj.u/tile->top-entity 
+                                           (get-in level target-pos+offset))))))]
     (cond
       (isa-closer-tile? (nth->offset-pos 0))
       (get-in level (nth->offset-pos 0))

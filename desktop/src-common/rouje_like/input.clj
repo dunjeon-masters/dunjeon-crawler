@@ -19,7 +19,9 @@
                             (= z (:z c-position))
                             true) ;(This is for the relay and the counter) 
                          entities)
-        entities (reverse (sort-by :pri entities))#_(SORT in decreasing order)]
+        entities (reverse (sort-by (fn [e]
+                                     (:pri (rj.e/get-c-on-e system e :tickable))) 
+                                   entities)) #_(SORT in decreasing order)]
     (reduce (fn [system entity]
               (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
                 (tick c-tickable entity system)))

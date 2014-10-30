@@ -130,3 +130,4 @@
                                  (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
                                    (str value " gold")))}]])
      :z z}))
+
