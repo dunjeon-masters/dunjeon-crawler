@@ -143,6 +143,10 @@
    :skeleton {:x 3 :y 5
               :width 16 :height 16
               :color {:r 255 :g 255 :b 255 :a 255}
+              :tile-sheet "DarkondDigsDeeper_16x16.png"}
+   :snake    {:x 3 :y 7
+              :width 16 :height 16
+              :color {:r 1 :g 255 :b 1 :a 255}
               :tile-sheet "DarkondDigsDeeper_16x16.png"}})
 
 (def ^:private type->texture

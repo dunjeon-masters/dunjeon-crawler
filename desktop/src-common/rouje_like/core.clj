@@ -22,6 +22,7 @@
             [rouje-like.world :as rj.wr]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.skeleton :as rj.sk]
+            [rouje-like.snake :as rj.snk]
             [rouje-like.items :as rj.items]
             [rouje-like.messaging :as rj.msg]))
 
@@ -86,6 +87,11 @@
         ;; Spawn Skeletons
         (as-> system
               (nth (iterate rj.sk/add-skeleton system)
+                   (* (/ init-bat% 100)
+                      (apply * (vals rj.c/world-sizes)))))
+
+        (as-> system
+              (nth (iterate rj.snk/add-snake system)
                    (* (/ init-bat% 100)
                       (apply * (vals rj.c/world-sizes)))))
 

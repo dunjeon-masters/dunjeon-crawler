@@ -3,7 +3,7 @@
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
 ;;TODO: PUT IN config.clj
-(def block-size 36)
+(def block-size 18)
 (def world-sizes {:width  60
                   :height 60})
 (def view-port-sizes [20 20])
@@ -60,6 +60,8 @@
 (defrecord Sight [distance])
 
 (defrecord Skeleton [])
+
+(defrecord Snake [])
 
 (defrecord Tile [^Number x ^Number y
                  ^PersistentVector entities])
@@ -140,6 +142,7 @@
             :renderable   (type (->Renderable nil nil))
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
+            :snake        (type (->Snake))
             :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil))
             :torch        (type (->Torch nil))
