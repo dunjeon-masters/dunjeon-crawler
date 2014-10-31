@@ -2,19 +2,6 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
-<<<<<<< HEAD
-;;TODO: PUT IN config.clj
-(def block-size 18)
-(def world-sizes {:width  60
-                  :height 60})
-(def view-port-sizes [20 20])
-(def padding-sizes {:top   1
-                    :btm   1
-                    :left  1
-                    :right 1})
-
-=======
->>>>>>> origin/master
 (defrecord Bat [])
 
 (defrecord Broadcaster [msg-fn])
@@ -23,6 +10,8 @@
 
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
+
+(defrecord Drake [])
 
 (defrecord Entity [^Keyword id
                    ^Keyword type])
@@ -41,6 +30,10 @@
 
 (defrecord Lichen [grow-chance%
                    max-blob-size])
+
+(defrecord Mimic [])
+
+(defrecord Necromancer [])
 
 (defrecord Player [show-world?])
 
@@ -66,13 +59,15 @@
 
 (defrecord Skeleton [])
 
-<<<<<<< HEAD
+(defrecord Slime [])
+
 (defrecord Snake [])
 
-(defrecord Tile [^Number x ^Number y
-=======
+(defrecord Spider [])
+
+(defrecord Troll [])
+
 (defrecord Tile [^Number x ^Number y ^Number z
->>>>>>> origin/master
                  ^PersistentVector entities])
 
 (defrecord Torch [brightness])
@@ -138,6 +133,7 @@
             :counter      (type (->Counter nil))
             :destructible (type (->Destructible nil nil nil nil))
             :digger       (type (->Digger nil nil))
+            :drake        (type (->Drake))
             :entity       (type (->Entity nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
@@ -145,6 +141,8 @@
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
             :mobile       (type (->Mobile nil nil))
+            :mimic        (type (->Mimic))
+            :necromancer  (type (->Necromancer))
             :player       (type (->Player nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :portal       (type (->Portal nil nil nil))
@@ -155,9 +153,12 @@
             :renderable   (type (->Renderable nil nil))
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
+            :slime        (type (->Slime))
+            :spider       (type (->Spider))
             :snake        (type (->Snake))
             :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
+            :troll        (type (->Troll))
             :wallet       (type (->Wallet nil))
             :world        (type (->World nil))})

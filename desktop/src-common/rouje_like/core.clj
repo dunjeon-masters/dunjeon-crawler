@@ -18,14 +18,9 @@
             [rouje-like.utils :as rj.u]
             [rouje-like.player :as rj.pl]
             [rouje-like.world :as rj.wr]
-<<<<<<< HEAD
-            [rouje-like.attacker :as rj.atk]
-            [rouje-like.skeleton :as rj.sk]
-            [rouje-like.snake :as rj.snk]
-            [rouje-like.items :as rj.items]
-=======
->>>>>>> origin/master
-            [rouje-like.messaging :as rj.msg]))
+            [rouje-like.messaging :as rj.msg]
+            [rouje-like.lichen :as rj.lc]
+            [rouje-like.bat :as rj.bt]))
 
 (declare main-screen main-menu-screen rouje-like)
 
@@ -33,72 +28,6 @@
 
 (defn init-entities
   [system]
-<<<<<<< HEAD
-  (let [e-world  (br.e/create-entity)
-        e-counter  (br.e/create-entity)]
-    (-> system
-        (rj.e/add-e e-counter)
-        (rj.e/add-c e-counter (rj.c/map->Counter {:turn 1}))
-        (rj.e/add-c e-counter (rj.c/map->Tickable {:pri -2
-                                                   :tick-fn (fn [_ e-this system]
-                                                              (rj.e/upd-c system e-this :counter
-                                                                          (fn [c-counter]
-                                                                            (println (:turn c-counter))
-                                                                            (update-in c-counter [:turn]
-                                                                                       inc))))}))
-
-        (rj.pl/init-player)
-        (rj.msg/init-relay)
-
-        (rj.e/add-e e-world)
-        (rj.e/add-c e-world (rj.c/map->World {:world (rj.wr/generate-random-world
-                                                       rj.c/world-sizes init-wall%)}))
-        (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn rj.wr/render-world
-                                                   :args      {:view-port-sizes rj.c/view-port-sizes}}))
-
-        ;; Add Items: Gold, Torches...
-        (as-> system
-              (nth (iterate rj.items/add-gold system)
-                   (* (/ init-gold% 100)
-                      (apply * (vals rj.c/world-sizes)))))
-
-        (as-> system
-              (nth (iterate rj.items/add-torch system)
-                   (* (/ init-torch% 100)
-                      (apply * (vals rj.c/world-sizes)))))
-
-        ;; Spawn lichens
-        (as-> system
-              (nth (iterate rj.lc/add-lichen system)
-                   (* (/ init-lichen% 100)
-                      (apply * (vals rj.c/world-sizes)))))
-
-        ;; Spawn bats
-        (as-> system
-              (nth (iterate rj.bt/add-bat system)
-                   (* (/ init-bat% 100)
-                      (apply * (vals rj.c/world-sizes)))))
-
-        ;; Spawn Skeletons
-        (as-> system
-              (nth (iterate rj.sk/add-skeleton system)
-                   (* (/ init-bat% 100)
-                      (apply * (vals rj.c/world-sizes)))))
-
-        (as-> system
-              (nth (iterate rj.snk/add-snake system)
-                   (* (/ init-bat% 100)
-                      (apply * (vals rj.c/world-sizes)))))
-
-        ;; Add player
-        (as-> system
-              (let [e-player (first (rj.e/all-e-with-c system :player))]
-                (rj.wr/update-in-world system e-world rj.pl/init-player-pos
-                                       (fn [entities]
-                                         (vec (conj (filter #(#{:floor} (:type %)) entities)
-                                                    (rj.c/map->Entity {:id   e-player
-                                                                       :type :player}))))))))))
-=======
   (-> system
       (rj.pl/init-player)
       (rj.msg/init-relay)
@@ -114,7 +43,6 @@
                                       (vec (conj (filter #(#{:floor} (:type %)) entities)
                                                  (rj.c/map->Entity {:id   e-player
                                                                     :type :player})))))))))
->>>>>>> origin/master
 
 (defn register-system-fns
   [system]

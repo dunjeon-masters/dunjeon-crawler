@@ -1,7 +1,7 @@
 (ns rouje-like.config)
 
 ;; WORLD CONFIG
-(def block-size 36)
+(def block-size 18)
 (def padding-sizes {:top   1
                     :btm   2
                     :left  1
@@ -52,3 +52,44 @@
    :atk 3
    :exp 1})
 
+(def snake-stats
+  {:hp  2
+   :def 1
+   :atk 2
+   :exp 1})
+
+(def troll-stats
+  {:hp  8
+   :def 2
+   :atk 4
+   :exp 4})
+
+(def mimic-stats
+  {:hp 5
+   :def 2
+   :atk 3
+   :exp 3})
+
+(def spider-stats
+  {:hp 2
+   :def 0
+   :atk 1
+   :exp 1})
+
+(def slime-stats
+  {:hp 2
+   :def 0
+   :atk 1
+   :exp 1})
+
+(def drake-stats
+  {:hp 6
+   :def 3
+   :atk 4
+   :exp 5})
+
+(def necro-stats
+  {:hp 6
+   :def 3
+   :atk 4
+   :exp 5})

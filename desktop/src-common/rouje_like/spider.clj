@@ -1,4 +1,4 @@
-(ns rouje-like.snake
+(ns rouje-like.spider
   (:require [brute.entity :as br.e]
 
             [rouje-like.entity-wrapper :as rj.e]
@@ -12,7 +12,7 @@
 
 (declare process-input-tick)
 
-(defn add-snake
+(defn add-spider
   ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
@@ -24,40 +24,40 @@
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
        (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
-         (add-snake system target-tile)
+         (add-spider system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-snake (br.e/create-entity)
+         e-spider (br.e/create-entity)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-snake
-                                                               :type :snake})))))]
+                                            (rj.c/map->Entity {:id   e-spider
+                                                               :type :spider})))))]
      {:system (rj.e/system<<components
-                system e-snake
-                [[:snake {}]
+                system e-spider
+                [[:spider {}]
                  [:position {:x    (:x target-tile)
                              :y    (:y target-tile)
                              :z    (:z target-tile)
-                             :type :snake}]
+                             :type :spider}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
-                 [:sight {:distance 4}]
-                 [:attacker {:atk              (:atk rj.cfg/snake-stats)
+                 [:sight {:distance 3}]
+                 [:attacker {:atk              (:atk rj.cfg/spider-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/snake-stats)
-                                 :def        (:def rj.cfg/snake-stats)
+                 [:destructible {:hp         (:hp  rj.cfg/spider-stats)
+                                 :def        (:def rj.cfg/spider-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp rj.cfg/snake-stats)}]
+                 [:killable {:experience (:exp rj.cfg/spider-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the snake")}]])
+                 [:broadcaster {:msg-fn (constantly "the spider")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -159,3 +159,4 @@
               :else system)
             system)))
   )
+

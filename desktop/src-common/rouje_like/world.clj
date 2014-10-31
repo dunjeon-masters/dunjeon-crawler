@@ -15,8 +15,15 @@
             [rouje-like.utils :as rj.u]
             [rouje-like.items :as rj.items]
             [rouje-like.lichen :as rj.lc]
+            [rouje-like.mimic :as rj.mi]
             [rouje-like.bat :as rj.bt]
+            [rouje-like.drake :as rj.dr]
+            [rouje-like.necromancer :as rj.ne]
             [rouje-like.skeleton :as rj.sk]
+            [rouje-like.slime :as rj.sl]
+            [rouje-like.snake :as rj.snk]
+            [rouje-like.spider :as rj.sp]
+            [rouje-like.troll :as rj.tr]
             [rouje-like.portal :as rj.p]
             [rouje-like.config :as rj.cfg]))
 
@@ -83,6 +90,13 @@
 (def ^:private init-lichen% 1)
 (def ^:private init-bat% 1)
 (def ^:private init-skeleton% 1)
+(def ^:private init-snake% 1)
+(def ^:private init-troll% 1)
+(def ^:private init-mimic% 1)
+(def ^:private init-spider% 1)
+(def ^:private init-slime% 1)
+(def ^:private init-drake% 1)
+(def ^:private init-necro% 1)
 
 (defn init-entities
   [system z]
@@ -124,6 +138,62 @@
              (* (/ init-skeleton% 100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
+
+      ;; Spawn Snakes
+      (as-> system
+            (do (println "core::add-snake " (not (nil? system))) system)
+            (nth (iterate rj.snk/add-snake {:system system :z z})
+                 (* (/ init-snake% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+
+      ;; Spawn Trolls
+      (as-> system
+            (do (println "core::add-troll " (not (nil? system))) system)
+            (nth (iterate rj.tr/add-troll {:system system :z z})
+                 (* (/ init-troll% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+
+      ;; Spawn Mimics
+      (as-> system
+            (do (println "core::add-mimic " (not (nil? system))) system)
+            (nth (iterate rj.mi/add-mimic {:system system :z z})
+                 (* (/ init-mimic% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+
+      ;; Spawn Spiders
+      (as-> system
+            (do (println "core::add-spider " (not (nil? system))) system)
+            (nth (iterate rj.sp/add-spider {:system system :z z})
+                 (* (/ init-spider% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+
+      ;; Spawn Slimes
+      (as-> system
+            (do (println "core::add-slime " (not (nil? system))) system)
+            (nth (iterate rj.sl/add-slime {:system system :z z})
+                 (* (/ init-slime% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+
+      ;; Spawn Drakes
+      (as-> system
+            (do (println "core::add-drake " (not (nil? system))) system)
+            (nth (iterate rj.dr/add-drake {:system system :z z})
+                 (* (/ init-drake% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+
+      ;; Spawn Necromancers
+      (as-> system
+            (do (println "core::add-necro " (not (nil? system))) system)
+            (nth (iterate rj.ne/add-necro {:system system :z z})
+                 (* (/ init-necro% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
 
       ;; Add portal
       (as-> system
@@ -230,7 +300,31 @@
    :snake    {:x 3 :y 7
               :width 16 :height 16
               :color {:r 1 :g 255 :b 1 :a 255}
-              :tile-sheet "DarkondDigsDeeper_16x16.png"}})
+              :tile-sheet "DarkondDigsDeeper_16x16.png"}
+   :troll    {:x 4 :y 5
+              :width 12 :height 12
+              :color {:r 255 :g 140 :b 1 :a 255}
+              :tile-sheet "grim_12x12.png"}
+   :mimic    {:x 15 :y 8
+              :width 12 :height 12
+              :color {:r 255 :g 241 :b 36 :a 255}
+              :tile-sheet "grim_12x12.png"}
+   :spider   {:x 14 :y 9
+              :width 16 :height 16
+              :color {:r 183 :g 21 :b 3 :a 255}
+              :tile-sheet "DarkondDigsDeeper_16x16.png"}
+   :slime   {:x 7 :y 15
+              :width 16 :height 16
+              :color {:r 72 :g 223 :b 7 :a 125}
+              :tile-sheet "DarkondDigsDeeper_16x16.png"}
+   :drake   {:x 13 :y 0
+             :width 16 :height 16
+             :color {:r 222 :g 5 :b 48 :a 255}
+             :tile-sheet "DarkondDigsDeeper_16x16.png"}
+   :necromancer   {:x 10 :y 14
+             :width 12 :height 12
+             :color {:r 116 :g 84 :b 141 :a 255}
+             :tile-sheet "grim_12x12.png"}})
 
 (def ^:private type->texture
   (memoize

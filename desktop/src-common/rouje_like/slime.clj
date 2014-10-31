@@ -1,4 +1,4 @@
-(ns rouje-like.skeleton
+(ns rouje-like.slime
   (:require [brute.entity :as br.e]
 
             [rouje-like.entity-wrapper :as rj.e]
@@ -12,7 +12,7 @@
 
 (declare process-input-tick)
 
-(defn add-skeleton
+(defn add-slime
   ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
@@ -24,40 +24,40 @@
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
        (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
-         (add-skeleton system target-tile)
+         (add-slime system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-skeleton (br.e/create-entity)
+         e-slime (br.e/create-entity)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-skeleton
-                                                               :type :skeleton})))))]
+                                            (rj.c/map->Entity {:id   e-slime
+                                                               :type :slime})))))]
      {:system (rj.e/system<<components
-                system e-skeleton
-                [[:skeleton {}]
+                system e-slime
+                [[:slime {}]
                  [:position {:x    (:x target-tile)
                              :y    (:y target-tile)
                              :z    (:z target-tile)
-                             :type :skeleton}]
+                             :type :slime}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
-                 [:attacker {:atk              (:atk rj.cfg/skeleton-stats)
+                 [:attacker {:atk              (:atk rj.cfg/slime-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/skeleton-stats)
-                                 :def        (:def rj.cfg/skeleton-stats)
+                 [:destructible {:hp         (:hp  rj.cfg/slime-stats)
+                                 :def        (:def rj.cfg/slime-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp rj.cfg/skeleton-stats)}]
+                 [:killable {:experience (:exp rj.cfg/slime-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the skeleton")}]]) 
+                 [:broadcaster {:msg-fn (constantly "the slime")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -66,7 +66,7 @@
         dist-from-target (rj.u/taxicab-dist this-pos target-pos)
 
         this-pos+dir-offset (fn [this-pos dir]
-                                 (rj.u/coords+offset this-pos (rj.u/direction->offset dir)))
+                              (rj.u/coords+offset this-pos (rj.u/direction->offset dir)))
         shuffled-directions (shuffle [:up :down :left :right])
         offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
                                         shuffled-directions)
@@ -74,7 +74,7 @@
         is-valid-target-tile? #{:floor :torch :gold :player}
 
         nth->offset-pos (fn [index]
-                            (nth offset-shuffled-directions index))
+                          (nth offset-shuffled-directions index))
         isa-closer-tile? (fn [target-pos+offset]
                            (and (< (rj.u/taxicab-dist target-pos+offset target-pos)
                                    dist-from-target)
@@ -115,11 +115,11 @@
         c-sight (rj.e/get-c-on-e system e-this :sight)
         is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
                                                                         #(<= %  (:distance c-sight))))
-        
+
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
         target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
-                              is-player-within-range?)
+                             is-player-within-range?)
                       (get-closest-tile-to level this-pos (first is-player-within-range?))
                       (if (seq neighbor-tiles)
                         (rand-nth (conj neighbor-tiles nil))
