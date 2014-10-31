@@ -1,7 +1,10 @@
 ## Announcements
 
 Will be using github and this README as a message board. Check periodically for updates.
-10/27: Monster Google Doc updated, have a look at what exists thus far. We can add/remove as we please, and they'll be more than enough for what we currently need even if we can't get some more variety from them (Firey/Icy/Poisoin/etc). Implementation should just require tweaks here and there.
+
+10/27: Monster Google Doc updated, have a look at what exists thus far. We can add/remove as we please, and they'll be more than enough for what we currently need even if we can't get some more variety from them (Firey/Icy/Poisoin/etc). Implementation should just require tweaks here and there. -Jordan
+
+10/30: I've started working on ideas for themes/traps. It's not yet finished, but you can find it [here](https://docs.google.com/a/ucsc.edu/document/d/1YX6R140gGa4ri2gixDD0ymiKPiRndbpVi7OnwCmFpCA/edit?usp=sharing). Input is always appreciated. -Jordan
 
 ## Introduction
 
