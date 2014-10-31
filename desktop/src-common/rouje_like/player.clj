@@ -171,7 +171,8 @@
                         " - " "Defense: [" def "]"
                         " - " "Race: [" race "]"
                         " - " "Experience: [" experience "]"
-                        " - " "Level: [" level "]")
+                        " - " "Level: [" level "]"
+                        "\n cli: " @rj.u/cli)
 
                    (color :green)
                    :set-y (float (* (+ vheight

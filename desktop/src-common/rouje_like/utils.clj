@@ -5,6 +5,9 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]))
 
+(def cli (atom ""))
+(def cli? (atom false))
+
 (def get-default-pri
   {:floor 1
    :torch 2
