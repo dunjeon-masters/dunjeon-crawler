@@ -6,6 +6,7 @@
             [rouje-like.utils :as rj.u]
             [rouje-like.player :as rj.pl]
             [rouje-like.components :as rj.c :refer [tick]]
+            [clojure.string :as s]
             [brute.entity]))
 
 (defn tick-entities
@@ -62,61 +63,41 @@
       system)))
 
 ;Temporary, will eventually be used to execute cmdl actions
-(defn cmd-action
-  [cmd]
-  (println cmd))
+(defn cmds->action
+  [system cmds]
+  (let [cmd->action {"name" (fn [system n])
+                     "race" (fn [system r]
+                              (let [e-player (first (rj.e/all-e-with-c system :player))]
+                                (rj.e/upd-c system e-player :race
+                                            (fn [c-race]
+                                              (assoc c-race :race
+                                                     (keyword r))))))
+                     "class" (fn [system c])}
+        cmd&arg (first (partition 2 (s/split cmds #" ")))
+        action (cmd->action (first cmd&arg) (fn [s _] identity s))
+        arg (second cmd&arg)] 
+    (action system arg)))
 
-;MEGA HACK - Thank vim vim <C-a> & macros
 (def keycode->cli-action
-  {(play/key-code :escape) (fn [system]
-                             (reset! rj.u/cli? false)
-                             (reset! rj.u/cli "")
-                             system)
-   (play/key-code :backspace) (fn [system]
-                                (swap! rj.u/cli #(apply str (drop-last 1 %)))
-                                system)
-   (play/key-code :enter) (fn [system]
-                            (cmd-action @rj.u/cli)
-                            (reset! rj.u/cli? false)
-                            (reset! rj.u/cli "")
-                            system)
-   (play/key-code :space) (fn [system] (swap! rj.u/cli str " ") system)
-   (play/key-code :a) (fn [system] (swap! rj.u/cli str "a") system)
-   (play/key-code :b) (fn [system] (swap! rj.u/cli str "b") system)
-   (play/key-code :c) (fn [system] (swap! rj.u/cli str "c") system)
-   (play/key-code :d) (fn [system] (swap! rj.u/cli str "d") system)
-   (play/key-code :e) (fn [system] (swap! rj.u/cli str "e") system)
-   (play/key-code :f) (fn [system] (swap! rj.u/cli str "f") system)
-   (play/key-code :g) (fn [system] (swap! rj.u/cli str "g") system)
-   (play/key-code :h) (fn [system] (swap! rj.u/cli str "h") system)
-   (play/key-code :i) (fn [system] (swap! rj.u/cli str "i") system)
-   (play/key-code :j) (fn [system] (swap! rj.u/cli str "j") system)
-   (play/key-code :k) (fn [system] (swap! rj.u/cli str "k") system)
-   (play/key-code :l) (fn [system] (swap! rj.u/cli str "l") system)
-   (play/key-code :m) (fn [system] (swap! rj.u/cli str "m") system)
-   (play/key-code :n) (fn [system] (swap! rj.u/cli str "n") system)
-   (play/key-code :o) (fn [system] (swap! rj.u/cli str "o") system)
-   (play/key-code :p) (fn [system] (swap! rj.u/cli str "p") system)
-   (play/key-code :q) (fn [system] (swap! rj.u/cli str "q") system)
-   (play/key-code :r) (fn [system] (swap! rj.u/cli str "r") system)
-   (play/key-code :s) (fn [system] (swap! rj.u/cli str "s") system)
-   (play/key-code :t) (fn [system] (swap! rj.u/cli str "t") system)
-   (play/key-code :u) (fn [system] (swap! rj.u/cli str "u") system)
-   (play/key-code :v) (fn [system] (swap! rj.u/cli str "v") system)
-   (play/key-code :w) (fn [system] (swap! rj.u/cli str "w") system)
-   (play/key-code :x) (fn [system] (swap! rj.u/cli str "x") system)
-   (play/key-code :y) (fn [system] (swap! rj.u/cli str "y") system)
-   (play/key-code :z) (fn [system] (swap! rj.u/cli str "z") system)
-   (play/key-code :0) (fn [system] (swap! rj.u/cli str "0") system)
-   (play/key-code :1) (fn [system] (swap! rj.u/cli str "1") system)
-   (play/key-code :2) (fn [system] (swap! rj.u/cli str "2") system)
-   (play/key-code :3) (fn [system] (swap! rj.u/cli str "3") system)
-   (play/key-code :4) (fn [system] (swap! rj.u/cli str "4") system)
-   (play/key-code :5) (fn [system] (swap! rj.u/cli str "5") system)
-   (play/key-code :6) (fn [system] (swap! rj.u/cli str "6") system)
-   (play/key-code :7) (fn [system] (swap! rj.u/cli str "7") system)
-   (play/key-code :8) (fn [system] (swap! rj.u/cli str "8") system)
-   (play/key-code :9) (fn [system] (swap! rj.u/cli str "9") system)})
+  (let 
+    [k->cli-fn (fn [k] (fn [system] (swap! rj.u/cli str (name k)) system)) 
+     key-codes (range 29 55) ;[a-z] 
+     alphabet [:a :b :c :d :e :f :g :h :i :j :k :l :m
+               :n :o :p :q :r :s :t :u :v :w :x :y :z]] 
+    (merge {(play/key-code :escape)    (fn [system]
+                                         (reset! rj.u/cli? false)
+                                         (reset! rj.u/cli "")
+                                         system)
+            (play/key-code :backspace) (fn [system]
+                                         (swap! rj.u/cli #(apply str (drop-last 1 %)))
+                                         system)
+            (play/key-code :enter)     (fn [system]
+                                         (let [cli @rj.u/cli] 
+                                           (reset! rj.u/cli? false)
+                                           (reset! rj.u/cli "")
+                                           (cmds->action system cli)))
+            (play/key-code :space) (fn [system] (swap! rj.u/cli str " ") system)}
+           (zipmap key-codes (map k->cli-fn alphabet)))))
 
 (def keycode->action
   {(play/key-code :semicolon)     (fn [system]
