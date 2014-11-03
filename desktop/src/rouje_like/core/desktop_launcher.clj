@@ -7,6 +7,11 @@
            [org.lwjgl.input Keyboard])
   (:gen-class))
 
+;https://github.com/oakes/play-clj/blob/master/TUTORIAL.md#using-the-repl
+#_(in-ns 'rouje-like.world)
+#_(use 'rouje-like.world :reload)
+#_(-main)
+
 (defn -main
   []
   (LwjglApplication. rouje-like "rouje-like"
@@ -20,3 +25,4 @@
                         block-size))
   (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
   (Keyboard/enableRepeatEvents true))
+
