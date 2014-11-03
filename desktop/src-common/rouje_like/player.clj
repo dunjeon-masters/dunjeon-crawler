@@ -14,7 +14,8 @@
             [rouje-like.mobile :as rj.m]
             [brute.entity :as br.e]
             [rouje-like.experience :as rj.exp]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.config :as rj.cfg]
+            [rouje-like.status :as rj.stat]))
 
 (defn can-dig?
   [_ target]
@@ -134,6 +135,9 @@
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage}]
+       [:status {:status :none
+                 :add-effect rj.stat/add-effect-fn
+                 :remove-effect rj.stat/remove-effect-fn}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
 
 (defn render-player-stats
@@ -165,6 +169,9 @@
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
         attack (:atk c-attacker)
 
+        c-status (rj.e/get-c-on-e system e-this :status)
+        status (:status c-status)
+
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
@@ -176,7 +183,8 @@
                         " - " "Class: [" class "]"
                         " - " "Experience: [" experience "]"
                         " - " "Level: [" level "]"
-                        "\n cli: " @rj.u/cli)
+                        "\n cli: " @rj.u/cli
+                        " - " "Status: [" status "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
