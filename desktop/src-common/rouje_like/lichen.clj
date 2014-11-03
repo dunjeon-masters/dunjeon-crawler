@@ -40,7 +40,7 @@
                            :max-blob-size 8}]
                  [:position {:x (:x target-tile)
                              :y (:y target-tile)
-                             :z (:z target-tile)                
+                             :z (:z target-tile)
                              :type :lichen}]
                  [:destructible {:hp      (:hp  rj.cfg/lichen-stats)
                                  :def (:def rj.cfg/lichen-stats)
@@ -52,7 +52,7 @@
                              :is-valid-target? (constantly true)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the lichen")}]]) 
+                 [:broadcaster {:msg-fn (constantly "the lichen")}]])
       :z (:z target-tile)})))
 
 (defn get-size-of-lichen-blob

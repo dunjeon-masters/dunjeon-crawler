@@ -60,7 +60,8 @@
 
 (defrecord Wallet [^Number gold])
 
-(defrecord World [levels])
+(defrecord World [levels
+                  add-level-fn])
 
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
@@ -140,4 +141,4 @@
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
             :wallet       (type (->Wallet nil))
-            :world        (type (->World nil))})
+            :world        (type (->World nil nil))})

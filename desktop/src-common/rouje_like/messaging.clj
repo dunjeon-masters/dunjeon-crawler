@@ -11,12 +11,12 @@
 
 (defn add-msg
   [system k-buffer msg]
-  (let [e-relay (first (rj.e/all-e-with-c system :relay))] 
+  (let [e-relay (first (rj.e/all-e-with-c system :relay))]
     (rj.u/? msg)
     (rj.e/upd-c system e-relay :relay
                 (fn [c-relay]
                   (update-in c-relay [k-buffer]
-                             conj {:message msg 
+                             conj {:message msg
                                    :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
                                                c-counter (rj.e/get-c-on-e system e-counter :counter)]
                                            (:turn c-counter))})))))

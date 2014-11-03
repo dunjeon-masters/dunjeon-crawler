@@ -49,7 +49,7 @@
                                  :take-damage-fn rj.d/take-damage}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the bat")}]]) 
+                 [:broadcaster {:msg-fn (constantly "the bat")}]])
       :z (:z target-tile)})))
 
 (defn process-input-tick

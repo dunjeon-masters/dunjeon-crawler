@@ -7,8 +7,8 @@
                     :left  1
                     :right 1})
 (def view-port-sizes [20 20])
-(def world-sizes {:width  60
-                  :height 60})
+(def world-sizes {:width  20
+                  :height 20})
 
 ;; PLAYER CONFIG
 (def player-stats

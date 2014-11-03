@@ -80,14 +80,14 @@
   (let [result (if (< sight
                       (taxicab-dist [x y] [i j]))
                  false
-                 (as-> (points->line [x y] [i j]) line 
-                   (filter (fn [[x y]] 
+                 (as-> (points->line [x y] [i j]) line
+                   (filter (fn [[x y]]
                              (-> (get-in level [x y])
                                  (tile->top-entity)
                                  (:type)
                                  (#{:wall :lichen})))
                            line)
-                   (every? (partial = [i j]) 
+                   (every? (partial = [i j])
                            line)))]
     result))
 

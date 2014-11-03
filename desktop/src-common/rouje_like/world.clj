@@ -89,7 +89,7 @@
   (-> system
       ;; Add Items: Gold, Torches...
       (as-> system
-        (do (println "core::add-gold: " (not (nil? system))) system) 
+        (do (println "core::add-gold: " (not (nil? system))) system)
         (nth (iterate rj.items/add-gold {:system system :z z})
              (* (/ init-gold% 100)
                 (apply * (vals rj.cfg/world-sizes))))
@@ -123,13 +123,15 @@
         (nth (iterate rj.sk/add-skeleton {:system system :z z})
              (* (/ init-skeleton% 100)
                 (apply * (vals rj.cfg/world-sizes))))
-        (:system system))
+        (:system system))))
 
-      ;; Add portal
-      (as-> system
-            (do (println "core::add-portal " (not (nil? system))) system)
-            (rj.p/add-portal {:system system :z z})
-            (:system system))))
+(defn add-portal
+  [system z]
+  ;; Add portal
+  (as-> system system
+    (do (println "core::add-portal " (not (nil? system))) system)
+    (rj.p/add-portal {:system system :z z})
+    (:system system)))
 
 (defn generate-random-level
   [{:keys [width height]} z]
@@ -158,22 +160,23 @@
                 (:level level))]
     level))
 
-(declare render-world)
+(declare render-world add-level)
 (defn init-world
   [system]
-
   (let [z 0
         e-world  (br.e/create-entity)
-        level0 (generate-random-level 
+        level0 (generate-random-level
                  rj.cfg/world-sizes z)
         level1 (generate-random-level
                  rj.cfg/world-sizes (inc z))]
-    (-> system 
+    (-> system
         (rj.e/add-e e-world)
-        (rj.e/add-c e-world (rj.c/map->World {:levels [level0 level1]}))
+        (rj.e/add-c e-world (rj.c/map->World {:levels [level0 level1]
+                                              :add-level-fn add-level}))
         (init-entities z)
+        (add-portal z)
         (init-entities (inc z))
-        
+
         (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn render-world
                                                    :args      {:view-port-sizes rj.cfg/view-port-sizes}})))))
 
@@ -181,14 +184,15 @@
   [system z]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         new-level (generate-random-level rj.cfg/world-sizes z)]
-    (-> system 
+    (-> system
         (rj.e/upd-c e-world :world
                     (fn [c-world]
                       (update-in c-world [:levels]
                                  (fn [levels]
                                    (conj levels
                                          new-level)))))
-        (init-entities z))))
+        (init-entities z)
+        (add-portal (dec z)))))
 
 (def ^:private type->tile-info
   {:player   {:x 0 :y 4

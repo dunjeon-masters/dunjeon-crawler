@@ -19,7 +19,7 @@
         (rj.e/upd-c system e-this :destructible
                     (fn [c-destructible]
                       (update-in c-destructible [:hp] - damage)))
-        
+
         (if-let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
           (if (and (:can-retaliate? c-this)
                    (can-attack? c-attacker e-this e-from system))
@@ -27,8 +27,8 @@
             system)
           system)
 
-        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)] 
-          (rj.msg/add-msg system :static 
+        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+          (rj.msg/add-msg system :static
                           (format "%s dealt %s damage to %s"
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
                                     ((:msg-fn atker-c-broadcaster) system e-from))
@@ -36,8 +36,8 @@
           system))
 
       (as-> system system
-        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)] 
-          (rj.msg/add-msg system :static 
+        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+          (rj.msg/add-msg system :static
                           (format "%s killed %s"
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
                                     ((:msg-fn atker-c-broadcaster) system e-from))
@@ -67,6 +67,6 @@
                                (update-in c-experience [:experience]
                                           #(+ % (:experience c-killable)))))
                  (level-up-fn e-from)))
-          system) 
+          system)
         (rj.e/kill-e system e-this)))))
 

@@ -48,11 +48,13 @@
 
 (defn port-entity [system e-world entity from-pos portal]
   "Teleport ENTITY from FROM-POS through PORTAL."
-  (let [to-pos (rj.p/portal-target-pos system portal)
+  (let [[z x y] (rj.p/portal-target-pos system portal)
         c-world (rj.e/get-c-on-e system e-world :world)
-        level (nth (:levels c-world) (nth to-pos 0))
-        target-tile (get-in level [(nth to-pos 1) (nth to-pos 2)])]
-    (move-entity system e-world entity to-pos from-pos target-tile)))
+        level (nth (:levels c-world) z)
+        target-tile (get-in level [x y])]
+    (as-> system system
+        (move-entity system e-world entity [z x y] from-pos target-tile)
+        ((:add-level-fn c-world) system (inc z)))))
 
 (defn move
   [_ e-this target-tile system]
@@ -65,3 +67,4 @@
     (if (and (= this-type :player) portal)
       (port-entity system e-world e-this this-pos portal)
       (move-entity system e-world e-this target-pos this-pos target-tile))))
+

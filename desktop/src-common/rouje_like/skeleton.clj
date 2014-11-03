@@ -57,7 +57,7 @@
                  [:killable {:experience (:exp rj.cfg/skeleton-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the skeleton")}]]) 
+                 [:broadcaster {:msg-fn (constantly "the skeleton")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -79,7 +79,7 @@
                            (and (< (rj.u/taxicab-dist target-pos+offset target-pos)
                                    dist-from-target)
                                 (is-valid-target-tile?
-                                  (:type (rj.u/tile->top-entity 
+                                  (:type (rj.u/tile->top-entity
                                            (get-in level target-pos+offset))))))]
     (cond
       (isa-closer-tile? (nth->offset-pos 0))
@@ -116,7 +116,7 @@
         c-sight (rj.e/get-c-on-e system e-this :sight)
         is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
                                                                         #(<= %  (:distance c-sight))))
-        
+
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
         target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)

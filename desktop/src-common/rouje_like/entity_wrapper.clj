@@ -46,7 +46,7 @@
   `(add-c ~s# ~e-this# ((keyword->new-component ~k-component#) ~m-component#)))
 
 (defmacro system<<components
-  [s e-this partitions] 
+  [s e-this partitions]
   `(let [s# ~s]
      (as-> s# ~'s
        ~@(for [p partitions]

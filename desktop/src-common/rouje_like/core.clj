@@ -56,7 +56,7 @@
       (init-entities system)
       (register-system-fns system)
       (reset! sys system)))
-  
+
   :on-render
   (fn [screen _]
     (clear!)

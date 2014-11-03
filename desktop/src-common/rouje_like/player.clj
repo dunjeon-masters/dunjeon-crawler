@@ -47,8 +47,8 @@
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels z-pos) 
-        
+        world (nth levels z-pos)
+
         target-coords (rj.u/coords+offset [x-pos y-pos]
                                           (rj.u/direction->offset
                                             direction))
@@ -143,6 +143,9 @@
         c-race (rj.e/get-c-on-e system e-this :race)
         race (:race c-race)
 
+        c-class (rj.e/get-c-on-e system e-this :class)
+        class (:class c-class)
+
         c-wallet (rj.e/get-c-on-e system e-this :wallet)
         gold (:gold c-wallet)
 
@@ -170,6 +173,7 @@
                         " - " "Attack: [" attack "]"
                         " - " "Defense: [" def "]"
                         " - " "Race: [" race "]"
+                        " - " "Class: [" class "]"
                         " - " "Experience: [" experience "]"
                         " - " "Level: [" level "]"
                         "\n cli: " @rj.u/cli)

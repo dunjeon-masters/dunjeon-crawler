@@ -170,3 +170,4 @@
                        (rj.pl/process-input-tick system :right)
                        (rj.pl/process-input-tick system :left))))
       (tick-entities)))
+
