@@ -136,8 +136,9 @@
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage}]
        [:status {:status :none
-                 :add-effect rj.stat/add-effect-fn
-                 :remove-effect rj.stat/remove-effect-fn}]
+                 :add-effect-fn rj.stat/add-effect
+                 :remove-effect-fn rj.stat/remove-effect
+                 :apply-effect-fn rj.stat/apply-effect}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
 
 (defn render-player-stats

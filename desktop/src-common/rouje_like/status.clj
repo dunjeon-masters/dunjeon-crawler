@@ -4,10 +4,14 @@
             [rouje-like.messaging :as rj.msg]
             [rouje-like.config :as rj.cfg]))
 
-(defn add-effect-fn
+(defn add-effect
   [system e-this e-from]
   )
 
-(defn remove-effect-fn
+(defn remove-effect
+  [system e-this e-from]
+  )
+
+(defn apply-effect
   [system e-this e-from]
   )

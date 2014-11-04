@@ -55,7 +55,8 @@
 
 (defrecord Status [status
                    add-effect-fn
-                   remove-effect-fn])
+                   remove-effect-fn
+                   apply-effect-fn])
 
 (defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
@@ -141,7 +142,7 @@
             :renderable   (type (->Renderable nil nil))
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
-            :status       (type (->Status nil nil nil))
+            :status       (type (->Status nil nil nil nil))
             :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
