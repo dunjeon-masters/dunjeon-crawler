@@ -3,10 +3,10 @@
            [com.badlogic.gdx.scenes.scene2d.ui Label Skin])
   (:require [play-clj.core :refer :all]
             [play-clj.ui :refer :all]
-            [play-clj.g2d :refer [texture texture!]]
 
             [rouje-like.components :as rj.c :refer [can-attack? attack
                                                     can-move? move]]
+            [rouje-like.rendering :as rj.r]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.destructible :as rj.d]
@@ -96,7 +96,6 @@
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-multiplier 1.)
 
-(declare render-player)
 (defn init-player
   [system]
   (let [e-player (br.e/create-entity)
@@ -128,65 +127,10 @@
                        :lower-bound   init-sight-lower-bound
                        :upper-bound   init-sight-upper-bound
                        :torch-multiplier   init-sight-torch-multiplier}]
-       [:renderable {:render-fn render-player
+       [:renderable {:render-fn rj.r/render-player
                      :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
        [:destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
-
-(defn render-player-stats
-  [_ e-this {:keys [view-port-sizes]} system]
-  (let [[_ vheight] view-port-sizes
-
-        c-race (rj.e/get-c-on-e system e-this :race)
-        race (:race c-race)
-
-        c-class (rj.e/get-c-on-e system e-this :class)
-        class (:class c-class)
-
-        c-wallet (rj.e/get-c-on-e system e-this :wallet)
-        gold (:gold c-wallet)
-
-        c-experience (rj.e/get-c-on-e system e-this :experience)
-        experience (:experience c-experience)
-        level (:level c-experience)
-
-        c-position (rj.e/get-c-on-e system e-this :position)
-        x (:x c-position)
-        y (:y c-position)
-        z (:z c-position)
-
-        c-destructible (rj.e/get-c-on-e system e-this :destructible)
-        hp (:hp c-destructible)
-        def (:def c-destructible)
-
-        c-attacker (rj.e/get-c-on-e system e-this :attacker)
-        attack (:atk c-attacker)
-
-        renderer (new SpriteBatch)]
-    (.begin renderer)
-    (label! (label (str "Gold: [" gold "]"
-                        " - " "Position: [" x "," y "," z "]"
-                        " - " "HP: [" hp "]"
-                        " - " "Attack: [" attack "]"
-                        " - " "Defense: [" def "]"
-                        " - " "Race: [" race "]"
-                        " - " "Class: [" class "]"
-                        " - " "Experience: [" experience "]"
-                        " - " "Level: [" level "]"
-                        "\n cli: " @rj.u/cli)
-
-                   (color :green)
-                   :set-y (float (* (+ vheight
-                                       (dec (+ (:top rj.cfg/padding-sizes)
-                                               (:btm rj.cfg/padding-sizes))))
-                                    rj.cfg/block-size)))
-            :draw renderer 1.0)
-    (.end renderer)))
-
-(defn render-player
-  [_ e-this args system]
-  (render-player-stats _ e-this args system))
-
