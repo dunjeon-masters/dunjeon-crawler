@@ -10,6 +10,7 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.destructible :as rj.d]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.mobile :as rj.m]
             [brute.entity :as br.e]
@@ -120,6 +121,10 @@
        [:digger {:can-dig?-fn can-dig?
                  :dig-fn      dig}]
        [:attacker {:atk              (+ (:atk rj.cfg/player-stats) (:atk (rj.cfg/race->stats player-race)))
+                   :status-effects   [{:type :poison :duration 10
+                                       :value 1
+                                       :apply-fn rj.stef/apply-poison
+                                       :e-from e-player}]
                    :can-attack?-fn   rj.atk/can-attack?
                    :attack-fn        rj.atk/attack
                    :is-valid-target? (constantly true)}]
@@ -135,10 +140,7 @@
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage
-                       :status-effects []
-                       :add-effect-fn rj.d/add-effect
-                       :remove-effect-fn rj.d/remove-effect
-                       :apply-effect-fn rj.d/apply-effect}]
+                       :status-effects []}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
 
 (defn render-player-stats

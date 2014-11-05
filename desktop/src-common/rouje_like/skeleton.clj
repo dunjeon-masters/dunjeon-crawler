@@ -9,58 +9,10 @@
             [rouje-like.messaging :as rj.msg]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.config :as rj.cfg]))
 
 (declare process-input-tick)
-
-(defn apply-poison
-  [system e-this status]
-  (let [e-from (:e-from status)
-        e-world (first (rj.e/all-e-with-c system :world))
-        c-position (rj.e/get-c-on-e system e-this :position)
-        hp (:hp (rj.e/get-c-on-e system e-this :destructible))
-        damage (:value status)]
-    (if (pos? (- hp damage))
-      (as-> system system
-        (rj.e/upd-c system e-this :destructible
-                    (fn [c-destructible]
-                      (update-in c-destructible [:hp] - damage)))
-
-        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-          (rj.msg/add-msg system :static
-                          (format "%s was dealt %s poison damage"
-                                  ((:msg-fn c-broadcaster) system e-this) damage))
-          system))
-
-      (as-> system system
-        ;;TODO: Test player being poisonous, might cause NPE
-        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-          (rj.msg/add-msg system :static
-                          (format "%s killed %s"
-                                  (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                    ((:msg-fn atker-c-broadcaster) system e-from))
-                                  ((:msg-fn c-broadcaster) system e-this)))
-          system)
-
-        (rj.u/update-in-world system e-world
-                              [(:z c-position) (:x c-position) (:y c-position)]
-                              (fn [entities]
-                                (vec
-                                  (remove
-                                    #(#{e-this} (:id %))
-                                    entities))))
-
-        (if-let [c-killable (rj.e/get-c-on-e system e-this :killable)]
-          (let [c-exp (rj.e/get-c-on-e system e-from :experience)
-                level-up-fn (:level-up-fn c-exp)]
-
-            (->> (rj.e/upd-c system e-from :experience
-                             (fn [c-experience]
-                               (update-in c-experience [:experience]
-                                          #(+ % (:experience c-killable)))))
-                 (level-up-fn e-from)))
-          system)
-        (rj.e/kill-e system e-this)))))
 
 (defn add-skeleton
   ([{:keys [system z]}]
@@ -101,7 +53,7 @@
                              :attack-fn        rj.atk/attack
                              :status-effects   [{:type :poison, :duration 3
                                                  :value (inc (rand-int 2))
-                                                 :apply-fn apply-poison
+                                                 :apply-fn rj.stef/apply-poison
                                                  :e-from e-skeleton}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp             (:hp  rj.cfg/skeleton-stats)
@@ -182,14 +134,15 @@
                         nil))
         e-target (:id (rj.u/tile->top-entity target-tile))]
     (if (not (nil? target-tile))
-      (cond
-        (and (< (rand-int 100) 80)
-             (can-move? c-mobile e-this target-tile system))
-        (move c-mobile e-this target-tile system)
+      (-> (cond
+              (and (< (rand-int 100) 80)
+                   (can-move? c-mobile e-this target-tile system))
+              (move c-mobile e-this target-tile system)
 
-        (can-attack? c-attacker e-this e-target system)
-        (attack c-attacker e-this e-target system)
+              (can-attack? c-attacker e-this e-target system)
+              (attack c-attacker e-this e-target system)
 
-        :else system)
+              :else system)
+        (rj.d/apply-effects e-this))
       system)))
 
