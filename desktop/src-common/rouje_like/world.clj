@@ -1,18 +1,15 @@
 (ns rouje-like.world
-  (:import [com.badlogic.gdx.graphics.g2d SpriteBatch TextureRegion]
-           [clojure.lang Keyword Atom]
-           [com.badlogic.gdx.graphics Texture Pixmap Color]
-           [com.badlogic.gdx.files FileHandle])
+  (:import [com.badlogic.gdx.graphics.g2d SpriteBatch TextureRegion])
 
   (:require [play-clj.g2d :refer :all]
             [play-clj.core :refer :all]
 
-            [clojure.math.numeric-tower :as math]
             [brute.entity :as br.e]
 
+            [rouje-like.rendering :as rj.r]
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.items :as rj.items]
             [rouje-like.lichen :as rj.lc]
             [rouje-like.bat :as rj.bt]
@@ -77,6 +74,52 @@
                 (range (count level)))
    :z z})
 
+(defn ^:private maze:get-smoothed-tile
+  [block x y z]
+  (let [wall-threshold 2
+        wall-bound     5
+        wall-birth 3
+        block-freqs (block->freqs block)
+        wall-count (get block-freqs :wall 0)
+        this-type (:type (rj.u/tile->top-entity
+                           (first (filter (fn [tile]
+                                            (and (= x (:x tile)) (= y (:y tile))))
+                                          block))))
+        result (if (and (= this-type :wall)
+                        (<= wall-count wall-bound)
+                        (>= wall-count wall-threshold))
+                 :wall
+                 (if (and (= this-type :floor)
+                          (= wall-count wall-birth))
+                   :wall
+                   :floor))]
+    (update-in (rj.c/map->Tile {:x x :y y :z z
+                                :entities [(rj.c/map->Entity {:id   nil
+                                                              :type :floor})]})
+               [:entities] (fn [entities]
+                             (if (= result :wall)
+                               (conj entities
+                                     (rj.c/map->Entity {:id   nil
+                                                        :type :wall}))
+                               entities)))))
+
+(defn ^:private maze:get-smoothed-col
+  [level [x z]]
+  (mapv (fn [y]
+          (maze:get-smoothed-tile
+            (rj.u/get-ring-around level [x y] 1)
+            x y z))
+        (range (count (first level)))))
+
+(defn ^:private maze:smooth-level
+  "cells survive from one generation to the next if they have at least one
+  and at most five neighbours, and if a cell has exactly three neighbours, it is born."
+  [{:keys [level z]}]
+  {:level (mapv (fn [x]
+                  (maze:get-smoothed-col level [x z]))
+                (range (count level)))
+   :z z})
+
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
@@ -133,34 +176,63 @@
     (rj.p/add-portal {:system system :z z})
     (:system system)))
 
+;[:cave :desert :maze]
 (defn generate-random-level
-  [{:keys [width height]} z]
-  (let [level (vec
-                (map vec
-                     (for [x (range width)]
-                       (for [y (range height)]
-                         (update-in (rj.c/map->Tile {:x x :y y :z z
-                                                     :entities [(rj.c/map->Entity {:id   nil
-                                                                                   :type :floor})]})
-                                    [:entities] (fn [entities]
-                                                  (if (< (rand-int 100) init-wall%)
-                                                    (conj entities
-                                                          (rj.c/map->Entity {:id   nil
-                                                                             :type :wall}))
-                                                    entities)))))))
-        ;; SMOOTH-WORLD
-        level (as-> level level
-                (nth (iterate smooth-level-v1 {:level level
-                                               :z z})
-                     4)
-                (:level level)
-                (nth (iterate smooth-level-v2 {:level level
-                                               :z z})
-                     2)
-                (:level level))]
-    level))
+  ([level-sizes z]
+   (let [world-types [:cave :desert :maze]]
+     (generate-random-level level-sizes z (rand-nth world-types))))
 
-(declare render-world add-level)
+  ([{:keys [width height]} z world-type]
+   (case world-type
+     :cave (let [level (vec
+                         (map vec
+                              (for [x (range width)]
+                                (for [y (range height)]
+                                  (update-in (rj.c/map->Tile {:x x :y y :z z
+                                                              :entities [(rj.c/map->Entity {:id   nil
+                                                                                            :type :floor})]})
+                                             [:entities] (fn [entities]
+                                                           (if (< (rand-int 100) init-wall%)
+                                                             (conj entities
+                                                                   (rj.c/map->Entity {:id   nil
+                                                                                      :type :wall}))
+                                                             entities)))))))]
+             ;; SMOOTH-WORLD
+             (as-> level level
+               (nth (iterate smooth-level-v1 {:level level
+                                              :z z})
+                    4)
+               (:level level)
+               (nth (iterate smooth-level-v2 {:level level
+                                              :z z})
+                    2)
+               (:level level)))
+     :desert (vec (map vec
+                       (for [x (range width)]
+                         (for [y (range height)]
+                           (rj.c/map->Tile {:x x :y y :z z
+                                            :entities [(rj.c/map->Entity {:id   nil
+                                                                          :type :dune})]})))))
+     :maze (let [level (vec (map vec
+                                 (for [x (range width)]
+                                   (for [y (range height)]
+                                     (update-in (rj.c/map->Tile {:x x :y y :z z
+                                                              :entities [(rj.c/map->Entity {:id   nil
+                                                                                            :type :floor})]})
+                                             [:entities] (fn [entities]
+                                                           (if (< (rand-int 100) init-wall%)
+                                                             (conj entities
+                                                                   (rj.c/map->Entity {:id   nil
+                                                                                      :type :wall}))
+                                                             entities)))))))]
+             ;; CREATE MAZE
+             (as-> level level
+               (nth (iterate maze:smooth-level {:level level
+                                                :z z})
+                    5)
+               (:level level))))))
+
+(declare add-level)
 (defn init-world
   [system]
   (let [z 0
@@ -177,7 +249,7 @@
         (add-portal z)
         (init-entities (inc z))
 
-        (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn render-world
+        (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn rj.r/render-world
                                                    :args      {:view-port-sizes rj.cfg/view-port-sizes}})))))
 
 (defn add-level
@@ -193,114 +265,4 @@
                                          new-level)))))
         (init-entities z)
         (add-portal (dec z)))))
-
-(def ^:private type->tile-info
-  {:player   {:x 0 :y 4
-              :width 12 :height 12
-              :color {:r 255 :g 255 :b 255 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :wall     {:x 3 :y 2
-              :width 12 :height 12
-              :color {:r 255 :g 255 :b 255 :a 128}
-              :tile-sheet "grim_12x12.png"}
-   :gold     {:x 1 :y 9
-              :width 12 :height 12
-              :color {:r 255 :g 255 :b 1 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :lichen   {:x 15 :y 0
-              :width 12 :height 12
-              :color {:r 1 :g 255 :b 1 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :floor    {:x 14 :y 2
-              :width 12 :height 12
-              :color {:r 255 :g 255 :b 255 :a 64}
-              :tile-sheet "grim_12x12.png"}
-   :torch    {:x 1 :y 2
-              :width 12 :height 12
-              :color {:r 255 :g 1 :b 1 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :portal    {:x 4 :y 9
-              :width 12 :height 12
-              :color {:r 102 :g 0 :b 102 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :bat      {:x 0 :y 9
-              :width 16 :height 16
-              :color {:r 255 :g 255 :b 255 :a 128}
-              :tile-sheet "DarkondDigsDeeper_16x16.png"}
-   :skeleton {:x 3 :y 5
-              :width 16 :height 16
-              :color {:r 255 :g 255 :b 255 :a 255}
-              :tile-sheet "DarkondDigsDeeper_16x16.png"}})
-
-(def ^:private type->texture
-  (memoize
-    (fn [^Keyword type]
-      (let [tile-info (type->tile-info type)
-            tile-sheet (:tile-sheet tile-info)
-            width (:width tile-info)
-            height (:height tile-info)
-            x (* width (:x tile-info))
-            y (* height (:y tile-info))
-            tile-color (:color tile-info)]
-        (assoc (texture tile-sheet
-                        :set-region x y width height)
-               :color tile-color)))))
-
-(defn render-world
-  [_ e-this {:keys [view-port-sizes]} system]
-  (let [e-player (first (rj.e/all-e-with-c system :player))
-
-        c-player-pos (rj.e/get-c-on-e system e-player :position)
-        player-pos [(:x c-player-pos)
-                    (:y c-player-pos)]
-        show-world? (:show-world? (rj.e/get-c-on-e system e-player :player))
-
-        c-sight (rj.e/get-c-on-e system e-player :playersight)
-        sight (math/ceil (:distance c-sight))
-
-        c-world (rj.e/get-c-on-e system e-this :world)
-        levels (:levels c-world)
-        world (nth levels (:z c-player-pos))
-
-        [vp-size-x vp-size-y] view-port-sizes
-
-        start-x (max 0 (- (:x c-player-pos)
-                          (int (/ vp-size-x 2))))
-        start-y (max 0 (- (:y c-player-pos)
-                          (int (/ vp-size-y 2))))
-
-        end-x (+ start-x vp-size-x)
-        end-x (min end-x (count world))
-
-        end-y (+ start-y vp-size-y)
-        end-y (min end-y (count (first world)))
-
-        start-x (- end-x vp-size-x)
-        start-y (- end-y vp-size-y)
-
-        renderer (new SpriteBatch)]
-    (.begin renderer)
-    (doseq [x (range start-x end-x)
-            y (range start-y end-y)
-            :let [tile (get-in levels [(:z c-player-pos) x y])]]
-      (when (or show-world?
-                (rj.u/can-see? world sight player-pos [x y]))
-        (let [texture-entity (-> (rj.u/tile->top-entity tile)
-                                 (:type) (type->texture))]
-          (let [color-values (:color texture-entity)]
-            (.setColor renderer
-                       (Color. (float (/ (:r color-values) 255))
-                               (float (/ (:g color-values) 255))
-                               (float (/ (:b color-values) 255))
-                               (float (/ (:a color-values) 255)))))
-          (.draw renderer
-                 (:object texture-entity)
-                 (float (* (+ (- x start-x)
-                              (:left rj.cfg/padding-sizes))
-                           rj.cfg/block-size))
-                 (float (* (+ (- y start-y)
-                              (:btm rj.cfg/padding-sizes))
-                           rj.cfg/block-size))
-                 (float rj.cfg/block-size) (float rj.cfg/block-size)))))
-    (.end renderer)))
 

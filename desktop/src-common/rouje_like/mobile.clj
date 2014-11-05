@@ -2,11 +2,13 @@
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.components :as rj.c]
-            [rouje-like.portal :as rj.p]))
+            [rouje-like.portal :as rj.p]
+            [rouje-like.config :as rj.cfg]
+            [clojure.set :refer [union]]))
 
 (defn can-move?
   [_ _ target-tile _]
-  (#{:floor :gold :torch :portal} (:type (rj.u/tile->top-entity target-tile))))
+  (rj.cfg/<valid-move-targets> (:type (rj.u/tile->top-entity target-tile))))
 
 (defn add-entity [system e-world entity target-pos]
   "Add ENTITY to the tile at TARGET-POS."
@@ -26,9 +28,9 @@
     (rj.u/update-in-world system e-world target-pos
                           (fn [entities]
                             (vec
-                             (remove
-                              #(#{this-type} (:type %))
-                              entities))))))
+                              (remove
+                                #(#{this-type} (:type %))
+                                entities))))))
 
 (defn update-position [system entity target-tile]
   "Update the position of ENTITY to the position of TARGET-TILE."

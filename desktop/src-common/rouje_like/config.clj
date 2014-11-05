@@ -1,4 +1,5 @@
-(ns rouje-like.config)
+(ns rouje-like.config
+  (:require [clojure.set :refer [union]]))
 
 ;; WORLD CONFIG
 (def block-size 36)
@@ -9,6 +10,25 @@
 (def view-port-sizes [20 20])
 (def world-sizes {:width  20
                   :height 20})
+
+;; TILE TYPES
+(def <floors>
+  #{:dune :floor})
+
+(def <items>
+  #{:torch :gold})
+
+(def <empty>
+  (union <floors> <items>))
+
+(def <sight-blockers>
+  #{:wall :lichen})
+
+(def <valid-move-targets>
+  (union <empty> #{:portal}))
+
+(def <valid-mob-targets>
+  (union <empty> #{:player}))
 
 ;; PLAYER CONFIG
 (def player-stats

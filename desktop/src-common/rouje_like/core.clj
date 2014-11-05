@@ -18,6 +18,7 @@
             [rouje-like.utils :as rj.u]
             [rouje-like.player :as rj.pl]
             [rouje-like.world :as rj.wr]
+            [rouje-like.config :as rj.cfg]
             [rouje-like.messaging :as rj.msg]))
 
 (declare main-screen main-menu-screen rouje-like)
@@ -38,7 +39,7 @@
                   e-world (first (rj.e/all-e-with-c system :world))]
               (rj.u/update-in-world system e-world rj.pl/init-player-pos
                                     (fn [entities]
-                                      (vec (conj (filter #(#{:floor} (:type %)) entities)
+                                      (vec (conj (filter #(rj.cfg/<floors> (:type %)) entities)
                                                  (rj.c/map->Entity {:id   e-player
                                                                     :type :player})))))))))
 

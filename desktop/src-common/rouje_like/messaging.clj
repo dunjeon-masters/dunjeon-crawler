@@ -5,6 +5,7 @@
 
             [brute.entity :as br.e]
 
+            [rouje-like.rendering :as rj.r]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]
             [rouje-like.utils :as rj.u]))
@@ -19,29 +20,6 @@
                                    :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
                                                c-counter (rj.e/get-c-on-e system e-counter :counter)]
                                            (:turn c-counter))})))))
-
-
-(defn render-static-messages
-  [_ e-this _ system]
-  (let [c-relay (rj.e/get-c-on-e system e-this :relay)
-
-        e-counter (first (rj.e/all-e-with-c system :counter))
-        c-counter (rj.e/get-c-on-e system e-counter :counter)
-        current-turn (:turn c-counter)
-
-        statics (:static c-relay)
-        current-messages (filter #(= (:turn %) (dec current-turn))
-                                 statics)
-        static-messages (mapcat #(str (:message %) ". \n")
-                                current-messages)
-
-        renderer (new SpriteBatch)]
-    (.begin renderer)
-    (label! (label (apply str (into [] static-messages))
-                   (color :green)
-                   :set-y (float 0))
-            :draw renderer 1.0)
-    (.end renderer)))
 
 (defn process-input-tick
   [_ e-this system]
@@ -65,7 +43,7 @@
                       :blocking []}]
              [:tickable {:tick-fn process-input-tick
                          :pri -1}]
-             [:renderable {:render-fn render-static-messages}]]) system
+             [:renderable {:render-fn rj.r/render-static-messages}]]) system
       (rj.e/system<<components
         system e-counter
         [[:counter {:turn 1}]

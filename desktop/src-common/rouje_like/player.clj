@@ -3,10 +3,10 @@
            [com.badlogic.gdx.scenes.scene2d.ui Label Skin])
   (:require [play-clj.core :refer :all]
             [play-clj.ui :refer :all]
-            [play-clj.g2d :refer [texture texture!]]
 
             [rouje-like.components :as rj.c :refer [can-attack? attack
                                                     can-move? move]]
+            [rouje-like.rendering :as rj.r]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.destructible :as rj.d]
@@ -98,7 +98,6 @@
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-multiplier 1.)
 
-(declare render-player)
 (defn init-player
   [system]
   (let [e-player (br.e/create-entity)
@@ -134,7 +133,7 @@
                        :lower-bound   init-sight-lower-bound
                        :upper-bound   init-sight-upper-bound
                        :torch-multiplier   init-sight-torch-multiplier}]
-       [:renderable {:render-fn render-player
+       [:renderable {:render-fn rj.r/render-player
                      :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
        [:destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
                        :def (:def rj.cfg/player-stats)

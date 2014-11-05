@@ -3,6 +3,7 @@
             [clojure.pprint :refer [pprint]]
 
             [rouje-like.entity-wrapper :as rj.e]
+            [rouje-like.config :as rj.cfg]
             [rouje-like.components :as rj.c]))
 
 (def cli (atom ""))
@@ -10,6 +11,7 @@
 
 (def get-default-pri
   {:floor 1
+   :dune 0
    :torch 2
    :gold 3
    :wall 4
@@ -85,7 +87,7 @@
                              (-> (get-in level [x y])
                                  (tile->top-entity)
                                  (:type)
-                                 (#{:wall :lichen})))
+                                 (rj.cfg/<sight-blockers>)))
                            line)
                    (every? (partial = [i j])
                            line)))]
