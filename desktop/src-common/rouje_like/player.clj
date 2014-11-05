@@ -14,8 +14,7 @@
             [rouje-like.mobile :as rj.m]
             [brute.entity :as br.e]
             [rouje-like.experience :as rj.exp]
-            [rouje-like.config :as rj.cfg]
-            [rouje-like.status :as rj.stat]))
+            [rouje-like.config :as rj.cfg]))
 
 (defn can-dig?
   [_ target]
@@ -134,11 +133,11 @@
        [:destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
-                       :take-damage-fn rj.d/take-damage}]
-       [:status {:status :none
-                 :add-effect-fn rj.stat/add-effect
-                 :remove-effect-fn rj.stat/remove-effect
-                 :apply-effect-fn rj.stat/apply-effect}]
+                       :take-damage-fn rj.d/take-damage
+                       :status-effects []
+                       :add-effect-fn rj.d/add-effect
+                       :remove-effect-fn rj.d/remove-effect
+                       :apply-effect-fn rj.d/apply-effect}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
 
 (defn render-player-stats
@@ -166,12 +165,10 @@
         c-destructible (rj.e/get-c-on-e system e-this :destructible)
         hp (:hp c-destructible)
         def (:def c-destructible)
+        status (:status-effects c-destructible)
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
         attack (:atk c-attacker)
-
-        c-status (rj.e/get-c-on-e system e-this :status)
-        status (:status c-status)
 
         renderer (new SpriteBatch)]
     (.begin renderer)

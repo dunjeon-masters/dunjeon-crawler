@@ -45,10 +45,15 @@
                  [:destructible {:hp      (:hp  rj.cfg/lichen-stats)
                                  :def (:def rj.cfg/lichen-stats)
                                  :can-retaliate? true
-                                 :take-damage-fn rj.d/take-damage}]
+                                 :take-damage-fn rj.d/take-damage
+                                 :status-effects []
+                                 :add-effect-fn rj.d/add-effect
+                                 :remove-effect-fn rj.d/remove-effect
+                                 :apply-effect-fn rj.d/apply-effect}]
                  [:attacker {:atk (:atk rj.cfg/lichen-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :effects [{:type :poison, :duration :2, :damage 2}]
                              :is-valid-target? (constantly true)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]

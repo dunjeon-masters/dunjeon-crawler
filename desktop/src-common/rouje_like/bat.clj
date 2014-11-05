@@ -46,7 +46,11 @@
                  [:destructible {:hp      (:hp  rj.cfg/bat-stats)
                                  :def (:def rj.cfg/bat-stats)
                                  :can-retaliate? false
-                                 :take-damage-fn rj.d/take-damage}]
+                                 :take-damage-fn rj.d/take-damage
+                                 :status-effects []
+                                 :add-effect-fn rj.d/add-effect
+                                 :remove-effect-fn rj.d/remove-effect
+                                 :apply-effect-fn rj.d/apply-effect}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:msg-fn (constantly "the bat")}]])

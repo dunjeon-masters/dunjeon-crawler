@@ -2,7 +2,8 @@
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :refer [can-attack? attack]]
             [rouje-like.utils :as rj.u]
-            [rouje-like.messaging :as rj.msg]))
+            [rouje-like.messaging :as rj.msg]
+            [clojure.set :refer [intersection difference]]))
 
 (defn take-damage
   [c-this e-this damage e-from system]
@@ -70,3 +71,28 @@
           system)
         (rj.e/kill-e system e-this)))))
 
+(defn add-effect
+  [system e-this e-from]
+  (let  [c-attacker (rj.e/get-c-on-e system e-from :attacker)
+         attacker-effects (:status-effects c-attacker) #_(Effect vector that e-from has)
+         c-destructible (rj.e/get-c-on-e system e-this :destructible)
+         status (:status-effects c-destructible)]  #_(Current status(es) of e-this)
+
+    (as-> (if-let [intersect (seq (vec (intersection (apply hash-set status) (apply hash-set attacker-effects))))] #_(If already in status)
+            ((rj.e/upd-c system e-this c-destructible  #_(Refresh duplicate status effects)
+                         (fn [c-destructible] #_(How do I refresh all status effects in intersect?)
+                           (update-in c-destructible [:status-effects] (partial (conj (c-destructible :status-effects) 4))))))
+            system) system
+          (if-let [diff (seq (vec (difference (apply hash-set attacker-effects) (apply hash-set status))))] #_(If not in status)
+            system #_(Add effects to status vector. How do I add status effects all in diff? Pull maps from diff and conj?)
+            system))))
+
+(defn remove-effect
+  [system e-this e-from]
+  system
+  )
+
+(defn apply-effect
+  [system e-this e-from]
+  system
+  )

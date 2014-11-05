@@ -53,11 +53,6 @@
 
 (defrecord Skeleton [])
 
-(defrecord Status [status
-                   add-effect-fn
-                   remove-effect-fn
-                   apply-effect-fn])
-
 (defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
 
@@ -72,6 +67,7 @@
   (can-attack? [this e-this e-target system])
   (attack      [this e-this e-target system]))
 (defrecord Attacker [^Number atk
+                     status-effects
                      ^Fn attack-fn
                      ^Fn can-attack?-fn
                      is-valid-target?]
@@ -85,6 +81,10 @@
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [^Number hp
                          ^Number def
+                         status-effects
+                         add-effect-fn
+                         remove-effect-fn
+                         apply-effect-fn
                          can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible
@@ -118,12 +118,12 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker     (type (->Attacker nil nil nil nil))
+  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
-            :destructible (type (->Destructible nil nil nil nil))
+            :destructible (type (->Destructible nil nil nil nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
             :entity       (type (->Entity nil nil))
             :experience   (type (->Experience nil nil nil))
@@ -142,7 +142,6 @@
             :renderable   (type (->Renderable nil nil))
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
-            :status       (type (->Status nil nil nil nil))
             :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))

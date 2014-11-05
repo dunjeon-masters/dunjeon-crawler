@@ -49,11 +49,13 @@
                  [:attacker {:atk              (:atk rj.cfg/skeleton-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects          [{:type :poison, :duration 3, :damage 5}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp             (:hp  rj.cfg/skeleton-stats)
                                  :def        (:def rj.cfg/skeleton-stats)
                                  :can-retaliate? false
-                                 :take-damage-fn rj.d/take-damage}]
+                                 :take-damage-fn rj.d/take-damage
+                                 :status-effects []}]
                  [:killable {:experience (:exp rj.cfg/skeleton-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
