@@ -2,7 +2,8 @@
   (:require [brute.entity :as br.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.components :as rj.c]
-            [rouje-like.entity-wrapper :as rj.e]))
+            [rouje-like.entity-wrapper :as rj.e]
+            [rouje-like.config :as rj.cfg]))
 
 (defn pickup-item
   [system e-by e-this [z x y] item-type]
@@ -77,7 +78,7 @@
 
 (defn ^:private only-floor?
   [tile]
-  (every? #(#{:dune :floor} (:type %))
+  (every? #(rj.cfg/<floors> (:type %))
           (:entities tile)))
 
 (defn ^:private item>>entities

@@ -3,6 +3,7 @@
             [clojure.pprint :refer [pprint]]
 
             [rouje-like.entity-wrapper :as rj.e]
+            [rouje-like.config :as rj.cfg]
             [rouje-like.components :as rj.c]))
 
 (def cli (atom ""))
@@ -86,7 +87,7 @@
                              (-> (get-in level [x y])
                                  (tile->top-entity)
                                  (:type)
-                                 (#{:wall :lichen})))
+                                 (rj.cfg/<sight-blockers>)))
                            line)
                    (every? (partial = [i j])
                            line)))]

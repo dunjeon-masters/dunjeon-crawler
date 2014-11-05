@@ -8,7 +8,8 @@
             [rouje-like.mobile :as rj.m]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.config :as rj.cfg]
+            [clojure.set :refer [union]]))
 
 (declare process-input-tick)
 
@@ -23,7 +24,7 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:dune :floor} (:type (rj.u/tile->top-entity target-tile)))
+       (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
          (add-skeleton system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
@@ -71,7 +72,7 @@
         offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
                                         shuffled-directions)
 
-        is-valid-target-tile? #{:dune :floor :torch :gold :player}
+        is-valid-target-tile? rj.cfg/<valid-mob-targets>
 
         nth->offset-pos (fn [index]
                             (nth offset-shuffled-directions index))
