@@ -74,6 +74,52 @@
                 (range (count level)))
    :z z})
 
+(defn ^:private maze:get-smoothed-tile
+  [block x y z]
+  (let [wall-threshold 2
+        wall-bound     5
+        wall-birth 3
+        block-freqs (block->freqs block)
+        wall-count (get block-freqs :wall 0)
+        this-type (:type (rj.u/tile->top-entity
+                           (first (filter (fn [tile]
+                                            (and (= x (:x tile)) (= y (:y tile))))
+                                          block))))
+        result (if (and (= this-type :wall)
+                        (<= wall-count wall-bound)
+                        (>= wall-count wall-threshold))
+                 :wall
+                 (if (and (= this-type :floor)
+                          (= wall-count wall-birth))
+                   :wall
+                   :floor))]
+    (update-in (rj.c/map->Tile {:x x :y y :z z
+                                :entities [(rj.c/map->Entity {:id   nil
+                                                              :type :floor})]})
+               [:entities] (fn [entities]
+                             (if (= result :wall)
+                               (conj entities
+                                     (rj.c/map->Entity {:id   nil
+                                                        :type :wall}))
+                               entities)))))
+
+(defn ^:private maze:get-smoothed-col
+  [level [x z]]
+  (mapv (fn [y]
+          (maze:get-smoothed-tile
+            (rj.u/get-ring-around level [x y] 1)
+            x y z))
+        (range (count (first level)))))
+
+(defn ^:private maze:smooth-level
+  "cells survive from one generation to the next if they have at least one
+  and at most five neighbours, and if a cell has exactly three neighbours, it is born."
+  [{:keys [level z]}]
+  {:level (mapv (fn [x]
+                  (maze:get-smoothed-col level [x z]))
+                (range (count level)))
+   :z z})
+
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
@@ -130,9 +176,10 @@
     (rj.p/add-portal {:system system :z z})
     (:system system)))
 
+;[:cave :desert :maze]
 (defn generate-random-level
   ([level-sizes z]
-   (let [world-types [:cave :desert]]
+   (let [world-types [:cave :desert :maze]]
      (generate-random-level level-sizes z (rand-nth world-types))))
 
   ([{:keys [width height]} z world-type]
@@ -160,13 +207,30 @@
                                               :z z})
                     2)
                (:level level)))
-     :desert (vec
-               (map vec
-                    (for [x (range width)]
-                      (for [y (range height)]
-                        (rj.c/map->Tile {:x x :y y :z z
-                                         :entities [(rj.c/map->Entity {:id   nil
-                                                                       :type :dune})]}))))))))
+     :desert (vec (map vec
+                       (for [x (range width)]
+                         (for [y (range height)]
+                           (rj.c/map->Tile {:x x :y y :z z
+                                            :entities [(rj.c/map->Entity {:id   nil
+                                                                          :type :dune})]})))))
+     :maze (let [level (vec (map vec
+                                 (for [x (range width)]
+                                   (for [y (range height)]
+                                     (update-in (rj.c/map->Tile {:x x :y y :z z
+                                                              :entities [(rj.c/map->Entity {:id   nil
+                                                                                            :type :floor})]})
+                                             [:entities] (fn [entities]
+                                                           (if (< (rand-int 100) init-wall%)
+                                                             (conj entities
+                                                                   (rj.c/map->Entity {:id   nil
+                                                                                      :type :wall}))
+                                                             entities)))))))]
+             ;; CREATE MAZE
+             (as-> level level
+               (nth (iterate maze:smooth-level {:level level
+                                                :z z})
+                    5)
+               (:level level))))))
 
 (declare add-level)
 (defn init-world
