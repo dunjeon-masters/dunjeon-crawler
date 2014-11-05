@@ -69,6 +69,7 @@
               (attack c-attacker e-this e-target system)
 
               :else system))
+          (rj.d/apply-effects e-this)
           (rj.e/upd-c e-this :playersight
                       (fn [c-playersight]
                         (update-in c-playersight [:distance] dec-sight)))

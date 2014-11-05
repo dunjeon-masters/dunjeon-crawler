@@ -6,3 +6,5 @@ desktop/target
 *.swp
 target/
 
+
+desktop/src-common/rouje_like/test.clj
