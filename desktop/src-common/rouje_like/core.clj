@@ -38,7 +38,7 @@
                   e-world (first (rj.e/all-e-with-c system :world))]
               (rj.u/update-in-world system e-world rj.pl/init-player-pos
                                     (fn [entities]
-                                      (vec (conj (filter #(#{:floor} (:type %)) entities)
+                                      (vec (conj (filter #(#{:dune :floor} (:type %)) entities)
                                                  (rj.c/map->Entity {:id   e-player
                                                                     :type :player})))))))))
 

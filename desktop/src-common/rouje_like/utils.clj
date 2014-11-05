@@ -10,6 +10,7 @@
 
 (def get-default-pri
   {:floor 1
+   :dune 0
    :torch 2
    :gold 3
    :wall 4

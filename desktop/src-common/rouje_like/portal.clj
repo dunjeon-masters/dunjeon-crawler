@@ -18,8 +18,8 @@
                                         (rand-int (count (first level)))]))]
      (loop [portal-tile (get-rand-tile level)
             target-tile (get-rand-tile level+)]
-       (let [portal-tile-good? (#{:floor} (:type (rj.u/tile->top-entity portal-tile)))
-             target-tile-good? (#{:floor} (:type (rj.u/tile->top-entity target-tile)))]
+       (let [portal-tile-good? (#{:dune :floor} (:type (rj.u/tile->top-entity portal-tile)))
+             target-tile-good? (#{:dune :floor} (:type (rj.u/tile->top-entity target-tile)))]
          (cond (and portal-tile-good? target-tile-good?)
                (add-portal system portal-tile target-tile)
 

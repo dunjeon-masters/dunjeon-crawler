@@ -77,7 +77,7 @@
 
 (defn ^:private only-floor?
   [tile]
-  (every? #(#{:floor} (:type %))
+  (every? #(#{:dune :floor} (:type %))
           (:entities tile)))
 
 (defn ^:private item>>entities

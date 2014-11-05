@@ -12,7 +12,7 @@
 
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.items :as rj.items]
             [rouje-like.lichen :as rj.lc]
             [rouje-like.bat :as rj.bt]
@@ -134,31 +134,42 @@
     (:system system)))
 
 (defn generate-random-level
-  [{:keys [width height]} z]
-  (let [level (vec
-                (map vec
-                     (for [x (range width)]
-                       (for [y (range height)]
-                         (update-in (rj.c/map->Tile {:x x :y y :z z
-                                                     :entities [(rj.c/map->Entity {:id   nil
-                                                                                   :type :floor})]})
-                                    [:entities] (fn [entities]
-                                                  (if (< (rand-int 100) init-wall%)
-                                                    (conj entities
-                                                          (rj.c/map->Entity {:id   nil
-                                                                             :type :wall}))
-                                                    entities)))))))
-        ;; SMOOTH-WORLD
-        level (as-> level level
-                (nth (iterate smooth-level-v1 {:level level
-                                               :z z})
-                     4)
-                (:level level)
-                (nth (iterate smooth-level-v2 {:level level
-                                               :z z})
-                     2)
-                (:level level))]
-    level))
+  ([level-sizes z]
+   (let [world-types [:cave :desert]]
+     (generate-random-level level-sizes z (rand-nth world-types))))
+
+  ([{:keys [width height]} z world-type]
+   (case world-type
+     :cave (let [level (vec
+                         (map vec
+                              (for [x (range width)]
+                                (for [y (range height)]
+                                  (update-in (rj.c/map->Tile {:x x :y y :z z
+                                                              :entities [(rj.c/map->Entity {:id   nil
+                                                                                            :type :floor})]})
+                                             [:entities] (fn [entities]
+                                                           (if (< (rand-int 100) init-wall%)
+                                                             (conj entities
+                                                                   (rj.c/map->Entity {:id   nil
+                                                                                      :type :wall}))
+                                                             entities)))))))]
+             ;; SMOOTH-WORLD
+             (as-> level level
+               (nth (iterate smooth-level-v1 {:level level
+                                              :z z})
+                    4)
+               (:level level)
+               (nth (iterate smooth-level-v2 {:level level
+                                              :z z})
+                    2)
+               (:level level)))
+     :desert (vec
+               (map vec
+                    (for [x (range width)]
+                      (for [y (range height)]
+                        (rj.c/map->Tile {:x x :y y :z z
+                                         :entities [(rj.c/map->Entity {:id   nil
+                                                                       :type :dune})]}))))))))
 
 (declare render-world add-level)
 (defn init-world
@@ -195,42 +206,48 @@
         (add-portal (dec z)))))
 
 (def ^:private type->tile-info
-  {:player   {:x 0 :y 4
-              :width 12 :height 12
-              :color {:r 255 :g 255 :b 255 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :wall     {:x 3 :y 2
-              :width 12 :height 12
-              :color {:r 255 :g 255 :b 255 :a 128}
-              :tile-sheet "grim_12x12.png"}
-   :gold     {:x 1 :y 9
-              :width 12 :height 12
-              :color {:r 255 :g 255 :b 1 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :lichen   {:x 15 :y 0
-              :width 12 :height 12
-              :color {:r 1 :g 255 :b 1 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :floor    {:x 14 :y 2
-              :width 12 :height 12
-              :color {:r 255 :g 255 :b 255 :a 64}
-              :tile-sheet "grim_12x12.png"}
-   :torch    {:x 1 :y 2
-              :width 12 :height 12
-              :color {:r 255 :g 1 :b 1 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :portal    {:x 4 :y 9
-              :width 12 :height 12
-              :color {:r 102 :g 0 :b 102 :a 255}
-              :tile-sheet "grim_12x12.png"}
-   :bat      {:x 0 :y 9
-              :width 16 :height 16
-              :color {:r 255 :g 255 :b 255 :a 128}
-              :tile-sheet "DarkondDigsDeeper_16x16.png"}
-   :skeleton {:x 3 :y 5
-              :width 16 :height 16
-              :color {:r 255 :g 255 :b 255 :a 255}
-              :tile-sheet "DarkondDigsDeeper_16x16.png"}})
+  (let [grim-tile-sheet "grim_12x12.png"
+        darkond-tile-sheet "DarkondDigsDeeper_16x16.png"]
+    {:player   {:x 0 :y 4
+                :width 12 :height 12
+                :color {:r 255 :g 255 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :wall     {:x 3 :y 2
+                :width 12 :height 12
+                :color {:r 255 :g 255 :b 255 :a 128}
+                :tile-sheet grim-tile-sheet}
+     :gold     {:x 1 :y 9
+                :width 12 :height 12
+                :color {:r 255 :g 255 :b 1 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :lichen   {:x 15 :y 0
+                :width 12 :height 12
+                :color {:r 1 :g 255 :b 1 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :floor    {:x 14 :y 2
+                :width 12 :height 12
+                :color {:r 255 :g 255 :b 255 :a 64}
+                :tile-sheet grim-tile-sheet}
+     :torch    {:x 1 :y 2
+                :width 12 :height 12
+                :color {:r 255 :g 1 :b 1 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :portal   {:x 4 :y 9
+                 :width 12 :height 12
+                 :color {:r 102 :g 0 :b 102 :a 255}
+                 :tile-sheet grim-tile-sheet}
+     :bat      {:x 14 :y 5
+                :width 12 :height 12
+                :color {:r 255 :g 255 :b 255 :a 128}
+                :tile-sheet grim-tile-sheet}
+     :skeleton {:x 3 :y 5
+                :width 16 :height 16
+                :color {:r 255 :g 255 :b 255 :a 255}
+                :tile-sheet darkond-tile-sheet}
+     :dune     {:x 14 :y 2
+                :width 12 :height 12
+                :color {:r 255 :g 140 :b 1 :a 255}
+                :tile-sheet grim-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize

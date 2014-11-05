@@ -23,7 +23,7 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
+       (if (#{:dune :floor} (:type (rj.u/tile->top-entity target-tile)))
          (add-skeleton system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
@@ -71,7 +71,7 @@
         offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
                                         shuffled-directions)
 
-        is-valid-target-tile? #{:floor :torch :gold :player}
+        is-valid-target-tile? #{:dune :floor :torch :gold :player}
 
         nth->offset-pos (fn [index]
                             (nth offset-shuffled-directions index))

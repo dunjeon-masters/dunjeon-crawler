@@ -23,7 +23,7 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
+       (if (#{:dune :floor} (:type (rj.u/tile->top-entity target-tile)))
          (add-lichen system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
@@ -89,9 +89,10 @@
         max-blob-size (:max-blob-size c-lichen)
 
         empty-neighbors (rj.u/get-neighbors-of-type world [x y]
-                                                    [:floor :torch :gold])]
+                                                    [:dune :floor :torch :gold])]
     (if (and (seq empty-neighbors)
              (< (rand 100) grow-chance%)
              (< (get-size-of-lichen-blob world [x y])
                 max-blob-size))
       (:system (add-lichen system (rand-nth empty-neighbors)))system)))
+
