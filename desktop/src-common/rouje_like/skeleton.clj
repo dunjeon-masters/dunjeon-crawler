@@ -6,10 +6,13 @@
             [rouje-like.components :as rj.c :refer [can-move? move
                                                     can-attack? attack]]
             [rouje-like.mobile :as rj.m]
+            [rouje-like.messaging :as rj.msg]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.config :as rj.cfg]
             [clojure.set :refer [union]]))
+
 
 (declare process-input-tick)
 
@@ -50,11 +53,17 @@
                  [:attacker {:atk              (:atk rj.cfg/skeleton-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   [{:type :paralysis
+                                                 :duration 2
+                                                 :value 1
+                                                 :e-from e-skeleton
+                                                 :apply-fn rj.stef/apply-paralysis}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp             (:hp  rj.cfg/skeleton-stats)
                                  :def        (:def rj.cfg/skeleton-stats)
                                  :can-retaliate? false
-                                 :take-damage-fn rj.d/take-damage}]
+                                 :take-damage-fn rj.d/take-damage
+                                 :status-effects []}]
                  [:killable {:experience (:exp rj.cfg/skeleton-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
@@ -128,14 +137,15 @@
                         nil))
         e-target (:id (rj.u/tile->top-entity target-tile))]
     (if (not (nil? target-tile))
-      (cond
-        (and (< (rand-int 100) 80)
-             (can-move? c-mobile e-this target-tile system))
-        (move c-mobile e-this target-tile system)
+      (-> (cond
+              (and (< (rand-int 100) 80)
+                   (can-move? c-mobile e-this target-tile system))
+              (move c-mobile e-this target-tile system)
 
-        (can-attack? c-attacker e-this e-target system)
-        (attack c-attacker e-this e-target system)
+              (can-attack? c-attacker e-this e-target system)
+              (attack c-attacker e-this e-target system)
 
-        :else system)
+              :else system)
+        (rj.d/apply-effects e-this))
       system)))
 

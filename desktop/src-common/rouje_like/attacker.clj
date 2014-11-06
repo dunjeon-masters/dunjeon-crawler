@@ -1,7 +1,8 @@
 (ns rouje-like.attacker
   (:require [rouje-like.utils :as rj.u]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.components :as rj.c]))
+            [rouje-like.components :as rj.c]
+            [rouje-like.destructible :as rj.d]))
 
 (defn can-attack?
   [c-this _ e-target system]
@@ -15,5 +16,6 @@
   (let [damage (:atk c-this)
 
         c-destr (rj.e/get-c-on-e system e-target :destructible)]
-    (rj.c/take-damage c-destr e-target damage e-this system)))
+    (as-> (rj.c/take-damage c-destr e-target damage e-this system) system
+    )))
 
