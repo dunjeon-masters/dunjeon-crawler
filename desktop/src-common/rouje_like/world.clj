@@ -123,6 +123,7 @@
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
+(def ^:private init-health-potion% 2)
 (def ^:private init-lichen% 1)
 (def ^:private init-bat% 1)
 (def ^:private init-skeleton% 1)
@@ -143,6 +144,12 @@
              (* (/ init-torch% 100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
+      (as-> system
+            (do (println "core::add-health-potion " (not (nil? system))) system)
+            (nth (iterate rj.items/add-health-potion {:system system :z z})
+                 (* (/ init-health-potion% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
 
       ;; Spawn lichens
       (as-> system

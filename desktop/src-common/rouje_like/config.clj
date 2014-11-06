@@ -16,7 +16,7 @@
   #{:dune :floor})
 
 (def <items>
-  #{:torch :gold})
+  #{:torch :gold :health-potion})
 
 (def <empty>
   (union <floors> <items>))
@@ -70,4 +70,7 @@
    :def 1
    :atk 3
    :exp 1})
+
+(def potion-stats
+  {:health 5})
 

@@ -118,11 +118,11 @@
                 :tile-sheet grim-tile-sheet}
      :gold     {:x 1 :y 9
                 :width 12 :height 12
-                :color {:r 255 :g 255 :b 1 :a 255}
+                :color {:r 255 :g 255 :b 0 :a 255}
                 :tile-sheet grim-tile-sheet}
      :lichen   {:x 15 :y 0
                 :width 12 :height 12
-                :color {:r 1 :g 255 :b 1 :a 255}
+                :color {:r 0 :g 255 :b 0 :a 255}
                 :tile-sheet grim-tile-sheet}
      :floor    {:x 14 :y 2
                 :width 12 :height 12
@@ -130,7 +130,7 @@
                 :tile-sheet grim-tile-sheet}
      :torch    {:x 1 :y 2
                 :width 12 :height 12
-                :color {:r 255 :g 1 :b 1 :a 255}
+                :color {:r 255 :g 0 :b 0 :a 255}
                 :tile-sheet grim-tile-sheet}
      :portal   {:x 4 :y 9
                  :width 12 :height 12
@@ -146,8 +146,12 @@
                 :tile-sheet darkond-tile-sheet}
      :dune     {:x 14 :y 2
                 :width 12 :height 12
-                :color {:r 255 :g 140 :b 1 :a 255}
-                :tile-sheet grim-tile-sheet}}))
+                :color {:r 255 :g 140 :b 0 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :health-potion {:x 13 :y 10
+                    :width 12 :height 12
+                    :color {:r 255 :g 0 :b 0 :a 255}
+                    :tile-sheet grim-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize
