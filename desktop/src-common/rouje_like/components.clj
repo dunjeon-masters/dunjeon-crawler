@@ -62,6 +62,10 @@
 
 (defrecord Wallet [^Number gold])
 
+(defrecord Armor [armor])
+
+(defrecord Weapon [weapon])
+
 (defrecord World [levels
                   add-level-fn])
 
@@ -117,7 +121,8 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
+  get-type {:armor        (type (->Armor nil))
+            :attacker     (type (->Attacker nil nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
@@ -146,4 +151,5 @@
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
             :wallet       (type (->Wallet nil))
+            :weapon       (type (->Weapon nil))
             :world        (type (->World nil nil))})
