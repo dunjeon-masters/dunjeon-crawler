@@ -8,7 +8,7 @@
                                                     can-move? move]]
             [rouje-like.rendering :as rj.r]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.mobile :as rj.m]
@@ -17,17 +17,29 @@
             [rouje-like.config :as rj.cfg]))
 
 (defn can-dig?
-  [_ target]
-  (#{:wall} (:type (rj.u/tile->top-entity target))))
+  [_ _ target]
+  (rj.cfg/<walls> (:type (rj.u/tile->top-entity target))))
 
 (defn dig
-  [system target-tile]
-  (let [e-world (first (rj.e/all-e-with-c system :world))]
-    (-> system
-        (rj.u/update-in-world e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
-                               (fn [entities]
-                                 (remove #(#{:wall} (:type %))
-                                         entities))))))
+  [system e-this target-tile]
+  (let [target-top-entity (rj.u/tile->top-entity target-tile)] (cond
+    (= (:type target-top-entity) :wall)
+    (let [e-world (first (rj.e/all-e-with-c system :world))]
+      (-> system
+          (rj.u/update-in-world e-world
+                                [(:z target-tile) (:x target-tile) (:y target-tile)]
+                                (fn [entities]
+                                  (remove #(#{:wall} (:type %))
+                                          entities)))))
+
+    (= (:type target-top-entity) :maze-wall)
+    (let [c-attacker-this (rj.e/get-c-on-e system e-this :attacker)
+          damage 1
+          _ (? (rj.e/all-c-on-e system (:id target-top-entity)))
+          e-target (:id target-top-entity)
+          c-destr (rj.e/get-c-on-e system e-target :destructible)]
+      (rj.c/take-damage c-destr e-target damage e-this system))
+    :else system)))
 
 (defn process-input-tick
   [system direction]
@@ -62,8 +74,8 @@
               (can-move? c-mobile e-this target-tile system)
               (move c-mobile e-this target-tile system)
 
-              ((:can-dig?-fn c-digger) system target-tile)
-              ((:dig-fn c-digger) system target-tile)
+              ((:can-dig?-fn c-digger) system e-this target-tile)
+              ((:dig-fn c-digger) system e-this target-tile)
 
               (can-attack? c-attacker e-this e-target system)
               (attack c-attacker e-this e-target system)
@@ -134,3 +146,4 @@
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
+

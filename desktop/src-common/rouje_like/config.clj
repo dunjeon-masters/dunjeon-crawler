@@ -15,6 +15,9 @@
 (def <floors>
   #{:dune :floor})
 
+(def <walls>
+  #{:wall :maze-wall})
+
 (def <items>
   #{:torch :gold})
 
@@ -22,7 +25,7 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  #{:wall :lichen})
+  #{:wall :lichen :maze-wall})
 
 (def <valid-move-targets>
   (union <empty> #{:portal}))

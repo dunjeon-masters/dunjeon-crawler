@@ -12,6 +12,7 @@
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.items :as rj.items]
             [rouje-like.lichen :as rj.lc]
+            [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
             [rouje-like.skeleton :as rj.sk]
             [rouje-like.portal :as rj.p]
@@ -80,27 +81,31 @@
         wall-bound     5
         wall-birth 3
         block-freqs (block->freqs block)
-        wall-count (get block-freqs :wall 0)
-        this-type (:type (rj.u/tile->top-entity
-                           (first (filter (fn [tile]
-                                            (and (= x (:x tile)) (= y (:y tile))))
-                                          block))))
-        result (if (and (= this-type :wall)
+        wall-count (get block-freqs :maze-wall 0)
+        top-entity (rj.u/tile->top-entity
+                      (first (filter (fn [tile]
+                                       (and (= x (:x tile)) (= y (:y tile))))
+                                     block)))
+        this-id (:id top-entity)
+        this-type (:type top-entity)
+        result (if (and (= this-type :maze-wall)
                         (<= wall-count wall-bound)
                         (>= wall-count wall-threshold))
-                 :wall
+                 :maze-wall
                  (if (and (= this-type :floor)
                           (= wall-count wall-birth))
-                   :wall
+                   :maze-wall
                    :floor))]
     (update-in (rj.c/map->Tile {:x x :y y :z z
                                 :entities [(rj.c/map->Entity {:id   nil
                                                               :type :floor})]})
                [:entities] (fn [entities]
-                             (if (= result :wall)
+                             (if (= result :maze-wall)
                                (conj entities
-                                     (rj.c/map->Entity {:id   nil
-                                                        :type :wall}))
+                                     (rj.c/map->Entity {:id   (if this-id
+                                                                this-id
+                                                                (br.e/create-entity))
+                                                        :type :maze-wall}))
                                entities)))))
 
 (defn ^:private maze:get-smoothed-col
@@ -120,6 +125,29 @@
                 (range (count level)))
    :z z})
 
+(defn maze:entity-ize-walls
+  [system z]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        level (nth levels z)]
+    (reduce (fn [system tile]
+              (let [entities (:entities tile)
+                    maze-wall (filter #(= :maze-wall (:type %)) entities)]
+                (if (seq maze-wall)
+                  (let [e-maze-wall (:id (first maze-wall))]
+                    (rj.e/system<<components
+                      system e-maze-wall
+                      [[:position {:x (:x tile)
+                                   :y (:y tile)
+                                   :z z
+                                   :type :maze-wall}]
+                       [:destructible {:hp 2
+                                       :def 0
+                                       :take-damage-fn rj.d/take-damage}]]))
+                  system)))
+            system (flatten level))))
+
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
 (def ^:private init-gold% 5)
@@ -130,6 +158,9 @@
 (defn init-entities
   [system z]
   (-> system
+      ;; If maze-wall, add an entity to it
+      (as-> system
+        (maze:entity-ize-walls system z))
       ;; Add Items: Gold, Torches...
       (as-> system
         (do (println "core::add-gold: " (not (nil? system))) system)
@@ -207,12 +238,14 @@
                                               :z z})
                     2)
                (:level level)))
+
      :desert (vec (map vec
                        (for [x (range width)]
                          (for [y (range height)]
                            (rj.c/map->Tile {:x x :y y :z z
                                             :entities [(rj.c/map->Entity {:id   nil
                                                                           :type :dune})]})))))
+
      :maze (let [level (vec (map vec
                                  (for [x (range width)]
                                    (for [y (range height)]
@@ -222,8 +255,8 @@
                                              [:entities] (fn [entities]
                                                            (if (< (rand-int 100) init-wall%)
                                                              (conj entities
-                                                                   (rj.c/map->Entity {:id   nil
-                                                                                      :type :wall}))
+                                                                   (rj.c/map->Entity {:id   (br.e/create-entity)
+                                                                                      :type :maze-wall}))
                                                              entities)))))))]
              ;; CREATE MAZE
              (as-> level level
