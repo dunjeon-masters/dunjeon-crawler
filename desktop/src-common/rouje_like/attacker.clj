@@ -16,6 +16,5 @@
   (let [damage (:atk c-this)
 
         c-destr (rj.e/get-c-on-e system e-target :destructible)]
-    (as-> (rj.c/take-damage c-destr e-target damage e-this system) system
-    )))
+    (rj.c/take-damage c-destr e-target damage e-this system)))
 
