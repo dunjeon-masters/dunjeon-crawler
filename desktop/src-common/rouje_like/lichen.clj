@@ -29,6 +29,7 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-lichen (br.e/create-entity)
+         hp (:hp  rj.cfg/lichen-stats)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec (conj (remove #(#{:wall} (:type %)) entities)
@@ -42,7 +43,8 @@
                              :y (:y target-tile)
                              :z (:z target-tile)
                              :type :lichen}]
-                 [:destructible {:hp  (:hp  rj.cfg/lichen-stats)
+                 [:destructible {:hp  hp
+                                 :max-hp hp
                                  :def (:def rj.cfg/lichen-stats)
                                  :can-retaliate? true
                                  :take-damage-fn rj.d/take-damage}]

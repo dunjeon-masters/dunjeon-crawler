@@ -33,6 +33,7 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-skeleton (br.e/create-entity)
+         hp (:hp rj.cfg/skeleton-stats)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
@@ -58,7 +59,8 @@
                                                  :apply-fn rj.stef/apply-poison
                                                  :e-from e-skeleton}]
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp             (:hp  rj.cfg/skeleton-stats)
+                 [:destructible {:hp         hp
+                                 :max-hp     hp
                                  :def        (:def rj.cfg/skeleton-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage

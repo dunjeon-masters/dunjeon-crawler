@@ -13,7 +13,7 @@
 
 ;; TILE TYPES
 (def <floors>
-  #{:dune :floor})
+  #{:dune :floor :forest-floor})
 
 (def <items>
   #{:torch :gold :health-potion})
@@ -22,7 +22,7 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  #{:wall :lichen})
+  #{:wall :lichen :tree})
 
 (def <valid-move-targets>
   (union <empty> #{:portal}))

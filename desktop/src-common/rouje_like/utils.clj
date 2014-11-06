@@ -11,11 +11,13 @@
 
 (def get-default-pri
   {:floor 1
+   :forest-floor 1
    :dune 0
    :health-potion 2
    :torch 3
    :gold 4
    :wall 5
+   :tree 5
    :lichen 6
    :bat 7
    :skeleton 8

@@ -19,7 +19,7 @@
 
 (defn can-dig?
   [_ target]
-  (#{:wall} (:type (rj.u/tile->top-entity target))))
+  (#{:wall :tree} (:type (rj.u/tile->top-entity target))))
 
 (defn dig
   [system target-tile]
@@ -27,7 +27,7 @@
     (-> system
         (rj.u/update-in-world e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                (fn [entities]
-                                 (remove #(#{:wall} (:type %))
+                                 (remove #(#{:wall :tree} (:type %))
                                          entities))))))
 
 (defn process-input-tick

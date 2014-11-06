@@ -108,7 +108,8 @@
 
 (def ^:private type->tile-info
   (let [grim-tile-sheet "grim_12x12.png"
-        darkond-tile-sheet "DarkondDigsDeeper_16x16.png"]
+        darkond-tile-sheet "DarkondDigsDeeper_16x16.png"
+        bisasam-tile-sheet "Bisasam_20x20.png"]
     {:player   {:x 0 :y 4
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 255}
@@ -129,10 +130,18 @@
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 64}
                 :tile-sheet grim-tile-sheet}
+     :forest-floor    {:x 14 :y 2
+                       :width 12 :height 12
+                       :color {:r 103 :g 133 :b 81 :a 64}
+                       :tile-sheet grim-tile-sheet}
      :torch    {:x 1 :y 2
                 :width 12 :height 12
                 :color {:r 255 :g 0 :b 0 :a 255}
                 :tile-sheet grim-tile-sheet}
+     :tree     {:x 5 :y 0
+                :width 20 :height 20
+                :color {:r 21 :g 54 :b 21 :a 255}
+                :tile-sheet bisasam-tile-sheet}
      :portal   {:x 4 :y 9
                  :width 12 :height 12
                  :color {:r 102 :g 0 :b 102 :a 255}

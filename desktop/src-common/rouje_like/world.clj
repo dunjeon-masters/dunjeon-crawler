@@ -74,6 +74,56 @@
                 (range (count level)))
    :z z})
 
+(defn ^:private forest:get-smoothed-tile
+  [block-d1 block-d2 x y z]
+  (let [wall-threshold-d1 5
+        wall-bound-d2 2
+        d1-block-freqs (block->freqs block-d1)
+        d2-block-freqs (if (nil? block-d2)
+                         {:tree (inc wall-bound-d2)}
+                         (block->freqs block-d2))
+        wall-count-d1 (get d1-block-freqs :tree 0)
+        wall-count-d2 (get d2-block-freqs :tree 0)
+        result (if (or (>= wall-count-d1 wall-threshold-d1)
+                       (<= wall-count-d2 wall-bound-d2))
+                 :tree
+                 :forest-floor)]
+    (update-in (rj.c/map->Tile {:x x :y y :z z
+                                :entities [(rj.c/map->Entity {:id   nil
+                                                              :type :forest-floor})]})
+               [:entities] (fn [entities]
+                             (if (= result :tree)
+                               (conj entities
+                                     (rj.c/map->Entity {:id   nil
+                                                        :type :tree}))
+                               entities)))))
+
+(defn ^:private forest:get-smoothed-col
+  [level [x z] max-dist]
+  {:pre [(#{1 2} max-dist)]}
+  (mapv (fn [y]
+          (forest:get-smoothed-tile
+            (rj.u/get-ring-around level [x y] 1)
+            (if (= max-dist 2)
+              (rj.u/get-ring-around level [x y] 2)
+              nil)
+            x y z))
+        (range (count (first level)))))
+
+(defn ^:private forest:smooth-level-v1
+  [{:keys [level z]}]
+  {:level (mapv (fn [x]
+                  (forest:get-smoothed-col level [x z] 2))
+                (range (count level)))
+   :z z})
+
+(defn ^:private forest:smooth-level-v2
+  [{:keys [level z]}]
+  {:level (mapv (fn [x]
+                  (forest:get-smoothed-col level [x z] 1))
+                (range (count level)))
+   :z z})
+
 (defn ^:private maze:get-smoothed-tile
   [block x y z]
   (let [wall-threshold 2
@@ -183,10 +233,9 @@
     (rj.p/add-portal {:system system :z z})
     (:system system)))
 
-;[:cave :desert :maze]
 (defn generate-random-level
   ([level-sizes z]
-   (let [world-types [:cave :desert :maze]]
+   (let [world-types [:cave :desert :maze :forest]]
      (generate-random-level level-sizes z (rand-nth world-types))))
 
   ([{:keys [width height]} z world-type]
@@ -220,6 +269,29 @@
                            (rj.c/map->Tile {:x x :y y :z z
                                             :entities [(rj.c/map->Entity {:id   nil
                                                                           :type :dune})]})))))
+     :forest (let [level (vec
+                         (map vec
+                              (for [x (range width)]
+                                (for [y (range height)]
+                                  (update-in (rj.c/map->Tile {:x x :y y :z z
+                                                              :entities [(rj.c/map->Entity {:id   nil
+                                                                                            :type :forest-floor})]})
+                                             [:entities] (fn [entities]
+                                                           (if (< (rand-int 100) 45)
+                                                             (conj entities
+                                                                   (rj.c/map->Entity {:id   nil
+                                                                                      :type :tree}))
+                                                             entities)))))))]
+             ;; SMOOTH-WORLD
+             (as-> level level
+                   (nth (iterate forest:smooth-level-v1 {:level level
+                                                  :z z})
+                        2)
+                   (:level level)
+                   (nth (iterate forest:smooth-level-v2 {:level level
+                                                  :z z})
+                        3)
+                   (:level level)))
      :maze (let [level (vec (map vec
                                  (for [x (range width)]
                                    (for [y (range height)]
