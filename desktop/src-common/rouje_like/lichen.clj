@@ -6,6 +6,7 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.config :as rj.cfg]))
@@ -42,13 +43,14 @@
                              :y (:y target-tile)
                              :z (:z target-tile)
                              :type :lichen}]
-                 [:destructible {:hp      (:hp  rj.cfg/lichen-stats)
+                 [:destructible {:hp  (:hp  rj.cfg/lichen-stats)
                                  :def (:def rj.cfg/lichen-stats)
                                  :can-retaliate? true
                                  :take-damage-fn rj.d/take-damage}]
                  [:attacker {:atk (:atk rj.cfg/lichen-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :effects []
                              :is-valid-target? (constantly true)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]

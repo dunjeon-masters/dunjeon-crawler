@@ -74,27 +74,34 @@
         c-destructible (rj.e/get-c-on-e system e-this :destructible)
         hp (:hp c-destructible)
         def (:def c-destructible)
+        status-effects (:status-effects c-destructible)
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
         attack (:atk c-attacker)
 
+        c-energy (rj.e/get-c-on-e system e-this :energy)
+        energy (:energy c-energy)
+
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
-                        " - " "Position: [" x "," y "," z "]"
-                        " - " "HP: [" hp "]"
-                        " - " "Attack: [" attack "]"
-                        " - " "Defense: [" def "]"
-                        " - " "Race: [" race "]"
-                        " - " "Class: [" class "]"
-                        " - " "Experience: [" experience "]"
-                        " - " "Level: [" level "]"
-                        "\n cli: " @rj.u/cli)
+                        " -  Position: [" x "," y "," z "]"
+                        " -  HP: [" hp "]"
+                        " -  Attack: [" attack "]"
+                        " -  Defense: [" def "]"
+                        " -  Race: [" race "]"
+                        " -  Class: [" class "]"
+                        "\nExperience: [" experience "]"
+                        " -  Level: [" level "]"
+                        " -  cli: " @rj.u/cli
+                        " - " "Status: " status-effects
+                        "\nEnergy: [" energy "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
-                                       (dec (+ (:top rj.cfg/padding-sizes)
-                                               (:btm rj.cfg/padding-sizes))))
+                                       (- (+ (:top rj.cfg/padding-sizes)
+                                             (:btm rj.cfg/padding-sizes))
+                                          2))
                                     rj.cfg/block-size)))
             :draw renderer 1.0)
     (.end renderer)))

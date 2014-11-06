@@ -2,7 +2,74 @@
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :refer [can-attack? attack]]
             [rouje-like.utils :as rj.u]
-            [rouje-like.messaging :as rj.msg]))
+            [rouje-like.messaging :as rj.msg]
+            [clojure.set :refer [intersection difference]]))
+
+(defn add-effects
+  [system e-this e-from]
+  (let  [c-attacker (rj.e/get-c-on-e system e-from :attacker)
+         attacker-effects (:status-effects c-attacker)
+         c-destructible (rj.e/get-c-on-e system e-this :destructible)
+         status (:status-effects c-destructible)
+         status-intersection (fn [my-status-effects incoming-status-effects]
+                               (filter #((apply hash-set (map (partial :type) incoming-status-effects))
+                                         (:type %))
+                                       my-status-effects))
+         status-difference (fn [my-status-effects incoming-status-effects]
+                             (filter #(not ((apply hash-set (map (partial :type) incoming-status-effects))
+                                            (:type %)))
+                                     my-status-effects))
+         status->value (fn [status]
+                         (* (:value status)
+                            (:duration status)))]
+    (as-> (if-let [intersection (seq (vec (status-intersection attacker-effects status)))]
+            (reduce (fn [system status]
+                      (rj.e/upd-c system e-this :destructible
+                                  (fn [c-destructible]
+                                    (update-in c-destructible [:status-effects]
+                                               (fn [status-effects]
+                                                 (vec (map (fn [my-status]
+                                                             (if (not= (:type my-status) (:type status))
+                                                               my-status
+                                                               (if (< (status->value my-status)
+                                                                      (status->value status))
+                                                                 status
+                                                                 my-status)))
+                                                           status-effects)))))))
+                    system intersection)
+            system) system
+          (if-let [diff (seq (vec (status-difference attacker-effects status)))]
+            (rj.e/upd-c system e-this :destructible
+                        (fn [c-destructible]
+                          (update-in c-destructible [:status-effects]
+                                     (fn [status-effects]
+                                       (vec (concat status-effects
+                                                    diff))))))
+            system))))
+
+(defn apply-effects
+  [system e-this]
+  (let [c-destructible (rj.e/get-c-on-e system e-this :destructible)
+        statuses (:status-effects c-destructible)
+        dec-status-effects (fn [status-effects]
+                               (vec (filter identity
+                                            (map (fn [status]
+                                                   (let [status- (update-in status [:duration]
+                                                                            dec)]
+                                                     (if (neg? (:duration status-))
+                                                       nil
+                                                       status-)))
+                                                 status-effects))))]
+    (reduce (fn [system status]
+              (as-> (rj.e/upd-c system e-this :destructible
+                                (fn [c-destructible]
+                                  (update-in c-destructible [:status-effects]
+                                             dec-status-effects))) system
+                (if-let [status (seq (filter #(#{(:type status)} (:type %))
+                                        (:status-effects (rj.e/get-c-on-e system e-this :destructible))))]
+                  ((:apply-fn (first status)) system e-this (first status))
+                  system)))
+            system statuses)))
 
 (defn take-damage
   [c-this e-this damage e-from system]
@@ -23,6 +90,7 @@
         (rj.e/upd-c system e-this :destructible
                     (fn [c-destructible]
                       (update-in c-destructible [:hp] - damage)))
+        (add-effects system e-this e-from)
 
         (if-let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
           (if (and (:can-retaliate? c-this)

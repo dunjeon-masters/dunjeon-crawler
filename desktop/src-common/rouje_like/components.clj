@@ -11,6 +11,8 @@
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
 
+(defrecord Energy [energy])
+
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
@@ -67,6 +69,7 @@
   (can-attack? [this e-this e-target system])
   (attack      [this e-this e-target system]))
 (defrecord Attacker [^Number atk
+                     status-effects
                      ^Fn attack-fn
                      ^Fn can-attack?-fn
                      is-valid-target?]
@@ -80,6 +83,7 @@
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [^Number hp
                          ^Number def
+                         status-effects
                          can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible
@@ -113,13 +117,14 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker     (type (->Attacker nil nil nil nil))
+  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
-            :destructible (type (->Destructible nil nil nil nil))
+            :destructible (type (->Destructible nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
+            :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
