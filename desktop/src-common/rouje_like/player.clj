@@ -8,7 +8,7 @@
                                                     can-move? move]]
             [rouje-like.rendering :as rj.r]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.destructible :as rj.d]
             [rouje-like.status-effects :as rj.stef]
             [rouje-like.attacker :as rj.atk]
@@ -55,38 +55,40 @@
                                             direction))
         target-tile (get-in world target-coords nil)]
     (if (and (not (nil? target-tile)))
-      (-> (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
-                c-digger   (rj.e/get-c-on-e system e-this :digger)
-                c-attacker (rj.e/get-c-on-e system e-this :attacker)
-                e-target (:id (rj.u/tile->top-entity target-tile))]
-            (cond
-              (can-move? c-mobile e-this target-tile system)
-              (move c-mobile e-this target-tile system)
+      (as-> (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
+                  c-digger   (rj.e/get-c-on-e system e-this :digger)
+                  c-attacker (rj.e/get-c-on-e system e-this :attacker)
+                  e-target (:id (rj.u/tile->top-entity target-tile))]
+              (cond
+                (can-move? c-mobile e-this target-tile system)
+                (move c-mobile e-this target-tile system)
 
-              ((:can-dig?-fn c-digger) system target-tile)
-              ((:dig-fn c-digger) system target-tile)
+                ((:can-dig?-fn c-digger) system target-tile)
+                ((:dig-fn c-digger) system target-tile)
 
-              (can-attack? c-attacker e-this e-target system)
-              (attack c-attacker e-this e-target system)
+                (can-attack? c-attacker e-this e-target system)
+                (attack c-attacker e-this e-target system)
 
-              :else system))
-          (rj.d/apply-effects e-this)
-          (rj.e/upd-c e-this :playersight
-                      (fn [c-playersight]
-                        (update-in c-playersight [:distance] dec-sight)))
-          (as-> system
-                (let [c-position (rj.e/get-c-on-e system e-this :position)
-                      this-pos [(:z c-position) (:x c-position) (:y c-position)]
-                      this-tile (get-in levels this-pos)
+                :else system)) system
+        (rj.d/apply-effects system e-this)
+        (rj.e/upd-c system e-this :playersight
+                    (fn [c-playersight]
+                      (update-in c-playersight [:distance] dec-sight)))
+        (let [c-position (rj.e/get-c-on-e system e-this :position)
+              this-pos [(:z c-position) (:x c-position) (:y c-position)]
+              this-tile (get-in levels this-pos)
 
-                      ;;TODO: There might be multiple items & user might want to choose to not pickup
-                      item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
-                                          (:entities this-tile)))]
-                  (if item
-                    (let [e-item (:id item)
-                          c-item (rj.e/get-c-on-e system e-item :item)]
-                      ((:pickup-fn c-item) system e-this e-item this-pos (:type item)))
-                    system))))
+              ;;TODO: There might be multiple items & user might want to choose to not pickup
+              item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
+                                  (:entities this-tile)))]
+          (if item
+            (let [e-item (:id item)
+                  c-item (rj.e/get-c-on-e system e-item :item)]
+              ((:pickup-fn c-item) system e-this e-item this-pos (:type item)))
+            system))
+        (rj.e/upd-c system e-this :energy
+                    (fn [c-energy]
+                      (update-in c-energy [:energy] dec))))
       system)))
 
 (def ^:private init-player-x-pos (/ (:width  rj.cfg/world-sizes) 2))
@@ -115,6 +117,7 @@
                    :y init-player-y-pos
                    :z 0
                    :type :player}]
+       [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]
        [:digger {:can-dig?-fn can-dig?
@@ -141,60 +144,4 @@
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
-
-(defn render-player-stats
-  [_ e-this {:keys [view-port-sizes]} system]
-  (let [[_ vheight] view-port-sizes
-
-        c-race (rj.e/get-c-on-e system e-this :race)
-        race (:race c-race)
-
-        c-class (rj.e/get-c-on-e system e-this :class)
-        class (:class c-class)
-
-        c-wallet (rj.e/get-c-on-e system e-this :wallet)
-        gold (:gold c-wallet)
-
-        c-experience (rj.e/get-c-on-e system e-this :experience)
-        experience (:experience c-experience)
-        level (:level c-experience)
-
-        c-position (rj.e/get-c-on-e system e-this :position)
-        x (:x c-position)
-        y (:y c-position)
-        z (:z c-position)
-
-        c-destructible (rj.e/get-c-on-e system e-this :destructible)
-        hp (:hp c-destructible)
-        def (:def c-destructible)
-        status (:status-effects c-destructible)
-
-        c-attacker (rj.e/get-c-on-e system e-this :attacker)
-        attack (:atk c-attacker)
-
-        renderer (new SpriteBatch)]
-    (.begin renderer)
-    (label! (label (str "Gold: [" gold "]"
-                        " - " "Position: [" x "," y "," z "]"
-                        " - " "HP: [" hp "]"
-                        " - " "Attack: [" attack "]"
-                        " - " "Defense: [" def "]"
-                        " - " "Race: [" race "]"
-                        " - " "Class: [" class "]"
-                        " - " "Experience: [" experience "]"
-                        " - " "Level: [" level "]"
-                        "\n cli: " @rj.u/cli
-                        " - " "Status: [" status "]")
-
-                   (color :green)
-                   :set-y (float (* (+ vheight
-                                       (dec (+ (:top rj.cfg/padding-sizes)
-                                               (:btm rj.cfg/padding-sizes))))
-                                    rj.cfg/block-size)))
-            :draw renderer 1.0)
-    (.end renderer)))
-
-(defn render-player
-  [_ e-this args system]
-  (render-player-stats _ e-this args system))
 

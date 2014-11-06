@@ -3,7 +3,7 @@
 
 ;; WORLD CONFIG
 (def block-size 36)
-(def padding-sizes {:top   2
+(def padding-sizes {:top   3
                     :btm   2
                     :left  1
                     :right 1})

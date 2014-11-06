@@ -11,6 +11,8 @@
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
 
+(defrecord Energy [energy])
+
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
@@ -82,9 +84,6 @@
 (defrecord Destructible [^Number hp
                          ^Number def
                          status-effects
-                         add-effect-fn
-                         remove-effect-fn
-                         apply-effect-fn
                          can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible
@@ -123,8 +122,9 @@
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
-            :destructible (type (->Destructible nil nil nil nil nil nil nil nil))
+            :destructible (type (->Destructible nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
+            :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))

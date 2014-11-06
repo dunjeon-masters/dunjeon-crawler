@@ -6,6 +6,7 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.config :as rj.cfg]))
@@ -49,7 +50,7 @@
                  [:attacker {:atk (:atk rj.cfg/lichen-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
-                             :effects [{:type :poison, :duration :2, :damage 2}]
+                             :effects []
                              :is-valid-target? (constantly true)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
