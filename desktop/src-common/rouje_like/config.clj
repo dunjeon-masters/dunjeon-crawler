@@ -33,6 +33,10 @@
 (def <valid-mob-targets>
   (union <empty> #{:player}))
 
+(def wall->stats
+  {:wall      {:hp 1}
+   :maze-wall {:hp 3}})
+
 ;; PLAYER CONFIG
 (def player-stats
   {:hp  100

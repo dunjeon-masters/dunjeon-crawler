@@ -23,23 +23,12 @@
 
 (defn dig
   [system e-this target-tile]
-  (let [target-top-entity (rj.u/tile->top-entity target-tile)] (cond
-    (= (:type target-top-entity) :wall)
-    (let [e-world (first (rj.e/all-e-with-c system :world))]
-      (-> system
-          (rj.u/update-in-world e-world
-                                [(:z target-tile) (:x target-tile) (:y target-tile)]
-                                (fn [entities]
-                                  (remove #(#{:wall} (:type %))
-                                          entities)))))
-
-    (= (:type target-top-entity) :maze-wall)
-    (let [c-attacker-this (rj.e/get-c-on-e system e-this :attacker)
-          damage 1
-          e-target (:id target-top-entity)
-          c-destr (rj.e/get-c-on-e system e-target :destructible)]
-      (rj.c/take-damage c-destr e-target damage e-this system))
-    :else system)))
+  (let [target-top-entity (rj.u/tile->top-entity target-tile)
+        c-attacker-this (rj.e/get-c-on-e system e-this :attacker)
+        damage 1
+        e-target (:id target-top-entity)
+        c-destr (rj.e/get-c-on-e system e-target :destructible)]
+    (rj.c/take-damage c-destr e-target damage e-this system)))
 
 (defn process-input-tick
   [system direction]

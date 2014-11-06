@@ -29,6 +29,11 @@
   [block-d1 block-d2 x y z]
   (let [wall-threshold-d1 5
         wall-bound-d2 2
+        top-entity (rj.u/tile->top-entity
+                     (first (filter (fn [tile]
+                                      (and (= x (:x tile)) (= y (:y tile))))
+                                    block-d1)))
+        this-id (:id top-entity)
         d1-block-freqs (block->freqs block-d1)
         d2-block-freqs (if (nil? block-d2)
                          {:wall (inc wall-bound-d2)}
@@ -45,7 +50,9 @@
                [:entities] (fn [entities]
                              (if (= result :wall)
                                (conj entities
-                                     (rj.c/map->Entity {:id   nil
+                                     (rj.c/map->Entity {:id   (if this-id
+                                                                this-id
+                                                                (br.e/create-entity))
                                                         :type :wall}))
                                entities)))))
 
@@ -125,7 +132,7 @@
                 (range (count level)))
    :z z})
 
-(defn maze:entity-ize-walls
+(defn entity-ize-walls
   [system z]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
@@ -133,16 +140,18 @@
         level (nth levels z)]
     (reduce (fn [system tile]
               (let [entities (:entities tile)
-                    maze-wall (filter #(= :maze-wall (:type %)) entities)]
-                (if (seq maze-wall)
-                  (let [e-maze-wall (:id (first maze-wall))]
+                    wall (filter #(rj.cfg/<walls> (:type %)) entities)]
+                (if (seq wall)
+                  (let [wall (first wall)
+                        wall-type (:type wall)
+                        e-wall (:id wall)]
                     (rj.e/system<<components
-                      system e-maze-wall
+                      system e-wall
                       [[:position {:x (:x tile)
                                    :y (:y tile)
                                    :z z
-                                   :type :maze-wall}]
-                       [:destructible {:hp 2
+                                   :type wall-type}]
+                       [:destructible {:hp (:hp (rj.cfg/wall->stats wall-type))
                                        :def 0
                                        :take-damage-fn rj.d/take-damage}]]))
                   system)))
@@ -158,9 +167,9 @@
 (defn init-entities
   [system z]
   (-> system
-      ;; If maze-wall, add an entity to it
+      ;; If wall, add an entity to it
       (as-> system
-        (maze:entity-ize-walls system z))
+        (entity-ize-walls system z))
       ;; Add Items: Gold, Torches...
       (as-> system
         (do (println "core::add-gold: " (not (nil? system))) system)
