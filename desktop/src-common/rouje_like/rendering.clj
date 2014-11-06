@@ -74,6 +74,7 @@
         c-destructible (rj.e/get-c-on-e system e-this :destructible)
         hp (:hp c-destructible)
         def (:def c-destructible)
+        status-effects (:status-effects c-destructible)
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
         attack (:atk c-attacker)
@@ -89,7 +90,8 @@
                         " - " "Class: [" class "]"
                         " - " "Experience: [" experience "]"
                         " - " "Level: [" level "]"
-                        "\n cli: " @rj.u/cli)
+                        "\n cli: " @rj.u/cli
+                        " - " "Status: " status-effects)
 
                    (color :green)
                    :set-y (float (* (+ vheight
