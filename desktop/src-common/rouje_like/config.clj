@@ -77,15 +77,3 @@
    :def 1
    :atk 3
    :exp 1})
-
-(def weapon-adjectives '[quick giant great tiny dull dented nil])
-
-(def weapons '[sword mace axe flail dagger])
-
-(def weapon-adverbs '[bloodletting pain poison paralysis power death nil])
-
-(defn generate-random-weapon []
-  (let [adj (rand-nth weapon-adjectives)
-        wpn (rand-nth weapons)
-        adv (rand-nth weapon-adverbs)]
-    [adj wpn 'of adv]))
