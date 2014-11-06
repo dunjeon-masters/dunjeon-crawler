@@ -2,7 +2,8 @@
   (:require [rouje-like.utils :as rj.u]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]
-            [rouje-like.destructible :as rj.d]))
+            [rouje-like.destructible :as rj.d]
+            [rouje-like.weapons :as rj.wpn]))
 
 (defn can-attack?
   [c-this _ e-target system]
@@ -14,7 +15,8 @@
 (defn attack
   [c-this e-this e-target system]
   (let [damage (:atk c-this)
+        wpn-atk (:atk (rj.wpn/weapon-stats (:weapon (rj.e/get-c-on-e system e-this :weapon))))
 
         c-destr (rj.e/get-c-on-e system e-target :destructible)]
-    (rj.c/take-damage c-destr e-target damage e-this system)))
+    (rj.c/take-damage c-destr e-target (+ damage (or wpn-atk 0)) e-this system)))
 
