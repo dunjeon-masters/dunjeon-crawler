@@ -75,6 +75,7 @@
         hp (:hp c-destructible)
         def (:def c-destructible)
         status-effects (:status-effects c-destructible)
+        max-hp (:max-hp c-destructible)
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
         attack (:atk c-attacker)
@@ -83,20 +84,20 @@
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
                         " - " "Position: [" x "," y "," z "]"
-                        " - " "HP: [" hp "]"
+                        " - " "HP: [" hp "/" max-hp "]"
                         " - " "Attack: [" attack "]"
                         " - " "Defense: [" def "]"
                         " - " "Race: [" race "]"
                         " - " "Class: [" class "]"
                         " - " "Experience: [" experience "]"
-                        " - " "Level: [" level "]"
-                        "\n cli: " @rj.u/cli
+                        "\n - " "Level: [" level "]"
+                        " cli: " @rj.u/cli
                         " - " "Status: " status-effects)
 
                    (color :green)
                    :set-y (float (* (+ vheight
-                                       (dec (+ (:top rj.cfg/padding-sizes)
-                                               (:btm rj.cfg/padding-sizes))))
+                                       (- (+ (:top rj.cfg/padding-sizes)
+                                               (:btm rj.cfg/padding-sizes)) 2))
                                     rj.cfg/block-size)))
             :draw renderer 1.0)
     (.end renderer)))

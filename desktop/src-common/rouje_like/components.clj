@@ -80,11 +80,9 @@
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [^Number hp
+                         ^Number max-hp
                          ^Number def
                          status-effects
-                         add-effect-fn
-                         remove-effect-fn
-                         apply-effect-fn
                          can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible
@@ -123,7 +121,7 @@
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
-            :destructible (type (->Destructible nil nil nil nil nil nil nil nil))
+            :destructible (type (->Destructible nil nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
             :entity       (type (->Entity nil nil))
             :experience   (type (->Experience nil nil nil))

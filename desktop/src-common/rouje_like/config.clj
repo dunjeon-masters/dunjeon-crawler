@@ -32,7 +32,7 @@
 
 ;; PLAYER CONFIG
 (def player-stats
-  {:hp  100
+  {:max-hp 100
    :atk 4
    :def 1})
 
@@ -40,15 +40,15 @@
                    :warrior {}
                    :mage    {}})
 
-(def race->stats {:human {:hp 10  :atk 1}
-                  :orc   {:hp 20  :atk 2}
-                  :elf   {:hp -5  :atk 0}})
+(def race->stats {:human {:max-hp 10  :atk 1}
+                  :orc   {:max-hp 20  :atk 2}
+                  :elf   {:max-hp -5  :atk 0}})
 
-(def stat->comp {:hp :destructible
+(def stat->comp {:max-hp :destructible
                  :atk :attacker
                  :def :destructible})
 
-(def stat->pointinc {:hp 5
+(def stat->pointinc {:max-hp 5
                      :atk 1
                      :def 1})
 

@@ -56,13 +56,22 @@
                                        (partial + (:value (rj.e/get-c-on-e system e-this :gold))))))
               (remove-item system [z x y])
               (broadcast-pickup system))
-      :health-potion (as-> system system
-                           (rj.e/upd-c system e-by :destructible
+      :health-potion (let [c-destructible (rj.e/get-c-on-e system e-by :destructible)
+                           max-hp (:max-hp c-destructible)
+                           hp (:hp c-destructible)
+                           hp-potion-val (:health rouje-like.config/potion-stats)]
+                       (as-> system system
+                           (if (> max-hp (+ hp hp-potion-val))
+                             (rj.e/upd-c system e-by :destructible
                                  (fn [c-destructible]
                                    (update-in c-destructible [:hp]
                                               (partial + (:health rj.cfg/potion-stats)))))
+                             (rj.e/upd-c system e-by :destructible
+                                         (fn [c-destructible]
+                                           (update-in c-destructible [:hp]
+                                                      (constantly max-hp)))))
                            (remove-item system [z x y])
-                           (broadcast-pickup system))
+                           (broadcast-pickup system)))
       system)))
 
 
