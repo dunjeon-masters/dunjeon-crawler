@@ -211,9 +211,16 @@
             :let [tile (get-in levels [(:z c-player-pos) x y])]]
       (when (or show-world?
                 (rj.u/can-see? world sight player-pos [x y]))
-        (let [texture-entity (-> (rj.u/tile->top-entity tile)
+        (let [top-entity (rj.u/tile->top-entity tile)
+              texture-entity (-> top-entity
                                  (:type) (type->texture))]
-          (let [color-values (:color texture-entity)]
+          (let [color-values (:color texture-entity)
+                color-values (update-in color-values [:a]
+                                        (fn [alpha]
+                                          ;apply an alg to grey out tile
+                                          ;as the entity is damaged
+                                          ;use top-entity & its c-destr
+                                          alpha))]
             (.setColor renderer
                        (Color. (float (/ (:r color-values) 255))
                                (float (/ (:g color-values) 255))

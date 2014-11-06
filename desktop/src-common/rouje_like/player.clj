@@ -78,7 +78,8 @@
               this-pos [(:z c-position) (:x c-position) (:y c-position)]
               this-tile (get-in levels this-pos)
 
-              ;;TODO: There might be multiple items & user might want to choose to not pickup
+              ;;TODO: There might be multiple items & user might want to choose
+              ;;to not pickup
               item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
                                   (:entities this-tile)))]
           (if item
@@ -122,7 +123,8 @@
                  :move-fn      rj.m/move}]
        [:digger {:can-dig?-fn can-dig?
                  :dig-fn      dig}]
-       [:attacker {:atk              (+ (:atk rj.cfg/player-stats) (:atk (rj.cfg/race->stats player-race)))
+       [:attacker {:atk              (+ (:atk rj.cfg/player-stats)
+                                        (:atk (rj.cfg/race->stats player-race)))
                    :status-effects   [{:type :burn :duration 3
                                        :value 1
                                        :apply-fn rj.stef/apply-poison
@@ -138,7 +140,8 @@
                        :torch-multiplier   init-sight-torch-multiplier}]
        [:renderable {:render-fn rj.r/render-player
                      :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
-       [:destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
+       [:destructible {:hp      (+ (:hp rj.cfg/player-stats)
+                                   (:hp (rj.cfg/race->stats player-race)))
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage
