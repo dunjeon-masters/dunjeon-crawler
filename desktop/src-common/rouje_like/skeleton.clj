@@ -55,7 +55,7 @@
                              :attack-fn        rj.atk/attack
                              :status-effects   [{:type :poison, :duration 3
                                                  :value (inc (rand-int 2))
-                                                 :apply-fn rj.stef/apply-burn
+                                                 :apply-fn rj.stef/apply-poison
                                                  :e-from e-skeleton}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp             (:hp  rj.cfg/skeleton-stats)
