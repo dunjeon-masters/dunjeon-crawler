@@ -7,8 +7,8 @@
                     :left  1
                     :right 1})
 (def view-port-sizes [20 20])
-(def world-sizes {:width  60
-                  :height 60})
+(def world-sizes {:width  30
+                  :height 30})
 
 ;; PLAYER CONFIG
 (def player-stats
@@ -93,3 +93,15 @@
    :def 3
    :atk 4
    :exp 5})
+
+(def giant_amoeba-stats
+  {:hp 4
+   :def 1
+   :atk 2
+   :exp 0})
+
+(def large_amoeba-stats
+  {:hp 2
+   :def 1
+   :atk 1
+   :exp 2})

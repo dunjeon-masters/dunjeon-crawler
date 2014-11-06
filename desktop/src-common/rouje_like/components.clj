@@ -20,6 +20,8 @@
                        level
                        level-up-fn])
 
+(defrecord Giant_amoeba [])
+
 (defrecord Gold [value])
 
 (defrecord Item [pickup-fn])
@@ -30,6 +32,8 @@
 
 (defrecord Lichen [grow-chance%
                    max-blob-size])
+
+(defrecord Large_amoeba [])
 
 (defrecord Mimic [])
 
@@ -137,8 +141,10 @@
             :entity       (type (->Entity nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
+            :giant_amoeba (type (->Giant_amoeba))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
+            :large_amoeba (type (->Large_amoeba))
             :lichen       (type (->Lichen nil nil))
             :mobile       (type (->Mobile nil nil))
             :mimic        (type (->Mimic))

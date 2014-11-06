@@ -1,4 +1,4 @@
-(ns rouje-like.mimic
+(ns rouje-like.giant_amoeba
   (:require [brute.entity :as br.e]
 
             [rouje-like.entity-wrapper :as rj.e]
@@ -12,7 +12,7 @@
 
 (declare process-input-tick)
 
-(defn add-mimic
+(defn add-giant_amoeba
   ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
@@ -24,56 +24,40 @@
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
        (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
-         (add-mimic system target-tile)
+         (add-giant_amoeba system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-mimic (br.e/create-entity)
+         e-giant_amoeba (br.e/create-entity)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-mimic
-                                                               :type :hidden-mimic})))))]
+                                            (rj.c/map->Entity {:id   e-giant_amoeba
+                                                               :type :giant_amoeba})))))]
      {:system (rj.e/system<<components
-                system e-mimic
-                [[:mimic {}]
+                system e-giant_amoeba
+                [[:giant_amoeba {}]
                  [:position {:x    (:x target-tile)
                              :y    (:y target-tile)
                              :z    (:z target-tile)
-                             :type :hidden-mimic}]
+                             :type :giant_amoeba}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
-                 [:sight {:distance 4}]
-                 [:attacker {:atk              (:atk rj.cfg/mimic-stats)
+                 [:sight {:distance 2}]
+                 [:attacker {:atk              (:atk rj.cfg/giant_amoeba-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/mimic-stats)
-                                 :def        (:def rj.cfg/mimic-stats)
+                 [:destructible {:hp         (:hp  rj.cfg/giant_amoeba-stats)
+                                 :def        (:def rj.cfg/giant_amoeba-stats)
                                  :can-retaliate? false
-                                 :take-damage-fn (fn [c-this e-this damage e-from system]
-                                                   (as-> (rj.d/take-damage c-this e-this damage e-from system) system
-                                                       (if (rj.e/get-c-on-e system e-this :mimic)
-                                                         (as-> (rj.e/upd-c system e-this :position
-                                                                     (fn [c-position]
-                                                                       (assoc c-position :type :mimic))) system
-                                                               (let [_ (println "updating mimic")
-                                                                     c-position (rj.e/get-c-on-e system e-this :position)]
-                                                                 (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
-                                                                                       (fn [entities]
-                                                                                         (vec
-                                                                                           (conj (remove
-                                                                                                   #(#{e-this} (:id %))
-                                                                                                   entities)
-                                                                                                 (rj.c/map->Entity {:id e-this
-                                                                                                                    :type :mimic})))))))
-                                                         system)))}]
-                 [:killable {:experience (:exp rj.cfg/mimic-stats)}]
+                                 :take-damage-fn rj.d/take-damage}]
+                 [:killable {:experience (:exp rj.cfg/giant_amoeba-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the mimic")}]])
+                 [:broadcaster {:msg-fn (constantly "the giant_amoeba")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -141,10 +125,10 @@
                         (rand-nth (conj neighbor-tiles nil))
                         nil))
         e-target (:id (rj.u/tile->top-entity target-tile))]
-    (if (and  (= :mimic (:type c-position)) (not (nil? target-tile)))
+    (if (not (nil? target-tile))
       (cond
         (and (< (rand-int 100) 80)
-            (can-move? c-mobile e-this target-tile system))
+             (can-move? c-mobile e-this target-tile system))
         (move c-mobile e-this target-tile system)
 
         (can-attack? c-attacker e-this e-target system)

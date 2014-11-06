@@ -17,6 +17,8 @@
             [rouje-like.lichen :as rj.lc]
             [rouje-like.mimic :as rj.mi]
             [rouje-like.bat :as rj.bt]
+            [rouje-like.giant_amoeba :as rj.ga]
+            [rouje-like.large_amoeba :as rj.la]
             [rouje-like.drake :as rj.dr]
             [rouje-like.necromancer :as rj.ne]
             [rouje-like.skeleton :as rj.sk]
@@ -89,14 +91,26 @@
 (def ^:private init-gold% 5)
 (def ^:private init-lichen% 1)
 (def ^:private init-bat% 1)
-(def ^:private init-skeleton% 1)
-(def ^:private init-snake% 1)
-(def ^:private init-troll% 1)
-(def ^:private init-mimic% 1)
-(def ^:private init-spider% 1)
-(def ^:private init-slime% 1)
-(def ^:private init-drake% 1)
-(def ^:private init-necro% 1)
+(def ^:private init-skeleton% 0.1)
+(def ^:private init-snake% 0.3)
+(def ^:private init-troll% 0.1)
+(def ^:private init-mimic% 0.1)
+(def ^:private init-spider% 0.5)
+(def ^:private init-slime% 0.1)
+(def ^:private init-drake% 0.01)
+(def ^:private init-necro% 0.1)
+(def ^:private init-giant_amoeba% 0.1)
+
+;; Starting floor for certain monsters to spawn on
+(def ^:private init-skeleton-floor 2)
+(def ^:private init-snake-floor 1)
+(def ^:private init-troll-floor 4)
+(def ^:private init-mimic-floor 5)
+(def ^:private init-spider-floor 1)
+(def ^:private init-slime-floor 3)
+(def ^:private init-drake-floor 7)
+(def ^:private init-necro-floor 6)
+(def ^:private init-giant_amoeba-floor 5)
 
 (defn init-entities
   [system z]
@@ -135,7 +149,7 @@
       (as-> system
         (do (println "core::add-skeleton " (not (nil? system))) system)
         (nth (iterate rj.sk/add-skeleton {:system system :z z})
-             (* (/ init-skeleton% 100)
+             (* (max 0 (min 0.05 (/ (+ init-skeleton% (* 0.2 (- z init-skeleton-floor))) 100)))
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
 
@@ -143,7 +157,7 @@
       (as-> system
             (do (println "core::add-snake " (not (nil? system))) system)
             (nth (iterate rj.snk/add-snake {:system system :z z})
-                 (* (/ init-snake% 100)
+                 (* (max 0 (min 0.05 (/ (+ init-snake% (* 0.2 (- z init-snake-floor))) 100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
@@ -151,7 +165,7 @@
       (as-> system
             (do (println "core::add-troll " (not (nil? system))) system)
             (nth (iterate rj.tr/add-troll {:system system :z z})
-                 (* (/ init-troll% 100)
+                 (* (max 0 (min 0.05 (/ (+ init-troll% (* 0.2 (- z init-troll-floor))) 100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
@@ -159,7 +173,7 @@
       (as-> system
             (do (println "core::add-mimic " (not (nil? system))) system)
             (nth (iterate rj.mi/add-mimic {:system system :z z})
-                 (* (/ init-mimic% 100)
+                 (* (max 0 (min 0.05 (/ (+ init-mimic% (* 0.2 (- z init-mimic-floor))) 100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
@@ -167,7 +181,7 @@
       (as-> system
             (do (println "core::add-spider " (not (nil? system))) system)
             (nth (iterate rj.sp/add-spider {:system system :z z})
-                 (* (/ init-spider% 100)
+                 (* (max 0 (min 0.05 (/ (+ init-spider% (* 0.2 (- z init-spider-floor))) 100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
@@ -175,7 +189,7 @@
       (as-> system
             (do (println "core::add-slime " (not (nil? system))) system)
             (nth (iterate rj.sl/add-slime {:system system :z z})
-                 (* (/ init-slime% 100)
+                 (* (max 0 (min 0.05 (/ (+ init-slime% (* 0.2 (- z init-slime-floor))) 100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
@@ -183,7 +197,7 @@
       (as-> system
             (do (println "core::add-drake " (not (nil? system))) system)
             (nth (iterate rj.dr/add-drake {:system system :z z})
-                 (* (/ init-drake% 100)
+                 (* (max 0 (min 0.05 (/ (+ init-drake% (* 0.2 (- z init-drake-floor))) 100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
@@ -191,9 +205,20 @@
       (as-> system
             (do (println "core::add-necro " (not (nil? system))) system)
             (nth (iterate rj.ne/add-necro {:system system :z z})
-                 (* (/ init-necro% 100)
+                 (* (max 0 (min 0.05 (/ (+ init-necro% (* 0.2 (- z init-necro-floor))) 100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
+
+      ;; Spawn Giant Amoebas
+      (as-> system
+            (do (println "core::add-giant_amoeba " (not (nil? system))) system)
+            (nth (iterate rj.ga/add-giant_amoeba {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ init-giant_amoeba% (* 0.2 (- z init-giant_amoeba-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+
+      ;; Spawn Large Amoebas
+      ;; I don't THINK we'd want anything here, considering how Large Amoeba only spawn from dead Giant Amoeba
 
       ;; Add portal
       (as-> system
@@ -309,6 +334,10 @@
               :width 12 :height 12
               :color {:r 255 :g 241 :b 36 :a 255}
               :tile-sheet "grim_12x12.png"}
+   :hidden-mimic {:x 1 :y 9
+                  :width 12 :height 12
+                  :color {:r 128 :g 255 :b 1 :a 255}
+                  :tile-sheet "grim_12x12.png"}
    :spider   {:x 14 :y 9
               :width 16 :height 16
               :color {:r 183 :g 21 :b 3 :a 255}
@@ -324,7 +353,15 @@
    :necromancer   {:x 10 :y 14
              :width 12 :height 12
              :color {:r 116 :g 84 :b 141 :a 255}
-             :tile-sheet "grim_12x12.png"}})
+             :tile-sheet "grim_12x12.png"}
+   :giant_amoeba  {:x 7 :y 12
+                   :width 16 :height 16
+                   :color {:r 111 :g 246 :b 255 :a 125}
+                   :tile-sheet "DarkondDigsDeeper_16x16.png"}
+   :large_amoeba  {:x 7 :y 12
+                   :width 16 :height 16
+                   :color {:r 175 :g 251 :b 255 :a 125}
+                   :tile-sheet "DarkondDigsDeeper_16x16.png"}})
 
 (def ^:private type->texture
   (memoize
