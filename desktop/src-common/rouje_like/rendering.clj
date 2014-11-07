@@ -14,6 +14,7 @@
 
             [rouje-like.components :refer [render]]
             [rouje-like.utils :as rj.u]
+            [rouje-like.weapons :as rj.wpn]
             [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper     :as rj.e]))
 
@@ -77,7 +78,13 @@
         status-effects (:status-effects c-destructible)
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
-        attack (:atk c-attacker)
+        c-weapon (rj.e/get-c-on-e system e-this :weapon)
+        weapon (:weapon c-weapon)
+        weapon-atk (if weapon
+                     (:atk (rj.wpn/weapon-stats weapon))
+                     0)
+        attack (+ (:atk c-attacker)
+                  weapon-atk)
 
         c-energy (rj.e/get-c-on-e system e-this :energy)
         energy (:energy c-energy)
@@ -94,7 +101,7 @@
                         "\nExperience: [" experience "]"
                         " -  Level: [" level "]"
                         " -  cli: " @rj.u/cli
-                        " - " "Status: " status-effects
+                        " -  Status: " status-effects
                         "\nEnergy: [" energy "]")
 
                    (color :green)
