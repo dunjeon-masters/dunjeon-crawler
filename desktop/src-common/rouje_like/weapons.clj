@@ -19,17 +19,16 @@
 (defn generate-random-weapon []
   "Generate a random weapon consisting of a weapon quality, a weapon type,
    and a weapon effect."
-  (let [adj (rand-nth weapon-qualities)
+  (let [quality (rand-nth weapon-qualities)
         wpn (rand-nth weapons)
-        adv (rand-nth weapon-effects)]
-    [adj wpn adv]))
+        effect (rand-nth weapon-effects)]
+    [quality wpn effect]))
 
 (defn weapon-stats [weapon]
   "Return a map of the stats of WEAPON or NIL."
   (and weapon
-       (let [adj (nth weapon 0)
-             wpn (nth weapon 1)
-             adv (nth weapon 2)]
+       (let [quality (nth weapon 0)
+             wpn (nth weapon 1)]
          {:atk (+ (or (:atk (:stats adj)) 0)
                   (:atk (:stats wpn)))})))
 
