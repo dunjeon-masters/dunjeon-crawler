@@ -37,7 +37,7 @@
   (and weapon
        (let [quality (nth weapon 0)
              wpn (nth weapon 1)]
-         {:atk (+ (or (:atk (:stats adj)) 0)
+         {:atk (+ (or (:atk (:stats quality)) 0)
                   (:atk (:stats wpn)))})))
 
 (defn weapon-name [weapon]
