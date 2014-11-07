@@ -3,6 +3,7 @@
             [rouje-like.utils :as rj.u]
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
+            [rouje-like.weapons :as rj.wpn]
             [rouje-like.config :as rj.cfg]))
 
 (defn pickup-item
@@ -57,9 +58,15 @@
               (remove-item system [z x y])
               (broadcast-pickup system))
 
+      :weapon (as-> system system
+                    (rj.e/upd-c system e-by :weapon
+                                (fn [c-weapon]
+                                  (assoc-in c-weapon [:weapon]
+                                            (:weapon (rj.e/get-c-on-e system e-this :weapon)))))
+                    (remove-item system [z x y])
+                    (broadcast-pickup system))
+
       system)))
-
-
 
 (defn ^:private item>>world
   [system is-valid-tile? z item>>entities]
@@ -132,3 +139,24 @@
                                    (str value " gold")))}]])
      :z z}))
 
+(defn add-weapon
+  [{:keys [system z]}]
+  (let [e-weapon (br.e/create-entity)
+
+        is-valid-tile? (fn [world [x y]]
+                         (only-floor? (get-in world [x y])))
+
+        weapon>>entities (fn [entities]
+                           (item>>entities entities e-weapon :weapon))
+
+        system (item>>world system is-valid-tile? z
+                             weapon>>entities)]
+    {:system (rj.e/system<<components
+              system e-weapon
+              [[:item {:pickup-fn pickup-item}]
+               [:weapon {:weapon (rj.wpn/generate-random-weapon)}]
+               [:broadcaster {:msg-fn
+                              (fn [system e-this]
+                                (let [name (rj.wpn/weapon-name (:weapon (rj.e/get-c-on-e system e-this :weapon)))]
+                                  (str "a " name)))}]])
+     :z z}))
