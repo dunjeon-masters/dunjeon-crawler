@@ -41,7 +41,7 @@
                   (:atk (:stats wpn)))})))
 
 (defn weapon-name [weapon]
-  "Return a vector containing the name of WEAPON."
-  (and weapon (map :name weapon)))
-      
-
+  "Return a string containing the name of WEAPON."
+  (and weapon (reduce (fn [sym1 sym2]
+                        (str (name sym1) " " (name sym2)))
+                      (map :name weapon))))
