@@ -19,7 +19,7 @@
   #{:wall :maze-wall})
 
 (def <items>
-  #{:torch :gold})
+  #{:torch :gold :weapon})
 
 (def <empty>
   (union <floors> <items>))
