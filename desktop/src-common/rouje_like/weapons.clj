@@ -5,8 +5,7 @@
                         {:name :great :stats {:atk 2}}
                         {:name :tiny :stats {:atk 1}}
                         {:name :dull :stats {:atk -1}}
-                        {:name :dented :stats {:atk -2}}
-                        nil])
+                        {:name :dented :stats {:atk -2}}])
 
 (def weapons [{:name :sword :stats {:atk 1}}
               {:name :mace :stats {:atk 1}}
