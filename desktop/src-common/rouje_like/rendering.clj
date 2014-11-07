@@ -155,7 +155,11 @@
      :portal   {:x 4 :y 9
                  :width 12 :height 12
                  :color {:r 102 :g 0 :b 102 :a 255}
-                 :tile-sheet grim-tile-sheet}
+                :tile-sheet grim-tile-sheet}
+     :weapon   {:x 2 :y 9
+                 :width 12 :height 12
+                 :color {:r 255 :g 255 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
      :bat      {:x 14 :y 5
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 128}
