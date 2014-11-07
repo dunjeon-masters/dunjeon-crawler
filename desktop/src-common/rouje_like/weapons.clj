@@ -14,7 +14,13 @@
               {:name :flail :stats {:atk 1}}
               {:name :dagger :stats {:atk 1}}])
 
-(def weapon-effects '[bloodletting pain poison paralysis power death nil])
+(def weapon-effects [{:name :bloodletting}
+                     {:name :pain}
+                     {:name :poison}
+                     {:name :paralysis}
+                     {:name :power}
+                     {:name :death}
+                     nil])
 
 (defn generate-random-weapon []
   "Generate a random weapon consisting of a weapon quality, a weapon type,
