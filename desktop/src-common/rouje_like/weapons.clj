@@ -25,16 +25,16 @@
     [adj wpn adv]))
 
 (defn weapon-stats [weapon]
-  "Return a map of the stats of WEAPON."
-  (if weapon
-    (let [adj (nth weapon 0)
-          wpn (nth weapon 1)
-          adv (nth weapon 2)]
-      {:atk (+ (or (:atk (:stats adj)) 0)
-               (:atk (:stats wpn)))})
-    nil))
+  "Return a map of the stats of WEAPON or NIL."
+  (and weapon
+       (let [adj (nth weapon 0)
+             wpn (nth weapon 1)
+             adv (nth weapon 2)]
+         {:atk (+ (or (:atk (:stats adj)) 0)
+                  (:atk (:stats wpn)))})))
 
 (defn weapon-name [weapon]
   "Return a vector containing the name of WEAPON."
-  (or (and weapon (map :name weapon))
-      nil))
+  (and weapon (map :name weapon)))
+      
+
