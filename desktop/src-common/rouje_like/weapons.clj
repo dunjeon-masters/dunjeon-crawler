@@ -1,6 +1,6 @@
 (ns rouje-like.weapons)
 
-(def weapon-adjectives [{:name :quick :stats {:atk 1}}
+(def weapon-qualities [{:name :quick :stats {:atk 1}}
                         {:name :giant :stats {:atk 2}}
                         {:name :great :stats {:atk 2}}
                         {:name :tiny :stats {:atk 1}}
@@ -14,14 +14,14 @@
               {:name :flail :stats {:atk 1}}
               {:name :dagger :stats {:atk 1}}])
 
-(def weapon-adverbs '[bloodletting pain poison paralysis power death nil])
+(def weapon-effects '[bloodletting pain poison paralysis power death nil])
 
 (defn generate-random-weapon []
-  "Generate a random weapon consisting of a weapon adjective, a weapon type
-   and a weapon adverb."
-  (let [adj (rand-nth weapon-adjectives)
+  "Generate a random weapon consisting of a weapon quality, a weapon type,
+   and a weapon effect."
+  (let [adj (rand-nth weapon-qualities)
         wpn (rand-nth weapons)
-        adv (rand-nth weapon-adverbs)]
+        adv (rand-nth weapon-effects)]
     [adj wpn adv]))
 
 (defn weapon-stats [weapon]
