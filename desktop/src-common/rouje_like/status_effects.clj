@@ -3,6 +3,19 @@
             [rouje-like.messaging :as rj.msg]
             [rouje-like.utils :as rj.u]))
 
+(defn apply-paralysis
+  [system e-this status]
+  (as-> system system
+    (rj.e/upd-c system e-this :energy
+                (fn [c-energy]
+                  (update-in c-energy [:energy] - (rand-nth [0 (:value status)]))))
+
+    (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+      (rj.msg/add-msg system :static
+                      (format "%s was paralyzed"
+                              ((:msg-fn c-broadcaster) system e-this)))
+      system)))
+
 (defn apply-burn
   [system e-this status]
   (let [e-from (:e-from status)

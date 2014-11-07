@@ -11,6 +11,8 @@
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
 
+(defrecord Energy [energy])
+
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
@@ -123,6 +125,7 @@
             :counter      (type (->Counter nil))
             :destructible (type (->Destructible nil nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
+            :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))

@@ -3,17 +3,20 @@
 
 ;; WORLD CONFIG
 (def block-size 36)
-(def padding-sizes {:top   2
+(def padding-sizes {:top   3
                     :btm   2
                     :left  1
                     :right 1})
 (def view-port-sizes [20 20])
-(def world-sizes {:width  20
-                  :height 20})
+(def world-sizes {:width  60
+                  :height 60})
 
 ;; TILE TYPES
 (def <floors>
   #{:dune :floor :forest-floor})
+
+(def <walls>
+  #{:wall :maze-wall})
 
 (def <items>
   #{:torch :gold :health-potion})
@@ -22,13 +25,17 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  #{:wall :lichen :tree})
+  #{:wall :lichen :tree :maze-wall})
 
 (def <valid-move-targets>
   (union <empty> #{:portal}))
 
 (def <valid-mob-targets>
   (union <empty> #{:player}))
+
+(def wall->stats
+  {:wall      {:hp 1}
+   :maze-wall {:hp 3}})
 
 ;; PLAYER CONFIG
 (def player-stats
@@ -62,7 +69,7 @@
 
 (def lichen-stats
   {:hp  4
-   :atk 1
+   :atk 0
    :def 1})
 
 (def skeleton-stats

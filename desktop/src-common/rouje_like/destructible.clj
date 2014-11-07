@@ -76,11 +76,10 @@
   (let [hp (:hp c-this)
 
         def (:def (rj.e/get-c-on-e system e-this :destructible))
-        damage (- damage def)
-        damage (if (pos? damage)
-                 damage
-                 1)
-        damage (rj.u/rand-rng 1 damage) ;rand[1,(dmg-def)]
+        damage (if (pos? (- damage def))
+                 (rj.u/rand-rng 1 (- damage def))
+                 (if (zero? damage)
+                   0 1))
 
         c-position (rj.e/get-c-on-e system e-this :position)
 

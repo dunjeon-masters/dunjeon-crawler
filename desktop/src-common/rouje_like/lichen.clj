@@ -6,8 +6,10 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.config :as rj.cfg]))
 
 (declare process-input-tick)
@@ -26,15 +28,20 @@
        (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
          (add-lichen system target-tile)
          (recur (get-rand-tile world))))))
+
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-lichen (br.e/create-entity)
          hp (:hp  rj.cfg/lichen-stats)
-         system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+
+         system (rj.u/update-in-world system e-world
+                                      [(:z target-tile) (:x target-tile) (:y target-tile)]
+
                                       (fn [entities]
                                         (vec (conj (remove #(#{:wall} (:type %)) entities)
                                                    (rj.c/map->Entity {:id   e-lichen
                                                                       :type :lichen})))))]
+
      {:system (rj.e/system<<components
                 system e-lichen
                 [[:lichen {:grow-chance% 4
@@ -51,7 +58,11 @@
                  [:attacker {:atk (:atk rj.cfg/lichen-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
-                             :effects [{:type :poison, :duration :2, :damage 2}]
+                             :status-effects [{:type :poison
+                                               :duration 2
+                                               :value 1
+                                               :e-from e-lichen
+                                               :apply-fn rj.stef/apply-poison}]
                              :is-valid-target? (constantly true)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]

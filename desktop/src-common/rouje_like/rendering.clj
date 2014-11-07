@@ -80,24 +80,30 @@
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
         attack (:atk c-attacker)
 
+        c-energy (rj.e/get-c-on-e system e-this :energy)
+        energy (:energy c-energy)
+
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
-                        " - " "Position: [" x "," y "," z "]"
-                        " - " "HP: [" hp "/" max-hp "]"
-                        " - " "Attack: [" attack "]"
-                        " - " "Defense: [" def "]"
-                        " - " "Race: [" race "]"
-                        " - " "Class: [" class "]"
-                        " - " "Experience: [" experience "]"
-                        "\n - " "Level: [" level "]"
-                        " cli: " @rj.u/cli
-                        " - " "Status: " status-effects)
+                        " -  Position: [" x "," y "," z "]"
+                        " -  HP: [" hp "]"
+                        " -  Attack: [" attack "/" max-hp "]"
+                        " -  Defense: [" def "]"
+                        " -  Race: [" race "]"
+                        " -  Class: [" class "]"
+                        "\nExperience: [" experience "]"
+                        " -  Level: [" level "]"
+                        " -  cli: " @rj.u/cli
+                        " - " "Status: " status-effects
+                        "\nEnergy: [" energy "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
                                        (- (+ (:top rj.cfg/padding-sizes)
-                                               (:btm rj.cfg/padding-sizes)) 2))
+                                             (:btm rj.cfg/padding-sizes))
+                                          2))
+
                                     rj.cfg/block-size)))
             :draw renderer 1.0)
     (.end renderer)))
@@ -118,6 +124,10 @@
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 128}
                 :tile-sheet grim-tile-sheet}
+     :maze-wall {:x 8 :y 5
+                 :width 12 :height 12
+                 :color {:r 255 :g 255 :b 255 :a 255}
+                 :tile-sheet grim-tile-sheet}
      :gold     {:x 1 :y 9
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 0 :a 255}
@@ -216,9 +226,16 @@
             :let [tile (get-in levels [(:z c-player-pos) x y])]]
       (when (or show-world?
                 (rj.u/can-see? world sight player-pos [x y]))
-        (let [texture-entity (-> (rj.u/tile->top-entity tile)
+        (let [top-entity (rj.u/tile->top-entity tile)
+              texture-entity (-> top-entity
                                  (:type) (type->texture))]
-          (let [color-values (:color texture-entity)]
+          (let [color-values (:color texture-entity)
+                color-values (update-in color-values [:a]
+                                        (fn [alpha]
+                                          ;apply an alg to grey out tile
+                                          ;as the entity is damaged
+                                          ;use top-entity & its c-destr
+                                          alpha))]
             (.setColor renderer
                        (Color. (float (/ (:r color-values) 255))
                                (float (/ (:g color-values) 255))

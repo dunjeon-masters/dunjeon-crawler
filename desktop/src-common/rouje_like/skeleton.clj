@@ -54,10 +54,11 @@
                  [:attacker {:atk              (:atk rj.cfg/skeleton-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
-                             :status-effects   [{:type :poison, :duration 3
-                                                 :value (inc (rand-int 2))
-                                                 :apply-fn rj.stef/apply-poison
-                                                 :e-from e-skeleton}]
+                             :status-effects   [{:type :paralysis
+                                                 :duration 2
+                                                 :value 1
+                                                 :e-from e-skeleton
+                                                 :apply-fn rj.stef/apply-paralysis}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         hp
                                  :max-hp     hp

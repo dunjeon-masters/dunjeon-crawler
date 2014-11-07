@@ -6,6 +6,7 @@
             [rouje-like.utils :as rj.u]
             [rouje-like.player :as rj.pl]
             [rouje-like.components :as rj.c :refer [tick]]
+            [rouje-like.messaging :as rj.msg]
             [clojure.string :as s]
             [brute.entity]))
 
@@ -27,40 +28,6 @@
               (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
                 (tick c-tickable entity system)))
             system entities)))
-
-;(defn inc-level
-;  [system]
-;  (let [e-player (first (rj.e/all-e-with-c system :player))
-;        c-mobile (rj.e/get-c-on-e system e-player :mobile)
-;        c-position (rj.e/get-c-on-e system e-player :position)
-;        z (:z c-position)
-;
-;        e-world (first (rj.e/all-e-with-c system :world))
-;        c-world (rj.e/get-c-on-e system e-world :world)
-;        levels (:levels c-world)
-;        target-tile (get-in levels [(inc z) (:x c-position) (:y c-position)]
-;                            nil)]
-;    (if target-tile
-;      (rj.c/move c-mobile e-player target-tile system)
-;      (as-> (rj.w/add-level system (inc z)) system
-;        (let [levels (:levels (rj.e/get-c-on-e system e-world :world))
-;              new-level (get-in levels [(inc z) (:x c-position) (:y c-position)])]
-;          (rj.c/move c-mobile e-player new-level system))))))
-
-;(defn dec-level
-;  [system]
-;  (let [e-player (first (rj.e/all-e-with-c system :player))
-;        c-mobile (rj.e/get-c-on-e system e-player :mobile)
-;        c-position (rj.e/get-c-on-e system e-player :position)
-;
-;        e-world (first (rj.e/all-e-with-c system :world))
-;        c-world (rj.e/get-c-on-e system e-world :world)
-;        levels (:levels c-world)
-;        target-tile (get-in levels [(dec (:z c-position)) (:x c-position) (:y c-position)]
-;                            nil)]
-;    (if target-tile
-;      (rj.c/move c-mobile e-player target-tile system)
-;      system)))
 
 ;Temporary, will eventually be used to execute cmdl actions
 (defn cmds->action
@@ -116,12 +83,6 @@
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))})
 
-;(play/key-code :right-bracket) inc-level
-;(play/key-code :space)         inc-level
-
-;(play/key-code :left-bracket)  dec-level
-;(play/key-code :shift-left)    dec-level
-
 (def keycode->direction
   {(play/key-code :W)          :up
    (play/key-code :dpad-up)    :up
@@ -150,12 +111,32 @@
       (if (not (nil? action))
         (action system)
 
-        (let [this (first (rj.e/all-e-with-c system :player))
+        (let [e-this (first (rj.e/all-e-with-c system :player))
+              c-energy (rj.e/get-c-on-e system e-this :energy)
+              energy (:energy c-energy)
               direction (keycode->direction keycode)]
           (if (not (nil? direction))
-            (-> system
-                (rj.pl/process-input-tick direction)
-                (tick-entities))
+            (as-> system system
+              (if (pos? energy)
+                (rj.pl/process-input-tick system direction)
+                (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+                  (rj.msg/add-msg system :static
+                                  (format "%s was paralyzed, and couldn't move this turn"
+                                          ((:msg-fn c-broadcaster) system e-this)))
+                  system))
+              (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
+                (tick-entities system)
+                system)
+              (let [energetic-entities (rj.e/all-e-with-c system :energy)]
+                (reduce (fn [system entity]
+                          (rj.e/upd-c system entity :energy
+                                      (fn [c-energy]
+                                        (update-in c-energy [:energy]
+                                                   (fn [energy]
+                                                     (if (< energy 1)
+                                                       (inc energy)
+                                                       energy))))))
+                        system energetic-entities)))
             system))))))
 
 (defn process-fling-input
@@ -170,3 +151,4 @@
                        (rj.pl/process-input-tick system :right)
                        (rj.pl/process-input-tick system :left))))
       (tick-entities)))
+
