@@ -25,7 +25,7 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  #{:wall :lichen :maze-wall})
+  (union <walls> #{:lichen}))
 
 (def <valid-move-targets>
   (union <empty> #{:portal}))
@@ -35,7 +35,7 @@
 
 (def wall->stats
   {:wall      {:hp 1}
-   :maze-wall {:hp 3}})
+   :maze-wall {:hp 100}})
 
 ;; PLAYER CONFIG
 (def player-stats
