@@ -140,13 +140,8 @@
                        :torch-multiplier   init-sight-torch-multiplier}]
        [:renderable {:render-fn rj.r/render-player
                      :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
-<<<<<<< HEAD
        [:destructible {:max-hp max-hp
                        :hp  max-hp
-=======
-       [:destructible {:hp      (+ (:hp rj.cfg/player-stats)
-                                   (:hp (rj.cfg/race->stats player-race)))
->>>>>>> origin/master
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage

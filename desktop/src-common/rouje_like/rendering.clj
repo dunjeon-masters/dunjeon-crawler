@@ -87,8 +87,8 @@
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
                         " -  Position: [" x "," y "," z "]"
-                        " -  HP: [" hp "]"
-                        " -  Attack: [" attack "/" max-hp "]"
+                        " -  HP: [" hp  "/" max-hp "]"
+                        " -  Attack: [" attack "]"
                         " -  Defense: [" def "]"
                         " -  Race: [" race "]"
                         " -  Class: [" class "]"
