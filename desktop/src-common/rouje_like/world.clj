@@ -194,14 +194,16 @@
                 (if (seq wall)
                   (let [wall (first wall)
                         wall-type (:type wall)
-                        e-wall (:id wall)]
+                        e-wall (:id wall)
+                        hp (:hp (rj.cfg/wall->stats wall-type))]
                     (rj.e/system<<components
                       system e-wall
                       [[:position {:x (:x tile)
                                    :y (:y tile)
                                    :z z
                                    :type wall-type}]
-                       [:destructible {:hp (:hp (rj.cfg/wall->stats wall-type))
+                       [:destructible {:hp hp
+                                       :max-hp hp
                                        :def 0
                                        :take-damage-fn rj.d/take-damage}]]))
                   system)))

@@ -13,7 +13,7 @@
             [clojure.math.numeric-tower :as math]
 
             [rouje-like.components :refer [render]]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper     :as rj.e]))
 
@@ -232,10 +232,11 @@
           (let [color-values (:color texture-entity)
                 color-values (update-in color-values [:a]
                                         (fn [alpha]
-                                          ;apply an alg to grey out tile
-                                          ;as the entity is damaged
-                                          ;use top-entity & its c-destr
-                                          alpha))]
+                                          (if-let [c-destr (rj.e/get-c-on-e system (:id top-entity) :destructible)]
+                                            (let [hp (:hp c-destr)
+                                                  max-hp (:max-hp c-destr)]
+                                              (max 75 (* (/ hp max-hp) alpha)))
+                                           alpha)))]
             (.setColor renderer
                        (Color. (float (/ (:r color-values) 255))
                                (float (/ (:g color-values) 255))
