@@ -264,8 +264,8 @@
           [x y :w])))))
 
 (defn ^:private generate-maze
-  [level]
-  (let [maze (growing-tree (gen-walls (count level) (count (first level))))]
+  [level [width height]]
+  (let [maze (growing-tree (gen-walls width height))]
     (reduce (fn [level cell]
               (if (= :f (cell 2))
                 (update-in level [(cell 0) (cell 1)]
@@ -326,7 +326,7 @@
                                                               (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                  :type :maze-wall})]})))))]
              ;; CREATE MAZE
-             (generate-maze level)))))
+             (generate-maze level [width height])))))
 
 (declare add-level)
 (defn init-world
