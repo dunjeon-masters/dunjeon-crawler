@@ -28,7 +28,9 @@
   (let [quality (rand-nth weapon-qualities)
         wpn (rand-nth weapons)
         effect (rand-nth weapon-effects)]
-    [quality wpn effect]))
+    (if effect
+      [quality wpn {:name :of} effect] ; lame fix
+      [quality wpn])))
 
 (defn weapon-stats [weapon]
   "Return a map of the stats of WEAPON or NIL."
