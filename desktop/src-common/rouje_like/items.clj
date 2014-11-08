@@ -76,10 +76,7 @@
                            (broadcast-pickup system)))
       
       :weapon (as-> system system
-                    (rj.e/upd-c system e-by :weapon
-                                (fn [c-weapon]
-                                  (assoc-in c-weapon [:weapon]
-                                            (:weapon (rj.e/get-c-on-e system e-this :weapon)))))
+                    (rj.wpn/switch-weapon system e-by (:weapon (rj.e/get-c-on-e system e-this :weapon)))
                     (remove-item system [z x y])
                     (broadcast-pickup system))
 
