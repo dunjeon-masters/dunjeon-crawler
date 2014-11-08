@@ -33,13 +33,18 @@
       [quality wpn {:name :of} effect] ; lame fix
       [quality wpn])))
 
+(defn reduce-stats [& rest]
+  "Takes maps of stats and reduces them to a single map with all stats
+   combined."
+  (reduce (fn [r stats]
+            (merge-with + r stats)) {} rest))
+
 (defn weapon-stats [weapon]
   "Return a map of the stats of WEAPON or NIL."
   (and weapon
        (let [quality (nth weapon 0)
              wpn (nth weapon 1)]
-         {:atk (+ (or (:atk (:stats quality)) 0)
-                  (:atk (:stats wpn)))})))
+         (reduce-stats (:stats quality) (:stats wpn)))))
 
 (defn weapon-name [weapon]
   "Return a string containing the name of WEAPON."
