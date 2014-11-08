@@ -80,13 +80,8 @@
         max-hp (:max-hp c-destructible)
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
-        c-weapon (rj.e/get-c-on-e system e-this :weapon)
-        weapon (:weapon c-weapon)
-        weapon-atk (if weapon
-                     (:atk (rj.wpn/weapon-stats weapon))
-                     0)
-        attack (+ (:atk c-attacker)
-                  weapon-atk)
+
+        attack (:atk c-attacker)
 
         c-energy (rj.e/get-c-on-e system e-this :energy)
         energy (:energy c-energy)
