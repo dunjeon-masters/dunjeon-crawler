@@ -15,8 +15,7 @@
 (defn attack
   [c-this e-this e-target system]
   (let [damage (:atk c-this)
-        wpn-atk (:atk (rj.wpn/weapon-stats (:weapon (rj.e/get-c-on-e system e-this :weapon))))
 
         c-destr (rj.e/get-c-on-e system e-target :destructible)]
-    (rj.c/take-damage c-destr e-target (+ damage (or wpn-atk 0)) e-this system)))
+    (rj.c/take-damage c-destr e-target damage e-this system)))
 
