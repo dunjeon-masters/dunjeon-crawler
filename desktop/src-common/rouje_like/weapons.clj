@@ -68,7 +68,7 @@
     system))
 
 (defn negate-stats [stats]
-  "Return a map of STATS w/ the stat values inverted."
+  "Return a map of STATS w/ the stat values negated."
   (if (not (empty? stats))
     (reduce (fn [r [stat val]] (assoc r stat (apply - val '()))) {} stats)
     nil))
