@@ -23,6 +23,8 @@
                      {:name :death}
                      nil])
 
+(def armor [{:name :breastplate :stats {:max-hp 3}}])
+
 (defn generate-random-weapon []
   "Generate a random weapon consisting of a weapon quality, a weapon type,
    and a weapon effect."
@@ -32,6 +34,9 @@
     (if effect
       [quality wpn {:name :of} effect] ; lame fix
       [quality wpn])))
+
+(defn generate-random-armor []
+  [(rand-nth armor)])
 
 (defn reduce-stats [& rest]
   "Takes maps of stats and reduces them to a single map with all stats
