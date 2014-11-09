@@ -86,6 +86,11 @@
   [block-d1 block-d2 x y z]
   (let [wall-threshold-d1 5
         wall-bound-d2 2
+        top-entity (rj.u/tile->top-entity
+                     (first (filter (fn [tile]
+                                      (and (= x (:x tile)) (= y (:y tile))))
+                                    block-d1)))
+        this-id (:id top-entity)
         d1-block-freqs (block->freqs block-d1)
         d2-block-freqs (if (nil? block-d2)
                          {:tree (inc wall-bound-d2)}
@@ -102,7 +107,9 @@
                [:entities] (fn [entities]
                              (if (= result :tree)
                                (conj entities
-                                     (rj.c/map->Entity {:id   nil
+                                     (rj.c/map->Entity {:id   (if this-id
+                                                                this-id
+                                                                (br.e/create-entity))
                                                         :type :tree}))
                                entities)))))
 
@@ -132,56 +139,6 @@
                 (range (count level)))
    :z z})
 
-(defn ^:private maze:get-smoothed-tile
-  [block x y z]
-  (let [wall-threshold 2
-        wall-bound     5
-        wall-birth 3
-        block-freqs (block->freqs block)
-        wall-count (get block-freqs :maze-wall 0)
-        top-entity (rj.u/tile->top-entity
-                      (first (filter (fn [tile]
-                                       (and (= x (:x tile)) (= y (:y tile))))
-                                     block)))
-        this-id (:id top-entity)
-        this-type (:type top-entity)
-        result (if (and (= this-type :maze-wall)
-                        (<= wall-count wall-bound)
-                        (>= wall-count wall-threshold))
-                 :maze-wall
-                 (if (and (= this-type :floor)
-                          (= wall-count wall-birth))
-                   :maze-wall
-                   :floor))]
-    (update-in (rj.c/map->Tile {:x x :y y :z z
-                                :entities [(rj.c/map->Entity {:id   nil
-                                                              :type :floor})]})
-               [:entities] (fn [entities]
-                             (if (= result :maze-wall)
-                               (conj entities
-                                     (rj.c/map->Entity {:id   (if this-id
-                                                                this-id
-                                                                (br.e/create-entity))
-                                                        :type :maze-wall}))
-                               entities)))))
-
-(defn ^:private maze:get-smoothed-col
-  [level [x z]]
-  (mapv (fn [y]
-          (maze:get-smoothed-tile
-            (rj.u/get-ring-around level [x y] 1)
-            x y z))
-        (range (count (first level)))))
-
-(defn ^:private maze:smooth-level
-  "cells survive from one generation to the next if they have at least one
-  and at most five neighbours, and if a cell has exactly three neighbours, it is born."
-  [{:keys [level z]}]
-  {:level (mapv (fn [x]
-                  (maze:get-smoothed-col level [x z]))
-                (range (count level)))
-   :z z})
-
 (defn entity-ize-walls
   [system z]
   (let [e-world (first (rj.e/all-e-with-c system :world))
@@ -205,7 +162,10 @@
                        [:destructible {:hp hp
                                        :max-hp hp
                                        :def 0
-                                       :take-damage-fn rj.d/take-damage}]]))
+                                       :take-damage-fn (if (= :maze-wall wall-type)
+                                                        (fn [c e _ f s]
+                                                          (rj.d/take-damage c e 0 f s))
+                                                        rj.d/take-damage)}]]))
                   system)))
             system (flatten level))))
 
@@ -217,7 +177,7 @@
 (def ^:private init-bat% 1)
 (def ^:private init-skeleton% 1)
 
-(defn init-entities
+(defn ^:private init-entities
   [system z]
   (-> system
       ;; If wall, add an entity to it
@@ -267,13 +227,136 @@
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))))
 
-(defn add-portal
+(defn ^:private add-portal
   [system z]
   ;; Add portal
   (as-> system system
     (do (println "core::add-portal " (not (nil? system))) system)
     (rj.p/add-portal {:system system :z z})
     (:system system)))
+
+(def ^:private maze:direction8->offset
+  {:left  [-1  0]
+   :right [ 1  0]
+   :up    [ 0 -1]
+   :down  [ 0  1]
+   :up-left    [-1 -1]
+   :up-right   [ 1 -1]
+   :down-left  [-1  1]
+   :down-right [ 1  1]})
+
+(def ^:private maze:direction4->offset
+  {:left  [-1 0]
+   :right [1  0]
+   :up    [0 -1]
+   :down  [0  1]})
+
+(defn ^:private maze:coords+offset
+  [[x y] [dx dy]]
+  [(+ x dx) (+ y dy)])
+
+(defn ^:private maze:get-neighbors-coords
+  [origin target]
+  (if origin
+    (let [y-eq? (= (origin 0) (target 0))]
+      (remove #(= (if y-eq? (origin 1) (origin 0))
+                  (if y-eq? (% 1) (% 0)))
+              (map maze:coords+offset
+                   (repeat target) (vals maze:direction8->offset))))
+    (map maze:coords+offset
+         (repeat target) (vals maze:direction4->offset))))
+
+(defn ^:private maze:get-neighbors-of-type
+  [level mark pos typ]
+  (let [neighbors (maze:get-neighbors-coords mark pos)
+        neighbors (map #(get-in level % nil)
+                       neighbors)
+        neighbors (filter identity neighbors)]
+    (filter #(= typ (% 2)) neighbors)))
+
+(defn ^:private maze:get-first-valid-neighbor
+  [level cells neighbors mark]
+  (let [neighbors (shuffle neighbors)]
+    (loop [candidate (first neighbors)
+           candidates (rest neighbors)]
+      (if candidate
+        (let [[x y t] candidate
+              candidate-pos [x y]
+              cand-neighbors (maze:get-neighbors-of-type level mark candidate-pos :w)
+              wall-count (count cand-neighbors)]
+          (if (= 5 wall-count)
+            candidate
+            (recur (first candidates)
+                   (rest candidates))))
+        nil))))
+
+(defn ^:private maze:floor-it
+  [tile]
+  (assoc tile 2 :f))
+
+(defn ^:private maze:floor-in-level
+  [level pos]
+  (update-in level pos
+             maze:floor-it))
+(defn ^:private maze:get-candidate
+  [cells alg perc]
+  (case alg
+    :rand  (rand-nth cells)
+    :first (first cells)
+    :last  (last cells)
+    :rand/first (if (< (rand) perc)
+                  (rand-nth cells)
+                  (first cells))
+    :rand/last  (if (< (rand) perc)
+                  (rand-nth cells)
+                  (last cells))
+    :first/last (if (< (rand) perc)
+                  (first cells)
+                  (last cells))
+    :else (first cells)))
+(defn ^:private maze:growing-tree
+  [level]
+  (let [init-tile (rand-nth (rand-nth level))
+        init-tile (maze:floor-it init-tile)
+        [x y t] init-tile]
+    (loop [cells [init-tile]
+           level (maze:floor-in-level level [x y])]
+      (if (seq cells)
+        (let [candidate (maze:get-candidate cells :first/last 0.5)
+              [x y t] candidate
+              candidate-pos [x y]
+              neighbors (maze:get-neighbors-of-type level nil candidate-pos :w)
+              valid-neighbor (maze:get-first-valid-neighbor level cells neighbors candidate)
+              [x y t] valid-neighbor
+              valid-neighbor-pos [x y]]
+          (if valid-neighbor
+            (recur (conj cells (maze:floor-it valid-neighbor))
+                   (maze:floor-in-level level valid-neighbor-pos))
+            (recur (remove #(= % candidate) cells)
+                   level)))
+        level))))
+
+(defn ^:private maze:gen-walls
+  [width height]
+  (vec
+    (for [x (range width)]
+      (vec
+        (for [y (range height)]
+          [x y :w])))))
+
+(defn ^:private generate-maze
+  [level [width height]]
+  (let [maze (maze:growing-tree (maze:gen-walls width height))]
+    (reduce (fn [level cell]
+              (if (= :f (cell 2))
+                (update-in level [(cell 0) (cell 1)]
+                           (fn [tile]
+                             (update-in tile [:entities]
+                                        (fn [entities]
+                                          (remove #(= :maze-wall (:type %))
+                                                  entities)))))
+                level))
+            level (map vec (partition 3 (flatten maze))))))
 
 (defn generate-random-level
   ([level-sizes z]
@@ -292,7 +375,7 @@
                                              [:entities] (fn [entities]
                                                            (if (< (rand-int 100) init-wall%)
                                                              (conj entities
-                                                                   (rj.c/map->Entity {:id   nil
+                                                                   (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                       :type :wall}))
                                                              entities)))))))]
              ;; SMOOTH-WORLD
@@ -312,6 +395,7 @@
                            (rj.c/map->Tile {:x x :y y :z z
                                             :entities [(rj.c/map->Entity {:id   nil
                                                                           :type :dune})]})))))
+
      :forest (let [level (vec
                          (map vec
                               (for [x (range width)]
@@ -320,40 +404,33 @@
                                                               :entities [(rj.c/map->Entity {:id   nil
                                                                                             :type :forest-floor})]})
                                              [:entities] (fn [entities]
-                                                           (if (< (rand-int 100) 45)
+                                                           (if (< (rand-int 100) init-wall%)
                                                              (conj entities
-                                                                   (rj.c/map->Entity {:id   nil
+                                                                   (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                       :type :tree}))
                                                              entities)))))))]
              ;; SMOOTH-WORLD
              (as-> level level
-                   (nth (iterate forest:smooth-level-v1 {:level level
-                                                  :z z})
-                        2)
-                   (:level level)
-                   (nth (iterate forest:smooth-level-v2 {:level level
-                                                  :z z})
-                        3)
-                   (:level level)))
+               (nth (iterate forest:smooth-level-v1 {:level level
+                                                     :z z})
+                    2)
+               (:level level)
+               (nth (iterate forest:smooth-level-v2 {:level level
+                                                     :z z})
+                    3)
+               (:level level)))
 
-     :maze (let [level (vec (map vec
-                                 (for [x (range width)]
-                                   (for [y (range height)]
-                                     (update-in (rj.c/map->Tile {:x x :y y :z z
-                                                              :entities [(rj.c/map->Entity {:id   nil
-                                                                                            :type :floor})]})
-                                             [:entities] (fn [entities]
-                                                           (if (< (rand-int 100) init-wall%)
-                                                             (conj entities
-                                                                   (rj.c/map->Entity {:id   (br.e/create-entity)
-                                                                                      :type :maze-wall}))
-                                                             entities)))))))]
+     :maze (let [level (vec
+                         (map vec
+                              (for [x (range width)]
+                                (for [y (range height)]
+                                  (rj.c/map->Tile {:x x :y y :z z
+                                                   :entities [(rj.c/map->Entity {:id nil
+                                                                                 :type :floor})
+                                                              (rj.c/map->Entity {:id   (br.e/create-entity)
+                                                                                 :type :maze-wall})]})))))]
              ;; CREATE MAZE
-             (as-> level level
-               (nth (iterate maze:smooth-level {:level level
-                                                :z z})
-                    5)
-               (:level level))))))
+             (generate-maze level [width height])))))
 
 (declare add-level)
 (defn init-world
