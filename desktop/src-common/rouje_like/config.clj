@@ -13,13 +13,13 @@
 
 ;; TILE TYPES
 (def <floors>
-  #{:dune :floor})
+  #{:dune :floor :forest-floor})
 
 (def <walls>
-  #{:wall :maze-wall})
+  #{:wall :tree :maze-wall})
 
 (def <items>
-  #{:torch :gold})
+  #{:torch :gold :health-potion})
 
 (def <empty>
   (union <floors> <items>))
@@ -34,12 +34,13 @@
   (union <empty> #{:player}))
 
 (def wall->stats
-  {:wall      {:hp 1}
+  {:wall      {:hp 2}
+   :tree      {:hp 1}
    :maze-wall {:hp 100}})
 
 ;; PLAYER CONFIG
 (def player-stats
-  {:hp  100
+  {:max-hp 100
    :atk 4
    :def 1})
 
@@ -47,15 +48,15 @@
                    :warrior {}
                    :mage    {}})
 
-(def race->stats {:human {:hp 10  :atk 1}
-                  :orc   {:hp 20  :atk 2}
-                  :elf   {:hp -5  :atk 0}})
+(def race->stats {:human {:max-hp 10  :atk 1}
+                  :orc   {:max-hp 20  :atk 2}
+                  :elf   {:max-hp -5  :atk 0}})
 
-(def stat->comp {:hp :destructible
+(def stat->comp {:max-hp :destructible
                  :atk :attacker
                  :def :destructible})
 
-(def stat->pointinc {:hp 5
+(def stat->pointinc {:max-hp 5
                      :atk 1
                      :def 1})
 
@@ -77,4 +78,7 @@
    :def 1
    :atk 3
    :exp 1})
+
+(def potion-stats
+  {:health 5})
 

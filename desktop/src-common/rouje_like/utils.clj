@@ -11,14 +11,18 @@
 
 (def get-default-pri
   {:floor 1
+   :forest-floor 1
    :dune 0
-   :torch 2
-   :gold 3
-   :wall 4
-   :lichen 5
-   :bat 6
-   :else 7
-   :player 8})
+   :health-potion 2
+   :torch 3
+   :gold 4
+   :wall 5
+   :tree 5
+   :lichen 6
+   :bat 7
+   :skeleton 8
+   :else 99
+   :player 100})
 
 (defn sort-by-type
   [entities get-pri]

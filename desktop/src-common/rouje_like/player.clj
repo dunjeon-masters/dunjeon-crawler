@@ -24,7 +24,6 @@
 (defn dig
   [system e-this target-tile]
   (let [target-top-entity (rj.u/tile->top-entity target-tile)
-        c-attacker-this (rj.e/get-c-on-e system e-this :attacker)
         damage 1
         e-target (:id target-top-entity)
         c-destr (rj.e/get-c-on-e system e-target :destructible)]
@@ -105,7 +104,8 @@
   [system]
   (let [e-player (br.e/create-entity)
         player-class (rand-nth (keys rj.cfg/class->stats))
-        player-race (rand-nth (keys rj.cfg/race->stats))]
+        player-race (rand-nth (keys rj.cfg/race->stats))
+        max-hp (+ (:max-hp rj.cfg/player-stats) (:max-hp (rj.cfg/race->stats player-race)))]
     (rj.e/system<<components
       system e-player
       [[:player {:show-world? false}]
@@ -140,8 +140,8 @@
                        :torch-multiplier   init-sight-torch-multiplier}]
        [:renderable {:render-fn rj.r/render-player
                      :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
-       [:destructible {:hp      (+ (:hp rj.cfg/player-stats)
-                                   (:hp (rj.cfg/race->stats player-race)))
+       [:destructible {:max-hp max-hp
+                       :hp  max-hp
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage

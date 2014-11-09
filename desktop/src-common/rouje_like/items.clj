@@ -9,7 +9,7 @@
   [system e-by e-this [z x y] item-type]
   (let [remove-item (fn [system this-pos]
                       (let [e-world (first (rj.e/all-e-with-c system :world))]
-                        (rj.u/update-in-world system e-world [z x y]
+                        (rj.u/update-in-world system e-world this-pos
                                                (fn [entities]
                                                  (vec
                                                    (remove
@@ -56,7 +56,22 @@
                                        (partial + (:value (rj.e/get-c-on-e system e-this :gold))))))
               (remove-item system [z x y])
               (broadcast-pickup system))
-
+      :health-potion (let [c-destructible (rj.e/get-c-on-e system e-by :destructible)
+                           max-hp (:max-hp c-destructible)
+                           hp (:hp c-destructible)
+                           hp-potion-val (:health rouje-like.config/potion-stats)]
+                       (as-> system system
+                           (if (> max-hp (+ hp hp-potion-val))
+                             (rj.e/upd-c system e-by :destructible
+                                 (fn [c-destructible]
+                                   (update-in c-destructible [:hp]
+                                              (partial + (:health rj.cfg/potion-stats)))))
+                             (rj.e/upd-c system e-by :destructible
+                                         (fn [c-destructible]
+                                           (update-in c-destructible [:hp]
+                                                      (constantly max-hp)))))
+                           (remove-item system [z x y])
+                           (broadcast-pickup system)))
       system)))
 
 
@@ -86,6 +101,29 @@
   (conj entities
         (rj.c/map->Entity {:id   e-id
                            :type e-type})))
+
+(defn add-health-potion
+  [{:keys [system z]}]
+  (let [e-potion (br.e/create-entity)
+
+        not-near-potions? (fn [world [x y]]
+                            (rj.u/not-any-radially-of-type world [x y]
+                                                           #(<= % 3) [:health-potion]))
+
+        is-valid-tile? (fn [world [x y]]
+                         (let [tile (get-in world [x y])]
+                           (and (not-near-potions? world [x y])
+                                (only-floor? tile))))
+
+        health-potion>>entities (fn [entities]
+                          (item>>entities entities e-potion :health-potion))
+        system (item>>world system is-valid-tile? z
+                            health-potion>>entities)]
+    {:system (rj.e/system<<components
+               system e-potion
+               [[:item {:pickup-fn pickup-item}]
+                [:broadcaster {:msg-fn (constantly "a health potion")}]])
+     :z z}))
 
 (defn add-torch
   [{:keys [system z]}]

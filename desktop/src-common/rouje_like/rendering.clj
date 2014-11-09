@@ -13,7 +13,7 @@
             [clojure.math.numeric-tower :as math]
 
             [rouje-like.components :refer [render]]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper     :as rj.e]))
 
@@ -75,6 +75,7 @@
         hp (:hp c-destructible)
         def (:def c-destructible)
         status-effects (:status-effects c-destructible)
+        max-hp (:max-hp c-destructible)
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
         attack (:atk c-attacker)
@@ -86,7 +87,7 @@
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
                         " -  Position: [" x "," y "," z "]"
-                        " -  HP: [" hp "]"
+                        " -  HP: [" hp  "/" max-hp "]"
                         " -  Attack: [" attack "]"
                         " -  Defense: [" def "]"
                         " -  Race: [" race "]"
@@ -102,6 +103,7 @@
                                        (- (+ (:top rj.cfg/padding-sizes)
                                              (:btm rj.cfg/padding-sizes))
                                           2))
+
                                     rj.cfg/block-size)))
             :draw renderer 1.0)
     (.end renderer)))
@@ -112,7 +114,8 @@
 
 (def ^:private type->tile-info
   (let [grim-tile-sheet "grim_12x12.png"
-        darkond-tile-sheet "DarkondDigsDeeper_16x16.png"]
+        darkond-tile-sheet "DarkondDigsDeeper_16x16.png"
+        bisasam-tile-sheet "Bisasam_20x20.png"]
     {:player   {:x 0 :y 4
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 255}
@@ -127,20 +130,28 @@
                  :tile-sheet grim-tile-sheet}
      :gold     {:x 1 :y 9
                 :width 12 :height 12
-                :color {:r 255 :g 255 :b 1 :a 255}
+                :color {:r 255 :g 255 :b 0 :a 255}
                 :tile-sheet grim-tile-sheet}
      :lichen   {:x 15 :y 0
                 :width 12 :height 12
-                :color {:r 1 :g 255 :b 1 :a 255}
+                :color {:r 0 :g 255 :b 0 :a 255}
                 :tile-sheet grim-tile-sheet}
      :floor    {:x 14 :y 2
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 64}
                 :tile-sheet grim-tile-sheet}
+     :forest-floor    {:x 14 :y 2
+                       :width 12 :height 12
+                       :color {:r 103 :g 133 :b 81 :a 64}
+                       :tile-sheet grim-tile-sheet}
      :torch    {:x 1 :y 2
                 :width 12 :height 12
-                :color {:r 255 :g 1 :b 1 :a 255}
+                :color {:r 255 :g 0 :b 0 :a 255}
                 :tile-sheet grim-tile-sheet}
+     :tree     {:x 5 :y 0
+                :width 20 :height 20
+                :color {:r 21 :g 54 :b 21 :a 255}
+                :tile-sheet bisasam-tile-sheet}
      :portal   {:x 4 :y 9
                  :width 12 :height 12
                  :color {:r 102 :g 0 :b 102 :a 255}
@@ -155,8 +166,12 @@
                 :tile-sheet darkond-tile-sheet}
      :dune     {:x 14 :y 2
                 :width 12 :height 12
-                :color {:r 255 :g 140 :b 1 :a 255}
-                :tile-sheet grim-tile-sheet}}))
+                :color {:r 255 :g 140 :b 0 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :health-potion {:x 13 :y 10
+                    :width 12 :height 12
+                    :color {:r 255 :g 0 :b 0 :a 255}
+                    :tile-sheet grim-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize
@@ -217,10 +232,11 @@
           (let [color-values (:color texture-entity)
                 color-values (update-in color-values [:a]
                                         (fn [alpha]
-                                          ;apply an alg to grey out tile
-                                          ;as the entity is damaged
-                                          ;use top-entity & its c-destr
-                                          alpha))]
+                                          (if-let [c-destr (rj.e/get-c-on-e system (:id top-entity) :destructible)]
+                                            (let [hp (:hp c-destr)
+                                                  max-hp (:max-hp c-destr)]
+                                              (max 75 (* (/ hp max-hp) alpha)))
+                                           alpha)))]
             (.setColor renderer
                        (Color. (float (/ (:r color-values) 255))
                                (float (/ (:g color-values) 255))
