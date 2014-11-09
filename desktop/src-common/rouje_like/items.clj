@@ -76,12 +76,12 @@
                            (broadcast-pickup system)))
       
       :weapon (as-> system system
-                    (rj.wpn/switch-weapon system e-by (:weapon (rj.e/get-c-on-e system e-this :weapon)))
+                    (rj.wpn/switch-equipment system e-by :weapon (:weapon (rj.e/get-c-on-e system e-this :weapon)))
                     (remove-item system [z x y])
                     (broadcast-pickup system))
 
       :armor (as-> system system
-                    (rj.wpn/switch-armor system e-by (:armor (rj.e/get-c-on-e system e-this :armor)))
+                    (rj.wpn/switch-equipment system e-by :armor (:armor (rj.e/get-c-on-e system e-this :armor)))
                     (remove-item system [z x y])
                     (broadcast-pickup system))
 
@@ -199,8 +199,8 @@
                [:weapon {:weapon (rj.wpn/generate-random-weapon)}]
                [:broadcaster {:msg-fn
                               (fn [system e-this]
-                                (let [name (rj.wpn/weapon-name (:weapon (rj.e/get-c-on-e system e-this :weapon)))]
-                                  (str "a " name)))}]])
+                                (let [name (rj.wpn/equipment-name (:weapon (rj.e/get-c-on-e system e-this :weapon)))]
+                                  (str "a" name)))}]])
      :z z}))
 
 (defn add-armor
@@ -221,6 +221,6 @@
                [:armor {:armor (rj.wpn/generate-random-armor)}]
                [:broadcaster {:msg-fn
                               (fn [system e-this]
-                                (let [name (rj.wpn/armor-name (:armor (rj.e/get-c-on-e system e-this :armor)))]
-                                  (str "a " name)))}]])
+                                (let [name (rj.wpn/equipment-name (:armor (rj.e/get-c-on-e system e-this :armor)))]
+                                  (str "a" name)))}]])
      :z z}))
