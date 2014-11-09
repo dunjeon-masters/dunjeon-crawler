@@ -16,6 +16,8 @@
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
+(defrecord Equipment [equipment])
+
 (defrecord Experience [experience
                        level
                        level-up-fn])
@@ -61,10 +63,6 @@
 (defrecord Torch [brightness])
 
 (defrecord Wallet [^Number gold])
-
-(defrecord Armor [armor])
-
-(defrecord Weapon [weapon])
 
 (defrecord World [levels
                   add-level-fn])
@@ -122,8 +120,7 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:armor        (type (->Armor nil))
-            :attacker     (type (->Attacker nil nil nil nil nil))
+  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
@@ -132,6 +129,7 @@
             :digger       (type (->Digger nil nil))
             :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
+            :equipment    (type (->Equipment nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
             :item         (type (->Item nil))
@@ -152,5 +150,4 @@
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
             :wallet       (type (->Wallet nil))
-            :weapon       (type (->Weapon nil))
             :world        (type (->World nil nil))})

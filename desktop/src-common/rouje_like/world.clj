@@ -267,17 +267,13 @@
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
 
-      ;; just a test
-      ;; (as-> system
-      ;;   (do (println "core::add-weapon " (not (nil? system))) system)
-      ;;   (rj.items/add-weapon {:system system :z z})
-      ;;   (:system system))
-
-      ;; just a test
+      ;; Spawn equipment for testing
       (as-> system
-        (do (println "core::add-armor " (not (nil? system))) system)
-        (rj.items/add-armor {:system system :z z})
-        (:system system))))
+            (do (println "core::add-equipment " (not (nil? system))) system)
+            (nth (iterate rj.items/add-equipment {:system system :z z})
+                 (* (/ 1 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))))
 
 (defn add-portal
   [system z]

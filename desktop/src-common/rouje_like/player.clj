@@ -15,7 +15,6 @@
             [rouje-like.mobile :as rj.m]
             [brute.entity :as br.e]
             [rouje-like.experience :as rj.exp]
-            [rouje-like.weapons :as rj.wpn]
             [rouje-like.config :as rj.cfg]))
 
 (defn can-dig?
@@ -119,8 +118,7 @@
                    :y init-player-y-pos
                    :z 0
                    :type :player}]
-       [:armor {:armor nil}]
-       [:weapon {:weapon nil}]
+       [:equipment {:equipment nil}]
        [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]

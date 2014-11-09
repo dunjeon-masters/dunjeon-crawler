@@ -2,8 +2,7 @@
   (:require [rouje-like.utils :as rj.u]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]
-            [rouje-like.destructible :as rj.d]
-            [rouje-like.weapons :as rj.wpn]))
+            [rouje-like.destructible :as rj.d]))
 
 (defn can-attack?
   [c-this _ e-target system]

@@ -1,4 +1,4 @@
-(ns rouje-like.weapons
+(ns rouje-like.equipment
   (:require [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper :as rj.e]))
 
@@ -38,18 +38,27 @@
 (defn generate-random-armor []
   [(rand-nth armor)])
 
+(defn generate-random-equipment [& type]
+  "Generate a random piece of equipment or a random TYPE and returns a map
+   of the type of equipment generated along with the equipment."
+  (case (or type (rand-int 2))
+    0 {:type :weapon :weapon (generate-random-weapon)}
+    1 {:type :armor :armor (generate-random-armor)}))
+
 (defn reduce-stats [stat-lst]
   "Takes list of stats and reduces them to a single map with all stats
    combined."
   (reduce (fn [r stats]
             (merge-with + r stats)) {} stat-lst))
 
-(defn equipment-name [eq]
+(defn equipment-name [eq-comp]
   "Return a string containing the name of EQ."
-  (if eq
-    (reduce (fn [sym1 sym2]
-              (str (name sym1) " " (name sym2))) ""
-            (map :name eq))
+  (if eq-comp
+    (let [eq-type (:type eq-comp)
+          eq (eq-type eq-comp)]
+      (reduce (fn [sym1 sym2]
+                (str (name sym1) " " (name sym2)))
+              "" (map :name eq)))
     ""))
 
 (defn equipment-stats [eq]
@@ -86,18 +95,25 @@
             {} stats)
     nil))
 
-(defn switch-equipment [system e-this eq-type new-eq]
-  "Switch the current equipment slot of EQ-TYPE on E-THIS with NEW-EQ and update
+(defn switch-equipment [system e-this new-eq-comp]
+  "Switch the current equipment slot on E-THIS with NEW-EQ-COMP and update
    E-THIS's stats to reflect the change."
-  (let [current-eq (eq-type (rj.e/get-c-on-e system e-this eq-type))
+  (let [eq-type (:type new-eq-comp)
+        new-eq (eq-type new-eq-comp)
+
+        current-eq-comp (:equipment (rj.e/get-c-on-e system e-this :equipment))
+        current-eq (eq-type current-eq-comp)
+        
         old-stats (equipment-stats current-eq)
         new-stats (equipment-stats new-eq)]
     (-> system
           ;; iterate over old-stats and pass them to update-stat for removal
           (update-stats e-this (negate-stats old-stats))
           ;; switch equipment
-          (rj.e/upd-c e-this eq-type
-                      (fn [c-eq]
-                        (assoc-in c-eq [eq-type] new-eq)))
+          (rj.e/upd-c e-this :equipment
+                      (fn [eq-comp]
+                        (update-in eq-comp [:equipment]
+                                   (fn [equipment]
+                                     (assoc-in equipment [eq-type] new-eq)))))
           ;; iterate over new-stats and pass them to update-stat
           (update-stats e-this new-stats))))

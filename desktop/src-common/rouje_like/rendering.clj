@@ -15,7 +15,7 @@
             [rouje-like.components :refer [render]]
 
             [rouje-like.utils :as rj.u :refer [?]]
-            [rouje-like.weapons :as rj.wpn]
+            [rouje-like.equipment :as rj.eq]
             [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper     :as rj.e]))
 
@@ -159,14 +159,10 @@
                  :width 12 :height 12
                  :color {:r 102 :g 0 :b 102 :a 255}
                 :tile-sheet grim-tile-sheet}
-     :weapon   {:x 2 :y 9
+     :equipment {:x 2 :y 9
                  :width 12 :height 12
                  :color {:r 255 :g 255 :b 255 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :armor    {:x 2 :y 9
-                :width 12 :height 12
-                :color {:r 255 :g 255 :b 255 :a 255}
-                :tile-sheet grim-tile-sheet}
+                 :tile-sheet grim-tile-sheet}
      :bat      {:x 14 :y 5
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 128}

@@ -3,7 +3,7 @@
             [rouje-like.utils :as rj.u]
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.weapons :as rj.wpn]
+            [rouje-like.equipment :as rj.eq]
             [rouje-like.config :as rj.cfg]))
 
 (defn pickup-item
@@ -75,15 +75,10 @@
                            (remove-item system [z x y])
                            (broadcast-pickup system)))
       
-      :weapon (as-> system system
-                    (rj.wpn/switch-equipment system e-by :weapon (:weapon (rj.e/get-c-on-e system e-this :weapon)))
-                    (remove-item system [z x y])
-                    (broadcast-pickup system))
-
-      :armor (as-> system system
-                    (rj.wpn/switch-equipment system e-by :armor (:armor (rj.e/get-c-on-e system e-this :armor)))
-                    (remove-item system [z x y])
-                    (broadcast-pickup system))
+      :equipment (as-> system system
+                       (rj.eq/switch-equipment system e-by (rj.e/get-c-on-e system e-this :equipment))
+                       (remove-item system [z x y])
+                       (broadcast-pickup system))
 
       system)))
 
@@ -181,46 +176,28 @@
                                    (str value " gold")))}]])
      :z z}))
 
-(defn add-weapon
+(defn add-equipment
   [{:keys [system z]}]
-  (let [e-weapon (br.e/create-entity)
+  (let [e-eq (br.e/create-entity)
+
+        ;; generate a random equipment piece
+        eq (rj.eq/generate-random-equipment)
+        eq-type (:type eq)
 
         is-valid-tile? (fn [world [x y]]
                          (only-floor? (get-in world [x y])))
 
-        weapon>>entities (fn [entities]
-                           (item>>entities entities e-weapon :weapon))
+        eq>>entities (fn [entities]
+                       (item>>entities entities e-eq :equipment))
 
         system (item>>world system is-valid-tile? z
-                             weapon>>entities)]
+                            eq>>entities)]
     {:system (rj.e/system<<components
-              system e-weapon
+              system e-eq
               [[:item {:pickup-fn pickup-item}]
-               [:weapon {:weapon (rj.wpn/generate-random-weapon)}]
+               [:equipment {:type eq-type eq-type (eq-type eq)}]
                [:broadcaster {:msg-fn
                               (fn [system e-this]
-                                (let [name (rj.wpn/equipment-name (:weapon (rj.e/get-c-on-e system e-this :weapon)))]
-                                  (str "a" name)))}]])
-     :z z}))
-
-(defn add-armor
-  [{:keys [system z]}]
-  (let [e-armor (br.e/create-entity)
-
-        is-valid-tile? (fn [world [x y]]
-                         (only-floor? (get-in world [x y])))
-
-        armor>>entities (fn [entities]
-                           (item>>entities entities e-armor :armor))
-
-        system (item>>world system is-valid-tile? z
-                             armor>>entities)]
-    {:system (rj.e/system<<components
-              system e-armor
-              [[:item {:pickup-fn pickup-item}]
-               [:armor {:armor (rj.wpn/generate-random-armor)}]
-               [:broadcaster {:msg-fn
-                              (fn [system e-this]
-                                (let [name (rj.wpn/equipment-name (:armor (rj.e/get-c-on-e system e-this :armor)))]
+                                (let [name (rj.eq/equipment-name (rj.e/get-c-on-e system e-this :equipment))]
                                   (str "a" name)))}]])
      :z z}))
