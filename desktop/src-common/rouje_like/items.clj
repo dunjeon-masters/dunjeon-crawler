@@ -80,6 +80,11 @@
                     (remove-item system [z x y])
                     (broadcast-pickup system))
 
+      :armor (as-> system system
+                    (rj.wpn/switch-armor system e-by (:armor (rj.e/get-c-on-e system e-this :armor)))
+                    (remove-item system [z x y])
+                    (broadcast-pickup system))
+
       system)))
 
 (defn ^:private item>>world
@@ -195,5 +200,27 @@
                [:broadcaster {:msg-fn
                               (fn [system e-this]
                                 (let [name (rj.wpn/weapon-name (:weapon (rj.e/get-c-on-e system e-this :weapon)))]
+                                  (str "a " name)))}]])
+     :z z}))
+
+(defn add-armor
+  [{:keys [system z]}]
+  (let [e-armor (br.e/create-entity)
+
+        is-valid-tile? (fn [world [x y]]
+                         (only-floor? (get-in world [x y])))
+
+        armor>>entities (fn [entities]
+                           (item>>entities entities e-armor :armor))
+
+        system (item>>world system is-valid-tile? z
+                             armor>>entities)]
+    {:system (rj.e/system<<components
+              system e-armor
+              [[:item {:pickup-fn pickup-item}]
+               [:armor {:armor (rj.wpn/generate-random-armor)}]
+               [:broadcaster {:msg-fn
+                              (fn [system e-this]
+                                (let [name (rj.wpn/armor-name (:armor (rj.e/get-c-on-e system e-this :armor)))]
                                   (str "a " name)))}]])
      :z z}))

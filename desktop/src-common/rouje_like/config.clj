@@ -19,7 +19,7 @@
   #{:wall :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion :weapon})
+  #{:torch :gold :health-potion :weapon :armor})
 
 (def <empty>
   (union <floors> <items>))

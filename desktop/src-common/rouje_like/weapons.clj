@@ -59,6 +59,20 @@
             (map :name weapon))
     ""))
 
+(defn armor-name [weapon]
+  "Return a string containing the name of WEAPON."
+  (if weapon
+    (reduce (fn [sym1 sym2]
+              (str (name sym1) " " (name sym2)))
+            (map :name weapon))
+    ""))
+
+(defn armor-stats [weapon]
+  "Return a map of the stats of WEAPON or NIL."
+  (and weapon
+       (let [quality (nth weapon 0)]
+         (reduce-stats (:stats quality)))))
+
 (defn update-stat [system e-this stat amount]
   "Update the statistic STAT by AMOUNT on E-THIS."
   (let [comp-to-update (rj.cfg/stat->comp stat)]
@@ -98,5 +112,21 @@
           (rj.e/upd-c e-this :weapon
                       (fn [c-weapon]
                         (assoc-in c-weapon [:weapon] new-wpn)))
+          ;; iterate over new-stats and pass them to update-stat
+          (update-stats e-this new-stats))))
+
+(defn switch-armor [system e-this new-wpn]
+  "Switch the current weapon of E-THIS with NEW-WPN and update
+   E-THIS's stats to reflect the change."
+  (let [current-wpn (:armor (rj.e/get-c-on-e system e-this :armor))
+        old-stats (armor-stats current-wpn)
+        new-stats (armor-stats new-wpn)]
+    (-> system
+          ;; iterate over old-stats and pass them to update-stat for removal
+          (update-stats e-this (negate-stats old-stats))
+          ;; switch weapons
+          (rj.e/upd-c e-this :armor
+                      (fn [c-weapon]
+                        (assoc-in c-weapon [:armor] new-wpn)))
           ;; iterate over new-stats and pass them to update-stat
           (update-stats e-this new-stats))))

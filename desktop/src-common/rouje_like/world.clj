@@ -268,9 +268,15 @@
         (:system system))
 
       ;; just a test
+      ;; (as-> system
+      ;;   (do (println "core::add-weapon " (not (nil? system))) system)
+      ;;   (rj.items/add-weapon {:system system :z z})
+      ;;   (:system system))
+
+      ;; just a test
       (as-> system
-        (do (println "core::add-weapon " (not (nil? system))) system)
-        (rj.items/add-weapon {:system system :z z})
+        (do (println "core::add-armor " (not (nil? system))) system)
+        (rj.items/add-armor {:system system :z z})
         (:system system))))
 
 (defn add-portal
