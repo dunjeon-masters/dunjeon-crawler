@@ -143,14 +143,20 @@
             :set-x (float 300)
             :set-y (float 600))
     (vector
-      (label "Welcome to Dunjeon Crawler\n
-             type \"name <name>\" \"race <race>\" \"class <class>\" \n
-             and \"start game\" to begin!"
+      (label (str "Welcome to Dunjeon Crawler\n"
+                  "type \"name <name>\" \"race <race>\" \"class <class>\"\n"
+                  "and \"start game\" to begin!")
              (color :green)
              :set-x (float 250)
-             :set-y (float 550))
+             :set-y (float 550)
+             :set-width (float 250)
+             :set-wrap true)
       (assoc (label "" (color :green)
-                    :set-x (float 300)
+                    :set-x (float 250)
+                    :set-y (float 525))
+             :id :user)
+      (assoc (label "" (color :green)
+                    :set-x (float 250)
                     :set-y (float 500))
              :id :cmdl)))
 
@@ -161,7 +167,8 @@
            (case (:id entity)
              :cmdl (doto entity
                      (label! :set-text (str ">? " @cmdl)))
-             entity))
+             :user (doto entity
+                     (label! :set-text (str @user))) entity))
          (render! screen)))
 
   :on-key-down
