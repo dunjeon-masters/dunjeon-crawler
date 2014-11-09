@@ -21,6 +21,10 @@
             [rouje-like.config :as rj.cfg]
             [rouje-like.messaging :as rj.msg]))
 
+#_(in-ns 'rouje-like.core)
+#_(use 'rouje-like.core :reload)
+#_(on-gl (set-screen! hello-world main-screen))
+
 (declare main-screen main-menu-screen rouje-like)
 
 (def ^:private sys (atom {}))

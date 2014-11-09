@@ -10,6 +10,9 @@
             [clojure.string :as s]
             [brute.entity]))
 
+#_(in-ns 'rouje-like.input)
+#_(use 'rouje-like.input :reload)
+
 (defn tick-entities
   [system]
   {:pre [(not (nil? system))]}

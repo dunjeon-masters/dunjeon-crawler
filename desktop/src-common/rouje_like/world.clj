@@ -18,6 +18,9 @@
             [rouje-like.portal :as rj.p]
             [rouje-like.config :as rj.cfg]))
 
+#_(in-ns 'rouje-like.world)
+#_(use 'rouje-like.world :reload)
+
 (defn ^:private block->freqs
   [block]
   (frequencies

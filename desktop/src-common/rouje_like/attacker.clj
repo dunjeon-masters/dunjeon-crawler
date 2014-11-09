@@ -4,6 +4,9 @@
             [rouje-like.components :as rj.c]
             [rouje-like.destructible :as rj.d]))
 
+#_(in-ns 'rouje-like.attacker)
+#_(use 'rouje-like.attacker :reload)
+
 (defn can-attack?
   [c-this _ e-target system]
   (let [is-valid-target? (:is-valid-target? c-this)
