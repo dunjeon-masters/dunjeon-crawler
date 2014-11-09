@@ -66,7 +66,7 @@
                              :is-valid-target? (constantly true)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the lichen")}]])
+                 [:broadcaster {:name-fn (constantly "the lichen")}]])
       :z (:z target-tile)})))
 
 (defn get-size-of-lichen-blob

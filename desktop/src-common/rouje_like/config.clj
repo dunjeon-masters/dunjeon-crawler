@@ -8,15 +8,15 @@
                     :left  1
                     :right 1})
 (def view-port-sizes [20 20])
-(def world-sizes {:width  60
-                  :height 60})
+(def world-sizes {:width  20
+                  :height 20})
 
 ;; TILE TYPES
 (def <floors>
   #{:dune :floor :forest-floor})
 
 (def <walls>
-  #{:wall :maze-wall})
+  #{:wall :tree :maze-wall})
 
 (def <items>
   #{:torch :gold :health-potion :equipment})
@@ -25,7 +25,7 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  #{:wall :lichen :tree :maze-wall})
+  (union <walls> #{:lichen}))
 
 (def <valid-move-targets>
   (union <empty> #{:portal}))
@@ -34,8 +34,9 @@
   (union <empty> #{:player}))
 
 (def wall->stats
-  {:wall      {:hp 1}
-   :maze-wall {:hp 3}})
+  {:wall      {:hp 2}
+   :tree      {:hp 1}
+   :maze-wall {:hp 100}})
 
 ;; PLAYER CONFIG
 (def player-stats

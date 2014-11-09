@@ -19,6 +19,9 @@
             [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper     :as rj.e]))
 
+#_(in-ns 'rouje-like.rendering)
+#_(use 'rouje-like.rendering :reload)
+
 (defn process-one-game-tick
   [system delta-time]
   (let [renderable-entities (rj.e/all-e-with-c system :renderable)]

@@ -101,14 +101,23 @@
 (def ^:private init-sight-torch-multiplier 1.)
 
 (defn init-player
-  [system]
+  [system {:keys [n r c] :or {n "the player"} :as user}]
   (let [e-player (br.e/create-entity)
-        player-class (rand-nth (keys rj.cfg/class->stats))
-        player-race (rand-nth (keys rj.cfg/race->stats))
-        max-hp (+ (:max-hp rj.cfg/player-stats) (:max-hp (rj.cfg/race->stats player-race)))]
+
+        valid-class? (into #{} (keys rj.cfg/class->stats))
+        player-class (if (valid-class? (keyword c))
+                       (keyword c) (rand-nth (keys rj.cfg/class->stats)))
+
+        valid-race? (into #{} (keys rj.cfg/race->stats))
+        player-race (if (valid-race? (keyword r))
+                      (keyword r) (rand-nth (keys rj.cfg/race->stats)))
+
+        max-hp (+ (:max-hp rj.cfg/player-stats)
+                  (:max-hp (rj.cfg/race->stats player-race)))]
     (rj.e/system<<components
       system e-player
-      [[:player {:show-world? false}]
+      [[:player {:name n
+                 :show-world? false}]
        [:klass {:class player-class}]
        [:race {:race player-race}]
        [:experience {:experience 0
@@ -148,4 +157,4 @@
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
-       [:broadcaster {:msg-fn (constantly "you")}]])))
+       [:broadcaster {:name-fn (constantly "you")}]])))

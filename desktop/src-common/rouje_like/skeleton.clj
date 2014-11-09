@@ -69,7 +69,7 @@
                  [:killable {:experience (:exp rj.cfg/skeleton-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the skeleton")}]])
+                 [:broadcaster {:name-fn (constantly "the skeleton")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to

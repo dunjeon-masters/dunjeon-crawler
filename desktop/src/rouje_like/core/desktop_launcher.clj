@@ -8,8 +8,8 @@
   (:gen-class))
 
 ;https://github.com/oakes/play-clj/blob/master/TUTORIAL.md#using-the-repl
-#_(in-ns 'rouje-like.world)
-#_(use 'rouje-like.world :reload)
+#_(in-ns 'rouje-like.core.desktop-launcher)
+#_(use 'rouje-like.core.desktop-launcher :reload)
 #_(-main)
 
 (defn -main

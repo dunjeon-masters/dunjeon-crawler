@@ -11,6 +11,9 @@
             [clojure.string :as s]
             [brute.entity]))
 
+#_(in-ns 'rouje-like.input)
+#_(use 'rouje-like.input :reload)
+
 (defn tick-entities
   [system]
   {:pre [(not (nil? system))]}
@@ -68,7 +71,7 @@
                                            (reset! rj.u/cli? false)
                                            (reset! rj.u/cli "")
                                            (cmds->action system cli)))
-            (play/key-code :space) (fn [system] (swap! rj.u/cli str " ") system)}
+            (play/key-code :space)     (fn [system] (swap! rj.u/cli str " ") system)}
            (zipmap key-codes (map k->cli-fn alphabet)))))
 
 (def keycode->action
@@ -125,7 +128,7 @@
                 (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
                   (rj.msg/add-msg system :static
                                   (format "%s was paralyzed, and couldn't move this turn"
-                                          ((:msg-fn c-broadcaster) system e-this)))
+                                          ((:name-fn c-broadcaster) system e-this)))
                   system))
               (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
                 (tick-entities system)

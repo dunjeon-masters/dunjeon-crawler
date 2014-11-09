@@ -6,6 +6,9 @@
             [rouje-like.config :as rj.cfg]
             [rouje-like.components :as rj.c]))
 
+#_(in-ns 'rouje-like.utils)
+#_(use 'rouje-like.utils :reload)
+
 (def cli (atom ""))
 (def cli? (atom false))
 
