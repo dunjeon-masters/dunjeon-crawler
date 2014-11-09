@@ -24,6 +24,8 @@
 
 (defrecord Gold [value])
 
+(defrecord Inventory [slot junk])
+
 (defrecord Item [pickup-fn])
 
 (defrecord Killable [experience])
@@ -132,6 +134,7 @@
             :equipment    (type (->Equipment nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
+            :inventory    (type (->Inventory nil nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))

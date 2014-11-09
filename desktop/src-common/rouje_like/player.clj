@@ -119,6 +119,7 @@
                    :z 0
                    :type :player}]
        [:equipment {:equipment nil}]
+       [:inventory {:slot nil :junk 0}]
        [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]
@@ -148,4 +149,3 @@
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
        [:broadcaster {:msg-fn (constantly "you")}]])))
-

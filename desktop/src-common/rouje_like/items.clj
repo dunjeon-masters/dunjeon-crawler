@@ -4,6 +4,7 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]
+            [rouje-like.inventory :as rj.inv]
             [rouje-like.config :as rj.cfg]))
 
 (defn pickup-item
@@ -76,7 +77,7 @@
                            (broadcast-pickup system)))
       
       :equipment (as-> system system
-                       (rj.eq/switch-equipment system e-by (rj.e/get-c-on-e system e-this :equipment))
+                       (rj.inv/pickup-slot-item system e-by (rj.e/get-c-on-e system e-this :equipment))
                        (remove-item system [z x y])
                        (broadcast-pickup system))
 

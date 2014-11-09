@@ -7,6 +7,7 @@
             [rouje-like.player :as rj.pl]
             [rouje-like.components :as rj.c :refer [tick]]
             [rouje-like.messaging :as rj.msg]
+            [rouje-like.inventory :as rj.inv]
             [clojure.string :as s]
             [brute.entity]))
 
@@ -80,6 +81,8 @@
                                                           (update-in c-player [:show-world?]
                                                                      (fn [prev]
                                                                        (not prev))))))
+   (play/key-code :E)             (fn [system]
+                                    (rj.inv/equip-slot-item system (first (rj.e/all-e-with-c system :player))))
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))})
 

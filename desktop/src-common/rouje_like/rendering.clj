@@ -79,6 +79,9 @@
         status-effects (:status-effects c-destructible)
         max-hp (:max-hp c-destructible)
 
+        junk (:junk (rj.e/get-c-on-e system e-this :inventory))
+        slot (rj.eq/equipment-name (:slot (rj.e/get-c-on-e system e-this :inventory)))
+
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
         attack (:atk c-attacker)
@@ -99,7 +102,9 @@
                         " -  Level: [" level "]"
                         " -  cli: " @rj.u/cli
                         " -  Status: " status-effects
-                        "\nEnergy: [" energy "]")
+                        "\nEnergy: [" energy "]"
+                        " -  Junk: [" junk "]"
+                        " -  Slot: [" slot "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
