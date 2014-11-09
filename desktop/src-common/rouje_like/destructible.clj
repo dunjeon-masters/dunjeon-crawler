@@ -102,8 +102,8 @@
           (rj.msg/add-msg system :static
                           (format "%s dealt %s damage to %s"
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                    ((:msg-fn atker-c-broadcaster) system e-from))
-                                  damage ((:msg-fn c-broadcaster) system e-this)))
+                                    ((:name-fn atker-c-broadcaster) system e-from))
+                                  damage ((:name-fn c-broadcaster) system e-this)))
           system))
 
       (as-> system system
@@ -111,8 +111,8 @@
           (rj.msg/add-msg system :static
                           (format "%s killed %s"
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                    ((:msg-fn atker-c-broadcaster) system e-from))
-                                  ((:msg-fn c-broadcaster) system e-this)))
+                                    ((:name-fn atker-c-broadcaster) system e-from))
+                                  ((:name-fn c-broadcaster) system e-this)))
           system)
 
         (if-let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]

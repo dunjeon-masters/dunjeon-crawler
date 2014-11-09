@@ -52,7 +52,7 @@
                                  :status-effects []}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the bat")}]])
+                 [:broadcaster {:name-fn (constantly "the bat")}]])
       :z (:z target-tile)})))
 
 (defn process-input-tick

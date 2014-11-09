@@ -125,7 +125,7 @@
                 (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
                   (rj.msg/add-msg system :static
                                   (format "%s was paralyzed, and couldn't move this turn"
-                                          ((:msg-fn c-broadcaster) system e-this)))
+                                          ((:name-fn c-broadcaster) system e-this)))
                   system))
               (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
                 (tick-entities system)

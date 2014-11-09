@@ -13,7 +13,7 @@
     (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
       (rj.msg/add-msg system :static
                       (format "%s was paralyzed"
-                              ((:msg-fn c-broadcaster) system e-this)))
+                              ((:name-fn c-broadcaster) system e-this)))
       system)))
 
 (defn apply-burn
@@ -32,7 +32,7 @@
             (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
               (rj.msg/add-msg system :static
                               (format "%s was dealt %s burn damage"
-                                      ((:msg-fn c-broadcaster) system e-this) damage))
+                                      ((:name-fn c-broadcaster) system e-this) damage))
               system))
 
       (as-> system system
@@ -40,8 +40,8 @@
               (rj.msg/add-msg system :static
                               (format "%s burned %s to death"
                                       (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                        ((:msg-fn atker-c-broadcaster) system e-from))
-                                      ((:msg-fn c-broadcaster) system e-this)))
+                                        ((:name-fn atker-c-broadcaster) system e-from))
+                                      ((:name-fn c-broadcaster) system e-this)))
               system)
 
             (rj.u/update-in-world system e-world
@@ -80,7 +80,7 @@
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
           (rj.msg/add-msg system :static
                           (format "%s was dealt %s poison damage"
-                                  ((:msg-fn c-broadcaster) system e-this) damage))
+                                  ((:name-fn c-broadcaster) system e-this) damage))
           system))
 
       (as-> system system
@@ -88,8 +88,8 @@
           (rj.msg/add-msg system :static
                           (format "%s killed %s with poison"
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                    ((:msg-fn atker-c-broadcaster) system e-from))
-                                  ((:msg-fn c-broadcaster) system e-this)))
+                                    ((:name-fn atker-c-broadcaster) system e-from))
+                                  ((:name-fn c-broadcaster) system e-this)))
           system)
 
         (rj.u/update-in-world system e-world

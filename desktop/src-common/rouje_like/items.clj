@@ -25,8 +25,8 @@
                                            (update-in c-relay [:static]
                                                       conj {:message (format "%s picked up %s"
                                                                              (let [by-c-broadcaster (rj.e/get-c-on-e system e-by :broadcaster)]
-                                                                               ((:msg-fn by-c-broadcaster) system e-by))
-                                                                             ((:msg-fn c-broadcaster) system e-this))
+                                                                               ((:name-fn by-c-broadcaster) system e-by))
+                                                                             ((:name-fn c-broadcaster) system e-this))
                                                             :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
                                                                         c-counter (rj.e/get-c-on-e system e-counter :counter)]
                                                                     (:turn c-counter))})))
@@ -122,7 +122,7 @@
     {:system (rj.e/system<<components
                system e-potion
                [[:item {:pickup-fn pickup-item}]
-                [:broadcaster {:msg-fn (constantly "a health potion")}]])
+                [:broadcaster {:name-fn (constantly "a health potion")}]])
      :z z}))
 
 (defn add-torch
@@ -146,7 +146,7 @@
                system e-torch
                [[:item {:pickup-fn pickup-item}]
                 [:torch {:brightness 2}]
-                [:broadcaster {:msg-fn (constantly "a torch")}]])
+                [:broadcaster {:name-fn (constantly "a torch")}]])
      :z z}))
 
 (defn add-gold
@@ -164,7 +164,7 @@
                system e-gold
                [[:item {:pickup-fn pickup-item}]
                 [:gold {:value 1}]
-                [:broadcaster {:msg-fn
+                [:broadcaster {:name-fn
                                (fn [system e-this]
                                  (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
                                    (str value " gold")))}]])

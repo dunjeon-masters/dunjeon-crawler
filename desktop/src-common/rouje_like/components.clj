@@ -4,7 +4,7 @@
 
 (defrecord Bat [])
 
-(defrecord Broadcaster [msg-fn])
+(defrecord Broadcaster [name-fn])
 
 (defrecord Counter [turn])
 
