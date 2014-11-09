@@ -31,7 +31,8 @@
 (defrecord Lichen [grow-chance%
                    max-blob-size])
 
-(defrecord Player [show-world?])
+(defrecord Player [name
+                   show-world?])
 
 (defrecord PlayerSight [distance
                         decline-rate
@@ -133,7 +134,7 @@
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
             :mobile       (type (->Mobile nil nil))
-            :player       (type (->Player nil))
+            :player       (type (->Player nil nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :portal       (type (->Portal nil nil nil))
             :position     (type (->Position nil nil nil nil))

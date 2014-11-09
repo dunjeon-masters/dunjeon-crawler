@@ -70,7 +70,7 @@
                                            (reset! rj.u/cli? false)
                                            (reset! rj.u/cli "")
                                            (cmds->action system cli)))
-            (play/key-code :space) (fn [system] (swap! rj.u/cli str " ") system)}
+            (play/key-code :space)     (fn [system] (swap! rj.u/cli str " ") system)}
            (zipmap key-codes (map k->cli-fn alphabet)))))
 
 (def keycode->action
