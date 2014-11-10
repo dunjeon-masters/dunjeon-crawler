@@ -13,7 +13,9 @@
             [clojure.math.numeric-tower :as math]
 
             [rouje-like.components :refer [render]]
+
             [rouje-like.utils :as rj.u :refer [?]]
+            [rouje-like.equipment :as rj.eq]
             [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper     :as rj.e]))
 
@@ -80,7 +82,11 @@
         status-effects (:status-effects c-destructible)
         max-hp (:max-hp c-destructible)
 
+        junk (:junk (rj.e/get-c-on-e system e-this :inventory))
+        slot (rj.eq/equipment-name (:slot (rj.e/get-c-on-e system e-this :inventory)))
+
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
+
         attack (:atk c-attacker)
 
         c-energy (rj.e/get-c-on-e system e-this :energy)
@@ -98,8 +104,10 @@
                         "\nExperience: [" experience "]"
                         " -  Level: [" level "]"
                         " -  cli: " @rj.u/cli
-                        " - " "Status: " status-effects
-                        "\nEnergy: [" energy "]")
+                        " -  Status: " status-effects
+                        "\nEnergy: [" energy "]"
+                        " -  Junk: [" junk "]"
+                        " -  Slot: [" slot "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
@@ -158,6 +166,10 @@
      :portal   {:x 4 :y 9
                  :width 12 :height 12
                  :color {:r 102 :g 0 :b 102 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :equipment {:x 2 :y 9
+                 :width 12 :height 12
+                 :color {:r 255 :g 255 :b 255 :a 255}
                  :tile-sheet grim-tile-sheet}
      :bat      {:x 14 :y 5
                 :width 12 :height 12

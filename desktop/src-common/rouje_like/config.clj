@@ -19,7 +19,7 @@
   #{:wall :tree :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion})
+  #{:torch :gold :health-potion :equipment})
 
 (def <empty>
   (union <floors> <items>))
@@ -81,4 +81,3 @@
 
 (def potion-stats
   {:health 5})
-

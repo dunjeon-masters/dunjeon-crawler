@@ -228,7 +228,15 @@
         (nth (iterate rj.sk/add-skeleton {:system system :z z})
              (* (/ init-skeleton% 100)
                 (apply * (vals rj.cfg/world-sizes))))
-        (:system system))))
+        (:system system))
+
+      ;; Spawn equipment for testing
+      (as-> system
+            (do (println "core::add-equipment " (not (nil? system))) system)
+            (nth (iterate rj.items/add-equipment {:system system :z z})
+                 (* (/ 1 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))))
 
 (defn ^:private add-portal
   [system z]
