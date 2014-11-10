@@ -202,3 +202,4 @@
                                 (let [name (rj.eq/equipment-name (rj.e/get-c-on-e system e-this :equipment))]
                                   (str "a" name)))}]])
      :z z}))
+

@@ -2,17 +2,17 @@
   (:require [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper :as rj.e]))
 
-(def weapon-qualities [{:name :quick :stats {:atk 1}}
-                        {:name :giant :stats {:atk 2}}
-                        {:name :great :stats {:atk 2}}
-                        {:name :tiny :stats {:atk 1}}
-                        {:name :dull :stats {:atk -1}}
-                        {:name :dented :stats {:atk -2}}])
+(def weapon-qualities [{:name :quick  :stats {:atk  1}}
+                       {:name :giant  :stats {:atk  2}}
+                       {:name :great  :stats {:atk  2}}
+                       {:name :tiny   :stats {:atk  1}}
+                       {:name :dull   :stats {:atk -1}}
+                       {:name :dented :stats {:atk -2}}])
 
-(def weapons [{:name :sword :stats {:atk 1}}
-              {:name :mace :stats {:atk 1}}
-              {:name :axe :stats {:atk 1}}
-              {:name :flail :stats {:atk 1}}
+(def weapons [{:name :sword  :stats {:atk 1}}
+              {:name :mace   :stats {:atk 1}}
+              {:name :axe    :stats {:atk 1}}
+              {:name :flail  :stats {:atk 1}}
               {:name :dagger :stats {:atk 1}}])
 
 (def weapon-effects [{:name :bloodletting}
@@ -49,7 +49,8 @@
   "Takes list of stats and reduces them to a single map with all stats
    combined."
   (reduce (fn [r stats]
-            (merge-with + r stats)) {} stat-lst))
+            (merge-with + r stats))
+          {} stat-lst))
 
 (defn equipment-name [eq-comp]
   "Return a string containing the name of EQ."
@@ -64,7 +65,7 @@
 (defn equipment-stats [eq]
   "Return a map of the stats of EQ."
   (and eq
-       (reduce-stats (filter (fn [elt] (not (nil? elt)))
+       (reduce-stats (filter (fn [elt] (not (nil? elt))) ;TODO: consider identity
                              (map :stats eq)))))
 
 (defn update-stat [system e-this stat amount]
@@ -103,7 +104,7 @@
 
         current-eq-comp (:equipment (rj.e/get-c-on-e system e-this :equipment))
         current-eq (eq-type current-eq-comp)
-        
+
         old-stats (equipment-stats current-eq)
         new-stats (equipment-stats new-eq)]
     (-> system
@@ -117,3 +118,4 @@
                                      (assoc-in equipment [eq-type] new-eq)))))
           ;; iterate over new-stats and pass them to update-stat
           (update-stats e-this new-stats))))
+
