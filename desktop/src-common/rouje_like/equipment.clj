@@ -69,18 +69,14 @@
   [system e-this stats]
   "Loop over [stat val] pairs in STATS and update them on E-THIS."
   (if (not (empty? stats))
-    (loop [system system
-           e-this e-this
-           stats stats]
-      (let [[stat amount] (first stats)
-            more? (rest stats)]
-        (if (empty? more?)
-          (update-stat system e-this stat amount)
-          (recur (update-stat system e-this stat amount) e-this more?))))
+    (reduce (fn [system [stat amount]]
+              (update-stat system e-this stat amount))
+            system stats)
     system))
 
 (defn update-values
   [m f & args]
+  "Apply to each value v in m, (f v args)"
   (reduce (fn [r [k v]]
             (assoc r k (apply f v args)))
           {} m))
