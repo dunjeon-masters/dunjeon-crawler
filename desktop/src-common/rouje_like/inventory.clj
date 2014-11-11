@@ -39,7 +39,7 @@
     (if item
       (do (as-> system system
               (rj.eq/switch-equipment system e-this item)
-              (if c-equip
+              (if ((:type item) c-equip)
                   (add-junk system e-this item)
                   system)
               (switch-slot-item system e-this)))
