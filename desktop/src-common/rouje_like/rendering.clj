@@ -86,6 +86,10 @@
         junk (:junk c-inv)
         slot (rj.eq/equipment-name (or (:weapon (:slot c-inv)) (:armor (:slot c-inv))))
 
+        c-equip (rj.e/get-c-on-e system e-this :equipment)
+        armor (rj.eq/equipment-name (:armor c-equip))
+        weapon (rj.eq/equipment-name (:weapon c-equip))
+
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
         attack (:atk c-attacker)
@@ -96,19 +100,21 @@
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Gold: [" gold "]"
-                        " -  Position: [" x "," y "," z "]"
-                        " -  HP: [" hp  "/" max-hp "]"
-                        " -  Attack: [" attack "]"
-                        " -  Defense: [" def "]"
-                        " -  Race: [" race "]"
-                        " -  Class: [" class "]"
+                        " - Position: [" x "," y "," z "]"
+                        " - HP: [" hp  "/" max-hp "]"
+                        " - Attack: [" attack "]"
+                        " - Defense: [" def "]"
+                        " - Race: [" race "]"
+                        " - Class: [" class "]"
                         "\nExperience: [" experience "]"
-                        " -  Level: [" level "]"
-                        " -  cli: " @rj.u/cli
-                        " -  Status: " status-effects
+                        " - Level: [" level "]"
+                        " - cli: " @rj.u/cli
+                        " - Status: " status-effects
                         "\nEnergy: [" energy "]"
-                        " -  Junk: [" junk "]"
-                        " -  Slot: [" slot "]")
+                        " - Junk: [" junk "]"
+                        " - Slot: [" slot "]"
+                        " - Armor: [" armor "]"
+                        " - Weapon: [" weapon "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
