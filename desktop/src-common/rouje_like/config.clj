@@ -65,33 +65,41 @@
 
 ;; EQUIPMENT CONFIG
 (def weapons
-  [[:sword  {:atk 3}]
-   [:mace   {:atk 2}]
-   [:axe    {:atk 3}]
-   [:flail  {:atk 2}]
-   [:dagger {:atk 1}]])
+  (->> (flatten
+         [(repeat 1 [:sword  {:atk 3}])
+          (repeat 1 [:mace   {:atk 2}])
+          (repeat 1 [:axe    {:atk 3}])
+          (repeat 1 [:flail  {:atk 2}])
+          (repeat 1 [:dagger {:atk 1}])])
+       (partition 2)))
 
 (def weapon-qualities
-  [[:quick  {:atk  1}]
-   [:giant  {:atk  2}]
-   [:great  {:atk  2}]
-   [:tiny   {:atk  1}]
-   [:dull   {:atk -1}]
-   [:dented {:atk -2}]])
+  (->> (flatten
+         [(repeat 1 [:quick  {:atk  1}])
+          (repeat 1 [:giant  {:atk  2}])
+          (repeat 1 [:great  {:atk  2}])
+          (repeat 1 [:tiny   {:atk  1}])
+          (repeat 1 [:dull   {:atk -1}])
+          (repeat 1 [:dented {:atk -2}])])
+       (partition 2)))
 
 (def weapon-effects
-  [[:bloodletting]
-   [:pain]
-   [:poison]
-   [:paralysis]
-   [:power]
-   [:death]
-   [nil]])
+  (->> (flatten
+         [(repeat 1 [:bloodletting])
+          (repeat 1 [:pain])
+          (repeat 1 [:poison])
+          (repeat 1 [:paralysis])
+          (repeat 1 [:power])
+          (repeat 1 [:death])
+          (repeat 1 [nil])])
+       (partition 2)))
 
 (def armors
-  [[:chestplate {:def 1 :max-hp 1}]
-   [:chainmail  {:max-hp 3}]
-   [:tunic      {:max-hp 1}]])
+  (->> (flatten
+         [(repeat 1 [:chestplate {:max-hp 1 :def 1}])
+          (repeat 1 [:chainmail  {:max-hp 3}])
+          (repeat 1 [:tunic      {:max-hp 1}])])
+       (partition 2)))
 
 ;; CREATURE CONFIG
 (def bat-stats
