@@ -83,7 +83,7 @@
         max-hp (:max-hp c-destructible)
 
         c-inv (rj.e/get-c-on-e system e-this :inventory)
-        junk (count (:junk c-inv))
+        junk (count (? (:junk c-inv)))
         slot (rj.eq/equipment-name (or (:weapon (:slot c-inv)) (:armor (:slot c-inv))))
 
         c-equip (rj.e/get-c-on-e system e-this :equipment)

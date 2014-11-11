@@ -51,7 +51,9 @@
   [eq]
   "Return a string containing the name of EQ."
   (if eq
-    (str (name (:name eq))
+    (str (if-let [quality (:quality eq)]
+           (str (name quality) " "))
+         (name (:name eq))
          (if-let [effect (:effect eq)]
            (str " of " (name effect))))
     ""))
