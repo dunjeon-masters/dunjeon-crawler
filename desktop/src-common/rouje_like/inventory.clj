@@ -1,5 +1,6 @@
 (ns rouje-like.inventory
-  (:require [rouje-like.entity-wrapper :as rj.e]
+  (:require [rouje-like.utils :refer [?]]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]))
 
 (defn add-junk [system e-this]
@@ -9,7 +10,7 @@
                 (update-in inv-comp [:junk] inc))))
 
 (defn switch-slot-item [system e-this & [item]]
-  "Switches ITEM into the inventory slot of E-THIS or removes the current item 
+  "Switches ITEM into the inventory slot of E-THIS or removes the current item
    there if ITEM is not passed."
   (rj.e/upd-c system e-this :inventory
               (fn [inv-comp]
@@ -27,14 +28,13 @@
 
 (defn equip-slot-item [system e-this]
   "Equip the item E-THIS is currently holding in their inventory slot."
-  (let [item (:slot (rj.e/get-c-on-e system e-this :inventory))
-        c-equip (rj.e/get-c-on-e system e-this :equipment)
-        equip (:equipment c-equip)]
+  (let [slot (:slot (rj.e/get-c-on-e system e-this :inventory))
+        item (or (:weapon slot) (:armor slot))
+        c-equip (rj.e/get-c-on-e system e-this :equipment)]
     (if item
       (do (as-> system system
               (rj.eq/switch-equipment system e-this item)
-              ; need to check if existing item is equipped
-              (if equip
+              (if c-equip
                   (add-junk system e-this)
                   system)
               (switch-slot-item system e-this)))

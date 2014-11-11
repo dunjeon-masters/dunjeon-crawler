@@ -16,7 +16,7 @@
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
-(defrecord Equipment [equipment])
+(defrecord Equipment [weapon armor])
 
 (defrecord Experience [experience
                        level
@@ -132,7 +132,7 @@
             :digger       (type (->Digger nil nil))
             :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
-            :equipment    (type (->Equipment nil))
+            :equipment    (type (->Equipment nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
             :inventory    (type (->Inventory nil nil))

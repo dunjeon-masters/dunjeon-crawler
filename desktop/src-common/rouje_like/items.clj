@@ -1,6 +1,6 @@
 (ns rouje-like.items
   (:require [brute.entity :as br.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]
@@ -75,7 +75,7 @@
                                                       (constantly max-hp)))))
                            (remove-item system [z x y])
                            (broadcast-pickup system)))
-      
+
       :equipment (as-> system system
                        (rj.inv/pickup-slot-item system e-by (rj.e/get-c-on-e system e-this :equipment))
                        (remove-item system [z x y])
@@ -196,10 +196,10 @@
     {:system (rj.e/system<<components
               system e-eq
               [[:item {:pickup-fn pickup-item}]
-               [:equipment {:type eq-type eq-type (eq-type eq)}]
+               [:equipment {eq-type eq}]
                [:broadcaster {:name-fn
                               (fn [system e-this]
-                                (let [name (rj.eq/equipment-name (rj.e/get-c-on-e system e-this :equipment))]
-                                  (str "a" name)))}]])
+                                (let [eq-name (rj.eq/equipment-name (eq-type (rj.e/get-c-on-e system e-this :equipment)))]
+                                  (str "a " eq-name)))}]])
      :z z}))
 
