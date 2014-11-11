@@ -179,6 +179,7 @@
 (def ^:private init-lichen% 1)
 (def ^:private init-bat% 1)
 (def ^:private init-skeleton% 1)
+(def ^:private init-equip% 1)
 
 (defn ^:private init-entities
   [system z]
@@ -234,7 +235,7 @@
       (as-> system
             (do (println "core::add-equipment " (not (nil? system))) system)
             (nth (iterate rj.items/add-equipment {:system system :z z})
-                 (* (/ 1 100)
+                 (* (/ init-equip% 100)
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))))
 

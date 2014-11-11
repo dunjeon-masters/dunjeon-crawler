@@ -82,8 +82,9 @@
         status-effects (:status-effects c-destructible)
         max-hp (:max-hp c-destructible)
 
-        junk (:junk (rj.e/get-c-on-e system e-this :inventory))
-        slot (rj.eq/equipment-name (:slot (rj.e/get-c-on-e system e-this :inventory)))
+        c-inv (rj.e/get-c-on-e system e-this :inventory)
+        junk (:junk c-inv)
+        slot (rj.eq/equipment-name (:slot c-inv))
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 

@@ -15,6 +15,7 @@
 (def get-default-pri
   {:floor 1
    :forest-floor 1
+   :equipment 2
    :dune 0
    :health-potion 2
    :torch 3

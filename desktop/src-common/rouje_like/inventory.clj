@@ -27,10 +27,15 @@
 
 (defn equip-slot-item [system e-this]
   "Equip the item E-THIS is currently holding in their inventory slot."
-  (let [item (:slot (rj.e/get-c-on-e system e-this :inventory))]
+  (let [item (:slot (rj.e/get-c-on-e system e-this :inventory))
+        c-equip (rj.e/get-c-on-e system e-this :equipment)
+        equip (:equipment c-equip)]
     (if item
-      (do (-> system
-              (rj.eq/switch-equipment e-this item)
-              (add-junk e-this) ; need to check if existing item is equipped
-              (switch-slot-item e-this)))
+      (do (as-> system system
+              (rj.eq/switch-equipment system e-this item)
+              ; need to check if existing item is equipped
+              (if equip
+                  (add-junk system e-this)
+                  system)
+              (switch-slot-item system e-this)))
       system)))
