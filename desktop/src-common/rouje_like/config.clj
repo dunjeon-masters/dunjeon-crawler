@@ -81,3 +81,13 @@
 
 (def potion-stats
   {:health 5})
+
+;; WORLD CONFIG
+(def init-wall% 45)
+(def init-torch% 2)
+(def init-gold% 5)
+(def init-health-potion% 2)
+(def init-lichen% 1)
+(def init-bat% 1)
+(def init-skeleton% 1)
+

@@ -172,14 +172,6 @@
                   system)))
             system (flatten level))))
 
-(def ^:private init-wall% 45)
-(def ^:private init-torch% 2)
-(def ^:private init-gold% 5)
-(def ^:private init-health-potion% 2)
-(def ^:private init-lichen% 1)
-(def ^:private init-bat% 1)
-(def ^:private init-skeleton% 1)
-
 (defn ^:private init-entities
   [system z]
   (-> system
@@ -190,19 +182,19 @@
       (as-> system
         (do (println "core::add-gold: " (not (nil? system))) system)
         (nth (iterate rj.items/add-gold {:system system :z z})
-             (* (/ init-gold% 100)
+             (* (/ rj.cfg/init-gold% 100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
       (as-> system
         (do (println "core::add-torch " (not (nil? system))) system)
         (nth (iterate rj.items/add-torch {:system system :z z})
-             (* (/ init-torch% 100)
+             (* (/ rj.cfg/init-torch% 100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
       (as-> system
             (do (println "core::add-health-potion " (not (nil? system))) system)
             (nth (iterate rj.items/add-health-potion {:system system :z z})
-                 (* (/ init-health-potion% 100)
+                 (* (/ rj.cfg/init-health-potion% 100)
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
@@ -210,7 +202,7 @@
       (as-> system
         (do (println "core::add-lichen " (not (nil? system))) system)
         (nth (iterate rj.lc/add-lichen {:system system :z z})
-             (* (/ init-lichen% 100)
+             (* (/ rj.cfg/init-lichen% 100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
 
@@ -218,7 +210,7 @@
       (as-> system
         (do (println "core::add-bat " (not (nil? system))) system)
         (nth (iterate rj.bt/add-bat {:system system :z z})
-             (* (/ init-bat% 100)
+             (* (/ rj.cfg/init-bat% 100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
 
@@ -226,7 +218,7 @@
       (as-> system
         (do (println "core::add-skeleton " (not (nil? system))) system)
         (nth (iterate rj.sk/add-skeleton {:system system :z z})
-             (* (/ init-skeleton% 100)
+             (* (/ rj.cfg/init-skeleton% 100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
 
@@ -384,7 +376,7 @@
                                                               :entities [(rj.c/map->Entity {:id   nil
                                                                                             :type :floor})]})
                                              [:entities] (fn [entities]
-                                                           (if (< (rand-int 100) init-wall%)
+                                                           (if (< (rand-int 100) rj.cfg/init-wall%)
                                                              (conj entities
                                                                    (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                       :type :wall}))
@@ -415,7 +407,7 @@
                                                               :entities [(rj.c/map->Entity {:id   nil
                                                                                             :type :forest-floor})]})
                                              [:entities] (fn [entities]
-                                                           (if (< (rand-int 100) init-wall%)
+                                                           (if (< (rand-int 100) rj.cfg/init-wall%)
                                                              (conj entities
                                                                    (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                       :type :tree}))
