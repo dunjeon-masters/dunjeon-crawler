@@ -157,4 +157,4 @@
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
-       [:broadcaster {:name-fn (constantly "you")}]])))
+       [:broadcaster {:name-fn (constantly n)}]])))
