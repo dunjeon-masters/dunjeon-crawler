@@ -4,11 +4,12 @@
             [rouje-like.equipment :as rj.eq]))
 
 (defn add-junk
-  [system e-this]
+  [system e-this item]
   "Increment the amount of junk E-THIS is carrying."
   (rj.e/upd-c system e-this :inventory
               (fn [inv-comp]
-                (update-in inv-comp [:junk] inc))))
+                (update-in inv-comp [:junk]
+                           conj item))))
 
 (defn switch-slot-item
   [system e-this & [item]]
@@ -25,7 +26,7 @@
   (let [old-slot (:slot (rj.e/get-c-on-e system e-this :inventory))]
     (if old-slot
       (-> system
-          (add-junk e-this)
+          (add-junk e-this item)
           (switch-slot-item e-this item))
       (switch-slot-item system e-this item))))
 
@@ -39,7 +40,7 @@
       (do (as-> system system
               (rj.eq/switch-equipment system e-this item)
               (if c-equip
-                  (add-junk system e-this)
+                  (add-junk system e-this item)
                   system)
               (switch-slot-item system e-this)))
       system)))
