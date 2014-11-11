@@ -89,8 +89,9 @@
    [nil]])
 
 (def armors
-  [[:breastplate {:max-hp 3}]
-   [:tunic       {:max-hp 1}]])
+  [[:chestplate {:def 1 :max-hp 1}]
+   [:chainmail  {:max-hp 3}]
+   [:tunic      {:max-hp 1}]])
 
 ;; CREATURE CONFIG
 (def bat-stats
@@ -110,3 +111,4 @@
 
 (def potion-stats
   {:health 5})
+
