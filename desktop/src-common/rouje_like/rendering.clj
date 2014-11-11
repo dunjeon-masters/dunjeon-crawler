@@ -58,6 +58,9 @@
   [_ e-this {:keys [view-port-sizes]} system]
   (let [[_ vheight] view-port-sizes
 
+        c-player (rj.e/get-c-on-e system e-this :player)
+        player-name (:name c-player)
+
         c-race (rj.e/get-c-on-e system e-this :race)
         race (:race c-race)
 
@@ -94,20 +97,21 @@
 
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (str "Gold: [" gold "]"
-                        " -  Position: [" x "," y "," z "]"
-                        " -  HP: [" hp  "/" max-hp "]"
-                        " -  Attack: [" attack "]"
-                        " -  Defense: [" def "]"
-                        " -  Race: [" race "]"
-                        " -  Class: [" class "]"
+    (label! (label (str "Name: " player-name
+                        " - Gold: [" gold "]"
+                        " - Position: [" x "," y "," z "]"
+                        " - HP: [" hp  "/" max-hp "]"
+                        " - Attack: [" attack "]"
+                        " - Defense: [" def "]"
+                        " - Race: [" race "]"
+                        " - Class: [" class "]"
                         "\nExperience: [" experience "]"
-                        " -  Level: [" level "]"
-                        " -  cli: " @rj.u/cli
-                        " -  Status: " status-effects
+                        " - Level: [" level "]"
+                        " - cli: " @rj.u/cli
+                        " - Status: " status-effects
                         "\nEnergy: [" energy "]"
-                        " -  Junk: [" junk "]"
-                        " -  Slot: [" slot "]")
+                        " - Junk: [" junk "]"
+                        " - Slot: [" slot "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
