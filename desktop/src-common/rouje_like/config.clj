@@ -63,6 +63,35 @@
 (def level-exp
   {:exp 1})
 
+;; EQUIPMENT CONFIG
+(def weapons
+  [[:sword  {:atk 3}]
+   [:mace   {:atk 2}]
+   [:axe    {:atk 3}]
+   [:flail  {:atk 2}]
+   [:dagger {:atk 1}]])
+
+(def weapon-qualities
+  [[:quick  {:atk  1}]
+   [:giant  {:atk  2}]
+   [:great  {:atk  2}]
+   [:tiny   {:atk  1}]
+   [:dull   {:atk -1}]
+   [:dented {:atk -2}]])
+
+(def weapon-effects
+  [[:bloodletting]
+   [:pain]
+   [:poison]
+   [:paralysis]
+   [:power]
+   [:death]
+   [nil]])
+
+(def armors
+  [[:breastplate {:max-hp 3}]
+   [:tunic       {:max-hp 1}]])
+
 ;; CREATURE CONFIG
 (def bat-stats
   {:hp  2

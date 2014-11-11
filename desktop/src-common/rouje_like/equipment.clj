@@ -6,29 +6,21 @@
 #_(in-ns 'rouje-like.equipment)
 #_(use 'rouje-like.equipment :reload)
 
-(def weapon-qualities [{:quality :quick  :stats {:atk  1}}
-                       {:quality :giant  :stats {:atk  2}}
-                       {:quality :great  :stats {:atk  2}}
-                       {:quality :tiny   :stats {:atk  1}}
-                       {:quality :dull   :stats {:atk -1}}
-                       {:quality :dented :stats {:atk -2}}])
+(def weapon-qualities
+  (map #(zipmap [:quality :stats] %)
+       rj.cfg/weapon-qualities))
 
-(def weapons [{:name :sword  :stats {:atk 3}}
-              {:name :mace   :stats {:atk 2}}
-              {:name :axe    :stats {:atk 3}}
-              {:name :flail  :stats {:atk 2}}
-              {:name :dagger :stats {:atk 1}}])
+(def weapons
+  (map #(zipmap [:name :stats] %)
+       rj.cfg/weapons))
 
-(def weapon-effects [{:effect :bloodletting}
-                     {:effect :pain}
-                     {:effect :poison}
-                     {:effect :paralysis}
-                     {:effect :power}
-                     {:effect :death}
-                     nil])
+(def weapon-effects
+  (map #(zipmap [:effect] %)
+       rj.cfg/weapon-effects))
 
-(def armors [{:name :breastplate :stats {:max-hp 3}}
-             {:name :tunic       :stats {:max-hp 1}}])
+(def armors
+  (map #(zipmap [:name :stats] %)
+       rj.cfg/armors))
 
 (defn generate-random-weapon []
   "Generate a random weapon consisting of a weapon quality, a weapon type,
