@@ -6,6 +6,8 @@ Will be using github and this README as a message board. Check periodically for 
 
 10/30: I've started working on ideas for themes/traps. It's not yet finished, but you can find it [here](https://docs.google.com/a/ucsc.edu/document/d/1YX6R140gGa4ri2gixDD0ymiKPiRndbpVi7OnwCmFpCA/edit?usp=sharing). Input is always appreciated. -Jordan
 
+11/9: [Armor/Weapons/Consumables thus far.](https://docs.google.com/a/ucsc.edu/document/d/1HD_VH_KtgKsAfmLSafig0YqoChKScHf81xySMMOXCPo/edit?usp=sharing) -Jordan
+
 ## Introduction
 
 A play-clj rogue like.
