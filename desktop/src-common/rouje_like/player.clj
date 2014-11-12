@@ -129,7 +129,7 @@
                    :type :player}]
        [:equipment {:weapon nil
                     :armor nil}]
-       [:inventory {:slot nil :junk []}]
+       [:inventory {:slot nil :junk [] :hp-potion 0}]
        [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]

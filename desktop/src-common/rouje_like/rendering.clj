@@ -88,6 +88,7 @@
         c-inv (rj.e/get-c-on-e system e-this :inventory)
         junk (count (:junk c-inv))
         slot (rj.eq/equipment-name (or (:weapon (:slot c-inv)) (:armor (:slot c-inv))))
+        hp-potions (:hp-potion c-inv)
 
         c-equip (rj.e/get-c-on-e system e-this :equipment)
         armor (rj.eq/equipment-name (:armor c-equip))
@@ -117,7 +118,8 @@
                         " - Junk: [" junk "]"
                         " - Slot: [" slot "]"
                         " - Armor: [" armor "]"
-                        " - Weapon: [" weapon "]")
+                        " - Weapon: [" weapon "]"
+                        " - HP-Potions: [" hp-potions "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight

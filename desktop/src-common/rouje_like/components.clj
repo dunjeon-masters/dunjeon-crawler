@@ -24,7 +24,7 @@
 
 (defrecord Gold [value])
 
-(defrecord Inventory [slot junk])
+(defrecord Inventory [slot junk hp-potion])
 
 (defrecord Item [pickup-fn])
 
@@ -135,7 +135,7 @@
             :equipment    (type (->Equipment nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
-            :inventory    (type (->Inventory nil nil))
+            :inventory    (type (->Inventory nil nil nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
