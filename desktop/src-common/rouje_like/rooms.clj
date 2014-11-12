@@ -16,7 +16,7 @@
    :last-add? nil})
 
 (defn print-level
-  [{:keys [level rooms]}]
+  [{:keys [level rooms] :as LEVEL}]
   (doseq [row level]
     (println
       (map #(case (% 2)
@@ -24,23 +24,46 @@
               :f "_"
               :d "+"
               :t "!")
-           row))))
+           row)))
+  :as LEVEL)
+
+(defn valid-door-locs
+  [x y w h]
+  (let [x-off (int (math/ceil (/ (+ -1 x x w) 2)))
+        _ (? x-off)
+        y-off (int (math/ceil (/ (+ -1 y y h) 2)))
+        _ (? y-off)]
+    [[x          y-off]
+     [x-off      y]
+     [x-off      (+ -1 y h)]
+     [(+ -1 x w) y-off]]))
 
 (defn create-room
   [[x y] [width height]]
   {:x x :y y
    :width width
-   :height height})
+   :height height
+   :door (let [[x y] (rand-nth (valid-door-locs x y width height))]
+           [x y :d])})
+
+(defn update-in-level
+  [cell level]
+  (map #(if (and (= (% 0) (cell 0))
+                 (= (% 1) (cell 1)))
+          cell %)
+       level))
 
 (defn room->points
-  [{:keys [x y width height]}]
-  (map (fn [[i j _ :as t]]
-         (if (or (seq (clojure.set/intersection #{i} #{x (+ -1 x width)}))
-                 (seq (clojure.set/intersection #{j} #{y (+ -1 y width)})))
-           (assoc t 2 :w) t))
-       (for [i (range x (+ x width))
-             j (range y (+ y height))]
-         [i j :f])))
+  [{:keys [x y width height door]}]
+  (update-in-level
+    door
+    (map (fn [[i j _ :as t]]
+           (if (or (seq (clojure.set/intersection #{i} #{x (+ -1 x width)}))
+                   (seq (clojure.set/intersection #{j} #{y (+ -1 y width)})))
+             (assoc t 2 :w) t))
+         (for [i (range x (+ x width))
+               j (range y (+ y height))]
+           [i j (if (< (rand-int 100) 10) :t :f)]))))
 
 (defn room-in-level?
   [level {:keys [x y width height]}]
@@ -97,9 +120,4 @@
     (as-> (add-room level room) level
       (add-room level (create-room [0 0] [5 5]))
       (print-level level))))
-
-#_(test-rooms [10 10]
-              [5 5] 5)
-#_(test-rooms [10 10]
-              [3 3] 5)
 

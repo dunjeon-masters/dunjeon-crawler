@@ -38,6 +38,9 @@
    :tree      {:hp 1}
    :maze-wall {:hp 100}})
 
+(def trap->stats
+  {:arrow-trap {:hp 1}})
+
 ;; PLAYER CONFIG
 (def player-stats
   {:max-hp 100
