@@ -38,8 +38,8 @@
 
 (defn generate-random-armor
   []
- (assoc (rand-nth armors)
-        :type :armor))
+  (assoc (rand-nth armors)
+         :type :armor))
 
 (defn generate-random-equipment
   []
