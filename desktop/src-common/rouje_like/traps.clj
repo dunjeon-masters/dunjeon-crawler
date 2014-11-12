@@ -38,7 +38,7 @@
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-trap
-                                                               :type :trap})))))]
+                                                               :type :arrow-trap})))))]
      {:system (rj.e/system<<components
                 system e-trap
                 [[:trap {}]

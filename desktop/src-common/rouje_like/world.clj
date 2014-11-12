@@ -11,6 +11,7 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.items :as rj.items]
+            [rouje-like.rooms :as rj.rm]
             [rouje-like.lichen :as rj.lc]
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
@@ -373,7 +374,7 @@
 
 (defn ^:private generate-desert
   [level [width height]]
-  (let [desert (add-room (gen-level width height :f) (create-room [5 5] [5 5]))]
+  (let [desert (rj.rm/add-room (rj.rm/gen-level width height :f) (rj.rm/create-room [5 5] [5 5]))]
     (reduce (fn [level cell]
               (case (cell 2)
                 :w (update-in level [(cell 0) (cell 1)]
@@ -392,13 +393,14 @@
                               (fn [tile]
                                 (update-in tile [:entities]
                                            (fn [entities]
-                                             conj (map->)))))
+                                             conj (rj.c/map->Entity {:id (br.e/create-entity)
+                                                                 :type :arrow-trap})))))
                 :d (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]
                                            (fn [entities]
-                                             (remove #(#{:wall} (:type %))
-                                                     entities)))))
+                                             conj (rj.c/map->Entity {:id (br.e/create-entity)
+                                                                 :type :door})))))
                 level))
             level (map vec (partition 3 (flatten desert))))))
 
@@ -441,7 +443,7 @@
                                     (rj.c/map->Tile {:x x :y y :z z
                                                      :entities [(rj.c/map->Entity {:id   nil
                                                                                    :type :dune})]})))))]
-               (generate-desert level [width height] z))
+               (generate-desert level [width height]))
 
      :forest (let [level (vec
                            (map vec
