@@ -15,7 +15,8 @@ ACTIONS TO START DOING
 		-Team meetings are important times to collaborate on how to approach problems. If you miss the meeting, you 			cannot contribute to product as efficiently as possible.
 	-Finish work we commit to at the scrum meetings
 		-Team membesr say we would do something and not actually do it. If we are waiting on someone to finish 				something, we expect them to follow through. If you can't do anything until next meeting, just say you 				can't.
-			more understanding of the genre and get some idea of how to balance our features.
+	-Use the same format in all functions and written code.
+		-For components we use c-name which allows all users to easily see what is a component. Being inconsistent and 		writing name-comp makes it more difficult to read your code.
 ------------------------------------------------------------------------------------------------------------------------
 ACTIONS TO KEEP DOING
 	-Getting help when you are stuck
@@ -26,11 +27,13 @@ ACTIONS TO KEEP DOING
 -Completed:
 	-As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it to].
     	-As a user, I want to have status effects [so that the game is more interesting].
-    	-As a user, I want armor, weapons, and accessories [so that I can protect myself and fight monsters more efficiently]. 
+    	-As a user, I want armor, weapons, and accessories [so that I can protect myself and fight monsters more efficiently].
     	-As a user, I want consumable items [so that I can heal].
- -Not Completed:
-    	-As a user, I want traps and terrain interaction [so that the floors have more user interaction and are more interesting      to play through]. 
+    	-As a user, I want traps and terrain interaction [so that the floors have more user interaction and are more 
+    	interesting to play through]. 
     	-As a user, I want themed levels with themed mobs and traps [so that the floors are unique and not so monotonous]. 
+-Not Completed:
+	None.
 ------------------------------------------------------------------------------------------------------------------------	
 WORK COMPLETION RATE FOR SPRINT 1
 	Total User Stories: 4
