@@ -23,7 +23,7 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
+       (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
          (add-drake system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
@@ -51,13 +51,14 @@
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  rj.cfg/drake-stats)
+                                 :max-hp     (:hp  rj.cfg/drake-stats)
                                  :def        (:def rj.cfg/drake-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp rj.cfg/drake-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the drake")}]])
+                 [:broadcaster {:name-fn (constantly "the drake")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -71,7 +72,7 @@
         offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
                                         shuffled-directions)
 
-        is-valid-target-tile? #{:floor :torch :gold :player}
+        is-valid-target-tile? rj.cfg/<valid-mob-targets>
 
         nth->offset-pos (fn [index]
                           (nth offset-shuffled-directions index))

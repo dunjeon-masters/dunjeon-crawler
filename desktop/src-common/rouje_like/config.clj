@@ -2,7 +2,7 @@
   (:require [clojure.set :refer [union]]))
 
 ;; WORLD CONFIG
-(def block-size 36)
+(def block-size 18)                                         ;; To see start screen, revert to 36
 (def padding-sizes {:top   3
                     :btm   2
                     :left  1
@@ -134,33 +134,43 @@
    :atk 1
    :exp 2})
 
+(def willowisp-stats
+  {:hp 3
+   :def 0
+   :atk 0
+   :exp 1})
+
 (def potion-stats
   {:health 5})
 
 ;; WORLD CONFIG
-(def ^:private init-wall% 45)
-(def ^:private init-torch% 2)
-(def ^:private init-gold% 5)
-(def ^:private init-health-potion% 2)
-(def ^:private init-lichen% 1)
-(def ^:private init-bat% 1)
-(def ^:private init-skeleton% 0.1)
-(def ^:private init-snake% 0.3)
-(def ^:private init-troll% 0.1)
-(def ^:private init-mimic% 0.1)
-(def ^:private init-spider% 0.5)
-(def ^:private init-slime% 0.1)
-(def ^:private init-drake% 0.01)
-(def ^:private init-necro% 0.1)
-(def ^:private init-giant_amoeba% 0.1)
+(def init-wall% 45)
+(def init-torch% 2)
+(def init-gold% 5)
+(def init-health-potion% 2)
+(def init-lichen% 1)
+(def init-bat% 1)
+
+;; MONSTER CONFIG
+(def init-skeleton% 0.1)
+(def init-snake% 0.3)
+(def init-troll% 0.1)
+(def init-mimic% 0.1)
+(def init-spider% 0.5)
+(def init-slime% 0.1)
+(def init-drake% 0.01)
+(def init-necro% 0.1)
+(def init-giant_amoeba% 0.1)
+(def init-willowisp% 0.1)
 
 ;; Starting floor for certain monsters to spawn on
-(def ^:private init-skeleton-floor 2)
-(def ^:private init-snake-floor 1)
-(def ^:private init-troll-floor 4)
-(def ^:private init-mimic-floor 5)
-(def ^:private init-spider-floor 1)
-(def ^:private init-slime-floor 3)
-(def ^:private init-drake-floor 7)
-(def ^:private init-necro-floor 6)
-(def ^:private init-giant_amoeba-floor 5)
+(def init-skeleton-floor 2)
+(def init-snake-floor 1)
+(def init-troll-floor 4)
+(def init-mimic-floor 4)
+(def init-spider-floor 1)
+(def init-slime-floor 3)
+(def init-drake-floor 8)
+(def init-necro-floor 6)
+(def init-giant_amoeba-floor 5)
+(def init-willowisp-floor 3)

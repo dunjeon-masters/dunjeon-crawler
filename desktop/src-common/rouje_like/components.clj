@@ -86,6 +86,8 @@
 
 (defrecord Wallet [^Number gold])
 
+(defrecord Willowisp [])
+
 (defrecord World [levels
                   add-level-fn])
 
@@ -182,4 +184,5 @@
             :torch        (type (->Torch nil))
             :troll        (type (->Troll))
             :wallet       (type (->Wallet nil))
+            :willowisp    (type (->Willowisp))
             :world        (type (->World nil nil))})

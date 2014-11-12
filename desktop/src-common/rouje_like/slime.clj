@@ -23,7 +23,7 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
+       (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
          (add-slime system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
@@ -51,13 +51,14 @@
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  rj.cfg/slime-stats)
+                                 :max-hp     (:hp  rj.cfg/slime-stats)
                                  :def        (:def rj.cfg/slime-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp rj.cfg/slime-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the slime")}]])
+                 [:broadcaster {:name-fn (constantly "the slime")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to

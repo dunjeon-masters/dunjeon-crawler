@@ -194,43 +194,47 @@
      :snake    {:x 3 :y 7
                 :width 16 :height 16
                 :color {:r 1 :g 255 :b 1 :a 255}
-                :tile-sheet "DarkondDigsDeeper_16x16.png"}
+                :tile-sheet darkond-tile-sheet}
      :troll    {:x 4 :y 5
                 :width 12 :height 12
                 :color {:r 255 :g 140 :b 1 :a 255}
-                :tile-sheet "grim_12x12.png"}
+                :tile-sheet grim-tile-sheet}
      :mimic    {:x 15 :y 8
                 :width 12 :height 12
                 :color {:r 255 :g 241 :b 36 :a 255}
-                :tile-sheet "grim_12x12.png"}
+                :tile-sheet grim-tile-sheet}
      :hidden-mimic {:x 1 :y 9
                     :width 12 :height 12
                     :color {:r 128 :g 255 :b 1 :a 255}
-                    :tile-sheet "grim_12x12.png"}
+                    :tile-sheet grim-tile-sheet}
      :spider   {:x 14 :y 9
                 :width 16 :height 16
                 :color {:r 183 :g 21 :b 3 :a 255}
-                :tile-sheet "DarkondDigsDeeper_16x16.png"}
+                :tile-sheet darkond-tile-sheet}
      :slime   {:x 7 :y 15
                :width 16 :height 16
                :color {:r 72 :g 223 :b 7 :a 125}
-               :tile-sheet "DarkondDigsDeeper_16x16.png"}
+               :tile-sheet darkond-tile-sheet}
      :drake   {:x 13 :y 0
                :width 16 :height 16
                :color {:r 222 :g 5 :b 48 :a 255}
-               :tile-sheet "DarkondDigsDeeper_16x16.png"}
+               :tile-sheet darkond-tile-sheet}
      :necromancer   {:x 10 :y 14
                      :width 12 :height 12
                      :color {:r 116 :g 84 :b 141 :a 255}
-                     :tile-sheet "grim_12x12.png"}
+                     :tile-sheet grim-tile-sheet}
      :giant_amoeba  {:x 7 :y 12
                      :width 16 :height 16
                      :color {:r 111 :g 246 :b 255 :a 125}
-                     :tile-sheet "DarkondDigsDeeper_16x16.png"}
+                     :tile-sheet darkond-tile-sheet}
      :large_amoeba  {:x 7 :y 12
                      :width 16 :height 16
                      :color {:r 175 :g 251 :b 255 :a 125}
-                     :tile-sheet "DarkondDigsDeeper_16x16.png"}}))
+                     :tile-sheet darkond-tile-sheet}
+     :willowisp  {:x 10 :y 2
+                     :width 20 :height 20
+                     :color {:r 210 :g 138 :b 181 :a 125}
+                     :tile-sheet bisasam-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize

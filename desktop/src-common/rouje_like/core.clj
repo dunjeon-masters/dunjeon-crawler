@@ -17,7 +17,7 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.rendering :as rj.r]
             [rouje-like.input :as rj.in]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.player :as rj.pl]
             [rouje-like.world :as rj.wr]
             [rouje-like.config :as rj.cfg]
@@ -137,11 +137,7 @@
 (defscreen main-menu-screen
   :on-show
   (fn [screen _]
-    (println "on-show main-menu-screen")
     (update! screen :renderer (stage))
-    (label "START SCREEN" (color :green)
-            :set-x (float 300)
-            :set-y (float 600))
     (vector
       (label (str "Welcome to Dunjeon Crawler\n"
                   "type \"name <name>\" \"race <race>\" \"class <class>\"\n"
@@ -168,7 +164,8 @@
              :cmdl (doto entity
                      (label! :set-text (str ">? " @cmdl)))
              :user (doto entity
-                     (label! :set-text (str @user))) entity))
+                     (label! :set-text (str @user)))
+             entity))
          (render! screen)))
 
   :on-key-down

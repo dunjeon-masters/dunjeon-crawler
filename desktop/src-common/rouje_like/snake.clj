@@ -6,9 +6,12 @@
             [rouje-like.components :as rj.c :refer [can-move? move
                                                     can-attack? attack]]
             [rouje-like.mobile :as rj.m]
+            [rouje-like.messaging :as rj.msg]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.status-effects :as rj.stef]
+            [rouje-like.config :as rj.cfg]
+            [clojure.set :refer [union]]))
 
 (declare process-input-tick)
 
@@ -23,12 +26,13 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
+       (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
          (add-snake system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-snake (br.e/create-entity)
+         hp (:hp rj.cfg/snake-stats)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
@@ -50,14 +54,15 @@
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/snake-stats)
+                 [:destructible {:hp         hp
+                                 :max-hp     hp
                                  :def        (:def rj.cfg/snake-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp rj.cfg/snake-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the snake")}]])
+                 [:broadcaster {:name-fn (constantly "the snake")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -71,7 +76,7 @@
         offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
                                         shuffled-directions)
 
-        is-valid-target-tile? #{:floor :torch :gold :player}
+        is-valid-target-tile? rj.cfg/<valid-mob-targets>
 
         nth->offset-pos (fn [index]
                           (nth offset-shuffled-directions index))
@@ -101,6 +106,10 @@
               this-pos [(:x c-position) (:y c-position)]
               c-mobile (rj.e/get-c-on-e system e-this :mobile)
 
+              e-player (first (rj.e/all-e-with-c system :player))
+              c-player-pos (rj.e/get-c-on-e system e-player :position)
+              player-pos [(:x c-player-pos) (:y c-player-pos)]
+
               e-world (first (rj.e/all-e-with-c system :world))
               c-world (rj.e/get-c-on-e system e-world :world)
               levels (:levels c-world)
@@ -110,9 +119,11 @@
 
               c-sight (rj.e/get-c-on-e system e-this :sight)
               is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
-                                                                              #(<= % (:distance c-sight))))
+                                                                              #(<= %  (:distance c-sight))))
 
-              target-tile (if is-player-within-range?
+
+              target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
+                                   is-player-within-range?)
                             (get-closest-tile-to level this-pos (first is-player-within-range?))
                             (if (seq neighbor-tiles)
                               (rand-nth (conj neighbor-tiles nil))
@@ -129,6 +140,10 @@
               this-pos [(:x c-position) (:y c-position)]
               c-mobile (rj.e/get-c-on-e system e-this :mobile)
 
+              e-player (first (rj.e/all-e-with-c system :player))
+              c-player-pos (rj.e/get-c-on-e system e-player :position)
+              player-pos [(:x c-player-pos) (:y c-player-pos)]
+
               e-world (first (rj.e/all-e-with-c system :world))
               c-world (rj.e/get-c-on-e system e-world :world)
               levels (:levels c-world)
@@ -138,10 +153,12 @@
 
               c-sight (rj.e/get-c-on-e system e-this :sight)
               is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
-                                                                              #(<= % (:distance c-sight))))
+                                                                              #(<= %  (:distance c-sight))))
+
               c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
-              target-tile (if is-player-within-range?
+              target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
+                                   is-player-within-range?)
                             (get-closest-tile-to level this-pos (first is-player-within-range?))
                             (if (seq neighbor-tiles)
                               (rand-nth (conj neighbor-tiles nil))
