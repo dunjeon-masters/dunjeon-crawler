@@ -183,8 +183,8 @@
        (ring-coords origin dist)))
 
 (defn rand-rng
- [start end]
- (+ (rand-int (- (inc end) start)) start))
+  [start end]
+  (+ (rand-int (- (inc end) start)) start))
 
 (defmacro ?
   [x & [tag]]
