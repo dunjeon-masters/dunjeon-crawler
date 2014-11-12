@@ -112,7 +112,7 @@
           system)
         (rj.e/kill-e system e-this)))))
 
-(def effect-type->apply-fn {:burn apply-burn
+(def effect-type->apply-fn {:fire apply-burn
                             :poison apply-poison
                             :paralyis apply-paralysis})
 

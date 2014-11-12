@@ -109,7 +109,7 @@
    :poison    {:type     :poison
                :duration 2
                :value    2}
-   :fire      {:type     :burn
+   :fire      {:type     :fire
                :duration 2
                :value    2}})
 
