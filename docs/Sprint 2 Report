@@ -15,8 +15,7 @@ ACTIONS TO START DOING
 		-Team meetings are important times to collaborate on how to approach problems. If you miss the meeting, you 			cannot contribute to product as efficiently as possible.
 	-Finish work we commit to at the scrum meetings
 		-Team membesr say we would do something and not actually do it. If we are waiting on someone to finish 				something, we expect them to follow through. If you can't do anything until next meeting, just say you 				can't.
-	-Play testing our game as well as other rogue likes
-		-Team members should test our game to find bugs. Playing other rogue like games is also important to gain 			more understanding of the genre and get some idea of how to balance our features.
+			more understanding of the genre and get some idea of how to balance our features.
 ------------------------------------------------------------------------------------------------------------------------
 ACTIONS TO KEEP DOING
 	-Getting help when you are stuck
@@ -24,14 +23,14 @@ ACTIONS TO KEEP DOING
 	-Committing bug free code to the master branch
 		-Team members have done a good job of only submitting bug free code to master so we always have a working 			prototype of the game.
 ------------------------------------------------------------------------------------------------------------------------	WORK COMPLETED/NOT COMPLETED
-	-Completed:
-		-As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it to].
-    -As a user, I want to have status effects [so that the game is more interesting].
-    -As a user, I want armor, weapons, and accessories [so that I can protect myself and fight monsters more efficiently]. 
-    -As a user, I want consumable items [so that I can heal].
-  -Not Completed:
-    -As a user, I want traps and terrain interaction [so that the floors have more user interaction and are more interesting      to play through]. 
-    -As a user, I want themed levels with themed mobs and traps [so that the floors are unique and not so monotonous]. 
+-Completed:
+	-As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it to].
+    	-As a user, I want to have status effects [so that the game is more interesting].
+    	-As a user, I want armor, weapons, and accessories [so that I can protect myself and fight monsters more efficiently]. 
+    	-As a user, I want consumable items [so that I can heal].
+ -Not Completed:
+    	-As a user, I want traps and terrain interaction [so that the floors have more user interaction and are more interesting      to play through]. 
+    	-As a user, I want themed levels with themed mobs and traps [so that the floors are unique and not so monotonous]. 
 ------------------------------------------------------------------------------------------------------------------------	
 WORK COMPLETION RATE FOR SPRINT 1
 	Total User Stories: 4
