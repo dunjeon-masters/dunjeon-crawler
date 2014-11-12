@@ -13,17 +13,18 @@
 (def cli? (atom false))
 
 (def get-default-pri
-  {:floor 1
-   :forest-floor 1
+  {:floor 0
+   :forest-floor 0
    :dune 0
+   :open-door 1
    :health-potion 2
-   :torch 3
-   :gold 4
-   :wall 5
-   :tree 5
-   :lichen 6
-   :bat 7
-   :skeleton 8
+   :torch 2
+   :gold 2
+   :wall 3
+   :tree 3
+   :lichen 4
+   :bat 4
+   :skeleton 4
    :else 99
    :player 100})
 

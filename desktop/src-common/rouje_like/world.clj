@@ -178,6 +178,24 @@
                       e-trap (:id trap)]
                   (rj.trap/add-trap system tile trap-type e-trap))
                 system)))
+          (door-take-damage-fn [c-this e-this damage e-from system]
+            (if-let [c-door (rj.e/get-c-on-e system e-this :door)]
+              (as-> (rj.e/upd-c system e-this :position
+                                (fn [c-position]
+                                  (assoc-in c-position [:type]
+                                            :open-door))) system
+                (let [c-position (rj.e/get-c-on-e system e-this :position)
+                      e-world (first (rj.e/all-e-with-c system :world))]
+                  (rj.u/update-in-world system e-world
+                                        [(:z c-position) (:x c-position) (:y c-position)]
+                                        (fn [entities]
+                                          (map
+                                            #(if (#{e-this} (:id %))
+                                               (assoc-in % [:type]
+                                                         :open-door)
+                                               %)
+                                            entities)))))
+              system))
           (entity-ize-door [system tile]
             (let [entities (:entities tile)
                   door (filter #(#{:door} (:type %)) entities)]
@@ -197,23 +215,7 @@
                                      :max-hp 1
                                      :def 0
                                      :take-damage-fn
-                                     (fn [c-this e-this damage e-from system]
-                                       (if-let [c-door (rj.e/get-c-on-e system e-this :door)]
-                                         (as-> (rj.e/upd-c system e-this :position
-                                                           (fn [c-position]
-                                                             (assoc-in c-position [:type]
-                                                                       :open-door))) system
-                                           (let [c-position (rj.e/get-c-on-e system e-this :position)
-                                                 e-world (first (rj.e/all-e-with-c system :world))]
-                                             (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
-                                                                   (fn [entities]
-                                                                     (map
-                                                                       #(if (#{e-this} (:id %))
-                                                                          (assoc-in % [:type]
-                                                                                    :open-door)
-                                                                          %)
-                                                                       entities)))))
-                                         system))}]]))
+                                     door-take-damage-fn}]]))
                 system)))]
     (let [e-world (first (rj.e/all-e-with-c system :world))
           c-world (rj.e/get-c-on-e system e-world :world)
