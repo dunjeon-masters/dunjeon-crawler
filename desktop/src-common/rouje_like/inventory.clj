@@ -1,7 +1,8 @@
 (ns rouje-like.inventory
   (:require [rouje-like.utils :refer [?]]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.equipment :as rj.eq]))
+            [rouje-like.equipment :as rj.eq]
+            [rouje-like.status-effects :as rj.stef]))
 
 (defn add-junk
   [system e-this item]
@@ -39,6 +40,11 @@
     (if item
       (do (as-> system system
               (rj.eq/switch-equipment system e-this item)
+              (rj.e/upd-c system e-this :attacker
+                          (fn [c-attacker]
+                            (update-in c-attacker [:status-effects]
+                                       (fn [status-effects]
+                                         (map #(assoc % :apply-fn ((? (:type %)) rj.stef/effect-type->apply-fn)) (? status-effects))))))
               (if ((:type item) c-equip)
                   (add-junk system e-this item)
                   system)

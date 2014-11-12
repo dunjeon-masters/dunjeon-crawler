@@ -91,7 +91,6 @@
         weapon (rj.eq/equipment-name (:weapon c-equip))
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
-
         attack (:atk c-attacker)
 
         c-energy (rj.e/get-c-on-e system e-this :energy)

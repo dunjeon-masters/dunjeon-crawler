@@ -85,12 +85,13 @@
 
 (def weapon-effects
   (->> (flatten
-         [(repeat 1 [:bloodletting])
-          (repeat 1 [:pain])
+         [(repeat 1 [:bloodletting {:atk 1}])
+          (repeat 1 [:pain {:atk 1}])
           (repeat 1 [:poison])
           (repeat 1 [:paralysis])
-          (repeat 1 [:power])
-          (repeat 1 [:death])
+          (repeat 1 [:power {:atk 2}])
+          (repeat 1 [:death {:atk 2}])
+          (repeat 1 [:fire])
           (repeat 1 [nil])])
        (partition 2)))
 
@@ -100,6 +101,17 @@
           (repeat 1 [:chainmail  {:max-hp 3}])
           (repeat 1 [:tunic      {:max-hp 1}])])
        (partition 2)))
+
+(def status-effects
+  {:paralysis {:type     :paralysis
+               :duration 2
+               :value    1}
+   :poison    {:type     :poison
+               :duration 2
+               :value    2}
+   :fire      {:type     :burn
+               :duration 2
+               :value    2}})
 
 ;; CREATURE CONFIG
 (def bat-stats

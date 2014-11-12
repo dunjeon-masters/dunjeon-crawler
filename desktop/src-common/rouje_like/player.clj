@@ -137,10 +137,7 @@
                  :dig-fn      dig}]
        [:attacker {:atk              (+ (:atk rj.cfg/player-stats)
                                         (:atk (rj.cfg/race->stats player-race)))
-                   :status-effects   [{:type :burn :duration 3
-                                       :value 1
-                                       :apply-fn rj.stef/apply-poison
-                                       :e-from e-player}]
+                   :status-effects   []
                    :can-attack?-fn   rj.atk/can-attack?
                    :attack-fn        rj.atk/attack
                    :is-valid-target? (constantly true)}]

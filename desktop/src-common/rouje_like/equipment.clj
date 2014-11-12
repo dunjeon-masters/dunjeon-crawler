@@ -83,6 +83,31 @@
             (assoc r k (apply f v args)))
           {} m))
 
+(defn get-stat-map
+  [effect]
+  "Returns map of status effect in weapon-status-effects"
+  (effect rj.cfg/status-effects))
+
+(defn add-effect
+  [system e-this effect]
+  "Add effect to e-this"
+  effect
+  (if (nil? effect)
+    system
+    (if-let [stat-map (get-stat-map effect)]
+      (rj.e/upd-c system e-this :attacker
+                  (fn [c-attacker]
+                    (update-in c-attacker [:status-effects]
+                               conj (assoc stat-map :e-from e-this))))
+      system)))
+
+(defn remove-effects
+  [system e-this]
+  (rj.e/upd-c system e-this :attacker
+              (fn [c-attacker]
+                (update-in c-attacker [:status-effects]
+                           (fn [_] [])))))
+
 (defn switch-equipment
   [system e-this new-eq]
   "Switch the current equipment slot on E-THIS with C-NEW-EQ and update
@@ -97,11 +122,13 @@
     (-> system
           ;; iterate over old-stats and pass them to update-stat for removal
           (update-stats e-this (update-values old-stats -))
+          (remove-effects e-this)
           ;; switch equipment
           (rj.e/upd-c e-this :equipment
                       (fn [c-eq]
                         (assoc-in c-eq [eq-type]
                                   new-eq)))
           ;; iterate over new-stats and pass them to update-stat
-          (update-stats e-this new-stats))))
+          (update-stats e-this new-stats)
+          (add-effect e-this (:effect new-eq)))))
 
