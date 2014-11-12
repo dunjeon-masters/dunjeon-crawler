@@ -44,7 +44,7 @@
                           (fn [c-attacker]
                             (update-in c-attacker [:status-effects]
                                        (fn [status-effects]
-                                         (map #(assoc % :apply-fn ((? (:type %)) rj.stef/effect-type->apply-fn)) (? status-effects))))))
+                                         (map #(assoc % :apply-fn ((:type %) rj.stef/effect-type->apply-fn)) (? status-effects))))))
               (if ((:type item) c-equip)
                   (add-junk system e-this item)
                   system)
