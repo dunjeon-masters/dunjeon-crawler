@@ -382,24 +382,7 @@
                         trap-type (:type trap)
                         e-trap (:id trap)
                         target-tile tile]
-                    (rj.e/system<<components
-                      system e-trap
-                      [[:trap {}]
-                       [:position {:x    (:x target-tile)
-                                   :y    (:y target-tile)
-                                   :z    (:z target-tile)
-                                   :type (keyword (str (name trap-type) "-" (name :trap)))}]
-                       [:sight {:distance 2}]
-                       [:attacker {:atk              (:atk rj.cfg/trap-stats)
-                                   :can-attack?-fn   rj.atk/can-attack?
-                                   :attack-fn        rj.atk/attack
-                                   :status-effects   []
-                                   :is-valid-target? (partial #{:player})}]
-                       [:tickable {:tick-fn rj.trap/process-input-tick
-                                   :pri 0}]
-                       [:broadcaster {:name-fn (constantly (str "the "
-                                                                (name trap-type)
-                                                                " trap"))}]]))
+                    (rj.trap/add-trap system target-tile trap-type e-trap))
                   system)))
             system (flatten level))))
 

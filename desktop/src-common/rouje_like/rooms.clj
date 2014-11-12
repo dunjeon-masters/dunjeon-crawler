@@ -46,7 +46,7 @@
    :door (let [[x y] (rand-nth (valid-door-locs x y width height))]
            [x y :d])})
 
-(defn update-in-level
+(defn change-in-level
   [cell level]
   (map #(if (and (= (% 0) (cell 0))
                  (= (% 1) (cell 1)))
@@ -54,16 +54,24 @@
        level))
 
 (defn room->points
-  [{:keys [x y width height door]}]
-  (update-in-level
-    door
-    (map (fn [[i j _ :as t]]
-           (if (or (seq (clojure.set/intersection #{i} #{x (+ -1 x width)}))
-                   (seq (clojure.set/intersection #{j} #{y (+ -1 y width)})))
-             (assoc t 2 :w) t))
-         (for [i (range x (+ x width))
-               j (range y (+ y height))]
-           [i j (if (< (rand-int 100) 10) :t :f)]))))
+  [{:keys [x y width height door] :as room}]
+  (let [corner? (fn [{:keys [x y width height]} [i j]]
+                  (let [x-max (+ -1 x width)
+                        y-max (+ -1 y height)]
+                    (or (= [i j] [x     y])
+                        (= [i j] [x     y-max])
+                        (= [i j] [x-max y])
+                        (= [i j] [x-max y-max]))))]
+    (change-in-level
+      door
+      (map (fn [[i j _ :as t]]
+             (if (or (seq (clojure.set/intersection #{i} #{x (+ -1 x width)}))
+                     (seq (clojure.set/intersection #{j} #{y (+ -1 y width)})))
+               (assoc t 2 (if (and (not (corner? room [i j]))
+                                   (< (rand-int 100) 20)) :t :w)) t))
+           (for [i (range x (+ x width))
+                 j (range y (+ y height))]
+             [i j :f])))))
 
 (defn room-in-level?
   [level {:keys [x y width height]}]
