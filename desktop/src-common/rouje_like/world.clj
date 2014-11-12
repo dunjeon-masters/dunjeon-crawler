@@ -164,7 +164,7 @@
                      [:destructible {:hp hp
                                      :max-hp hp
                                      :def 0
-                                     :take-damage-fn (if (= :maze-wall wall-type)
+                                     :take-damage-fn (if (rj.cfg/<indestructible-walls> wall-type)
                                                        (fn [c e _ f s]
                                                          (rj.d/take-damage c e 0 f s))
                                                        rj.d/take-damage)}]]))
@@ -428,7 +428,7 @@
                               (fn [tile]
                                 (update-in tile [:entities]
                                            conj (rj.c/map->Entity {:id (br.e/create-entity)
-                                                                   :type :wall}))))
+                                                                   :type :temple-wall}))))
                 :f (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]

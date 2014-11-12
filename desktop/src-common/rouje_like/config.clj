@@ -18,6 +18,9 @@
 (def <walls>
   #{:door :wall :tree :maze-wall})
 
+(def <indestructible-walls>
+  #{:temple-wall :maze-wall})
+
 (def <items>
   #{:torch :gold :health-potion})
 

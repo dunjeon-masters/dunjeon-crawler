@@ -78,21 +78,18 @@
         level (nth levels (:z c-position))
 
         c-sight (rj.e/get-c-on-e system e-this :sight)
-        is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
-                                                                        #(<= %  (:distance c-sight))))
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
-        target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
-                              is-player-within-range?)
+        target-tile (if (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
                       (get-in level player-pos nil)
                       nil)
         e-target (:id (rj.u/tile->top-entity target-tile))]
     (if (not (nil? target-tile))
       (-> (cond
-              (can-attack? c-attacker e-this e-target system)
-              (attack c-attacker e-this e-target system)
+            (can-attack? c-attacker e-this e-target system)
+            (attack c-attacker e-this e-target system)
 
-              :else system))
+            :else system))
       system)))
 
