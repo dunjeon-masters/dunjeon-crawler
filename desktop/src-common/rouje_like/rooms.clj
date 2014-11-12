@@ -53,13 +53,13 @@
 
 (defn room->points
   [{:keys [x y width height door] :as room}]
-  (let [corner? (fn [{:keys [x y width height]} [i j]]
-                  (let [x-max (+ -1 x width)
-                        y-max (+ -1 y height)]
-                    (or (= [i j] [x     y])
-                        (= [i j] [x     y-max])
-                        (= [i j] [x-max y])
-                        (= [i j] [x-max y-max]))))]
+  (letfn [(corner? [{:keys [x y width height]} [i j]]
+            (let [x-max (+ -1 x width)
+                  y-max (+ -1 y height)]
+              (or (= [i j] [x     y])
+                  (= [i j] [x     y-max])
+                  (= [i j] [x-max y])
+                  (= [i j] [x-max y-max]))))]
     (change-in-level
       door
       (map (fn [[i j _ :as t]]

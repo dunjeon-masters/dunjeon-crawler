@@ -38,7 +38,7 @@
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-trap
-                                                               :type :arrow-trap})))))]
+                                                               :type trap-type})))))]
      {:system (add-trap system target-tile trap-type e-trap)
       :z (:z target-tile)}))
 
@@ -49,7 +49,7 @@
       [:position {:x    (:x target-tile)
                   :y    (:y target-tile)
                   :z    (:z target-tile)
-                  :type (keyword (str (name trap-type) "-" (name :trap)))}]
+                  :type trap-type}]
       [:sight {:distance 2}]
       [:attacker {:atk              (:atk rj.cfg/trap-stats)
                   :can-attack?-fn   rj.atk/can-attack?
@@ -59,8 +59,7 @@
       [:tickable {:tick-fn process-input-tick
                   :pri 0}]
       [:broadcaster {:name-fn (constantly (str "the "
-                                               (name trap-type)
-                                               " trap"))}]])))
+                                               (name trap-type)))}]])))
 
 (defn process-input-tick
   [_ e-this system]
