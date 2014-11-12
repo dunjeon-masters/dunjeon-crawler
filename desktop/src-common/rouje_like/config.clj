@@ -79,6 +79,12 @@
    :atk 3
    :exp 1})
 
+(def trap-stats
+  {:atk 1})
+
+(def trap-types
+  [:arrow])
+
 (def potion-stats
   {:health 5})
 

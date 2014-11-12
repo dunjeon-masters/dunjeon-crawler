@@ -83,7 +83,8 @@
                         (if (in-room? [x y])
                           (assoc-in level [y x] [x y t])
                           level))
-                      level points))
+                      level points)
+              level)
      :rooms (if valid-room?
               (conj rooms room)
               rooms)

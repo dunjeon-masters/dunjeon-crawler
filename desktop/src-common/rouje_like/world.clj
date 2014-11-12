@@ -15,6 +15,7 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
             [rouje-like.skeleton :as rj.sk]
+            [rouje-like.traps :as rj.trap]
             [rouje-like.portal :as rj.p]
             [rouje-like.config :as rj.cfg]))
 
@@ -186,6 +187,7 @@
       ;; If wall, add an entity to it
       (as-> system
         (entity-ize-walls system z))
+
       ;; Add Items: Gold, Torches...
       (as-> system
         (do (println "core::add-gold: " (not (nil? system))) system)
@@ -228,6 +230,13 @@
         (nth (iterate rj.sk/add-skeleton {:system system :z z})
              (* (/ init-skeleton% 100)
                 (apply * (vals rj.cfg/world-sizes))))
+        (:system system))
+
+      ;; Spawn Traps
+      (as-> system
+        (do (println "core::add-trap " (not (nil? system))) system)
+        (nth (iterate rj.trap/add-trap {:system system :z z})
+             5)
         (:system system))))
 
 (defn ^:private add-portal
@@ -292,7 +301,6 @@
             (recur (first candidates)
                    (rest candidates))))
         nil))))
-
 (defn ^:private maze:floor-it
   [tile]
   (assoc tile 2 :f))
@@ -301,6 +309,7 @@
   [level pos]
   (update-in level pos
              maze:floor-it))
+
 (defn ^:private maze:get-candidate
   [cells alg perc]
   (case alg
@@ -317,6 +326,7 @@
                   (first cells)
                   (last cells))
     :else (first cells)))
+
 (defn ^:private maze:growing-tree
   [level]
   (let [init-tile (rand-nth (rand-nth level))
@@ -361,10 +371,42 @@
                 level))
             level (map vec (partition 3 (flatten maze))))))
 
+(defn ^:private generate-desert
+  [level [width height]]
+  (let [desert (add-room (gen-level width height :f) (create-room [5 5] [5 5]))]
+    (reduce (fn [level cell]
+              (case (cell 2)
+                :w (update-in level [(cell 0) (cell 1)]
+                              (fn [tile]
+                                (update-in tile [:entities]
+                                           (fn [entities]
+                                             conj (rj.c/map->Entity {:id (br.e/create-entity)
+                                                                     :type :wall})))))
+                :f (update-in level [(cell 0) (cell 1)]
+                              (fn [tile]
+                                (update-in tile [:entities]
+                                           (fn [entities]
+                                             (remove #(#{:wall} (:type %))
+                                                     entities)))))
+                :t (update-in level [(cell 0) (cell 1)]
+                              (fn [tile]
+                                (update-in tile [:entities]
+                                           (fn [entities]
+                                             conj (map->)))))
+                :d (update-in level [(cell 0) (cell 1)]
+                              (fn [tile]
+                                (update-in tile [:entities]
+                                           (fn [entities]
+                                             (remove #(#{:wall} (:type %))
+                                                     entities)))))
+                level))
+            level (map vec (partition 3 (flatten desert))))))
+
 (defn generate-random-level
   ([level-sizes z]
-   (let [world-types [:cave :desert :maze :forest]]
-     (generate-random-level level-sizes z (rand-nth world-types))))
+   (let [world-types [:cave :desert :maze :forest]
+         world-type (rand-nth world-types)]
+     (generate-random-level level-sizes z world-type)))
 
   ([{:keys [width height]} z world-type]
    (case world-type
@@ -392,26 +434,28 @@
                     2)
                (:level level)))
 
-     :desert (vec (map vec
-                       (for [x (range width)]
-                         (for [y (range height)]
-                           (rj.c/map->Tile {:x x :y y :z z
-                                            :entities [(rj.c/map->Entity {:id   nil
-                                                                          :type :dune})]})))))
+     :desert (let [level (vec
+                           (map vec
+                                (for [x (range width)]
+                                  (for [y (range height)]
+                                    (rj.c/map->Tile {:x x :y y :z z
+                                                     :entities [(rj.c/map->Entity {:id   nil
+                                                                                   :type :dune})]})))))]
+               (generate-desert level [width height] z))
 
      :forest (let [level (vec
-                         (map vec
-                              (for [x (range width)]
-                                (for [y (range height)]
-                                  (update-in (rj.c/map->Tile {:x x :y y :z z
-                                                              :entities [(rj.c/map->Entity {:id   nil
-                                                                                            :type :forest-floor})]})
-                                             [:entities] (fn [entities]
-                                                           (if (< (rand-int 100) init-wall%)
-                                                             (conj entities
-                                                                   (rj.c/map->Entity {:id   (br.e/create-entity)
-                                                                                      :type :tree}))
-                                                             entities)))))))]
+                           (map vec
+                                (for [x (range width)]
+                                  (for [y (range height)]
+                                    (update-in (rj.c/map->Tile {:x x :y y :z z
+                                                                :entities [(rj.c/map->Entity {:id   nil
+                                                                                              :type :forest-floor})]})
+                                               [:entities] (fn [entities]
+                                                             (if (< (rand-int 100) init-wall%)
+                                                               (conj entities
+                                                                     (rj.c/map->Entity {:id   (br.e/create-entity)
+                                                                                        :type :tree}))
+                                                               entities)))))))]
              ;; SMOOTH-WORLD
              (as-> level level
                (nth (iterate forest:smooth-level-v1 {:level level

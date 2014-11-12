@@ -61,6 +61,8 @@
 
 (defrecord Torch [brightness])
 
+(defrecord Trap [])
+
 (defrecord Wallet [^Number gold])
 
 (defrecord World [levels
@@ -147,5 +149,6 @@
             :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
+            :trap         (type (->Trap))
             :wallet       (type (->Wallet nil))
             :world        (type (->World nil nil))})
