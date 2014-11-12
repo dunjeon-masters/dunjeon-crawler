@@ -3,17 +3,29 @@
             [clojure.pprint :refer [pprint]]
 
             [rouje-like.entity-wrapper :as rj.e]
+            [rouje-like.config :as rj.cfg]
             [rouje-like.components :as rj.c]))
+
+#_(in-ns 'rouje-like.utils)
+#_(use 'rouje-like.utils :reload)
+
+(def cli (atom ""))
+(def cli? (atom false))
 
 (def get-default-pri
   {:floor 1
-   :torch 2
-   :gold 3
-   :wall 4
-   :lichen 5
-   :bat 6
-   :else 7
-   :player 8})
+   :forest-floor 1
+   :dune 0
+   :health-potion 2
+   :torch 3
+   :gold 4
+   :wall 5
+   :tree 5
+   :lichen 6
+   :bat 7
+   :skeleton 8
+   :else 99
+   :player 100})
 
 (defn sort-by-type
   [entities get-pri]
@@ -77,14 +89,14 @@
   (let [result (if (< sight
                       (taxicab-dist [x y] [i j]))
                  false
-                 (as-> (points->line [x y] [i j]) line 
-                   (filter (fn [[x y]] 
+                 (as-> (points->line [x y] [i j]) line
+                   (filter (fn [[x y]]
                              (-> (get-in level [x y])
                                  (tile->top-entity)
                                  (:type)
-                                 (#{:wall :lichen})))
+                                 (rj.cfg/<sight-blockers>)))
                            line)
-                   (every? (partial = [i j]) 
+                   (every? (partial = [i j])
                            line)))]
     result))
 
@@ -173,14 +185,14 @@
  [start end]
  (+ (rand-int (- (inc end) start)) start))
 
-;;target-pos = [31 36] @([rouje_like/skeleton.clj:76])
+;;@[turn: xxxx] x = ~x #([rouje_like/skeleton.clj:76])
 (defmacro ? [x]
   (let [line  (:line (meta &form))
         file *file*]
     `(let [x# ~x]
-       (println (pr-str '~x) "=" (pr-str x#)
-                (str "#(" ~file ":" ~line ")")
-                (str "@[" (quot  (System/currentTimeMillis) 1000) "]"))
+       (println (str "@[" (apply str (drop 5 (str (System/currentTimeMillis)))) "]: ")
+                (pr-str '~x) "=" (pr-str x#)
+                (str "#(" ~file ":" ~line ")"))
        x#)))
 
 (defn update-in-world

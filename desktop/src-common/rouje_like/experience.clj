@@ -24,12 +24,11 @@
                               (wrand [3 3 3 1]))]
     (if (= stat-to-level-up :all)
       (-> system
-          (level-up-stats e-this :hp)
+          (level-up-stats e-this :max-hp)
           (level-up-stats e-this :atk)
           (level-up-stats e-this :def))
       (level-up-stats system e-this stat-to-level-up))))
   ([system e-this stat-to-level-up]
-   (println stat-to-level-up)
    (let [comp-to-level-up (rj.cfg/stat->comp stat-to-level-up)]
      (rj.e/upd-c system e-this comp-to-level-up
                  (fn [c-comp]
@@ -51,3 +50,4 @@
                                   (inc level)))
           (level-up-stats e-this))
       system)))
+

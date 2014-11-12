@@ -6,9 +6,13 @@
             [rouje-like.components :as rj.c :refer [can-move? move
                                                     can-attack? attack]]
             [rouje-like.mobile :as rj.m]
+            [rouje-like.messaging :as rj.msg]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.status-effects :as rj.stef]
+            [rouje-like.config :as rj.cfg]
+            [clojure.set :refer [union]]))
+
 
 (declare process-input-tick)
 
@@ -23,12 +27,13 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
+       (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
          (add-skeleton system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-skeleton (br.e/create-entity)
+         hp (:hp rj.cfg/skeleton-stats)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
@@ -49,15 +54,22 @@
                  [:attacker {:atk              (:atk rj.cfg/skeleton-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   [{:type :paralysis
+                                                 :duration 2
+                                                 :value 1
+                                                 :e-from e-skeleton
+                                                 :apply-fn rj.stef/apply-paralysis}]
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/skeleton-stats)
+                 [:destructible {:hp         hp
+                                 :max-hp     hp
                                  :def        (:def rj.cfg/skeleton-stats)
                                  :can-retaliate? false
-                                 :take-damage-fn rj.d/take-damage}]
+                                 :take-damage-fn rj.d/take-damage
+                                 :status-effects []}]
                  [:killable {:experience (:exp rj.cfg/skeleton-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the skeleton")}]]) 
+                 [:broadcaster {:name-fn (constantly "the skeleton")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -71,7 +83,7 @@
         offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
                                         shuffled-directions)
 
-        is-valid-target-tile? #{:floor :torch :gold :player}
+        is-valid-target-tile? rj.cfg/<valid-mob-targets>
 
         nth->offset-pos (fn [index]
                             (nth offset-shuffled-directions index))
@@ -79,7 +91,8 @@
                            (and (< (rj.u/taxicab-dist target-pos+offset target-pos)
                                    dist-from-target)
                                 (is-valid-target-tile?
-                                  (:type (rj.u/tile->top-entity (get-in level target-pos+offset))))))]
+                                  (:type (rj.u/tile->top-entity
+                                           (get-in level target-pos+offset))))))]
     (cond
       (isa-closer-tile? (nth->offset-pos 0))
       (get-in level (nth->offset-pos 0))
@@ -115,7 +128,7 @@
         c-sight (rj.e/get-c-on-e system e-this :sight)
         is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
                                                                         #(<= %  (:distance c-sight))))
-        
+
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
         target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
@@ -126,14 +139,15 @@
                         nil))
         e-target (:id (rj.u/tile->top-entity target-tile))]
     (if (not (nil? target-tile))
-      (cond
-        (and (< (rand-int 100) 80)
-             (can-move? c-mobile e-this target-tile system))
-        (move c-mobile e-this target-tile system)
+      (-> (cond
+              (and (< (rand-int 100) 80)
+                   (can-move? c-mobile e-this target-tile system))
+              (move c-mobile e-this target-tile system)
 
-        (can-attack? c-attacker e-this e-target system)
-        (attack c-attacker e-this e-target system)
+              (can-attack? c-attacker e-this e-target system)
+              (attack c-attacker e-this e-target system)
 
-        :else system)
+              :else system)
+        (rj.d/apply-effects e-this))
       system)))
 

@@ -4,7 +4,7 @@
 
 (defrecord Bat [])
 
-(defrecord Broadcaster [msg-fn])
+(defrecord Broadcaster [name-fn])
 
 (defrecord Counter [turn])
 
@@ -13,8 +13,13 @@
 
 (defrecord Drake [])
 
+(defrecord Energy [energy])
+
+
 (defrecord Entity [^Keyword id
                    ^Keyword type])
+
+(defrecord Equipment [equipment])
 
 (defrecord Experience [experience
                        level
@@ -23,6 +28,8 @@
 (defrecord Giant_amoeba [])
 
 (defrecord Gold [value])
+
+(defrecord Inventory [slot junk])
 
 (defrecord Item [pickup-fn])
 
@@ -39,7 +46,8 @@
 
 (defrecord Necromancer [])
 
-(defrecord Player [show-world?])
+(defrecord Player [name
+                   show-world?])
 
 (defrecord PlayerSight [distance
                         decline-rate
@@ -78,12 +86,14 @@
 
 (defrecord Wallet [^Number gold])
 
-(defrecord World [levels])
+(defrecord World [levels
+                  add-level-fn])
 
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
   (attack      [this e-this e-target system]))
 (defrecord Attacker [^Number atk
+                     status-effects
                      ^Fn attack-fn
                      ^Fn can-attack?-fn
                      is-valid-target?]
@@ -96,7 +106,9 @@
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
 (defrecord Destructible [^Number hp
+                         ^Number max-hp
                          ^Number def
+                         status-effects
                          can-retaliate?
                          ^Fn take-damage-fn]
   IDestructible
@@ -130,18 +142,21 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker     (type (->Attacker nil nil nil nil))
+  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
-            :destructible (type (->Destructible nil nil nil nil))
+            :destructible (type (->Destructible nil nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
             :drake        (type (->Drake))
+            :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
+            :equipment    (type (->Equipment nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
             :giant_amoeba (type (->Giant_amoeba))
+            :inventory    (type (->Inventory nil nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :large_amoeba (type (->Large_amoeba))
@@ -149,7 +164,7 @@
             :mobile       (type (->Mobile nil nil))
             :mimic        (type (->Mimic))
             :necromancer  (type (->Necromancer))
-            :player       (type (->Player nil))
+            :player       (type (->Player nil nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :portal       (type (->Portal nil nil nil))
             :position     (type (->Position nil nil nil nil))
@@ -167,4 +182,4 @@
             :torch        (type (->Torch nil))
             :troll        (type (->Troll))
             :wallet       (type (->Wallet nil))
-            :world        (type (->World nil))})
+            :world        (type (->World nil nil))})

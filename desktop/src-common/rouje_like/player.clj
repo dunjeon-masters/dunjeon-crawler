@@ -3,13 +3,14 @@
            [com.badlogic.gdx.scenes.scene2d.ui Label Skin])
   (:require [play-clj.core :refer :all]
             [play-clj.ui :refer :all]
-            [play-clj.g2d :refer [texture texture!]]
 
             [rouje-like.components :as rj.c :refer [can-attack? attack
                                                     can-move? move]]
+            [rouje-like.rendering :as rj.r]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.destructible :as rj.d]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.mobile :as rj.m]
             [brute.entity :as br.e]
@@ -17,17 +18,16 @@
             [rouje-like.config :as rj.cfg]))
 
 (defn can-dig?
-  [_ target]
-  (#{:wall} (:type (rj.u/tile->top-entity target))))
+  [_ _ target]
+  (rj.cfg/<walls> (:type (rj.u/tile->top-entity target))))
 
 (defn dig
-  [system target-tile]
-  (let [e-world (first (rj.e/all-e-with-c system :world))]
-    (-> system
-        (rj.u/update-in-world e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
-                               (fn [entities]
-                                 (remove #(#{:wall} (:type %))
-                                         entities))))))
+  [system e-this target-tile]
+  (let [target-top-entity (rj.u/tile->top-entity target-tile)
+        damage 1
+        e-target (:id target-top-entity)
+        c-destr (rj.e/get-c-on-e system e-target :destructible)]
+    (rj.c/take-damage c-destr e-target damage e-this system)))
 
 (defn process-input-tick
   [system direction]
@@ -47,44 +47,48 @@
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels z-pos) 
-        
+        world (nth levels z-pos)
+
         target-coords (rj.u/coords+offset [x-pos y-pos]
                                           (rj.u/direction->offset
                                             direction))
         target-tile (get-in world target-coords nil)]
     (if (and (not (nil? target-tile)))
-      (-> (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
-                c-digger   (rj.e/get-c-on-e system e-this :digger)
-                c-attacker (rj.e/get-c-on-e system e-this :attacker)
-                e-target (:id (rj.u/tile->top-entity target-tile))]
-            (cond
-              (can-move? c-mobile e-this target-tile system)
-              (move c-mobile e-this target-tile system)
+      (as-> (let [c-mobile   (rj.e/get-c-on-e system e-this :mobile)
+                  c-digger   (rj.e/get-c-on-e system e-this :digger)
+                  c-attacker (rj.e/get-c-on-e system e-this :attacker)
+                  e-target (:id (rj.u/tile->top-entity target-tile))]
+              (cond
+                (can-move? c-mobile e-this target-tile system)
+                (move c-mobile e-this target-tile system)
 
-              ((:can-dig?-fn c-digger) system target-tile)
-              ((:dig-fn c-digger) system target-tile)
+                ((:can-dig?-fn c-digger) system e-this target-tile)
+                ((:dig-fn c-digger) system e-this target-tile)
 
-              (can-attack? c-attacker e-this e-target system)
-              (attack c-attacker e-this e-target system)
+                (can-attack? c-attacker e-this e-target system)
+                (attack c-attacker e-this e-target system)
 
-              :else system))
-          (rj.e/upd-c e-this :playersight
-                      (fn [c-playersight]
-                        (update-in c-playersight [:distance] dec-sight)))
-          (as-> system
-                (let [c-position (rj.e/get-c-on-e system e-this :position)
-                      this-pos [(:z c-position) (:x c-position) (:y c-position)]
-                      this-tile (get-in levels this-pos)
+                :else system)) system
+        (rj.d/apply-effects system e-this)
+        (rj.e/upd-c system e-this :playersight
+                    (fn [c-playersight]
+                      (update-in c-playersight [:distance] dec-sight)))
+        (let [c-position (rj.e/get-c-on-e system e-this :position)
+              this-pos [(:z c-position) (:x c-position) (:y c-position)]
+              this-tile (get-in levels this-pos)
 
-                      ;;TODO: There might be multiple items & user might want to choose to not pickup
-                      item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
-                                          (:entities this-tile)))]
-                  (if item
-                    (let [e-item (:id item)
-                          c-item (rj.e/get-c-on-e system e-item :item)]
-                      ((:pickup-fn c-item) system e-this e-item this-pos (:type item)))
-                    system))))
+              ;;TODO: There might be multiple items & user might want to choose
+              ;;to not pickup
+              item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
+                                  (:entities this-tile)))]
+          (if item
+            (let [e-item (:id item)
+                  c-item (rj.e/get-c-on-e system e-item :item)]
+              ((:pickup-fn c-item) system e-this e-item this-pos (:type item)))
+            system))
+        (rj.e/upd-c system e-this :energy
+                    (fn [c-energy]
+                      (update-in c-energy [:energy] dec))))
       system)))
 
 (def ^:private init-player-x-pos (/ (:width  rj.cfg/world-sizes) 2))
@@ -96,15 +100,24 @@
 (def ^:private init-sight-upper-bound 11)                   ;; Exclusive
 (def ^:private init-sight-torch-multiplier 1.)
 
-(declare render-player)
 (defn init-player
-  [system]
+  [system {:keys [n r c] :or {n "the player"} :as user}]
   (let [e-player (br.e/create-entity)
-        player-class (rand-nth (keys rj.cfg/class->stats))
-        player-race (rand-nth (keys rj.cfg/race->stats))]
+
+        valid-class? (into #{} (keys rj.cfg/class->stats))
+        player-class (if (valid-class? (keyword c))
+                       (keyword c) (rand-nth (keys rj.cfg/class->stats)))
+
+        valid-race? (into #{} (keys rj.cfg/race->stats))
+        player-race (if (valid-race? (keyword r))
+                      (keyword r) (rand-nth (keys rj.cfg/race->stats)))
+
+        max-hp (+ (:max-hp rj.cfg/player-stats)
+                  (:max-hp (rj.cfg/race->stats player-race)))]
     (rj.e/system<<components
       system e-player
-      [[:player {:show-world? false}]
+      [[:player {:name n
+                 :show-world? false}]
        [:klass {:class player-class}]
        [:race {:race player-race}]
        [:experience {:experience 0
@@ -114,11 +127,19 @@
                    :y init-player-y-pos
                    :z 0
                    :type :player}]
+       [:equipment {:equipment nil}]
+       [:inventory {:slot nil :junk 0}]
+       [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]
        [:digger {:can-dig?-fn can-dig?
                  :dig-fn      dig}]
-       [:attacker {:atk              (+ (:atk rj.cfg/player-stats) (:atk (rj.cfg/race->stats player-race)))
+       [:attacker {:atk              (+ (:atk rj.cfg/player-stats)
+                                        (:atk (rj.cfg/race->stats player-race)))
+                   :status-effects   [{:type :burn :duration 3
+                                       :value 1
+                                       :apply-fn rj.stef/apply-poison
+                                       :e-from e-player}]
                    :can-attack?-fn   rj.atk/can-attack?
                    :attack-fn        rj.atk/attack
                    :is-valid-target? (constantly true)}]
@@ -128,59 +149,12 @@
                        :lower-bound   init-sight-lower-bound
                        :upper-bound   init-sight-upper-bound
                        :torch-multiplier   init-sight-torch-multiplier}]
-       [:renderable {:render-fn render-player
+       [:renderable {:render-fn rj.r/render-player
                      :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
-       [:destructible {:hp      (+ (:hp rj.cfg/player-stats) (:hp (rj.cfg/race->stats player-race)))
+       [:destructible {:max-hp max-hp
+                       :hp  max-hp
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
-                       :take-damage-fn rj.d/take-damage}]
-       [:broadcaster {:msg-fn (constantly "you")}]])))
-
-(defn render-player-stats
-  [_ e-this {:keys [view-port-sizes]} system]
-  (let [[_ vheight] view-port-sizes
-
-        c-race (rj.e/get-c-on-e system e-this :race)
-        race (:race c-race)
-
-        c-wallet (rj.e/get-c-on-e system e-this :wallet)
-        gold (:gold c-wallet)
-
-        c-experience (rj.e/get-c-on-e system e-this :experience)
-        experience (:experience c-experience)
-        level (:level c-experience)
-
-        c-position (rj.e/get-c-on-e system e-this :position)
-        x (:x c-position)
-        y (:y c-position)
-        z (:z c-position)
-
-        c-destructible (rj.e/get-c-on-e system e-this :destructible)
-        hp (:hp c-destructible)
-        def (:def c-destructible)
-
-        c-attacker (rj.e/get-c-on-e system e-this :attacker)
-        attack (:atk c-attacker)
-
-        renderer (new SpriteBatch)]
-    (.begin renderer)
-    (label! (label (str "Gold: [" gold "]"
-                        " - " "Position: [" x "," y "," z "]"
-                        " - " "HP: [" hp "]"
-                        " - " "Attack: [" attack "]"
-                        " - " "Defense: [" def "]"
-                        " - " "Race: [" race "]"
-                        " - " "Experience: [" experience "]"
-                        " - " "Level: [" level "]")
-
-                   (color :green)
-                   :set-y (float (* (+ vheight
-                                       (dec (+ (:top rj.cfg/padding-sizes)
-                                               (:btm rj.cfg/padding-sizes))))
-                                    rj.cfg/block-size)))
-            :draw renderer 1.0)
-    (.end renderer)))
-
-(defn render-player
-  [_ e-this args system]
-  (render-player-stats _ e-this args system))
+                       :take-damage-fn rj.d/take-damage
+                       :status-effects []}]
+       [:broadcaster {:name-fn (constantly n)}]])))

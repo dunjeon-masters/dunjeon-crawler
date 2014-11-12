@@ -2,11 +2,13 @@
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.components :as rj.c]
-            [rouje-like.portal :as rj.p]))
+            [rouje-like.portal :as rj.p]
+            [rouje-like.config :as rj.cfg]
+            [clojure.set :refer [union]]))
 
 (defn can-move?
   [_ _ target-tile _]
-  (#{:floor :gold :torch :portal} (:type (rj.u/tile->top-entity target-tile))))
+  (rj.cfg/<valid-move-targets> (:type (rj.u/tile->top-entity target-tile))))
 
 (defn add-entity [system e-world entity target-pos]
   "Add ENTITY to the tile at TARGET-POS."
@@ -26,9 +28,9 @@
     (rj.u/update-in-world system e-world target-pos
                           (fn [entities]
                             (vec
-                             (remove
-                              #(#{this-type} (:type %))
-                              entities))))))
+                              (remove
+                                #(#{this-type} (:type %))
+                                entities))))))
 
 (defn update-position [system entity target-tile]
   "Update the position of ENTITY to the position of TARGET-TILE."
@@ -48,11 +50,13 @@
 
 (defn port-entity [system e-world entity from-pos portal]
   "Teleport ENTITY from FROM-POS through PORTAL."
-  (let [to-pos (rj.p/portal-target-pos system portal)
+  (let [[z x y] (rj.p/portal-target-pos system portal)
         c-world (rj.e/get-c-on-e system e-world :world)
-        level (nth (:levels c-world) (nth to-pos 0))
-        target-tile (get-in level [(nth to-pos 1) (nth to-pos 2)])]
-    (move-entity system e-world entity to-pos from-pos target-tile)))
+        level (nth (:levels c-world) z)
+        target-tile (get-in level [x y])]
+    (as-> system system
+        (move-entity system e-world entity [z x y] from-pos target-tile)
+        ((:add-level-fn c-world) system (inc z)))))
 
 (defn move
   [_ e-this target-tile system]
@@ -65,3 +69,4 @@
     (if (and (= this-type :player) portal)
       (port-entity system e-world e-this this-pos portal)
       (move-entity system e-world e-this target-pos this-pos target-tile))))
+

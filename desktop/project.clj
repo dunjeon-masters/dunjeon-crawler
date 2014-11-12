@@ -16,10 +16,10 @@
                  [org.clojure/clojure "1.6.0"]
 
                  [play-clj "0.3.11"]
-                 [org.clojure/math.numeric-tower "0.0.4"]
-                 [camel-snake-kebab "0.2.5" :exclusions [org.clojure/clojure]]
-                 [clojure-lanterna "0.9.4"]]
-  
+
+                 [org.clojure/tools.trace "0.7.8"]
+                 [org.clojure/math.numeric-tower "0.0.4"]]
+
   :source-paths ["src" "src-common" ]
 
   :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]

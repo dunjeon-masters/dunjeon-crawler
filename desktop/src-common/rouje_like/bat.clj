@@ -21,12 +21,13 @@
                          (get-in world [(rand-int (count world))
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
-       (if (#{:floor} (:type (rj.u/tile->top-entity target-tile)))
+       (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
          (add-bat system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-bat (br.e/create-entity)
+         hp (:hp  rj.cfg/bat-stats)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
@@ -43,13 +44,15 @@
                              :type :bat}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
-                 [:destructible {:hp      (:hp  rj.cfg/bat-stats)
+                 [:destructible {:hp  hp
+                                 :max-hp hp
                                  :def (:def rj.cfg/bat-stats)
                                  :can-retaliate? false
-                                 :take-damage-fn rj.d/take-damage}]
+                                 :take-damage-fn rj.d/take-damage
+                                 :status-effects []}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:msg-fn (constantly "the bat")}]]) 
+                 [:broadcaster {:name-fn (constantly "the bat")}]])
       :z (:z target-tile)})))
 
 (defn process-input-tick

@@ -28,6 +28,10 @@
   [system entity]
   (br.e/kill-entity system entity))
 
+(defn all-c-on-e
+  [system entity]
+  (br.e/get-all-components-on-entity system entity))
+
 (defn ->CamelCase
   [k]
   (str (s/upper-case (first k))
@@ -42,7 +46,7 @@
   `(add-c ~s# ~e-this# ((keyword->new-component ~k-component#) ~m-component#)))
 
 (defmacro system<<components
-  [s e-this partitions] 
+  [s e-this partitions]
   `(let [s# ~s]
      (as-> s# ~'s
        ~@(for [p partitions]
