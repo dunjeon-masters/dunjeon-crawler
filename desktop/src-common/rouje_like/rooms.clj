@@ -30,9 +30,7 @@
 (defn valid-door-locs
   [x y w h]
   (let [x-off (int (math/ceil (/ (+ -1 x x w) 2)))
-        _ (? x-off)
-        y-off (int (math/ceil (/ (+ -1 y y h) 2)))
-        _ (? y-off)]
+        y-off (int (math/ceil (/ (+ -1 y y h) 2)))]
     [[x          y-off]
      [x-off      y]
      [x-off      (+ -1 y h)]

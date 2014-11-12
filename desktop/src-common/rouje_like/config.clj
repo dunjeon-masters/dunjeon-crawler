@@ -13,10 +13,10 @@
 
 ;; TILE TYPES
 (def <floors>
-  #{:dune :floor :forest-floor})
+  #{:open-door :dune :floor :forest-floor})
 
 (def <walls>
-  #{:wall :tree :maze-wall})
+  #{:door :wall :tree :maze-wall})
 
 (def <items>
   #{:torch :gold :health-potion})

@@ -131,6 +131,10 @@
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 255}
                 :tile-sheet grim-tile-sheet}
+     :open-door {:x 12 :y 5
+                 :width 12 :height 12
+                 :color {:r 255 :g 255 :b 255 :a 255}
+                 :tile-sheet grim-tile-sheet}
      :arrow-trap {:x 15 :y 3
                   :width 12 :height 12
                   :color {:r 255 :g 255 :b 255 :a 255}
@@ -187,7 +191,7 @@
 (def ^:private type->texture
   (memoize
     (fn [^Keyword type]
-      (let [tile-info (? (type->tile-info (? type)))
+      (let [tile-info (type->tile-info type)
             tile-sheet (:tile-sheet tile-info)
             width (:width tile-info)
             height (:height tile-info)

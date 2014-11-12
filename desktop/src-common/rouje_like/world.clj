@@ -145,35 +145,85 @@
                 (range (count level)))
    :z z})
 
-(defn entity-ize-walls
+(defn entity-ize-level
   [system z]
-  (let [e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
-        level (nth levels z)]
-    (reduce (fn [system tile]
-              (let [entities (:entities tile)
-                    wall (filter #(rj.cfg/<walls> (:type %)) entities)]
-                (if (seq wall)
-                  (let [wall (first wall)
-                        wall-type (:type wall)
-                        e-wall (:id wall)
-                        hp (:hp (rj.cfg/wall->stats wall-type))]
-                    (rj.e/system<<components
-                      system e-wall
-                      [[:position {:x (:x tile)
-                                   :y (:y tile)
-                                   :z z
-                                   :type wall-type}]
-                       [:destructible {:hp hp
-                                       :max-hp hp
-                                       :def 0
-                                       :take-damage-fn (if (= :maze-wall wall-type)
-                                                        (fn [c e _ f s]
-                                                          (rj.d/take-damage c e 0 f s))
-                                                        rj.d/take-damage)}]]))
-                  system)))
-            system (flatten level))))
+  (letfn [(entity-ize-wall [system tile]
+            (let [entities (:entities tile)
+                  wall (filter #(rj.cfg/<walls> (:type %)) entities)]
+              (if (seq wall)
+                (let [wall (first wall)
+                      wall-type (:type wall)
+                      e-wall (:id wall)
+                      hp (:hp (rj.cfg/wall->stats wall-type))]
+                  (rj.e/system<<components
+                    system e-wall
+                    [[:position {:x (:x tile)
+                                 :y (:y tile)
+                                 :z z
+                                 :type wall-type}]
+                     [:destructible {:hp hp
+                                     :max-hp hp
+                                     :def 0
+                                     :take-damage-fn (if (= :maze-wall wall-type)
+                                                       (fn [c e _ f s]
+                                                         (rj.d/take-damage c e 0 f s))
+                                                       rj.d/take-damage)}]]))
+                system)))
+          (entity-ize-trap [system tile]
+            (let [entities (:entities tile)
+                  trap (filter #(#{:arrow-trap} (:type %)) entities)]
+              (if (seq trap)
+                (let [trap (first trap)
+                      trap-type (:type trap)
+                      e-trap (:id trap)]
+                  (rj.trap/add-trap system tile trap-type e-trap))
+                system)))
+          (entity-ize-door [system tile]
+            (let [entities (:entities tile)
+                  door (filter #(#{:door} (:type %)) entities)]
+              (if (seq door)
+                (let [door (first door)
+                      door-type (:type door)
+                      e-door (:id door)
+                      target-tile tile]
+                  (rj.e/system<<components
+                    system e-door
+                    [[:door {}]
+                     [:position {:x (:x tile)
+                                 :y (:y tile)
+                                 :z z
+                                 :type :door}]
+                     [:destructible {:hp 1
+                                     :max-hp 1
+                                     :def 0
+                                     :take-damage-fn
+                                     (fn [c-this e-this damage e-from system]
+                                       (if-let [c-door (rj.e/get-c-on-e system e-this :door)]
+                                         (as-> (rj.e/upd-c system e-this :position
+                                                           (fn [c-position]
+                                                             (assoc-in c-position [:type]
+                                                                       :open-door))) system
+                                           (let [c-position (rj.e/get-c-on-e system e-this :position)
+                                                 e-world (first (rj.e/all-e-with-c system :world))]
+                                             (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
+                                                                   (fn [entities]
+                                                                     (map
+                                                                       #(if (#{e-this} (:id %))
+                                                                          (assoc-in % [:type]
+                                                                                    :open-door)
+                                                                          %)
+                                                                       entities)))))
+                                         system))}]]))
+                system)))]
+    (let [e-world (first (rj.e/all-e-with-c system :world))
+          c-world (rj.e/get-c-on-e system e-world :world)
+          levels (:levels c-world)
+          level (nth levels z)]
+      (reduce (fn [system tile]
+                (reduce (fn [system entity-izer]
+                          (entity-izer system tile))
+                        system [entity-ize-wall entity-ize-trap entity-ize-door]))
+              system (flatten level)))))
 
 (def ^:private init-wall% 45)
 (def ^:private init-torch% 2)
@@ -184,13 +234,11 @@
 (def ^:private init-skeleton% 1)
 (def ^:private init-trap% 0)
 
-(declare entity-ize-traps)
 (defn ^:private init-entities
   [system z]
   (-> system
       (as-> system
-        (entity-ize-walls system z)
-        (entity-ize-traps system z))
+        (entity-ize-level system z))
 
       ;; Add Items: Gold, Torches...
       (as-> system
@@ -367,24 +415,6 @@
                                                   entities)))))
                 level))
             level (map vec (partition 3 (flatten maze))))))
-
-(defn entity-ize-traps
-  [system z]
-  (let [e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
-        level (nth levels z)]
-    (reduce (fn [system tile]
-              (let [entities (:entities tile)
-                    trap (filter #(#{:arrow-trap} (:type %)) entities)]
-                (if (seq trap)
-                  (let [trap (first trap)
-                        trap-type (:type trap)
-                        e-trap (:id trap)
-                        target-tile tile]
-                    (rj.trap/add-trap system target-tile trap-type e-trap))
-                  system)))
-            system (flatten level))))
 
 (defn ^:private generate-desert
   [level [width height]]
