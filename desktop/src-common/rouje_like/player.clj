@@ -91,7 +91,6 @@
                       (update-in c-energy [:energy] dec))))
       system)))
 
-
 (defn init-player
   [system {:keys [n r c] :or {n "the player"} :as user}]
   (let [e-player (br.e/create-entity)
@@ -100,7 +99,6 @@
         {:keys [distance decline-rate
                 lower-bound upper-bound
                 torch-multiplier]} rj.cfg/player-sight
-        _ (? x-pos)
 
         valid-class? (into #{} (keys rj.cfg/class->stats))
         player-class (if (valid-class? (keyword c))
@@ -154,3 +152,14 @@
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
        [:broadcaster {:name-fn (constantly n)}]])))
+
+(defn add-player
+  [system]
+  (let [e-player (first (rj.e/all-e-with-c system :player))
+        e-world (first (rj.e/all-e-with-c system :world))]
+    (rj.u/update-in-world system e-world rj.cfg/player-init-pos
+                          (fn [entities]
+                            (vec (conj (filter #(rj.cfg/<floors> (:type %)) entities)
+                                       (rj.c/map->Entity {:id   e-player
+                                                          :type :player})))))))
+
