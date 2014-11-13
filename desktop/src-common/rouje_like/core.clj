@@ -44,7 +44,7 @@
             (do (println "core::add-player " (not (nil? system))) system)
             (let [e-player (first (rj.e/all-e-with-c system :player))
                   e-world (first (rj.e/all-e-with-c system :world))]
-              (rj.u/update-in-world system e-world rj.pl/init-player-pos
+              (rj.u/update-in-world system e-world rj.cfg/player-init-pos
                                     (fn [entities]
                                       (vec (conj (filter #(rj.cfg/<floors> (:type %)) entities)
                                                  (rj.c/map->Entity {:id   e-player

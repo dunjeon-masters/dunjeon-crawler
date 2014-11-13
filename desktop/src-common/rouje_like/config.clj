@@ -63,6 +63,18 @@
 (def level-exp
   {:exp 1})
 
+(def player-init-pos
+  (let [x (/ (:width  world-sizes) 2)
+        y (/ (:height world-sizes) 2)]
+    [0 x y]))
+
+(def player-sight
+  {:distance 5.0
+   :decline-rate (/ 1 4)
+   :lower-bound 4         ;; Inclusive
+   :upper-bound 11        ;; Exclusive
+   :torch-multiplier 1.})
+
 ;; EQUIPMENT CONFIG
 (def weapons
   (->> (flatten
