@@ -105,7 +105,7 @@
 
         target-tile (if
                       (if c-arrow-trap
-                        (let [dir (:dir (? c-arrow-trap))
+                        (let [dir (:dir c-arrow-trap)
                               [t-x t-y] this-pos
                               [p-x p-y] player-pos]
                           (and

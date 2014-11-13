@@ -421,8 +421,8 @@
 (defn ^:private generate-desert
   [level [width height]]
   (let [desert (:level (rj.rm/print-level
-                         (rj.rm/add-room (rj.rm/gen-level width height :f)
-                                         (rj.rm/create-room [5 5] [5 5]))))]
+                         (rj.rm/gen-level-with-rooms
+                           width height (/ (* width height) 100) 5)))]
     (reduce (fn [level cell]
               (case (cell 2)
                 :w (update-in level [(cell 0) (cell 1)]

@@ -93,10 +93,10 @@
   [level {:keys [x y width height]}]
   (let [level-width (count level)
         level-height (count (first level))]
-    (and (pos? (inc x))
-         (pos? (inc y))
-         (<= (+ x width) level-width)
-         (<= (+ y height) level-height))))
+    (and (pos? x)
+         (pos? y)
+         (< (+ x width) level-width)
+         (< (+ y height) level-height))))
 
 (defn overlapping?
   [rooms {:keys [x y width height]}]
@@ -105,10 +105,12 @@
       (let [test-room (first rooms)
             x-intersecting? (<= (* 2 (math/abs
                                       (- x (:x test-room))))
-                               (+ -1 width (:width test-room)))
+                                ;+ 2 so as to have a 1 thickness padd around the room
+                               (+ 2 -1 width (:width test-room)))
             y-intersecting? (<= (* 2 (math/abs
                                       (- y (:y test-room))))
-                               (+ -1 height (:height test-room)))
+                                ;+ 2 so as to have a 1 thickness padd around the room
+                               (+ 2 -1 height (:height test-room)))
             intersect? (and x-intersecting?
                             y-intersecting?)]
         (if intersect?
@@ -135,6 +137,23 @@
               (conj rooms room)
               rooms)
      :last-add? valid-room?}))
+
+(defn gen-level-with-rooms
+  [width height number-of-rooms room-size]
+  (let [rand-pos (fn [] [(rand-int width) (rand-int height)])]
+    (loop [level (gen-level width height :f)
+           i number-of-rooms]
+      (if (pos? i)
+        (if (:last-add? level)
+          (recur (add-room
+                   level
+                   (create-room (rand-pos) [room-size room-size ]))
+                 (dec i))
+          (recur (add-room
+                   level
+                   (create-room (rand-pos) [room-size room-size]))
+                 i))
+        level))))
 
 (defn test-rooms
   [[level-x level-y] [room-x room-y] room-size]
