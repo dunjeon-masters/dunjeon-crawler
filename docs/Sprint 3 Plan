@@ -1,0 +1,65 @@
+Sprint 3 Plan
+Product Name: Dunjeon Crawler
+Team Name: Dunjeon Masters
+Sprint Completion Date: 12/10/2014
+Revision Number: 1
+Revision Date: 11/13/2014
+------------------------------------------------------------------------------------------------------------------------
+GOAL
+	To implement magic and spells, boss monsters, merchants, finish traps, and a save feature.
+------------------------------------------------------------------------------------------------------------------------
+USER STORIES
+
+USER STORY 1: As a user, I want to use magic and spells [so that I can have a larger variety of attacks]. 
+  TASK 1: Create a Magic component {0.5 ih}
+  TASK 2: Design spells {1 ih}
+  TASK 3: Implement 1 spell {4 ih}
+  TASK 4: Make sure the player can use spell(s) {2 ih}
+  TASK 5: Randomly give player chance to learn new spell every X level {2 ih}
+  TASK 6: Implement as many spells as possible {15 ih}
+  TOTAL: 24.5 ih
+  
+USER STORY 2: As a user, I want to encounter boss monsters [so that the game is more challenging]. 
+  TASK 1: Design boss monsters {1 ih}
+  TASK 2: Implement floor for boss monster {4 ih}
+  TASK 3: Implement boss monster {5 ih}
+  TASK 4: Implement level so that it appears every X floors {2 ih}
+  TASK 5: Only allow the portal to appear after the boss' defeat {1 ih}
+  TASK 6: Implement as many boss monsters as possible {15 ih}
+  TOTAL: 28 ih
+  
+USER STORY 3: As a user, I want to encounter merchants [so that I can sell my items and purchase items I would not be able to 
+              get through other methods]. 
+  TASK 1: Add Merchant NPC to game {1 ih}
+  TASK 2: Implement item inspection {5 ih}
+  TASK 3: Implement gold transaction/buying items {2 ih}
+  TASK 4: Implement junk->gold conversion (interact with merchant) {2 ih}
+  TASK 5: Implement Merchant-Floor {4 ih}
+  TASK 6: Implement Merchant-Portal {2.5 ih}
+  TOTAL: 16.5 ih
+  
+USER STORY 4: As a user, I want a save feature [so that I don’t have to play the whole playthrough in one sitting]. 
+  TASK 1: Plan out how to create saves {6 ih}
+  TASK 2: Implement save feature {4 ih}
+  TASK 3: Implement loading save {4 ih}
+  TOTAL: 14 ih
+  
+USER STORY 5: As a developer, I'd like these traps to be finished [so that we more variety beyond arrow traps].
+  TASK 1: Continue implementing traps {6 ih}
+  TOTAL: 6 ih
+  
+------------------------------------------------------------------------------------------------------------------------	
+TEAM ROLES
+	RACHELLE: Developer
+	ANTHONY: Product Owner, Developer
+	SCOTT: Developer
+	JORDAN: Designer, Developer, Scrum Master
+------------------------------------------------------------------------------------------------------------------------	
+INITIAL TASK ASSIGNMENT
+	RACHELLE: User Story 1, Task 1
+	ANTHONY: User Story 5, Task 1
+	SCOTT: User Story 3, Task 1
+	JORDAN: User Story 1, Task 2, User Story 2, Task 1
+------------------------------------------------------------------------------------------------------------------------	
+INITIAL BURNUP CHART AND SCRUM BOARD
+	https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing
