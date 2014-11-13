@@ -2,6 +2,8 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
+(defrecord ArrowTrap [dir])
+
 (defrecord Bat [])
 
 (defrecord Broadcaster [name-fn])
@@ -123,7 +125,8 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
+  get-type {:arrow-trap   (type (->ArrowTrap nil))
+            :attacker     (type (->Attacker nil nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))

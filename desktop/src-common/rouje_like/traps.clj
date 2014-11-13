@@ -5,7 +5,7 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c :refer [can-move? move
                                                     can-attack? attack]]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.config :as rj.cfg]))
 
 (declare process-input-tick)
@@ -43,23 +43,44 @@
       :z (:z target-tile)}))
 
   ([system target-tile trap-type e-trap]
-   (rj.e/system<<components
-     system e-trap
-     [[:trap {}]
-      [:position {:x    (:x target-tile)
-                  :y    (:y target-tile)
-                  :z    (:z target-tile)
-                  :type trap-type}]
-      [:sight {:distance 2}]
-      [:attacker {:atk              (:atk rj.cfg/trap-stats)
-                  :can-attack?-fn   rj.atk/can-attack?
-                  :attack-fn        rj.atk/attack
-                  :status-effects   []
-                  :is-valid-target? (partial #{:player})}]
-      [:tickable {:tick-fn process-input-tick
-                  :pri 0}]
-      [:broadcaster {:name-fn (constantly (str "the "
-                                               (name trap-type)))}]])))
+   (if (= :trap trap-type)
+     (rj.e/system<<components
+       system e-trap
+       [[:trap {}]
+        [:position {:x    (:x target-tile)
+                    :y    (:y target-tile)
+                    :z    (:z target-tile)
+                    :type trap-type}]
+        [:attacker {:atk              (:atk rj.cfg/trap-stats)
+                    :can-attack?-fn   rj.atk/can-attack?
+                    :attack-fn        rj.atk/attack
+                    :status-effects   []
+                    :is-valid-target? (partial #{:player})}]
+        [:tickable {:tick-fn process-input-tick
+                    :pri 0}]
+        [:broadcaster {:name-fn (constantly (str "the "
+                                                 (name trap-type)))}]])
+     (let [dir ({:down :up
+                 :up   :down
+                 :left :left
+                 :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
+       (rj.e/system<<components
+         system e-trap
+         [[:arrow-trap {:dir dir}]
+          [:position {:x    (:x target-tile)
+                      :y    (:y target-tile)
+                      :z    (:z target-tile)
+                      :type trap-type}]
+          [:sight {:distance 4}]
+          [:attacker {:atk              (:atk rj.cfg/trap-stats)
+                      :can-attack?-fn   rj.atk/can-attack?
+                      :attack-fn        rj.atk/attack
+                      :status-effects   []
+                      :is-valid-target? (partial #{:player})}]
+          [:tickable {:tick-fn process-input-tick
+                      :pri 0}]
+          [:broadcaster {:name-fn (constantly (str "the "
+                                                   (name trap-type)))}]])))))
 
 (defn process-input-tick
   [_ e-this system]
@@ -80,7 +101,25 @@
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
-        target-tile (if (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
+        c-arrow-trap (rj.e/get-c-on-e system e-this :arrow-trap)
+
+        target-tile (if
+                      (if c-arrow-trap
+                        (let [dir (:dir (? c-arrow-trap))
+                              [t-x t-y] this-pos
+                              [p-x p-y] player-pos]
+                          (and
+                            (case dir
+                              :up    (and (= t-x p-x)
+                                          (< t-y p-y))
+                              :down  (and (= t-x p-x)
+                                          (> t-y p-y))
+                              :left  (and (= t-y p-y)
+                                          (> t-x p-x))
+                              :right (and (= t-y p-y)
+                                          (< t-x p-x)))
+                            (rj.u/can-see? level (:distance c-sight) this-pos player-pos)))
+                        (rj.u/can-see? level (:distance c-sight) this-pos player-pos))
                       (get-in level player-pos nil)
                       nil)
         e-target (:id (rj.u/tile->top-entity target-tile))]

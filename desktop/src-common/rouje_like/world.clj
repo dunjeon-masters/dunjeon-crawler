@@ -420,8 +420,9 @@
 
 (defn ^:private generate-desert
   [level [width height]]
-  (let [desert (:level (rj.rm/add-room (rj.rm/gen-level width height :f)
-                                       (rj.rm/create-room [5 5] [5 5])))]
+  (let [desert (:level (rj.rm/print-level
+                         (rj.rm/add-room (rj.rm/gen-level width height :f)
+                                         (rj.rm/create-room [5 5] [5 5]))))]
     (reduce (fn [level cell]
               (case (cell 2)
                 :w (update-in level [(cell 0) (cell 1)]
@@ -439,14 +440,15 @@
                               (fn [tile]
                                 (update-in tile [:entities]
                                            conj (rj.c/map->Entity {:id (br.e/create-entity)
-                                                                   :type :arrow-trap}))))
+                                                                   :type :arrow-trap
+                                                                   :extra (cell 3)}))))
                 :d (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]
                                            conj (rj.c/map->Entity {:id (br.e/create-entity)
                                                                    :type :door}))))
                 level))
-            level (map vec (partition 3 (flatten desert))))))
+            level (map vec (partition 4 (flatten desert))))))
 
 (defn generate-random-level
   ([level-sizes z]

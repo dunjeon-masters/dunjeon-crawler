@@ -183,10 +183,9 @@
        (ring-coords origin dist)))
 
 (defn rand-rng
- [start end]
- (+ (rand-int (- (inc end) start)) start))
+  [start end]
+  (+ (rand-int (- (inc end) start)) start))
 
-;;@[turn: xxxx] x = ~x #([rouje_like/skeleton.clj:76])
 (defmacro ? [x]
   (let [line  (:line (meta &form))
         file *file*]

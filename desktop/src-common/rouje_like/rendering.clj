@@ -141,7 +141,7 @@
                  :tile-sheet grim-tile-sheet}
      :arrow-trap {:x 3 :y 2
                   :width 12 :height 12
-                  :color {:r 218 :g 165 :b 32 :a 160}
+                  :color {:r 218 :g 165 :b 32 :a 255}
                   :tile-sheet grim-tile-sheet}
      :maze-wall {:x 8 :y 5
                  :width 12 :height 12
