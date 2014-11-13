@@ -16,7 +16,7 @@
   #{:open-door :dune :floor :forest-floor})
 
 (def <walls>
-  #{:door :wall :tree :maze-wall})
+  #{:temple-wall :door :wall :tree :maze-wall})
 
 (def <indestructible-walls>
   #{:temple-wall :maze-wall})
@@ -37,9 +37,10 @@
   (union <empty> #{:player}))
 
 (def wall->stats
-  {:wall      {:hp 2}
-   :tree      {:hp 1}
-   :maze-wall {:hp 100}})
+  {:wall        {:hp 2}
+   :tree        {:hp 1}
+   :maze-wall   {:hp 100}
+   :temple-wall {:hp 100}})
 
 (def trap->stats
   {:arrow-trap {:hp 1}})

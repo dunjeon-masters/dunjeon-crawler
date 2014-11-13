@@ -47,7 +47,6 @@
 
 (defmacro system<<components
   [s e-this partitions]
-  (println partitions)
   `(let [s# ~s]
      (as-> s# ~'s
        ~@(for [p partitions]

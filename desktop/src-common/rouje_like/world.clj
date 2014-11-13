@@ -452,7 +452,7 @@
 
 (defn generate-random-level
   ([level-sizes z]
-   (let [world-types [#_:cave :desert #_:maze #_:forest]
+   (let [world-types [:cave :desert :maze :forest]
          world-type (rand-nth world-types)]
      (generate-random-level level-sizes z world-type)))
 
