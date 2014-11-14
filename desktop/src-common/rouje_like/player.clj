@@ -109,7 +109,11 @@
                       (keyword r) (rand-nth (keys rj.cfg/race->stats)))
 
         max-hp (+ (:max-hp rj.cfg/player-stats)
-                  (:max-hp (rj.cfg/race->stats player-race)))]
+                  (:max-hp (rj.cfg/race->stats player-race)))
+
+        max-mp (+ (:max-mp rj.cfg/player-stats)
+                  (:max-mp (rj.cfg/race->stats player-race)))]
+
     (rj.e/system<<components
       system e-player
       [[:player {:name n
@@ -151,6 +155,9 @@
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
+       [:magic {:max-mp max-mp
+                :mp max-mp
+                :spells []}]
        [:broadcaster {:name-fn (constantly n)}]])))
 
 (defn add-player

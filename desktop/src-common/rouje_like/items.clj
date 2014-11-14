@@ -79,20 +79,24 @@
   (let [c-destructible (rj.e/get-c-on-e system e-by :destructible)
         max-hp (:max-hp c-destructible)
         hp (:hp c-destructible)
-        hp-potion-val (:health rouje-like.config/potion-stats)]
-    (as-> system system
-          (if (> max-hp (+ hp hp-potion-val))
-            (rj.e/upd-c system e-by :destructible
-                        (fn [c-destructible]
-                          (update-in c-destructible [:hp]
-                                     (partial + (:health rj.cfg/potion-stats)))))
-            (rj.e/upd-c system e-by :destructible
-                        (fn [c-destructible]
-                          (update-in c-destructible [:hp]
-                                     (constantly max-hp)))))
-          (rj.e/upd-c system e-by :inventory
-                      (fn [c-inventory]
-                        (update-in c-inventory [:hp-potion] dec))))))
+        hp-potion-val (:health rouje-like.config/potion-stats)
+        c-inv (rj.e/get-c-on-e system e-by :inventory)
+        potion-count (:hp-potion c-inv)]
+    (if (> potion-count 0)
+      (as-> system system
+            (if (> max-hp (+ hp hp-potion-val))
+              (rj.e/upd-c system e-by :destructible
+                          (fn [c-destructible]
+                            (update-in c-destructible [:hp]
+                                       (partial + (:health rj.cfg/potion-stats)))))
+              (rj.e/upd-c system e-by :destructible
+                          (fn [c-destructible]
+                            (update-in c-destructible [:hp]
+                                       (constantly max-hp)))))
+            (rj.e/upd-c system e-by :inventory
+                        (fn [c-inventory]
+                          (update-in c-inventory [:hp-potion] dec))))
+      system)))
 
 (defn ^:private item>>world
   [system is-valid-tile? z item>>entities]

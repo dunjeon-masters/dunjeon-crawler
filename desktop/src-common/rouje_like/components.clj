@@ -35,6 +35,10 @@
 (defrecord Lichen [grow-chance%
                    max-blob-size])
 
+(defrecord Magic [mp
+                  max-mp
+                  spells])
+
 (defrecord Player [name
                    show-world?])
 
@@ -141,6 +145,7 @@
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
+            :magic        (type (->Magic nil nil nil))
             :mobile       (type (->Mobile nil nil))
             :player       (type (->Player nil nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))

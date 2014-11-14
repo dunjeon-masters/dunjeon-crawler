@@ -100,12 +100,17 @@
         c-energy (rj.e/get-c-on-e system e-this :energy)
         energy (:energy c-energy)
 
+        c-magic (rj.e/get-c-on-e system e-this :magic)
+        mp (:mp c-magic)
+        max-mp (:max-mp c-magic)
+
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Name: " player-name
                         " - Gold: [" gold "]"
                         " - Position: [" x "," y "," z "]"
                         " - HP: [" hp  "/" max-hp "]"
+                        " - MP: [" mp "/" max-mp "]"
                         " - Attack: [" attack "]"
                         " - Defense: [" def "]"
                         " - Race: [" race "]"

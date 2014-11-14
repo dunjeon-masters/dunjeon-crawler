@@ -3,7 +3,7 @@
 
 ;; WORLD CONFIG
 (def block-size 36)
-(def padding-sizes {:top   3
+(def padding-sizes {:top   1
                     :btm   2
                     :left  1
                     :right 1})
@@ -41,6 +41,7 @@
 ;; PLAYER CONFIG
 (def player-stats
   {:max-hp 100
+   :max-mp 15
    :atk 4
    :def 1})
 
@@ -48,17 +49,21 @@
                    :warrior {}
                    :mage    {}})
 
-(def race->stats {:human {:max-hp 10  :atk 1}
-                  :orc   {:max-hp 20  :atk 2}
-                  :elf   {:max-hp -5  :atk 0}})
+(def race->stats {:human {:max-hp 10  :atk 1 :max-mp 0}
+                  :orc   {:max-hp 20  :atk 2 :max-mp -1}
+                  :elf   {:max-hp -5  :atk 0 :max-mp 3}})
 
 (def stat->comp {:max-hp :destructible
+                 :hp :destructible
                  :atk :attacker
-                 :def :destructible})
+                 :def :destructible
+                 :max-mp :magic
+                 :mp :magic})
 
 (def stat->pointinc {:max-hp 5
                      :atk 1
-                     :def 1})
+                     :def 1
+                     :max-mp 2})
 
 (def level-exp
   {:exp 1})
@@ -122,8 +127,8 @@
                :duration 2
                :value    2}
    :fire      {:type     :fire
-               :duration 2
-               :value    2}})
+               :duration 4
+               :value    1}})
 
 ;; CREATURE CONFIG
 (def bat-stats
