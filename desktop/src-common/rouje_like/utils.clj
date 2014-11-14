@@ -15,6 +15,7 @@
 (def get-default-pri
   {:floor 1
    :forest-floor 1
+   :equipment 2
    :dune 0
    :health-potion 2
    :torch 3
@@ -182,17 +183,19 @@
        (ring-coords origin dist)))
 
 (defn rand-rng
- [start end]
- (+ (rand-int (- (inc end) start)) start))
+  [start end]
+  (+ (rand-int (- (inc end) start)) start))
 
-;;@[turn: xxxx] x = ~x #([rouje_like/skeleton.clj:76])
-(defmacro ? [x]
-  (let [line  (:line (meta &form))
+(defmacro ?
+  [x & [tag]]
+  (let [line (:line (meta &form))
         file *file*]
-    `(let [x# ~x]
-       (println (str "@[" (apply str (drop 5 (str (System/currentTimeMillis)))) "]: ")
-                (pr-str '~x) "=" (pr-str x#)
-                (str "#(" ~file ":" ~line ")"))
+    `(let [x#   ~x
+           tag# ~tag]
+       (println (str (str "#" (if tag# tag# "RJ") " ")
+                     "@[" (apply str (drop 5 (str (System/currentTimeMillis))))
+                     ", " ~file ":" ~line "]:\n"
+                     "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
        x#)))
 
 (defn update-in-world

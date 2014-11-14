@@ -38,17 +38,7 @@
       (rj.pl/init-player user)
       (rj.msg/init-relay)
       (rj.wr/init-world)
-
-      ;; Add player
-      (as-> system
-            (do (println "core::add-player " (not (nil? system))) system)
-            (let [e-player (first (rj.e/all-e-with-c system :player))
-                  e-world (first (rj.e/all-e-with-c system :world))]
-              (rj.u/update-in-world system e-world rj.pl/init-player-pos
-                                    (fn [entities]
-                                      (vec (conj (filter #(rj.cfg/<floors> (:type %)) entities)
-                                                 (rj.c/map->Entity {:id   e-player
-                                                                    :type :player})))))))))
+      (rj.pl/add-player)))
 
 (defn register-system-fns
   [system]

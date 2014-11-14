@@ -19,7 +19,7 @@
   #{:wall :tree :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion})
+  #{:torch :gold :health-potion :equipment})
 
 (def <empty>
   (union <floors> <items>))
@@ -63,6 +63,68 @@
 (def level-exp
   {:exp 1})
 
+(def player-init-pos
+  (let [x (/ (:width  world-sizes) 2)
+        y (/ (:height world-sizes) 2)]
+    [0 x y]))
+
+(def player-sight
+  {:distance 5.0
+   :decline-rate (/ 1 4)
+   :lower-bound 4         ;; Inclusive
+   :upper-bound 11        ;; Exclusive
+   :torch-multiplier 1.})
+
+;; EQUIPMENT CONFIG
+(def weapons
+  (->> (flatten
+         [(repeat 1 [:sword  {:atk 3}])
+          (repeat 1 [:mace   {:atk 2}])
+          (repeat 1 [:axe    {:atk 3}])
+          (repeat 1 [:flail  {:atk 2}])
+          (repeat 1 [:dagger {:atk 1}])])
+       (partition 2)))
+
+(def weapon-qualities
+  (->> (flatten
+         [(repeat 1 [:quick  {:atk  1}])
+          (repeat 1 [:giant  {:atk  2}])
+          (repeat 1 [:great  {:atk  2}])
+          (repeat 1 [:tiny   {:atk  1}])
+          (repeat 1 [:dull   {:atk -1}])
+          (repeat 1 [:dented {:atk -2}])])
+       (partition 2)))
+
+(def weapon-effects
+  (->> (flatten
+         [(repeat 1 [:bloodletting {:atk 1}])
+          (repeat 1 [:pain {:atk 1}])
+          (repeat 1 [:poison])
+          (repeat 1 [:paralysis])
+          (repeat 1 [:power {:atk 2}])
+          (repeat 1 [:death {:atk 2}])
+          (repeat 1 [:fire])
+          (repeat 1 [nil])])
+       (partition 2)))
+
+(def armors
+  (->> (flatten
+         [(repeat 1 [:chestplate {:max-hp 1 :def 1}])
+          (repeat 1 [:chainmail  {:max-hp 3}])
+          (repeat 1 [:tunic      {:max-hp 1}])])
+       (partition 2)))
+
+(def status-effects
+  {:paralysis {:type     :paralysis
+               :duration 2
+               :value    1}
+   :poison    {:type     :poison
+               :duration 2
+               :value    2}
+   :fire      {:type     :fire
+               :duration 2
+               :value    2}})
+
 ;; CREATURE CONFIG
 (def bat-stats
   {:hp  2
@@ -88,3 +150,12 @@
 (def potion-stats
   {:health 5})
 
+;; WORLD CONFIG
+(def init-wall% 45)
+(def init-torch% 2)
+(def init-gold% 5)
+(def init-health-potion% 2)
+(def init-lichen% 1)
+(def init-bat% 1)
+(def init-skeleton% 1)
+(def init-equip% 1)

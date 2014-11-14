@@ -7,6 +7,8 @@
             [rouje-like.player :as rj.pl]
             [rouje-like.components :as rj.c :refer [tick]]
             [rouje-like.messaging :as rj.msg]
+            [rouje-like.inventory :as rj.inv]
+            [rouje-like.items :as rj.item]
             [clojure.string :as s]
             [brute.entity]))
 
@@ -83,8 +85,12 @@
                                                           (update-in c-player [:show-world?]
                                                                      (fn [prev]
                                                                        (not prev))))))
+   (play/key-code :E)             (fn [system]
+                                    (rj.inv/equip-slot-item system (first (rj.e/all-e-with-c system :player))))
    (play/key-code :enter)         (fn [system]
-                                    (tick-entities system))})
+                                    (tick-entities system))
+   (play/key-code :H)             (fn [system]
+                                    (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player))))})
 
 (def keycode->direction
   {(play/key-code :W)          :up

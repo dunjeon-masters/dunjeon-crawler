@@ -91,18 +91,14 @@
                       (update-in c-energy [:energy] dec))))
       system)))
 
-(def ^:private init-player-x-pos (/ (:width  rj.cfg/world-sizes) 2))
-(def ^:private init-player-y-pos (/ (:height rj.cfg/world-sizes) 2))
-(def init-player-pos [0 init-player-x-pos init-player-y-pos])
-(def ^:private init-sight-distance 5.0)
-(def ^:private init-sight-decline-rate (/ 1 4))
-(def ^:private init-sight-lower-bound 4)                    ;; Inclusive
-(def ^:private init-sight-upper-bound 11)                   ;; Exclusive
-(def ^:private init-sight-torch-multiplier 1.)
-
 (defn init-player
   [system {:keys [n r c] :or {n "the player"} :as user}]
   (let [e-player (br.e/create-entity)
+
+        [z-pos x-pos y-pos] rj.cfg/player-init-pos
+        {:keys [distance decline-rate
+                lower-bound upper-bound
+                torch-multiplier]} rj.cfg/player-sight
 
         valid-class? (into #{} (keys rj.cfg/class->stats))
         player-class (if (valid-class? (keyword c))
@@ -123,10 +119,13 @@
        [:experience {:experience 0
                      :level 1
                      :level-up-fn rj.exp/level-up}]
-       [:position {:x init-player-x-pos
-                   :y init-player-y-pos
-                   :z 0
+       [:position {:x x-pos
+                   :y y-pos
+                   :z z-pos
                    :type :player}]
+       [:equipment {:weapon nil
+                    :armor nil}]
+       [:inventory {:slot nil :junk [] :hp-potion 0}]
        [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]
@@ -134,19 +133,16 @@
                  :dig-fn      dig}]
        [:attacker {:atk              (+ (:atk rj.cfg/player-stats)
                                         (:atk (rj.cfg/race->stats player-race)))
-                   :status-effects   [{:type :burn :duration 3
-                                       :value 1
-                                       :apply-fn rj.stef/apply-poison
-                                       :e-from e-player}]
+                   :status-effects   []
                    :can-attack?-fn   rj.atk/can-attack?
                    :attack-fn        rj.atk/attack
                    :is-valid-target? (constantly true)}]
        [:wallet {:gold 0}]
-       [:player-sight {:distance (inc init-sight-distance)
-                       :decline-rate  init-sight-decline-rate
-                       :lower-bound   init-sight-lower-bound
-                       :upper-bound   init-sight-upper-bound
-                       :torch-multiplier   init-sight-torch-multiplier}]
+       [:player-sight {:distance    (inc distance)
+                       :decline-rate     decline-rate
+                       :lower-bound      lower-bound
+                       :upper-bound      upper-bound
+                       :torch-multiplier torch-multiplier}]
        [:renderable {:render-fn rj.r/render-player
                      :args      {:view-port-sizes rj.cfg/view-port-sizes}}]
        [:destructible {:max-hp max-hp
@@ -155,5 +151,15 @@
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
-       [:broadcaster {:name-fn (constantly "you")}]])))
+       [:broadcaster {:name-fn (constantly n)}]])))
+
+(defn add-player
+  [system]
+  (let [e-player (first (rj.e/all-e-with-c system :player))
+        e-world (first (rj.e/all-e-with-c system :world))]
+    (rj.u/update-in-world system e-world rj.cfg/player-init-pos
+                          (fn [entities]
+                            (vec (conj (filter #(rj.cfg/<floors> (:type %)) entities)
+                                       (rj.c/map->Entity {:id   e-player
+                                                          :type :player})))))))
 

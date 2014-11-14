@@ -16,11 +16,15 @@
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
+(defrecord Equipment [weapon armor])
+
 (defrecord Experience [experience
                        level
                        level-up-fn])
 
 (defrecord Gold [value])
+
+(defrecord Inventory [slot junk hp-potion])
 
 (defrecord Item [pickup-fn])
 
@@ -130,8 +134,10 @@
             :digger       (type (->Digger nil nil))
             :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
+            :equipment    (type (->Equipment nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
+            :inventory    (type (->Inventory nil nil nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))

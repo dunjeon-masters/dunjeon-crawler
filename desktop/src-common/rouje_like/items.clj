@@ -1,8 +1,10 @@
 (ns rouje-like.items
   (:require [brute.entity :as br.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
+            [rouje-like.equipment :as rj.eq]
+            [rouje-like.inventory :as rj.inv]
             [rouje-like.config :as rj.cfg]))
 
 (defn pickup-item
@@ -56,25 +58,41 @@
                                        (partial + (:value (rj.e/get-c-on-e system e-this :gold))))))
               (remove-item system [z x y])
               (broadcast-pickup system))
-      :health-potion (let [c-destructible (rj.e/get-c-on-e system e-by :destructible)
-                           max-hp (:max-hp c-destructible)
-                           hp (:hp c-destructible)
-                           hp-potion-val (:health rouje-like.config/potion-stats)]
-                       (as-> system system
-                           (if (> max-hp (+ hp hp-potion-val))
-                             (rj.e/upd-c system e-by :destructible
-                                 (fn [c-destructible]
-                                   (update-in c-destructible [:hp]
-                                              (partial + (:health rj.cfg/potion-stats)))))
-                             (rj.e/upd-c system e-by :destructible
-                                         (fn [c-destructible]
-                                           (update-in c-destructible [:hp]
-                                                      (constantly max-hp)))))
+
+      :health-potion (as-> system system
+                           (rj.e/upd-c system e-by :inventory
+                                       (fn [c-inventory]
+                                         (update-in c-inventory [:hp-potion]
+                                                    inc)))
                            (remove-item system [z x y])
-                           (broadcast-pickup system)))
+                           (broadcast-pickup system))
+
+      :equipment (as-> system system
+                       (rj.inv/pickup-slot-item system e-by (rj.e/get-c-on-e system e-this :equipment))
+                       (remove-item system [z x y])
+                       (broadcast-pickup system))
+
       system)))
 
-
+(defn use-hp-potion
+  [system e-by]
+  (let [c-destructible (rj.e/get-c-on-e system e-by :destructible)
+        max-hp (:max-hp c-destructible)
+        hp (:hp c-destructible)
+        hp-potion-val (:health rouje-like.config/potion-stats)]
+    (as-> system system
+          (if (> max-hp (+ hp hp-potion-val))
+            (rj.e/upd-c system e-by :destructible
+                        (fn [c-destructible]
+                          (update-in c-destructible [:hp]
+                                     (partial + (:health rj.cfg/potion-stats)))))
+            (rj.e/upd-c system e-by :destructible
+                        (fn [c-destructible]
+                          (update-in c-destructible [:hp]
+                                     (constantly max-hp)))))
+          (rj.e/upd-c system e-by :inventory
+                      (fn [c-inventory]
+                        (update-in c-inventory [:hp-potion] dec))))))
 
 (defn ^:private item>>world
   [system is-valid-tile? z item>>entities]
@@ -168,5 +186,31 @@
                                (fn [system e-this]
                                  (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
                                    (str value " gold")))}]])
+     :z z}))
+
+(defn add-equipment
+  [{:keys [system z]}]
+  (let [e-eq (br.e/create-entity)
+
+        ;; generate a random equipment piece
+        eq (rj.eq/generate-random-equipment)
+        eq-type (:type eq)
+
+        is-valid-tile? (fn [world [x y]]
+                         (only-floor? (get-in world [x y])))
+
+        eq>>entities (fn [entities]
+                       (item>>entities entities e-eq :equipment))
+
+        system (item>>world system is-valid-tile? z
+                            eq>>entities)]
+    {:system (rj.e/system<<components
+              system e-eq
+              [[:item {:pickup-fn pickup-item}]
+               [:equipment {eq-type eq}]
+               [:broadcaster {:name-fn
+                              (fn [system e-this]
+                                (let [eq-name (rj.eq/equipment-name (eq-type (rj.e/get-c-on-e system e-this :equipment)))]
+                                  (str "a " eq-name)))}]])
      :z z}))
 

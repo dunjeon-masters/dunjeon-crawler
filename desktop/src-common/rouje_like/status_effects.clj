@@ -1,7 +1,7 @@
 (ns rouje-like.status-effects
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.messaging :as rj.msg]
-            [rouje-like.utils :as rj.u]))
+            [rouje-like.utils :as rj.u :refer [?]]))
 
 (defn apply-paralysis
   [system e-this status]
@@ -111,4 +111,8 @@
                  (level-up-fn e-from)))
           system)
         (rj.e/kill-e system e-this)))))
+
+(def effect-type->apply-fn {:fire apply-burn
+                            :poison apply-poison
+                            :paralyis apply-paralysis})
 
