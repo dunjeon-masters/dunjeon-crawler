@@ -200,6 +200,12 @@
                  (* (/ rj.cfg/init-health-potion% 100)
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
+      (as-> system
+            (do (println "core::add-magic-potion " (not (nil? system))) system)
+            (nth (iterate rj.items/add-magic-potion {:system system :z z})
+                 (* (/ rj.cfg/init-magic-potion% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
 
       ;; Spawn lichens
       (as-> system

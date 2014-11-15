@@ -129,7 +129,7 @@
                    :type :player}]
        [:equipment {:weapon nil
                     :armor nil}]
-       [:inventory {:slot nil :junk [] :hp-potion 0}]
+       [:inventory {:slot nil :junk [] :hp-potion 0 :mp-potion 0}]
        [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]
@@ -156,7 +156,7 @@
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
        [:magic {:max-mp max-mp
-                :mp max-mp
+                :mp 2
                 :spells []}]
        [:broadcaster {:name-fn (constantly n)}]])))
 

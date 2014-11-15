@@ -67,6 +67,14 @@
                            (remove-item system [z x y])
                            (broadcast-pickup system))
 
+      :magic-potion (as-> system system
+                           (rj.e/upd-c system e-by :inventory
+                                       (fn [c-inventory]
+                                         (update-in c-inventory [:mp-potion]
+                                                    inc)))
+                           (remove-item system [z x y])
+                           (broadcast-pickup system))
+
       :equipment (as-> system system
                        (rj.inv/pickup-slot-item system e-by (rj.e/get-c-on-e system e-this :equipment))
                        (remove-item system [z x y])
@@ -88,7 +96,7 @@
               (rj.e/upd-c system e-by :destructible
                           (fn [c-destructible]
                             (update-in c-destructible [:hp]
-                                       (partial + (:health rj.cfg/potion-stats)))))
+                                       (partial + hp-potion-val))))
               (rj.e/upd-c system e-by :destructible
                           (fn [c-destructible]
                             (update-in c-destructible [:hp]
@@ -96,6 +104,30 @@
             (rj.e/upd-c system e-by :inventory
                         (fn [c-inventory]
                           (update-in c-inventory [:hp-potion] dec))))
+      system)))
+
+(defn use-mp-potion
+  [system e-by]
+  (let [c-magic (rj.e/get-c-on-e system e-by :magic)
+        max-mp (:max-mp c-magic)
+        mp (:mp c-magic)
+        mp-potion-val (:magic rouje-like.config/potion-stats)
+        c-inv (rj.e/get-c-on-e system e-by :inventory)
+        potion-count (:mp-potion c-inv)]
+    (if (> potion-count 0)
+      (as-> system system
+            (if (> max-mp (+ mp mp-potion-val))
+              (rj.e/upd-c system e-by :magic
+                          (fn [c-magic]
+                            (update-in c-magic [:mp]
+                                       (partial + mp-potion-val))))
+              (rj.e/upd-c system e-by :magic
+                          (fn [c-magic]
+                            (update-in c-magic [:mp]
+                                       (constantly max-mp)))))
+            (rj.e/upd-c system e-by :inventory
+                        (fn [c-inventory]
+                          (update-in c-inventory [:mp-potion] dec))))
       system)))
 
 (defn ^:private item>>world
@@ -145,6 +177,29 @@
                system e-potion
                [[:item {:pickup-fn pickup-item}]
                 [:broadcaster {:name-fn (constantly "a health potion")}]])
+     :z z}))
+
+(defn add-magic-potion
+  [{:keys [system z]}]
+  (let [e-potion (br.e/create-entity)
+
+        not-near-potions? (fn [world [x y]]
+                            (rj.u/not-any-radially-of-type world [x y]
+                                                           #(<= % 3) [:magic-potion]))
+
+        is-valid-tile? (fn [world [x y]]
+                         (let [tile (get-in world [x y])]
+                           (and (not-near-potions? world [x y])
+                                (only-floor? tile))))
+
+        health-potion>>entities (fn [entities]
+                                  (item>>entities entities e-potion :magic-potion))
+        system (item>>world system is-valid-tile? z
+                            health-potion>>entities)]
+    {:system (rj.e/system<<components
+               system e-potion
+               [[:item {:pickup-fn pickup-item}]
+                [:broadcaster {:name-fn (constantly "a mp potion")}]])
      :z z}))
 
 (defn add-torch

@@ -19,7 +19,7 @@
   #{:wall :tree :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion :equipment})
+  #{:torch :gold :health-potion :equipment :magic-potion})
 
 (def <empty>
   (union <floors> <items>))
@@ -153,13 +153,14 @@
   [:arrow])
 
 (def potion-stats
-  {:health 5})
+  {:health 5 :magic 3})
 
 ;; WORLD CONFIG
 (def init-wall% 45)
 (def init-torch% 2)
 (def init-gold% 5)
-(def init-health-potion% 2)
+(def init-health-potion% 1)
+(def init-magic-potion% 1)
 (def init-lichen% 1)
 (def init-bat% 1)
 (def init-skeleton% 1)

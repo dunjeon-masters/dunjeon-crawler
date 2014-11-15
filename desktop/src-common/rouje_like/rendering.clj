@@ -89,6 +89,7 @@
         junk (count (:junk c-inv))
         slot (rj.eq/equipment-name (or (:weapon (:slot c-inv)) (:armor (:slot c-inv))))
         hp-potions (:hp-potion c-inv)
+        mp-potions (:mp-potion c-inv)
 
         c-equip (rj.e/get-c-on-e system e-this :equipment)
         armor (rj.eq/equipment-name (:armor c-equip))
@@ -124,7 +125,8 @@
                         " - Slot: [" slot "]"
                         " - Armor: [" armor "]"
                         " - Weapon: [" weapon "]"
-                        " - HP-Potions: [" hp-potions "]")
+                        " - HP-Potions: [" hp-potions "]"
+                        " - MP-Potions: [" mp-potions "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
@@ -211,7 +213,11 @@
      :health-potion {:x 13 :y 10
                      :width 12 :height 12
                      :color {:r 255 :g 0 :b 0 :a 255}
-                     :tile-sheet grim-tile-sheet}}))
+                     :tile-sheet grim-tile-sheet}
+     :magic-potion {:x 13 :y 10
+                    :width 12 :height 12
+                    :color {:r 0 :g 0 :b 255 :a 255}
+                    :tile-sheet grim-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize
