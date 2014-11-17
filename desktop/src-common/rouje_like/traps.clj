@@ -6,6 +6,7 @@
             [rouje-like.components :as rj.c :refer [can-move? move
                                                     can-attack? attack]]
             [rouje-like.utils :as rj.u :refer [?]]
+            [rouje-like.messaging :as rj.msg]
             [rouje-like.config :as rj.cfg]))
 
 (declare process-input-tick)
@@ -66,7 +67,8 @@
                  :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
        (rj.e/system<<components
          system e-trap
-         [[:arrow-trap {:dir dir}]
+         [[:arrow-trap {:dir dir
+                        :ready? false}]
           [:position {:x    (:x target-tile)
                       :y    (:y target-tile)
                       :z    (:z target-tile)
@@ -98,36 +100,44 @@
         level (nth levels (:z c-position))
 
         c-sight (rj.e/get-c-on-e system e-this :sight)
-
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
-
         c-arrow-trap (rj.e/get-c-on-e system e-this :arrow-trap)
 
-        target-tile (if
-                      (if c-arrow-trap
-                        (let [dir (:dir c-arrow-trap)
-                              [t-x t-y] this-pos
-                              [p-x p-y] player-pos]
-                          (and
-                            (case dir
-                              :up    (and (= t-x p-x)
-                                          (< t-y p-y))
-                              :down  (and (= t-x p-x)
-                                          (> t-y p-y))
-                              :left  (and (= t-y p-y)
-                                          (> t-x p-x))
-                              :right (and (= t-y p-y)
-                                          (< t-x p-x)))
-                            (rj.u/can-see? level (:distance c-sight) this-pos player-pos)))
-                        (rj.u/can-see? level (:distance c-sight) this-pos player-pos))
-                      (get-in level player-pos nil)
-                      nil)
-        e-target (:id (rj.u/tile->top-entity target-tile))]
-    (if (not (nil? target-tile))
-      (-> (cond
+        can-see-player? (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
+        can-see-player? (if c-arrow-trap
+                          (let [dir (:dir c-arrow-trap)
+                                [t-x t-y] this-pos
+                                [p-x p-y] player-pos]
+                            (and
+                              (case dir
+                                :up    (and (= t-x p-x)
+                                            (< t-y p-y))
+                                :down  (and (= t-x p-x)
+                                            (> t-y p-y))
+                                :left  (and (= t-y p-y)
+                                            (> t-x p-x))
+                                :right (and (= t-y p-y)
+                                            (< t-x p-x)))
+                              can-see-player?))
+                          can-see-player?)
+
+        target-tile (get-in level player-pos nil)]
+    (if can-see-player?
+      (let [e-target (:id (rj.u/tile->top-entity target-tile))]
+        (if (:ready? c-arrow-trap)
+          (cond
             (can-attack? c-attacker e-this e-target system)
             (attack c-attacker e-this e-target system)
 
-            :else system))
-      system)))
+            :else system)
+          (as-> (rj.e/upd-c system e-this :arrow-trap
+                            (fn [c-arrow-trap]
+                              (assoc c-arrow-trap :ready? true))) system
+            (rj.msg/add-msg system :static
+                            (format "%s hears a ticking noise"
+                                    (let [player-c-broadcaster (rj.e/get-c-on-e system e-target :broadcaster)]
+                                      ((:name-fn player-c-broadcaster) system e-target)))))))
+      (rj.e/upd-c system e-this :arrow-trap
+                  (fn [c-arrow-trap]
+                    (assoc c-arrow-trap :ready? false))))))
 
