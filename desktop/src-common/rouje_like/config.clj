@@ -66,7 +66,7 @@
 (def player-init-pos
   (let [x (/ (:width  world-sizes) 2)
         y (/ (:height world-sizes) 2)]
-    [0 x y]))
+    [1 x y]))
 
 (def player-sight
   {:distance 5.0
