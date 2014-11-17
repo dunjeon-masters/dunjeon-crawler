@@ -1,4 +1,4 @@
-(ns rouje-like.traps
+(ns rouje-like.arrow-trap
   (:require [brute.entity :as br.e]
 
             [rouje-like.attacker :as rj.atk]
@@ -27,9 +27,6 @@
          (recur (get-rand-tile world))))))
 
   ([system target-tile]
-   (add-trap system target-tile (rand-nth rj.cfg/trap-types)))
-
-  ([system target-tile trap-type]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-trap (br.e/create-entity)
          system (rj.u/update-in-world system e-world
@@ -39,29 +36,12 @@
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-trap
-                                                               :type trap-type})))))]
-     {:system (add-trap system target-tile trap-type e-trap)
+                                                               :type :arrow-trap})))))]
+     {:system (add-trap system target-tile e-trap)
       :z (:z target-tile)}))
 
-  ([system target-tile trap-type e-trap]
-   (if (= :trap trap-type)
-     (rj.e/system<<components
-       system e-trap
-       [[:trap {}]
-        [:position {:x    (:x target-tile)
-                    :y    (:y target-tile)
-                    :z    (:z target-tile)
-                    :type trap-type}]
-        [:attacker {:atk              (:atk rj.cfg/trap-stats)
-                    :can-attack?-fn   rj.atk/can-attack?
-                    :attack-fn        rj.atk/attack
-                    :status-effects   []
-                    :is-valid-target? (partial #{:player})}]
-        [:tickable {:tick-fn process-input-tick
-                    :pri 0}]
-        [:broadcaster {:name-fn (constantly (str "the "
-                                                 (name trap-type)))}]])
-     (let [dir ({:down :up
+  ([system target-tile e-trap]
+   (let [dir ({:down :up
                  :up   :down
                  :left :left
                  :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
@@ -72,7 +52,7 @@
           [:position {:x    (:x target-tile)
                       :y    (:y target-tile)
                       :z    (:z target-tile)
-                      :type trap-type}]
+                      :type :arrow-trap}]
           [:sight {:distance 4}]
           [:attacker {:atk              (:atk rj.cfg/trap-stats)
                       :can-attack?-fn   rj.atk/can-attack?
@@ -82,7 +62,7 @@
           [:tickable {:tick-fn process-input-tick
                       :pri 0}]
           [:broadcaster {:name-fn (constantly (str "the "
-                                                   (name trap-type)))}]])))))
+                                                   (name :arrow-trap)))}]]))))
 
 (defn process-input-tick
   [_ e-this system]

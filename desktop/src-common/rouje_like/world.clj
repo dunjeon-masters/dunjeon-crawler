@@ -17,7 +17,7 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
             [rouje-like.skeleton :as rj.sk]
-            [rouje-like.traps :as rj.trap]
+            [rouje-like.arrow-trap :as rj.arrow-trap]
             [rouje-like.portal :as rj.p]
             [rouje-like.config :as rj.cfg]))
 
@@ -176,7 +176,7 @@
                 (let [trap (first trap)
                       trap-type (:type trap)
                       e-trap (:id trap)]
-                  (rj.trap/add-trap system tile trap-type e-trap))
+                  (rj.arrow-trap/add-trap system tile e-trap))
                 system)))
           (door-take-damage-fn [c-this e-this damage e-from system]
             (if-let [c-door (rj.e/get-c-on-e system e-this :door)]
