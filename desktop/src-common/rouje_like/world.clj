@@ -12,6 +12,7 @@
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.items :as rj.items]
             [rouje-like.lichen :as rj.lc]
+            [rouje-like.merchant :as rj.merch]
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
             [rouje-like.skeleton :as rj.sk]
@@ -435,19 +436,29 @@
              ;; CREATE MAZE
              (generate-maze level [width height])))))
 
+(def merchant-level-size
+  {:width 10
+  :height 10})
+
+(defn generate-merchant-level
+  []
+  (generate-random-level rj.cfg/world-sizes 0 :desert))
+
 (declare add-level)
 (defn init-world
   [system]
-  (let [z 0
+  (let [z 1
         e-world  (br.e/create-entity)
-        level0 (generate-random-level
-                 rj.cfg/world-sizes z)
+        merch-level (generate-merchant-level)
         level1 (generate-random-level
-                 rj.cfg/world-sizes (inc z))]
+                rj.cfg/world-sizes z)
+        level2 (generate-random-level
+                rj.cfg/world-sizes (inc z))]
     (-> system
         (rj.e/add-e e-world)
-        (rj.e/add-c e-world (rj.c/map->World {:levels [level0 level1]
+        (rj.e/add-c e-world (rj.c/map->World {:levels [merch-level level1 level2]
                                               :add-level-fn add-level}))
+        (rj.merch/init-merchant 0)
         (init-entities z)
         (add-portal z)
         (init-entities (inc z))
@@ -468,4 +479,5 @@
                                          new-level)))))
         (init-entities z)
         (add-portal (dec z)))))
+
 
