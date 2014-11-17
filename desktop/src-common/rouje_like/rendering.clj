@@ -167,6 +167,10 @@
                        :width 12 :height 12
                        :color {:r 103 :g 133 :b 81 :a 64}
                        :tile-sheet grim-tile-sheet}
+     :merchant {:x 13 :y 4
+                :width 12 :height 12
+                :color {:r 0 :g 0 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
      :torch    {:x 1 :y 2
                 :width 12 :height 12
                 :color {:r 255 :g 0 :b 0 :a 255}
