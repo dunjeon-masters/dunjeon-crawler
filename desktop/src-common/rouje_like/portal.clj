@@ -32,9 +32,6 @@
                :else
                (recur (get-rand-tile level) (get-rand-tile level+)))))))
   ([system portal-tile target-tile p-type]
-     (println "portal-tile: " portal-tile)
-     (println "target-tile: " target-tile)
-     (println "p-type: " p-type)
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-portal (br.e/create-entity)
          system (rj.u/update-in-world system e-world [(:z portal-tile) (:x portal-tile) (:y portal-tile)]
@@ -52,13 +49,11 @@
                 [:position {:x (:x portal-tile)
                             :y (:y portal-tile)
                             :z (:z portal-tile)
-                            :type :portal}]])
+                            :type p-type}]])
       :z (:z target-tile)})))
 
 (defn portal-target-pos [system portal]
-  (println "getting target-pos from: " portal)
-  (let [target-pos (rj.e/get-c-on-e system (:id portal) :portal)]
-    (println "portal-target-pos: " target-pos)
+  (let [target-pos portal]
     [(:z target-pos) (:x target-pos) (:y target-pos)]))
 
 (defn is-portal? [entity]
