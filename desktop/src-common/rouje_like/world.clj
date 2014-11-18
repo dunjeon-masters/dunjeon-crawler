@@ -436,10 +436,6 @@
              ;; CREATE MAZE
              (generate-maze level [width height])))))
 
-(def merchant-level-size
-  {:width 10
-   :height 10})
-
 (defn generate-merchant-level
   []
   (generate-random-level rj.cfg/world-sizes 0 :desert))

@@ -11,24 +11,27 @@
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        merch-level (nth levels 0)]
-    (get-in merch-level [5 7])))
+        merch-level (nth levels 0)
+        merch-pos rj.cfg/merchant-pos]
+    (get-in merch-level [(:x merch-pos) (:y merch-pos)])))
 
 (defn merchant-portal-tile
   [system]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        merch-level (nth levels 0)]
-    (get-in merch-level [5 9])))
+        merch-level (nth levels 0)
+        merch-portal-pos rj.cfg/merchant-portal-pos]
+    (get-in merch-level [(:x merch-portal-pos) (:y merch-portal-pos)])))
 
 (defn merchant-player-tile
   [system]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        merch-level (nth levels 0)]
-    (get-in merch-level [5 5])))
+        merch-level (nth levels 0)
+        merch-player-pos rj.cfg/merchant-player-pos]
+    (get-in merch-level [(:x merch-player-pos) (:y merch-player-pos)])))
 
 (defn add-merchant
   ([{:keys [system z]}]

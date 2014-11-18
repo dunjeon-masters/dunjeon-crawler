@@ -153,3 +153,20 @@
 (def init-bat% 1)
 (def init-skeleton% 1)
 (def init-equip% 1)
+
+;; MERCHANT CONFIG
+(def merchant-pos
+  {:x 5
+   :y 7})
+
+(def merchant-portal-pos
+  {:x 5
+   :y 9})
+
+(def merchant-player-pos
+  {:x 5
+   :y 5})
+
+(def merchant-level-size
+  {:width 10
+   :height 10})
