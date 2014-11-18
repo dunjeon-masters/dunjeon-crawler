@@ -436,7 +436,7 @@
                                            (fn [entities]
                                              (remove #(#{:wall} (:type %))
                                                      entities)))))
-                :t (update-in level [(cell 0) (cell 1)]
+                :at (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]
                                            conj (rj.c/map->Entity {:id (br.e/create-entity)

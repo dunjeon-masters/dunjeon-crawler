@@ -23,10 +23,11 @@
           :let [r (.indexOf level row)]]
     (println
       r (map #(case (% 2)
-                :w "X"
-                :f "_"
-                :d "+"
-                :t "!")
+                :w  "X"
+                :f  "_"
+                :d  "+"
+                :at "!"
+                :st "v")
              row)))
   :as LEVEL)
 
@@ -56,38 +57,64 @@
 
 (defn room->points
   [{:keys [x y width height door] :as room}]
-  (letfn [(trap->dir [[i j] {:keys [x y width height]}]
-            (let [top   y
-                  left  x
-                  right (+ x width  -1)
-                  btm   (+ y height -1)]
-              (cond
-                (= i left)  :right
-                (= j top)   :down
-                (= i right) :left
-                (= j btm)   :up)))
-          (corner? [{:keys [x y width height]} [i j]]
-            (let [x-max (+ -1 x width)
-                  y-max (+ -1 y height)]
-              (or (= [i j] [x     y])
-                  (= [i j] [x     y-max])
-                  (= [i j] [x-max y])
-                  (= [i j] [x-max y-max]))))]
-    (change-in-level
-      door
-      (map (fn [[i j _ :as c]]
-             (if (or (seq (clojure.set/intersection #{i} #{x (+ -1 x width)}))
-                     (seq (clojure.set/intersection #{j} #{y (+ -1 y width)})))
-               (if (and (not (corner? room [i j]))
-                        (< (rand-int 100) 20))
-                 (assoc c
-                        2 :t
-                        3 {:dir (trap->dir [i j] room)})
-                 (assoc c 2 :w))
-               c))
-           (for [i (range x (+ x width))
-                 j (range y (+ y height))]
-             [i j :f {}])))))
+  (let [placed-traps (atom {:top false
+                            :btm false
+                            :left false
+                            :right false})]
+    (letfn [(trap->dir [[i j _ _] {:keys [x y width height]}]
+              (let [top   y
+                    left  x
+                    right (+ x width  -1)
+                    btm   (+ y height -1)]
+                (cond
+                  (= i left)  :right
+                  (= j top)   :down
+                  (= i right) :left
+                  (= j btm)   :up)))
+            (corner? [{:keys [x y width height]} [i j _ _]]
+              (let [x-max (+ -1 x width)
+                    y-max (+ -1 y height)]
+                (or (= [i j] [x     y])
+                    (= [i j] [x     y-max])
+                    (= [i j] [x-max y])
+                    (= [i j] [x-max y-max]))))
+            (point->side [{:keys [x y width height] :as room} [i j _ _]]
+              (if (not (corner? room [i j _ _]))
+                (cond
+                  (= i x)
+                  :left
+                  (= i (+ -1 x width))
+                  :right
+                  (= j y)
+                  :top
+                  (= j (+ -1 y height))
+                  :btm)
+                nil))
+            (edge? [{:keys [x y width height] :as room} [i j _ _ ]]
+              (or (= i x) (= i (+ -1 x width))
+                  (= j y) (= j (+ -1 y height))))
+            (wall-ify [cell]
+              (if (edge? room cell)
+                (assoc cell 2 :w)
+                cell))
+            (arrow-trap-ify [cell]
+              (if-let [side (point->side room cell)]
+                (if (and (not (@placed-traps side))
+                         (not= (cell 2) :d))
+                  (do (swap! placed-traps #(assoc % side true))
+                      (assoc cell
+                             2 :at
+                             3 {:dir (trap->dir cell room)}))
+                  cell)
+                cell))
+            (door-ify [door points]
+              (change-in-level door points))]
+      (as-> (for [i (range x (+ x width))
+                  j (range y (+ y height))]
+              [i j :f {}]) points
+        (map wall-ify points)
+        (door-ify door points)
+        (map arrow-trap-ify (shuffle points))))))
 
 (defn room-in-level?
   [level {:keys [x y width height]}]
@@ -147,7 +174,7 @@
         (if (:last-add? level)
           (recur (add-room
                    level
-                   (create-room (rand-pos) [room-size room-size ]))
+                   (create-room (rand-pos) [room-size room-size]))
                  (dec i))
           (recur (add-room
                    level
@@ -155,12 +182,3 @@
                  i))
         level))))
 
-(defn test-rooms
-  [[level-x level-y] [room-x room-y] room-size]
-  (let [level (gen-level level-x level-y :f)
-        room (create-room [room-x room-y] [room-size room-size])]
-    (as-> (add-room level room) level
-      (add-room level (create-room [0 0] [5 5]))
-      (print-level level))))
-
-#_(filter #(= :t (% 2)) (map vec (partition 4 (flatten (:level (test-rooms [10 10] [5 5] 5))))))
