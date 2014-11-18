@@ -35,6 +35,8 @@
 (defrecord Lichen [grow-chance%
                    max-blob-size])
 
+(defrecord MPortal [^Number x ^Number y ^Number z])
+
 (defrecord Merchant [])
 
 (defrecord Player [name
@@ -141,6 +143,7 @@
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
+            :m-portal     (type (->MPortal nil nil nil))
             :merchant     (type (->Merchant))
             :mobile       (type (->Mobile nil nil))
             :player       (type (->Player nil nil))

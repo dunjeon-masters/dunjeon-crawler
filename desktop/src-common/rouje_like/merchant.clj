@@ -6,9 +6,29 @@
             [rouje-like.config :as rj.cfg]
             [rouje-like.utils :as rj.u :refer [?]]))
 
-(def merchant-pos
-  {:x 5
-   :y 7})
+(defn merchant-tile
+  [system]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        merch-level (nth levels 0)]
+    (get-in merch-level [5 7])))
+
+(defn merchant-portal-tile
+  [system]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        merch-level (nth levels 0)]
+    (get-in merch-level [5 9])))
+
+(defn merchant-player-tile
+  [system]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        merch-level (nth levels 0)]
+    (get-in merch-level [5 5])))
 
 (defn add-merchant
   ([{:keys [system z]}]
@@ -17,7 +37,7 @@
            levels (:levels c-world)
            world (nth levels z)
 
-           merchant-tile (get-in world [(:x merchant-pos) (:y merchant-pos)])]
+           merchant-tile (merchant-tile system)]
        (add-merchant system merchant-tile)))
   ([system target-tile]
      (let [e-world (first (rj.e/all-e-with-c system :world))

@@ -183,6 +183,10 @@
                  :width 12 :height 12
                  :color {:r 102 :g 0 :b 102 :a 255}
                 :tile-sheet grim-tile-sheet}
+     :m-portal {:x 4 :y 9
+                :width 12 :height 12
+                :color {:r 0 :g 0 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
      :equipment {:x 2 :y 9
                  :width 12 :height 12
                  :color {:r 255 :g 255 :b 255 :a 255}

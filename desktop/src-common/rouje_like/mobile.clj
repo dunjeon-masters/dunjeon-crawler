@@ -54,9 +54,14 @@
         c-world (rj.e/get-c-on-e system e-world :world)
         level (nth (:levels c-world) z)
         target-tile (get-in level [x y])]
-    (as-> system system
-        (move-entity system e-world entity [z x y] from-pos target-tile)
-        ((:add-level-fn c-world) system (inc z)))))
+    (if (= (:type portal) :m-portal)
+      (as-> system system
+            (remove-entity system e-world portal from-pos)
+            (move-entity system e-world entity [z x y] from-pos target-tile)
+            ((:merchant-level-fn c-world) system from-pos))
+      (as-> system system
+            (move-entity system e-world entity [z x y] from-pos target-tile)
+            ((:add-level-fn c-world) system (inc z))))))
 
 (defn move
   [_ e-this target-tile system]
@@ -69,4 +74,3 @@
     (if (and (= this-type :player) portal)
       (port-entity system e-world e-this this-pos portal)
       (move-entity system e-world e-this target-pos this-pos target-tile))))
-

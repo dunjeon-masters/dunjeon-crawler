@@ -28,7 +28,7 @@
   (union <walls> #{:lichen}))
 
 (def <valid-move-targets>
-  (union <empty> #{:portal}))
+  (union <empty> #{:portal :m-portal}))
 
 (def <valid-mob-targets>
   (union <empty> #{:player}))
