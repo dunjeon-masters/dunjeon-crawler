@@ -128,7 +128,10 @@
                :value    2}
    :fire      {:type     :fire
                :duration 4
-               :value    1}})
+               :value    1}
+   :fireball  {:type     :fire
+               :duration 2
+               :value    2}})
 
 ;; CREATURE CONFIG
 (def bat-stats

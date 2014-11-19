@@ -18,6 +18,7 @@
    :equipment 2
    :dune 0
    :health-potion 2
+   :magic-potion 2
    :torch 3
    :gold 4
    :wall 5

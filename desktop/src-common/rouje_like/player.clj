@@ -156,7 +156,7 @@
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
        [:magic {:max-mp max-mp
-                :mp 2
+                :mp max-mp
                 :spells []}]
        [:broadcaster {:name-fn (constantly n)}]])))
 

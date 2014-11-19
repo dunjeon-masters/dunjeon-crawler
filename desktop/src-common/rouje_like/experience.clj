@@ -3,7 +3,8 @@
             [rouje-like.world :as rj.wr]
             [rouje-like.components :refer [can-attack? attack]]
             [rouje-like.config :as rj.cfg]
-            [rouje-like.messaging :as rj.msg]))
+            [rouje-like.messaging :as rj.msg]
+            [rouje-like.magic :as rj.mag]))
 
 (defn level->exp
   [level]
