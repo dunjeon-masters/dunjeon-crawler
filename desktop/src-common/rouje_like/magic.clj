@@ -20,4 +20,6 @@
         c-pos (rj.e/get-c-on-e system e-this :position)
         e-this-coords  [(:x c-pos) (:y c-pos)]
         range (map calc-range (repeat e-this-coords) dir-vec)]
+    ;; TODO if monster in range, attack closest one with damage and apply burn.
+    ;; TODO add a way to take in another keyboard input to tell the direction of fireball.
     system))
