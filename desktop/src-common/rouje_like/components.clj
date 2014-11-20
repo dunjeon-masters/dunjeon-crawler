@@ -2,6 +2,8 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
+#_(use 'rouje-like.components :reload)
+
 (defrecord ArrowTrap [dir
                       ready?])
 
@@ -61,7 +63,7 @@
 
 (defrecord Skeleton [])
 
-(defrecord SpikeTrap [])
+(defrecord SpikeTrap [visible?])
 
 (defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
@@ -155,6 +157,7 @@
             :renderable   (type (->Renderable nil nil))
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
+            :spike-trap   (type (->SpikeTrap nil))
             :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))

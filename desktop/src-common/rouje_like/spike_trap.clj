@@ -9,6 +9,8 @@
             [rouje-like.messaging :as rj.msg]
             [rouje-like.config :as rj.cfg]))
 
+#_(use 'rouje-like.spike-trap :reload)
+
 (declare process-input-tick)
 
 (defn add-trap
@@ -36,22 +38,22 @@
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-trap
-                                                               :type :spike-trap})))))]
+                                                               :type :hidden-spike-trap})))))]
      {:system (add-trap system target-tile e-trap)
       :z (:z target-tile)}))
 
   ([system target-tile e-trap]
    (let [dir ({:down :up
-                 :up   :down
-                 :left :left
-                 :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
+               :up   :down
+               :left :left
+               :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
        (rj.e/system<<components
          system e-trap
-         [[:spike-trap {}]
+         [[:spike-trap {:visible? 0}]
           [:position {:x    (:x target-tile)
                       :y    (:y target-tile)
                       :z    (:z target-tile)
-                      :type :spike-trap}]
+                      :type :hidden-spike-trap}]
           [:attacker {:atk              (:atk (:spike-trap rj.cfg/trap->stats))
                       :can-attack?-fn   rj.atk/can-attack?
                       :attack-fn        rj.atk/attack
@@ -76,23 +78,34 @@
         c-sight (rj.e/get-c-on-e system e-this :sight)
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
+        c-spike-trap (rj.e/get-c-on-e system e-this :spike-trap)
+
         player-is-adj? (seq (rj.u/get-neighbors-of-type level this-pos [:player]))]
-    (if player-is-adj?
-      (rj.msg/add-msg system :static
+    (as-> (if player-is-adj?
+            (rj.msg/add-msg system :static
                             (format "%s hears a shuffling noise"
                                     (let [e-player (first (rj.e/all-e-with-c system :player))
                                           player-c-broadcaster (rj.e/get-c-on-e system e-player :broadcaster)]
                                       ((:name-fn player-c-broadcaster) system e-player))))
-      (let [e-player (first (rj.e/all-e-with-c system :player))
-            c-player-pos (rj.e/get-c-on-e system e-player :position)
-            player-pos [(:x c-player-pos) (:y c-player-pos)]]
-        (if (= this-pos player-pos)
-          (let [target-tile (get-in level player-pos nil)
-                e-target (:id (rj.u/tile->top-entity target-tile))]
-            (cond
-              (can-attack? c-attacker e-this e-target system)
-              (attack c-attacker e-this e-target system)
+            (let [e-player (first (rj.e/all-e-with-c system :player))
+                  c-player-pos (rj.e/get-c-on-e system e-player :position)
+                  player-pos [(:x c-player-pos) (:y c-player-pos)]]
+              (if (= this-pos player-pos)
+                (let [target-tile (get-in level player-pos nil)
+                      e-target (:id (rj.u/tile->top-entity target-tile))]
+                  (as-> (cond
+                          (can-attack? c-attacker e-this e-target system)
+                          (attack c-attacker e-this e-target system)
 
-              :else system))
-          system)))))
+                          :else system) system
+                    (rj.e/upd-c system e-this :spike-trap
+                                (fn [c-spike-trap]
+                                  (assoc c-spike-trap :visible? 2)))
+                    (rj.u/change-type system e-this :hidden-spike-trap :spike-trap)))
+                system))) system
+      (if (pos? (? (:visible? c-spike-trap)))
+        (rj.e/upd-c system e-this :spike-trap
+                    (fn [c-spike-trap]
+                      (update-in c-spike-trap [:visible?] dec)))
+        (rj.u/change-type system e-this :spike-trap :hidden-spike-trap)))))
 

@@ -172,7 +172,7 @@
                 system)))
           (entity-ize-spike-trap [system tile]
             (let [entities (:entities tile)
-                  trap (filter #(#{:spike-trap} (:type %)) entities)]
+                  trap (filter #(#{:hidden-spike-trap} (:type %)) entities)]
               (if (seq trap)
                 (let [trap (first trap)
                       trap-type (:type trap)
@@ -450,7 +450,7 @@
                               (fn [tile]
                                 (update-in tile [:entities]
                                            conj (rj.c/map->Entity {:id (br.e/create-entity)
-                                                                   :type :spike-trap
+                                                                   :type :hidden-spike-trap
                                                                    :extra (cell 3)}))))
                 :at (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
