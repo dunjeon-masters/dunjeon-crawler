@@ -91,7 +91,8 @@
                                       (rj.inv/equip-slot-item system e-player)))
    (play/key-code :num-1)             (fn [system]
                                     (let [e-player (first (rj.e/all-e-with-c system :player))]
-                                      (rj.mag/use-fireball system e-player :right)))
+                                      (-> (rj.mag/use-fireball system e-player :right)
+                                          (tick-entities))))
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
    (play/key-code :H)             (fn [system]

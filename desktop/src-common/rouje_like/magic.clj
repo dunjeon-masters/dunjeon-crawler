@@ -44,6 +44,7 @@
                                                      :e-from e-this
                                                      :apply-fn rj.stef/apply-burn)]}]]))
             (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
-              (rj.d/add-effects system e-target e-fireball)))
+              (as-> (rj.d/add-effects system e-target e-fireball) system
+                    (rj.e/kill-e system e-fireball))))
       system)))
 
