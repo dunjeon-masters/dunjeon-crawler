@@ -36,12 +36,14 @@
     ;; TODO add a way to take in another keyboard input to tell the direction of fireball.
     (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
       (as-> (rj.c/take-damage (rj.e/get-c-on-e system e-target :destructible) e-target damage e-this system) system
-            (rj.e/system<<components
-              system (br.e/create-entity)
-              [[:fireball {}]
-               [:attacker {:status-effects [(assoc (:fireball rj.cfg/spell-effects)
-                                                   :e-from e-this
-                                                   :apply-fn rj.stef/apply-burn)]}]])
+            (let [e-fireball (br.e/create-entity)]
+              (rj.e/system<<components
+                system e-fireball
+                [[:fireball {}]
+                 [:attacker {:status-effects [(assoc (:fireball rj.cfg/status-effects)
+                                                     :e-from e-this
+                                                     :apply-fn rj.stef/apply-burn)]}]]))
             (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
               (rj.d/add-effects system e-target e-fireball)))
       system)))
+
