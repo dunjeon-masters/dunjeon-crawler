@@ -61,6 +61,8 @@
 
 (defrecord Skeleton [])
 
+(defrecord SpikeTrap [])
+
 (defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
 

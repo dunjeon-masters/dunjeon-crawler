@@ -1,4 +1,4 @@
-(ns rouje-like.arrow-trap
+(ns rouje-like.spike-trap
   (:require [brute.entity :as br.e]
 
             [rouje-like.attacker :as rj.atk]
@@ -8,8 +8,6 @@
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.messaging :as rj.msg]
             [rouje-like.config :as rj.cfg]))
-
-#_(use 'rouje-like.arrow-trap :reload)
 
 (declare process-input-tick)
 
@@ -38,7 +36,7 @@
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-trap
-                                                               :type :arrow-trap})))))]
+                                                               :type :spike-trap})))))]
      {:system (add-trap system target-tile e-trap)
       :z (:z target-tile)}))
 
@@ -49,14 +47,12 @@
                  :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
        (rj.e/system<<components
          system e-trap
-         [[:arrow-trap {:dir dir
-                        :ready? false}]
+         [[:spike-trap {}]
           [:position {:x    (:x target-tile)
                       :y    (:y target-tile)
                       :z    (:z target-tile)
-                      :type :arrow-trap}]
-          [:sight {:distance 4}]
-          [:attacker {:atk              (:atk (:arrow-trap rj.cfg/trap->stats))
+                      :type :spike-trap}]
+          [:attacker {:atk              (:atk (:spike-trap rj.cfg/trap->stats))
                       :can-attack?-fn   rj.atk/can-attack?
                       :attack-fn        rj.atk/attack
                       :status-effects   []
@@ -64,17 +60,13 @@
           [:tickable {:tick-fn process-input-tick
                       :pri 0}]
           [:broadcaster {:name-fn (constantly (str "the "
-                                                   (name :arrow-trap)))}]]))))
+                                                   (name :spike-trap)))}]]))))
 
 (defn process-input-tick
   [_ e-this system]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
         this-pos [(:x c-position) (:y c-position)]
         c-mobile (rj.e/get-c-on-e system e-this :mobile)
-
-        e-player (first (rj.e/all-e-with-c system :player))
-        c-player-pos (rj.e/get-c-on-e system e-player :position)
-        player-pos [(:x c-player-pos) (:y c-player-pos)]
 
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
@@ -83,44 +75,24 @@
 
         c-sight (rj.e/get-c-on-e system e-this :sight)
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
-        c-arrow-trap (rj.e/get-c-on-e system e-this :arrow-trap)
 
-        can-see-player? (if c-arrow-trap
-                          (let [dir (:dir c-arrow-trap)
-                                this-pos+ (rj.u/coords+offset this-pos (rj.u/direction->offset dir))
-                                [t-x t-y] this-pos
-                                [p-x p-y] player-pos
-                                can-see? (rj.u/can-see? level (:distance c-sight) this-pos+ player-pos)]
-                            (and
-                              (case dir
-                                :up    (and (= t-x p-x)
-                                            (< t-y p-y))
-                                :down  (and (= t-x p-x)
-                                            (> t-y p-y))
-                                :left  (and (= t-y p-y)
-                                            (> t-x p-x))
-                                :right (and (= t-y p-y)
-                                            (< t-x p-x)))
-                              can-see?))
-                          (rj.u/can-see? level (:distance c-sight) this-pos player-pos))
+        player-is-adj? (seq (rj.u/get-neighbors-of-type level this-pos [:player]))]
+    (if player-is-adj?
+      (rj.msg/add-msg system :static
+                            (format "%s hears a shuffling noise"
+                                    (let [e-player (first (rj.e/all-e-with-c system :player))
+                                          player-c-broadcaster (rj.e/get-c-on-e system e-player :broadcaster)]
+                                      ((:name-fn player-c-broadcaster) system e-player))))
+      (let [e-player (first (rj.e/all-e-with-c system :player))
+            c-player-pos (rj.e/get-c-on-e system e-player :position)
+            player-pos [(:x c-player-pos) (:y c-player-pos)]]
+        (if (= this-pos player-pos)
+          (let [target-tile (get-in level player-pos nil)
+                e-target (:id (rj.u/tile->top-entity target-tile))]
+            (cond
+              (can-attack? c-attacker e-this e-target system)
+              (attack c-attacker e-this e-target system)
 
-        target-tile (get-in level player-pos nil)]
-    (if can-see-player?
-      (let [e-target (:id (rj.u/tile->top-entity target-tile))]
-        (if (:ready? c-arrow-trap)
-          (cond
-            (can-attack? c-attacker e-this e-target system)
-            (attack c-attacker e-this e-target system)
-
-            :else system)
-          (as-> (rj.e/upd-c system e-this :arrow-trap
-                            (fn [c-arrow-trap]
-                              (assoc c-arrow-trap :ready? true))) system
-            (rj.msg/add-msg system :static
-                            (format "%s hears a ticking noise"
-                                    (let [player-c-broadcaster (rj.e/get-c-on-e system e-target :broadcaster)]
-                                      ((:name-fn player-c-broadcaster) system e-target)))))))
-      (rj.e/upd-c system e-this :arrow-trap
-                  (fn [c-arrow-trap]
-                    (assoc c-arrow-trap :ready? false))))))
+              :else system))
+          system)))))
 

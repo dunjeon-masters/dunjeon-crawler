@@ -1,6 +1,8 @@
 (ns rouje-like.config
   (:require [clojure.set :refer [union]]))
 
+#_(use 'rouje-like.config :reload)
+
 ;; WORLD CONFIG
 (def block-size 36)
 (def padding-sizes {:top   3
@@ -28,10 +30,10 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  (union <walls> #{:lichen}))
+  (union <walls> #{:arrow-trap :lichen}))
 
 (def <valid-move-targets>
-  (union <empty> #{:portal}))
+  (union <empty> #{:portal :spike-trap :hidden-spike-trap}))
 
 (def <valid-mob-targets>
   (union <empty> #{:player}))
@@ -43,7 +45,10 @@
    :temple-wall {:hp 100}})
 
 (def trap->stats
-  {:arrow-trap {:hp 1}})
+  {:arrow-trap {:hp 1
+                :atk 2}
+   :spike-trap {:hp 1
+                :atk 2}})
 
 ;; PLAYER CONFIG
 (def player-stats
@@ -85,9 +90,6 @@
    :def 1
    :atk 3
    :exp 1})
-
-(def trap-stats
-  {:atk 1})
 
 (def trap-types
   [:arrow])

@@ -18,6 +18,7 @@
             [rouje-like.bat :as rj.bt]
             [rouje-like.skeleton :as rj.sk]
             [rouje-like.arrow-trap :as rj.arrow-trap]
+            [rouje-like.spike-trap :as rj.spike-trap]
             [rouje-like.portal :as rj.p]
             [rouje-like.config :as rj.cfg]))
 
@@ -169,7 +170,16 @@
                                                          (rj.d/take-damage c e 0 f s))
                                                        rj.d/take-damage)}]]))
                 system)))
-          (entity-ize-trap [system tile]
+          (entity-ize-spike-trap [system tile]
+            (let [entities (:entities tile)
+                  trap (filter #(#{:spike-trap} (:type %)) entities)]
+              (if (seq trap)
+                (let [trap (first trap)
+                      trap-type (:type trap)
+                      e-trap (:id trap)]
+                  (rj.spike-trap/add-trap system tile e-trap))
+                system)))
+          (entity-ize-arrow-trap [system tile]
             (let [entities (:entities tile)
                   trap (filter #(#{:arrow-trap} (:type %)) entities)]
               (if (seq trap)
@@ -224,7 +234,7 @@
       (reduce (fn [system tile]
                 (reduce (fn [system entity-izer]
                           (entity-izer system tile))
-                        system [entity-ize-wall entity-ize-trap entity-ize-door]))
+                        system [entity-ize-wall entity-ize-arrow-trap entity-ize-spike-trap entity-ize-door]))
               system (flatten level)))))
 
 (def ^:private init-wall% 45)
@@ -436,6 +446,12 @@
                                            (fn [entities]
                                              (remove #(#{:wall} (:type %))
                                                      entities)))))
+                :st (update-in level [(cell 0) (cell 1)]
+                              (fn [tile]
+                                (update-in tile [:entities]
+                                           conj (rj.c/map->Entity {:id (br.e/create-entity)
+                                                                   :type :spike-trap
+                                                                   :extra (cell 3)}))))
                 :at (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]

@@ -57,7 +57,8 @@
 
 (defn room->points
   [{:keys [x y width height door] :as room}]
-  (let [placed-traps (atom {:top false
+  (let [num-spike-traps (atom 2)
+        placed-traps (atom {:top false
                             :btm false
                             :left false
                             :right false})]
@@ -107,6 +108,13 @@
                              3 {:dir (trap->dir cell room)}))
                   cell)
                 cell))
+            (spike-trap-ify [cell]
+              (if (and (pos? @num-spike-traps)
+                       (not (edge? room cell)))
+                (do (swap! num-spike-traps dec)
+                    (assoc cell
+                           2 :st))
+                cell))
             (door-ify [door points]
               (change-in-level door points))]
       (as-> (for [i (range x (+ x width))
@@ -114,7 +122,8 @@
               [i j :f {}]) points
         (map wall-ify points)
         (door-ify door points)
-        (map arrow-trap-ify (shuffle points))))))
+        (map arrow-trap-ify (shuffle points))
+        (map spike-trap-ify (shuffle points))))))
 
 (defn room-in-level?
   [level {:keys [x y width height]}]

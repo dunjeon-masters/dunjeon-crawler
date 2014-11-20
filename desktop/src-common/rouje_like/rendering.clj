@@ -128,7 +128,7 @@
                 :color {:r 255 :g 255 :b 255 :a 128}
                 :tile-sheet grim-tile-sheet}
      :temple-wall {:x 3 :y 2
-                   :width 12 :height 12 ;218,165,32
+                   :width 12 :height 12
                    :color {:r 218 :g 165 :b 32 :a 128}
                    :tile-sheet grim-tile-sheet}
      :door     {:x 11 :y 2
@@ -139,6 +139,14 @@
                  :width 12 :height 12
                  :color {:r 255 :g 255 :b 255 :a 128}
                  :tile-sheet grim-tile-sheet}
+     :hidden-spike-trap {:x 14 :y 2
+                         :width 12 :height 12
+                         :color {:r 255 :g 140 :b 0 :a 255}
+                         :tile-sheet grim-tile-sheet}
+     :spike-trap {:x 4 :y 14
+                  :width 16 :height 16
+                  :color {:r 218 :g 165 :b 32 :a 255}
+                  :tile-sheet darkond-tile-sheet}
      :arrow-trap {:x 3 :y 2
                   :width 12 :height 12
                   :color {:r 218 :g 165 :b 32 :a 255}
