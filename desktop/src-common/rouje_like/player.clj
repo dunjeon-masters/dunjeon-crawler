@@ -103,16 +103,19 @@
         valid-class? (into #{} (keys rj.cfg/class->stats))
         player-class (if (valid-class? (keyword c))
                        (keyword c) (rand-nth (keys rj.cfg/class->stats)))
+        _ (? player-class)
 
         valid-race? (into #{} (keys rj.cfg/race->stats))
         player-race (if (valid-race? (keyword r))
                       (keyword r) (rand-nth (keys rj.cfg/race->stats)))
 
         max-hp (+ (:max-hp rj.cfg/player-stats)
-                  (:max-hp (rj.cfg/race->stats player-race)))
+                  (:max-hp (rj.cfg/race->stats player-race))
+                  (:max-hp (rj.cfg/class->stats player-class)))
 
         max-mp (+ (:max-mp rj.cfg/player-stats)
-                  (:max-mp (rj.cfg/race->stats player-race)))]
+                  (:max-mp (rj.cfg/race->stats player-race))
+                  (:max-mp (rj.cfg/class->stats player-class)))]
 
     (rj.e/system<<components
       system e-player
@@ -136,7 +139,8 @@
        [:digger {:can-dig?-fn can-dig?
                  :dig-fn      dig}]
        [:attacker {:atk              (+ (:atk rj.cfg/player-stats)
-                                        (:atk (rj.cfg/race->stats player-race)))
+                                        (:atk (rj.cfg/race->stats player-race))
+                                        (:atk (rj.cfg/class->stats player-class)))
                    :status-effects   []
                    :can-attack?-fn   rj.atk/can-attack?
                    :attack-fn        rj.atk/attack

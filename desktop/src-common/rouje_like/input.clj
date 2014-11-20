@@ -10,7 +10,8 @@
             [rouje-like.inventory :as rj.inv]
             [rouje-like.items :as rj.item]
             [clojure.string :as s]
-            [brute.entity]))
+            [brute.entity]
+            [rouje-like.magic :as rj.mag]))
 
 #_(in-ns 'rouje-like.input)
 #_(use 'rouje-like.input :reload)
@@ -86,11 +87,17 @@
                                                                      (fn [prev]
                                                                        (not prev))))))
    (play/key-code :E)             (fn [system]
-                                    (rj.inv/equip-slot-item system (first (rj.e/all-e-with-c system :player))))
+                                    (let [e-player (first (rj.e/all-e-with-c system :player))]
+                                      (rj.inv/equip-slot-item system e-player)))
+   (play/key-code :num-1)             (fn [system]
+                                    (let [e-player (first (rj.e/all-e-with-c system :player))]
+                                      (rj.mag/use-fireball system e-player :right)))
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
    (play/key-code :H)             (fn [system]
-                                    (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player))))})
+                                    (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player))))
+   (play/key-code :M)             (fn [system]
+                                    (rj.item/use-mp-potion system (first (rj.e/all-e-with-c system :player))))})
 
 (def keycode->direction
   {(play/key-code :W)          :up
@@ -111,6 +118,7 @@
 
 (defn process-keyboard-input
   [system keycode]
+  (prn "foo")
   (if @rj.u/cli?
     (let [cli-action (keycode->cli-action keycode)]
           (if (not (nil? cli-action))

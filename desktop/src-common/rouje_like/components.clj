@@ -22,6 +22,8 @@
                        level
                        level-up-fn])
 
+(defrecord Fireball [])
+
 (defrecord Gold [value])
 
 (defrecord Inventory [slot junk hp-potion mp-potion])
@@ -140,6 +142,7 @@
             :entity       (type (->Entity nil nil))
             :equipment    (type (->Equipment nil nil))
             :experience   (type (->Experience nil nil nil))
+            :fireball     (type (->Fireball))
             :gold         (type (->Gold nil))
             :inventory    (type (->Inventory nil nil nil nil))
             :item         (type (->Item nil))

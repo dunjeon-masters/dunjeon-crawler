@@ -2,24 +2,46 @@
   (require [rouje-like.utils :as rj.u :refer [?]]
            [rouje-like.equipment :as rj.eq]
            [rouje-like.config :as rj.cfg]
-           [rouje-like.entity-wrapper     :as rj.e]))
+           [rouje-like.entity-wrapper :as rj.e]
+           [rouje-like.components :as rj.c]
+           [rouje-like.status-effects :as rj.stef]
+           [brute.entity :as br.e]
+           [rouje-like.destructible :as rj.d]))
 
-(def ^:private three-range-dir-vec-map
-  {:left  [[-1 0] [-2 0] [-3 0]]
-   :right [[1  0] [2 0] [3 0]]
-   :up    [[0 -1] [0 -2] [0 -3]]
-   :down  [[0  1] [0 2] [0 3]]})
-
-(defn calc-range
-  [[x y] [x-off y-off]]
-  [(+ x x-off) (+ y y-off)])
+(defn get-first-e-in-range
+  [system distance direction world player-pos]
+  (let [pos (rj.u/coords+offset player-pos (rj.u/direction->offset direction))]
+    (loop [distance distance
+           pos pos]
+      (let [tile (get-in world pos nil)
+            top-e (:id (rj.u/tile->top-entity tile))]
+        (if (not (pos? distance))
+          nil
+          (if (rj.e/get-c-on-e system top-e :destructible)
+            top-e
+            (recur (dec distance) (rj.u/coords+offset pos (rj.u/direction->offset direction)))))))))
 
 (defn use-fireball
   [system e-this direction]
-  (let [dir-vec (direction three-range-dir-vec-map)
-        c-pos (rj.e/get-c-on-e system e-this :position)
-        e-this-coords  [(:x c-pos) (:y c-pos)]
-        range (map calc-range (repeat e-this-coords) dir-vec)]
+  (let [c-position (rj.e/get-c-on-e system e-this :position)
+        e-this-pos  [(:x c-position) (:y c-position)]
+        e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        world (nth levels (:z c-position))
+        spell (:fireball rj.cfg/spell-effects)
+        distance (:distance spell)
+        damage (:value spell)]
     ;; TODO if monster in range, attack closest one with damage and apply burn.
     ;; TODO add a way to take in another keyboard input to tell the direction of fireball.
-    system))
+    (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
+      (as-> (rj.c/take-damage (rj.e/get-c-on-e system e-target :destructible) e-target damage e-this system) system
+            (rj.e/system<<components
+              system (br.e/create-entity)
+              [[:fireball {}]
+               [:attacker {:status-effects [(assoc (:fireball rj.cfg/spell-effects)
+                                                   :e-from e-this
+                                                   :apply-fn rj.stef/apply-burn)]}]])
+            (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
+              (rj.d/add-effects system e-target e-fireball)))
+      system)))

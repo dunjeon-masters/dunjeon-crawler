@@ -45,9 +45,10 @@
    :atk 4
    :def 1})
 
-(def class->stats {:rogue   {}
-                   :warrior {}
-                   :mage    {}})
+;; should we include defense?
+(def class->stats {:rogue   {:max-hp 2 :max-mp 2  :atk 1}
+                   :warrior {:max-hp 5 :max-mp -5 :atk 2}
+                   :mage    {:max-hp -5 :max-mp 5 :atk -2}})
 
 (def race->stats {:human {:max-hp 10  :atk 1 :max-mp 0}
                   :orc   {:max-hp 20  :atk 2 :max-mp -1}
@@ -60,6 +61,7 @@
                  :max-mp :magic
                  :mp :magic})
 
+;; TODO add magic-atk
 (def stat->pointinc {:max-hp 5
                      :atk 1
                      :def 1
@@ -132,6 +134,11 @@
    :fireball  {:type     :fire
                :duration 2
                :value    2}})
+
+(def spell-effects
+  {:fireball {:type :fire
+              :distance 3
+              :value 3}})
 
 ;; CREATURE CONFIG
 (def bat-stats

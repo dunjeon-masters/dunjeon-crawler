@@ -74,7 +74,7 @@
                 (as-> (rj.in/process-keyboard-input @sys key-code) system
                   (if (empty? (rj.e/all-e-with-c system :player))
                     (-> (br.e/create-system)
-                        (init-entities)
+                        (init-entities @user)
                         (register-system-fns))
                     system))))))
 
@@ -168,6 +168,13 @@
       (when cmdl-action
         (cmdl-action)))
     entities))
+
+(set-screen-wrapper! (fn [screen screen-fn]
+                       (try (screen-fn)
+                            (catch Exception e
+                              (.printStackTrace e)
+                              (reset! sys {})
+                              (set-screen! rouje-like screen)))))
 
 (defgame rouje-like
   :on-create
