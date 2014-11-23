@@ -12,12 +12,12 @@
 
             [clojure.string :as s]
 
-            [rouje-like.components :as rj.c]
+            [rouje-like.components :as rj.c :refer [->save-state]]
             [rouje-like.destructible :as rj.d]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.rendering :as rj.r]
             [rouje-like.input :as rj.in]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.player :as rj.pl]
             [rouje-like.world :as rj.wr]
             [rouje-like.config :as rj.cfg]
@@ -174,3 +174,35 @@
   (fn [this]
     (set-screen! this main-menu-screen)))
 
+(comment
+  (let [system @sys
+        e-player (first (rj.e/all-e-with-c system :player))
+        player-cs (rj.e/all-c-on-e system e-player)]
+     player-cs))
+
+#_(save-game @sys)
+(defn save-game [system]
+  (let [e-player (first (rj.e/all-e-with-c system :player))
+        saveable-components [:destructible :wallet
+                             :equipment :inventory
+                             :energy :experience
+                             :class :race :player
+                             :playersight :attacker]
+        save (reduce (fn [save k-comp]
+                       (let [c-comp (rj.e/get-c-on-e system e-player k-comp)]
+                         (merge save
+                                {k-comp (->save-state c-comp)})))
+                               {} saveable-components)]
+    (spit "save.edn" (pr-str save))))
+
+#_(swap! sys load-game)
+(defn load-game [system]
+  (let [save-state (read-string (slurp "save.edn"))
+
+        e-player (first (rj.e/all-e-with-c system :player))]
+    (reduce (fn [system k-saved-comp]
+              (rj.e/upd-c system e-player k-saved-comp
+                          (fn [c]
+                            (let [saved-comp (k-saved-comp save-state)]
+                              (merge c saved-comp)))))
+            system (keys save-state))))

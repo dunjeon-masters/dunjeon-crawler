@@ -2,6 +2,11 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
+#_(use 'rouje-like.components :reload)
+
+(defprotocol ISaveState
+  (->save-state [this]))
+
 (defrecord Bat [])
 
 (defrecord Broadcaster [name-fn])
@@ -11,45 +16,80 @@
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
 
-(defrecord Energy [energy])
+(defrecord Energy [energy]
+  ISaveState
+  (->save-state [this]
+    (zipmap (keys this) (vals this))))
 
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
-(defrecord Equipment [weapon armor])
+(defrecord Equipment [weapon
+                      armor]
+  ISaveState
+  (->save-state [this]
+    (zipmap (keys this) (vals this))))
 
 (defrecord Experience [experience
                        level
-                       level-up-fn])
+                       level-up-fn]
+  ISaveState
+  (->save-state [this]
+    (let [this (dissoc this :level-up-fn)]
+      (zipmap (keys this) (vals this)))))
 
 (defrecord Gold [value])
 
-(defrecord Inventory [slot junk hp-potion])
+(defrecord Inventory [slot
+                      junk
+                      hp-potion]
+  ISaveState
+  (->save-state [this]
+    (let [saved-slot (:slot this)
+          saved-slot (if saved-slot
+                       (->save-state saved-slot)
+                       nil)]
+      {:junk (map #(->save-state %)
+                  (:junk this))
+       :hp-potion (:hp-potion this)
+       :slot saved-slot})))
 
 (defrecord Item [pickup-fn])
 
 (defrecord Killable [experience])
 
-(defrecord Klass [class])
+(defrecord Klass [class]
+  ISaveState
+  (->save-state [this]
+    (zipmap (keys this) (vals this))))
 
 (defrecord Lichen [grow-chance%
                    max-blob-size])
 
 (defrecord Player [name
-                   show-world?])
+                   show-world?]
+  ISaveState
+  (->save-state [this]
+    (zipmap (keys this) (vals this))))
 
 (defrecord PlayerSight [distance
                         decline-rate
                         lower-bound
                         upper-bound
-                        torch-power])
+                        torch-power]
+  ISaveState
+  (->save-state [this]
+    (zipmap (keys this) (vals this))))
 
 (defrecord Portal [^Number x ^Number y ^Number z])
 
 (defrecord Position [x y z
                      ^Keyword type])
 
-(defrecord Race [race])
+(defrecord Race [race]
+  ISaveState
+  (->save-state [this]
+    (zipmap (keys this) (vals this))))
 
 (defrecord Receiver [])
 
@@ -65,7 +105,10 @@
 
 (defrecord Torch [brightness])
 
-(defrecord Wallet [^Number gold])
+(defrecord Wallet [^Number gold]
+  ISaveState
+  (->save-state [this]
+    (zipmap (keys this) (vals this))))
 
 (defrecord World [levels
                   add-level-fn])
@@ -77,7 +120,10 @@
                      status-effects
                      ^Fn attack-fn
                      ^Fn can-attack?-fn
-                     is-valid-target?]
+                     ^Fn is-valid-target?]
+  ISaveState
+  (->save-state [this]
+    {:atk (:atk this)})
   IAttacker
   (can-attack?     [this e-this e-target system]
     (can-attack?-fn this e-this e-target system))
@@ -92,6 +138,10 @@
                          status-effects
                          can-retaliate?
                          ^Fn take-damage-fn]
+  ISaveState
+  (->save-state [this]
+    (let [this (dissoc this :take-damage-fn)]
+      (zipmap (keys this) (vals this))))
   IDestructible
   (take-damage     [this e-this damage from system]
     (take-damage-fn this e-this damage from system)))
