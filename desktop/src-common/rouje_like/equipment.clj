@@ -58,6 +58,14 @@
            (str " of " (name effect))))
     ""))
 
+(defn equipment-value
+  [eq]
+  "An equipment's value is simply the sum of its stats."
+  (let [eq-stats (:stats eq)]
+    (reduce (fn [a [stat val]] (+ a val))
+            0
+            eq-stats)))
+
 (defn update-stat
   [system e-this stat amount]
   "Update the statistic STAT by AMOUNT on E-THIS."
