@@ -33,6 +33,17 @@
         merch-player-pos rj.cfg/merchant-player-pos]
     (get-in merch-level [(:x merch-player-pos) (:y merch-player-pos)])))
 
+(defn merchant-item-tiles
+  [system]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        merch-level (nth levels 0)
+        merch-item-pos rj.cfg/merchant-item-pos]
+    (map (fn [{x :x y :y}]
+           (get-in merch-level [x y]))
+         merch-item-pos)))
+
 (defn add-merchant
   ([{:keys [system z]}]
      (let [e-world (first (rj.e/all-e-with-c system :world))
@@ -67,3 +78,5 @@
   (as-> system system
         (add-merchant {:system system :z z})
         (:system system)))
+
+

@@ -440,6 +440,20 @@
   []
   (generate-random-level rj.cfg/world-sizes 0 :desert))
 
+(defn add-merch-items
+  [system]
+  (reduce (fn [sys tile]
+            (:system (rj.items/add-purchasable sys tile)))
+          system
+          (rj.merch/merchant-item-tiles system)))
+
+(defn remove-merch-items
+  [system]
+  (reduce (fn [sys {x :x y :y}]
+            (rj.items/remove-item sys [0 x y] :purchasable))
+          system
+          rj.cfg/merchant-item-pos))
+
 (defn reset-merch-level
   [system [z x y]]
   (let [e-world (first (rj.e/all-e-with-c system :world))
@@ -447,7 +461,10 @@
         levels (:levels c-world)
         level (nth levels z)
         target-tile (get-in level [x y])]
-    (:system (rj.p/add-portal system (rj.merch/merchant-portal-tile system) target-tile :portal))))
+    (as-> system system
+          (remove-merch-items system)
+          (add-merch-items system)
+          (:system (rj.p/add-portal system (rj.merch/merchant-portal-tile system) target-tile :portal)))))
 
 (defn add-merch-portal
   [system z]

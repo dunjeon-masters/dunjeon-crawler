@@ -53,6 +53,8 @@
 (defrecord Position [x y z
                      ^Keyword type])
 
+(defrecord Purchasable [item value])
+
 (defrecord Race [race])
 
 (defrecord Receiver [])
@@ -150,6 +152,7 @@
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :portal       (type (->Portal nil nil nil))
             :position     (type (->Position nil nil nil nil))
+            :purchasable  (type (->Purchasable nil nil))
             :race         (type (->Race nil))
             :receiver     (type (->Receiver))
             :relay        (type (->Relay nil nil))

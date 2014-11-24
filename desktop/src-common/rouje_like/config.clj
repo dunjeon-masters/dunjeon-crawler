@@ -19,7 +19,7 @@
   #{:wall :tree :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion :equipment})
+  #{:torch :gold :health-potion :equipment :purchasable})
 
 (def <empty>
   (union <floors> <items>))
@@ -165,8 +165,13 @@
 
 (def merchant-player-pos
   {:x 5
-   :y 5})
+   :y 3})
 
 (def merchant-level-size
   {:width 10
    :height 10})
+
+(def merchant-item-pos
+  [{:x 3 :y 5}
+   {:x 5 :y 5}
+   {:x 7 :y 5}])
