@@ -73,24 +73,23 @@
                        (remove-item system [z x y] item-type)
                        (broadcast-pickup system))
 
-      :purchasable (as-> system system
-                         ;; check if the player has enough money
-                         (let [c-purchasable (rj.e/get-c-on-e system e-this :purchasable)
-                               price (:value c-purchasable)
-                               item (:item c-purchasable)
-                               gold (:gold (rj.e/get-c-on-e system e-by :wallet))]
-                           (if (< price gold)
-                             ;; purchase the item
-                             (do
-                               (rj.inv/pickup-slot-item system e-by item)
-                               (rj.e/upd-c system e-by :wallet
-                                           (fn [c-wallet]
-                                             (update-in c-wallet [:gold]
-                                                        (partial + (- price)))))
-                               (remove-item system [z x y] item-type)
-                               (broadcast-pickup system))
-                             ;; otherwise broadcast a message saying unable to purchase
-                             system)))
+      :purchasable (let [c-purchasable (rj.e/get-c-on-e system e-this :purchasable)
+                         price (:value c-purchasable)
+                         item (rj.e/get-c-on-e system e-this :equipment)
+                         gold (:gold (rj.e/get-c-on-e system e-by :wallet))]
+                     ;; check if the player has enough money
+                     (if (< price gold)
+                       ;; purchase the item
+                       (as-> system system
+                             (rj.inv/pickup-slot-item system e-by item)
+                             (rj.e/upd-c system e-by :wallet
+                                         (fn [c-wallet]
+                                           (update-in c-wallet [:gold]
+                                                      (partial + (- price)))))
+                             (remove-item system [z x y] item-type)
+                             (broadcast-pickup system))
+                       ;; otherwise broadcast a message saying unable to purchase
+                       system))
 
       system)))
 
@@ -213,6 +212,7 @@
   (let [e-world (first (rj.e/all-e-with-c system :world))
         e-purchasable (br.e/create-entity)
         item (rj.eq/generate-random-equipment) ; right now just use equipment
+        item-type (:type item)
         system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                      (fn [entities]
                                        (vec
@@ -222,13 +222,14 @@
                                                             :type :purchasable})))))]
     {:system (rj.e/system<<components
               system e-purchasable
-              [[:purchasable {:item item :value (rj.eq/equipment-value item)}]
-               [:position {:x    (:x target-tile)
-                           :y    (:y target-tile)
-                           :z    (:z target-tile)
-                           :type :purchasable}]
-               [:broadcaster {:name-fn (str "an " (rj.eq/equipment-name item) " for "
-                                            (rj.eq/equipment-value item) " gold")}]])
+              [[:item {:pickup-fn pickup-item}]
+               [:purchasable {:value (rj.eq/equipment-value item)}]
+               [:equipment {item-type item}]
+               [:broadcaster {:name-fn (fn [system e-this]
+                                         (let [value (:value (rj.e/get-c-on-e system e-this :purchasable))
+                                               c-eq (rj.e/get-c-on-e system e-this :equipment)
+                                               name (rj.eq/equipment-name (item-type c-eq))]
+                                           (str "a " name " for " value " gold")))}]])
      :z (:z target-tile)}))
 
 (defn add-equipment
