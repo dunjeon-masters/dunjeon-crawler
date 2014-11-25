@@ -1,6 +1,6 @@
 (ns rouje-like.items
   (:require [brute.entity :as br.e]
-            [rouje-like.utils :as rj.u :refer [?]]
+            [rouje-like.utils :as rj.u :refer [? update-gold]]
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]
@@ -16,14 +16,6 @@
                              (remove
                               #(#{type} (:type %))
                               entities))))))
-
-(defn update-gold
-  [system e-this value]
-  "Update the amount of gold on E-THIS by VALUE."
-  (rj.e/upd-c system e-this :wallet
-                          (fn [c-wallet]
-                            (update-in c-wallet [:gold]
-                                       (partial + value)))))
 
 (defn pickup-item
   [system e-by e-this [z x y] item-type]
@@ -93,6 +85,9 @@
                              (broadcast-pickup system))
                        ;; otherwise broadcast a message saying unable to purchase
                        system))
+
+      :merchant (let [junk-value (rj.inv/junk-value)]
+                  (rj.inv/sell-junk system e-this))
 
       system)))
 

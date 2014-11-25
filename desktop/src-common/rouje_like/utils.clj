@@ -210,3 +210,11 @@
                                                      (fn [entities]
                                                        (fn<-entities entities))))))))))
 
+(defn update-gold
+  [system e-this value]
+  "Update the amount of gold on E-THIS by VALUE."
+  (rj.e/upd-c system e-this :wallet
+                          (fn [c-wallet]
+                            (update-in c-wallet [:gold]
+                                       (partial + value)))))
+
