@@ -8,6 +8,7 @@
 
 (defn merchant-tile
   [system]
+  "Return the tile the merchant is in."
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
@@ -17,6 +18,7 @@
 
 (defn merchant-portal-tile
   [system]
+  "Return the tile the exit portal to the merchant level is in."
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
@@ -26,6 +28,7 @@
 
 (defn merchant-player-tile
   [system]
+  "Return the tile that the player spawns at in the merchant level."
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
@@ -35,6 +38,7 @@
 
 (defn merchant-item-tiles
   [system]
+  "Return a vector of tiles that the merchant's purchasable items are in."
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
@@ -45,38 +49,22 @@
          merch-item-pos)))
 
 (defn add-merchant
-  ([{:keys [system z]}]
-     (let [e-world (first (rj.e/all-e-with-c system :world))
-           c-world (rj.e/get-c-on-e system e-world :world)
-           levels (:levels c-world)
-           world (nth levels z)
-
-           merchant-tile (merchant-tile system)]
-       (add-merchant system merchant-tile)))
-  ([system target-tile]
-     (let [e-world (first (rj.e/all-e-with-c system :world))
-           e-merchant (br.e/create-entity)
-           system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
-                                        (fn [entities]
-                                          (vec
-                                           (conj
-                                            (remove #(#{:wall} (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-merchant
-                                                               :type :merchant})))))]
-       {:system (rj.e/system<<components
-                 system e-merchant
-                 [[:merchant {}]
-                  [:position {:x    (:x target-tile)
-                              :y    (:y target-tile)
-                              :z    (:z target-tile)
-                              :type :merchant}]
-                  [:broadcaster {:name-fn (constantly "the merchant")}]])
-        :z (:z target-tile)})))
+  [system]
+  (let [target-tile (merchant-tile system)
+        e-world (first (rj.e/all-e-with-c system :world))
+        e-merchant (br.e/create-entity)
+        system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+                                     (fn [entities]
+                                       (vec
+                                        (conj
+                                         (remove #(#{:wall} (:type %)) entities)
+                                         (rj.c/map->Entity {:id   e-merchant
+                                                            :type :merchant})))))]
+    (rj.e/system<<components
+              system e-merchant
+              [[:merchant {}]
+               [:broadcaster {:name-fn (constantly "the merchant")}]])))
 
 (defn init-merchant
   [system z]
-  (as-> system system
-        (add-merchant {:system system :z z})
-        (:system system)))
-
-
+  (add-merchant system))
