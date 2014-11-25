@@ -90,9 +90,13 @@
                                     (let [e-player (first (rj.e/all-e-with-c system :player))]
                                       (rj.inv/equip-slot-item system e-player)))
    (play/key-code :num-1)             (fn [system]
-                                    (let [e-player (first (rj.e/all-e-with-c system :player))]
-                                      (-> (rj.mag/use-fireball system e-player :right)
-                                          (tick-entities))))
+                                    (let [e-player (first (rj.e/all-e-with-c system :player))
+                                          c-magic (rj.e/get-c-on-e system e-player :magic)
+                                          mp (:mp c-magic)]
+                                      (as-> (rj.mag/use-fireball system e-player :right) system
+                                            (if (pos? mp)
+                                              (tick-entities system)
+                                              system))))
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
    (play/key-code :H)             (fn [system]

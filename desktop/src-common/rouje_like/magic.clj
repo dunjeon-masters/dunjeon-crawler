@@ -31,6 +31,7 @@
             (recur (dec distance) (rj.u/coords+offset pos (rj.u/direction->offset direction)))))))))
 
 (defn use-fireball
+  "E-THIS shoots a fireball in DIRECTION"
   [system e-this direction]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
         e-this-pos  [(:x c-position) (:y c-position)]
@@ -48,6 +49,7 @@
     ;; (ex: poison does not damage player if they stand still and spam fireball)
     ;; TODO add a way to take in another keyboard input to tell the direction of fireball.
     ;; TODO add messages to fireball. ("player shoots fireball [up|down|right|left]" "fireball hits [e-this]" "fireball doesn't hit anything")
+    ;; (name :keyword) -> keyword
 
     (if (pos? mp)
       (as-> (dec-mp system e-this :fireball) system
