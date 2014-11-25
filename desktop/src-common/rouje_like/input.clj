@@ -96,7 +96,9 @@
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
    (play/key-code :I)             (fn [system]
-                                    (swap! input-manager :inspect-mode true))
+                                    (swap! input-manager assoc :inspect-mode true)
+                                    (println @input-manager)
+                                    system)
    (play/key-code :H)             (fn [system]
                                     (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player))))})
 
@@ -118,10 +120,10 @@
    (play/key-code :L)          :right})
 
 (def direction->position
-  {:up {:y 1}}
-  {:left {:x -1}}
-  {:down {:y -1}}
-  {:right {:x 1}})
+  {:up {:y 1}
+  :left {:x -1}
+  :down {:y -1}
+  :right {:x 1}})
 
 (defn process-keyboard-input
   [system keycode]
@@ -139,26 +141,31 @@
               energy (:energy c-energy)
               direction (keycode->direction keycode)]
           (if (not (nil? direction))
-            (if (:inspect-mode input-manager)
-              (as-> system system
-                    ;; get the tile facing direction
-                    (let [e-player (first (rj.e/all-e-with-c system :player))
-                          e-world (first (rj.e/all-e-with-c system :world))
-                          levels (rj.e/get-c-on-e system e-world :levels)
-                          player-pos (rj.e/get-c-on-e system :position)
+            (if (:inspect-mode @input-manager)
+              ;; get the tile facing direction
+              (let [e-player (first (rj.e/all-e-with-c system :player))
+                    e-world (first (rj.e/all-e-with-c system :world))
+                    levels (rj.e/get-c-on-e system e-world :levels)
+                    c-pos (rj.e/get-c-on-e system e-player :position)
+                    player-pos [(:z c-pos) (:x c-pos) (:y c-pos)]
 
-                          level (nth levels (:z player-pos))
-                          target-pos (rj.u/update-pos player-pos (direction direction->position))
-                          target-tile (get-in level [(:x target-pos) (:y target-pos)])
+                    level (nth levels (:z c-pos))
+                    target-pos (rj.u/update-pos player-pos (direction direction->position))
+                    entities (rj.u/entities-at-pos system target-pos)
 
-                          purchasable (filter #(:purchasable (:type %)))]
-                      (if purchsable
-                        ;; print stats using println
-                        (do ()
-                            (reset-input-manager :inspect-mode))
-                        (do (reset-input-manager :inspect-mode)
-                            (println "nothing to inspect")
-                            system))))
+                    inspectable (filter #(:inspectable (:type %)) entities)]
+                (println "direction: " (direction direction->position))
+                (println "player-pos: " player-pos)
+                (println "target-pos: " target-pos)
+                (println "entities: " entities)
+                (if (not (empty? inspectable))
+                  ;; print stats using println
+                  (do (println "inspecting something")
+                      (reset-input-manager :inspect-mode)
+                      system)
+                  (do (println "nothing to inspect")
+                      (reset-input-manager :inspect-mode)
+                      system)))
               (as-> system system
                     (if (pos? energy)
                       (rj.pl/process-input-tick system direction)
