@@ -436,6 +436,7 @@
              ;; CREATE MAZE
              (generate-maze level [width height])))))
 
+;;;; MERCHANT LEVEL CODE
 (defn generate-merchant-level
   []
   (generate-random-level rj.cfg/world-sizes 0 :desert))

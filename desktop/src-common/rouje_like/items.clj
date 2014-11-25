@@ -17,6 +17,14 @@
                               #(#{type} (:type %))
                               entities))))))
 
+(defn update-gold
+  [system e-this value]
+  "Update the amount of gold on E-THIS by VALUE."
+  (rj.e/upd-c system e-this :wallet
+                          (fn [c-wallet]
+                            (update-in c-wallet [:gold]
+                                       (partial + value)))))
+
 (defn pickup-item
   [system e-by e-this [z x y] item-type]
   (let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)
@@ -52,13 +60,11 @@
                    (remove-item [z x y] item-type)
                    (broadcast-pickup)))
 
-      :gold (as-> system system
-              (rj.e/upd-c system e-by :wallet
-                          (fn [c-wallet]
-                            (update-in c-wallet [:gold]
-                                       (partial + (:value (rj.e/get-c-on-e system e-this :gold))))))
-              (remove-item system [z x y] item-type)
-              (broadcast-pickup system))
+      :gold (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
+              (as-> system system
+                    (update-gold system e-by value)
+                    (remove-item system [z x y] item-type)
+                    (broadcast-pickup system)))
 
       :health-potion (as-> system system
                            (rj.e/upd-c system e-by :inventory
@@ -82,10 +88,7 @@
                        ;; purchase the item
                        (as-> system system
                              (rj.inv/pickup-slot-item system e-by item)
-                             (rj.e/upd-c system e-by :wallet
-                                         (fn [c-wallet]
-                                           (update-in c-wallet [:gold]
-                                                      (partial + (- price)))))
+                             (update-gold system e-by (- price))
                              (remove-item system [z x y] item-type)
                              (broadcast-pickup system))
                        ;; otherwise broadcast a message saying unable to purchase
