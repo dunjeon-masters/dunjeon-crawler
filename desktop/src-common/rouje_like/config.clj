@@ -67,6 +67,8 @@
                      :def 1
                      :max-mp 2})
 
+(def spell->mp-cost {:fireball 1})
+
 (def level-exp
   {:exp 1})
 
