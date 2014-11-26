@@ -97,7 +97,6 @@
                                     (tick-entities system))
    (play/key-code :I)             (fn [system]
                                     (swap! input-manager assoc :inspect-mode true)
-                                    (println @input-manager)
                                     system)
    (play/key-code :H)             (fn [system]
                                     (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player))))})
