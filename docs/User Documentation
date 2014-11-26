@@ -45,4 +45,16 @@ USER GUIDE/REFERENCE MANUAL
   -And many more...
 ------------------------------------------------------------------------------------------------------------------------------
 DESCRIPTION OF SUPPORTED FUNCTIONALITY
-  -(List of user stories)
+  -Messaging/dialog system
+  -Worlds with multiple randomly generated levels
+  -Players are able to choose race and class of character
+  -Advanced mob system
+  -Have the ability to give and receive status effects
+  -Traps and terrain interaction exist
+  -Themed levels randomly appear with themed mobs and traps 
+  -Player can pick up and equip armor, weapons, and accessories 
+  -Player can consume items to heal. 
+  -Players can aquire and use spells and magic 
+  -Boss monsters occasionally spawn 
+  -Merchants appear in the world, so player can buy and sell item 
+  -You can save your characters' stats and load them later 
