@@ -5,6 +5,7 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]
             [rouje-like.inventory :as rj.inv]
+            [rouje-like.messaging :as rj.msg]
             [rouje-like.config :as rj.cfg]))
 
 (defn remove-item
@@ -84,7 +85,8 @@
                              (remove-item system [z x y] item-type)
                              (broadcast-pickup system))
                        ;; otherwise broadcast a message saying unable to purchase
-                       system))
+                       (as-> system system
+                            (rj.msg/add-msg system :static "you do not have enough gold to purchase that"))))
 
       :merchant (let [junk-value (rj.inv/junk-value)]
                   (rj.inv/sell-junk system e-this))
