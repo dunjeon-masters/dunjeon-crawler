@@ -222,6 +222,8 @@
               system e-purchasable
               [[:item {:pickup-fn pickup-item}]
                [:purchasable {:value (rj.eq/equipment-value item)}]
+               [:inspectable {:msg (format "you see a %s that costs %d gold"
+                                           (rj.eq/equipment-name item) (rj.eq/equipment-value item))}]
                [:equipment {item-type item}]
                [:broadcaster {:name-fn (fn [system e-this]
                                          (let [value (:value (rj.e/get-c-on-e system e-this :purchasable))

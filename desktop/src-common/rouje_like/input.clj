@@ -142,7 +142,6 @@
               direction (keycode->direction keycode)]
           (if (not (nil? direction))
             (if (:inspect-mode @input-manager)
-              ;; get the tile facing direction
               (let [e-player (first (rj.e/all-e-with-c system :player))
                     e-world (first (rj.e/all-e-with-c system :world))
                     levels (rj.e/get-c-on-e system e-world :levels)
@@ -153,19 +152,18 @@
                     target-pos (rj.u/update-pos player-pos (direction direction->position))
                     entities (rj.u/entities-at-pos system target-pos)
 
-                    inspectable (filter #(:inspectable (:type %)) entities)]
-                (println "direction: " (direction direction->position))
-                (println "player-pos: " player-pos)
-                (println "target-pos: " target-pos)
-                (println "entities: " entities)
-                (if (not (empty? inspectable))
-                  ;; print stats using println
-                  (do (println "inspecting something")
-                      (reset-input-manager :inspect-mode)
-                      system)
-                  (do (println "nothing to inspect")
-                      (reset-input-manager :inspect-mode)
-                      system)))
+                    inspectable (first (filter rj.u/inspectable? entities))]
+                (if inspectable
+                  (let [c-inspectable (rj.e/get-c-on-e system (:id inspectable) :inspectable)
+                        msg (:msg c-inspectable)]
+                    (reset-input-manager :inspect-mode)
+                    (as-> system system
+                          (rj.msg/add-msg system :static msg)
+                          (tick-entities system)))
+                  (do (reset-input-manager :inspect-mode)
+                      (as-> system system
+                            (rj.msg/add-msg system :static "there is nothing to inspect there")
+                            (tick-entities system)))))
               (as-> system system
                     (if (pos? energy)
                       (rj.pl/process-input-tick system direction)

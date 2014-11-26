@@ -175,3 +175,6 @@
   [{:x 3 :y 5}
    {:x 5 :y 5}
    {:x 7 :y 5}])
+
+(def inspectables
+  [:purchasable])

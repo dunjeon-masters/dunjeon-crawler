@@ -227,6 +227,11 @@
       :y (update-in pos [2] (fn [val] (+ val v)))
       :z (update-in pos [0] (fn [val] (+ val v))))))
 
+(defn inspectable?
+  [entity]
+  (let [type (:type entity)]
+    (some #(= type %) rj.cfg/inspectables)))
+
 (defn entities-at-pos
   [system [z x y]]
   "Return the entities of the tile at [Z X Y]."

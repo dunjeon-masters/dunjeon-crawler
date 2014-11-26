@@ -24,6 +24,8 @@
 
 (defrecord Gold [value])
 
+(defrecord Inspectable [msg])
+
 (defrecord Inventory [slot junk hp-potion])
 
 (defrecord Item [pickup-fn])
@@ -141,6 +143,7 @@
             :equipment    (type (->Equipment nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
+            :inspectable  (type (->Inspectable nil))
             :inventory    (type (->Inventory nil nil nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
