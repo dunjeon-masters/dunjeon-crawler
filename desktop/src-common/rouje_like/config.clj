@@ -177,4 +177,4 @@
    {:x 7 :y 5}])
 
 (def inspectables
-  [:purchasable])
+  [:purchasable :merchant])

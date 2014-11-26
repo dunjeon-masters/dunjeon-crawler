@@ -63,7 +63,7 @@
     (rj.e/system<<components
               system e-merchant
               [[:merchant {}]
-               [:broadcaster {:name-fn (constantly "the merchant")}]])))
+               [:inspectable {:msg "the merchant says: bring your junk to me for gold"}])))
 
 (defn init-merchant
   [system z]
