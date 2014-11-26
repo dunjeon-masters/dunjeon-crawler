@@ -1,1 +1,17 @@
-TESTING DOCUMENT
+Product Name: Dunjeon Crawler
+Team Name: Dunjeon Masters
+Revision Number: 1
+Revision Date: 11/25/2014
+------------------------------------------------------------------------------------------------------------------------------
+Test document
+– Check into GitHub under separate file/directory
+– System test
+• One or more scenarios to cover each user story
+– Specific inputs, interaction, outputs
+– Specify via text/and or UML
+– Unit test
+• For each component
+– E.g. class, package; db, controller, view;
+– Equivalence classes of inputs
+» E.g. valid email address
+– Test cases selected covering classes
