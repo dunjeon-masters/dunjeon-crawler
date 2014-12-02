@@ -9,6 +9,7 @@
             [rouje-like.messaging :as rj.msg]
             [rouje-like.inventory :as rj.inv]
             [rouje-like.items :as rj.item]
+            [rouje-like.destructible :as rj.d]
             [clojure.string :as s]
             [brute.entity]
             [rouje-like.magic :as rj.mag]))
@@ -95,7 +96,8 @@
                                           mp (:mp c-magic)]
                                       (as-> (rj.mag/use-fireball system e-player :right) system
                                             (if (pos? mp)
-                                              (tick-entities system)
+                                              (-> (tick-entities system)
+                                                  (rj.d/apply-effects e-player))
                                               system))))
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))

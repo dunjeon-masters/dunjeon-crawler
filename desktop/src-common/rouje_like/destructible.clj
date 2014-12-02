@@ -7,6 +7,7 @@
 
 (defn add-effects
   [system e-this e-from]
+  "Adds applicable status effects from e-from to e-this."
   (let  [c-attacker (rj.e/get-c-on-e system e-from :attacker)
          attacker-effects (:status-effects c-attacker)
          c-destructible (rj.e/get-c-on-e system e-this :destructible)
@@ -52,6 +53,7 @@
 
 (defn apply-effects
   [system e-this]
+  "Applies status effects from e-this's destructible status-effects to e-this"
   (? (not (nil? system)))
   (let [c-destructible (rj.e/get-c-on-e system e-this :destructible)
         statuses (:status-effects c-destructible)

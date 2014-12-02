@@ -1,6 +1,5 @@
 (ns rouje-like.magic
   (require [rouje-like.utils :as rj.u :refer [?]]
-           [rouje-like.equipment :as rj.eq]
            [rouje-like.config :as rj.cfg]
            [rouje-like.entity-wrapper :as rj.e]
            [rouje-like.components :as rj.c]
@@ -10,12 +9,10 @@
 
 (defn dec-mp
   [system e-this spell]
-  (let [c-magic (rj.e/get-c-on-e system e-this :magic)
-        mp (:mp c-magic)]
-    (rj.e/upd-c system e-this :magic
-                (fn [c-magic]
-                  (update-in c-magic [:mp]
-                             #(- % (spell rj.cfg/spell->mp-cost)))))))
+  (rj.e/upd-c system e-this :magic
+              (fn [c-magic]
+                (update-in c-magic [:mp]
+                           #(- % (spell rj.cfg/spell->mp-cost))))))
 
 (defn get-first-e-in-range
   [system distance direction world player-pos]
@@ -45,11 +42,11 @@
         c-magic (rj.e/get-c-on-e system e-this :magic)
         mp (:mp c-magic)]
     ;; TODO lichen when attacked with fireball applies poison still. (Retaliation?)
-    ;; TODO status effects on player do not apply when casting a spell
-    ;; (ex: poison does not damage player if they stand still and spam fireball)
     ;; TODO add a way to take in another keyboard input to tell the direction of fireball.
     ;; TODO add messages to fireball. ("player shoots fireball [up|down|right|left]" "fireball hits [e-this]" "fireball doesn't hit anything")
     ;; (name :keyword) -> keyword
+    ;; TODO add applicable class to spells.
+    ;; (ex: fireball should be only for mages)
 
     (if (pos? mp)
       (as-> (dec-mp system e-this :fireball) system
