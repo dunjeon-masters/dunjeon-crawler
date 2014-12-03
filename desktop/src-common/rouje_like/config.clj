@@ -156,25 +156,25 @@
 
 ;; MERCHANT CONFIG
 (def merchant-pos
-  {:x 5
-   :y 7})
+  {:x 10
+   :y 12})
 
 (def merchant-portal-pos
-  {:x 5
-   :y 9})
+  {:x 10
+   :y 14})
 
 (def merchant-player-pos
-  {:x 5
-   :y 3})
+  {:x 10
+   :y 8})
 
 (def merchant-level-size
   {:width 10
    :height 10})
 
 (def merchant-item-pos
-  [{:x 3 :y 5}
-   {:x 5 :y 5}
-   {:x 7 :y 5}])
+  [{:x 8  :y 10}
+   {:x 10 :y 10}
+   {:x 12 :y 10}])
 
 (def inspectables
   [:purchasable :merchant])
