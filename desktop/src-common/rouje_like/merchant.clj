@@ -4,6 +4,7 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.config :as rj.cfg]
+            [rouje-like.items :as rj.i]
             [rouje-like.utils :as rj.u :refer [?]]))
 
 (defn merchant-tile
@@ -63,7 +64,8 @@
     (rj.e/system<<components
               system e-merchant
               [[:merchant {}]
-               [:inspectable {:msg "the merchant says: bring your junk to me for gold"}])))
+               [:item {:pickup-fn rj.i/pickup-item}]
+               [:inspectable {:msg "the merchant says: bring your junk to me for gold"}]])))
 
 (defn init-merchant
   [system z]

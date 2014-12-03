@@ -23,8 +23,8 @@
 (defn junk-value
   [system e-this]
   "Return the value of the junk E-THIS carries."
-  (let [inventory (rj.e/get-c-on-e system e-this :inventory)
-        junk (:junk inventory)]
+  (let [c-inv (rj.e/get-c-on-e system e-this :inventory)
+        junk (:junk c-inv)]
     (reduce (fn [v i]
               (+ v (rj.eq/equipment-value i)))
             0 junk)))

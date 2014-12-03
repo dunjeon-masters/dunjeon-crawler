@@ -88,8 +88,14 @@
                        (as-> system system
                             (rj.msg/add-msg system :static "you do not have enough gold to purchase that"))))
 
-      :merchant (let [junk-value (rj.inv/junk-value)]
-                  (rj.inv/sell-junk system e-this))
+      :merchant (let [junk-value (rj.inv/junk-value system e-by)
+                      c-inv (rj.e/get-c-on-e system e-by :inventory)
+                      junk (:junk c-inv)
+                      njunk (count junk)]
+                  (as-> system system
+                        (rj.msg/add-msg system :static (format "you sold %d pieces of junk for %d gold"
+                                                               njunk junk-value))
+                        (rj.inv/sell-junk system e-by)))
 
       system)))
 
@@ -259,4 +265,3 @@
                                 (let [eq-name (rj.eq/equipment-name (eq-type (rj.e/get-c-on-e system e-this :equipment)))]
                                   (str "a " eq-name)))}]])
      :z z}))
-
