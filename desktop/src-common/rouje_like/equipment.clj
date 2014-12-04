@@ -61,7 +61,6 @@
 (defn equipment-value
   [eq]
   "An equipment's value is simply the sum of its stats."
-  ;; this is really convoluted since someone messed with my equipment code
   (let [armor (:armor eq)
         wpn (:weapon eq)
         eq-stats (or (:stats armor) (:stats wpn) (:stats eq))]

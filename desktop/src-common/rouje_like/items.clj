@@ -77,7 +77,7 @@
                          item (rj.e/get-c-on-e system e-this :equipment)
                          gold (:gold (rj.e/get-c-on-e system e-by :wallet))]
                      ;; check if the player has enough money
-                     (if (< price gold)
+                     (if (<= price gold)
                        ;; purchase the item
                        (as-> system system
                              (rj.inv/pickup-slot-item system e-by item)
