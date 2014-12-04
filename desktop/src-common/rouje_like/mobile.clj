@@ -48,15 +48,21 @@
       (remove-entity e-world entity from-pos)
       (update-position entity tile)))
 
-(defn port-entity [system e-world entity from-pos portal]
+(defn port-entity [system e-world entity from-pos e-portal portal-pos p-type]
   "Teleport ENTITY from FROM-POS through PORTAL."
-  (let [[z x y] (rj.p/portal-target-pos system portal)
+  (let [portal (rj.e/get-c-on-e system e-portal :portal)
+        [z x y] (rj.p/portal-target-pos system portal)
         c-world (rj.e/get-c-on-e system e-world :world)
         level (nth (:levels c-world) z)
         target-tile (get-in level [x y])]
-    (as-> system system
-        (move-entity system e-world entity [z x y] from-pos target-tile)
-        ((:add-level-fn c-world) system (inc z)))))
+    (if (= p-type :m-portal)
+      (as-> system system
+            (remove-entity system e-world e-portal portal-pos)
+            (move-entity system e-world entity [z x y] from-pos target-tile)
+            ((:merchant-level-fn c-world) system from-pos))
+      (as-> system system
+            (move-entity system e-world entity [z x y] from-pos target-tile)
+            ((:add-level-fn c-world) system (inc z))))))
 
 (defn move
   [_ e-this target-tile system]
@@ -65,8 +71,9 @@
         this-pos [(:z c-position) (:x c-position) (:y c-position)]
         target-pos [(:z target-tile) (:x target-tile) (:y target-tile)]
         this-type (:type c-position)
-        portal (first (filter rj.p/is-portal? (:entities target-tile)))]
-    (if (and (= this-type :player) portal)
-      (port-entity system e-world e-this this-pos portal)
-      (move-entity system e-world e-this target-pos this-pos target-tile))))
 
+        portal (first (filter rj.p/is-portal? (:entities target-tile)))
+        e-portal (:id portal)]
+    (if (and (= this-type :player) portal)
+      (port-entity system e-world e-this this-pos e-portal target-pos (:type portal))
+      (move-entity system e-world e-this target-pos this-pos target-tile))))

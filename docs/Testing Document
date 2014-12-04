@@ -1,0 +1,50 @@
+Product Name: Dunjeon Crawler
+Team Name: Dunjeon Masters
+Revision Number: 1
+Revision Date: 11/25/2014
+-----------------------------------------------------------------------------
+SYSTEM TEST
+  - One or more scenarios to cover each user story
+    – Specific inputs, interaction, outputs
+    – Specify via text/and or UML
+-----------------------------------------------------------------------------
+UNIT TEST
+  - For each component
+    – E.g. class, package; db, controller, view;
+    – Equivalence classes of inputs
+      » E.g. valid email address
+    – Test cases selected covering classes
+
+Our plan for System Testing is to write up a description of each User Story
+that we feel accurately describes what the inputs, outputs of the US are, so
+as to help us categorize and prioritize our Unit Tests, but also possibly
+find any gaps in our testing coverage or implementation.
+
+Our plan for Unit Testing is to test
+each function with a comprehensive, but minimal, set of inputs and outputs.
+Currently we'll be dividing the responsiblity according to who wrote what,
+with the full acknowledgement that Anthony will be testing more of the code
+as had worked on this project before this class.
+Seeing as our project is a video game, and is based around a component entity
+system, our program builds up state as the user plays. Therefore we'll
+probably be creating helper functions to build up state to the point where that
+particular function would come into play. For example, if we needed to test
+that the fireball spell actually deals the correct amount of damage, we would
+need to build up the game state so that the player is close to a specific
+enemy, so that when we cast the spell, we can quickly verify that the right
+amount of damage waas dealt to the creature. Our current plan is to use the
+build in clojure.test library for testing, until we see a need to bring in
+a library, such as Midje or Speclj, for their extra features. Our plan for
+testing the rendering part of our game will involve us attacking the problem
+in two steps. First, because rendering modifies state that we do not have
+simple access to, we'll be verifing, through White-Box Testing, at least our
+helper functions are working as intended. After that we'll be implementing
+one or more of the following solutions based on their feasability:
+    - Take and compare screenshots of the same game state, with always one
+        screenshot being stored that is verified to be correct.
+    - Give up on testing it programmatically, and simply verify we are
+        rendering correctly on playthrough.
+
+If we have enough time after implementing the previously described tests,
+we'll also be looking into adding an optional type checking system, such
+as core.typed or prismatic's schema, to assist our testing efforts.

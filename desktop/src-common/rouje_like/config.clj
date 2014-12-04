@@ -19,7 +19,7 @@
   #{:wall :tree :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion :equipment :magic-potion})
+  #{:torch :gold :health-potion :equipment :purchasable :merchant :magic-potion})
 
 (def <empty>
   (union <floors> <items>))
@@ -28,7 +28,7 @@
   (union <walls> #{:lichen}))
 
 (def <valid-move-targets>
-  (union <empty> #{:portal}))
+  (union <empty> #{:portal :m-portal}))
 
 (def <valid-mob-targets>
   (union <empty> #{:player}))
@@ -75,7 +75,7 @@
 (def player-init-pos
   (let [x (/ (:width  world-sizes) 2)
         y (/ (:height world-sizes) 2)]
-    [0 x y]))
+    [1 x y]))
 
 (def player-sight
   {:distance 5.0
@@ -177,3 +177,28 @@
 (def init-bat% 1)
 (def init-skeleton% 1)
 (def init-equip% 1)
+
+;; MERCHANT CONFIG
+(def merchant-pos
+  {:x 10
+   :y 12})
+
+(def merchant-portal-pos
+  {:x 10
+   :y 14})
+
+(def merchant-player-pos
+  {:x 10
+   :y 8})
+
+(def merchant-level-size
+  {:width 10
+   :height 10})
+
+(def merchant-item-pos
+  [{:x 8  :y 10}
+   {:x 10 :y 10}
+   {:x 12 :y 10}])
+
+(def inspectables
+  [:purchasable :merchant])

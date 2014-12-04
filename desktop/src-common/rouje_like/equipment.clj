@@ -58,6 +58,16 @@
            (str " of " (name effect))))
     ""))
 
+(defn equipment-value
+  [eq]
+  "An equipment's value is simply the sum of its stats."
+  (let [armor (:armor eq)
+        wpn (:weapon eq)
+        eq-stats (or (:stats armor) (:stats wpn) (:stats eq))]
+    (reduce (fn [a [stat val]] (+ a val))
+            0
+            eq-stats)))
+
 (defn update-stat
   [system e-this stat amount]
   "Update the statistic STAT by AMOUNT on E-THIS."
@@ -133,4 +143,3 @@
           ;; iterate over new-stats and pass them to update-stat
           (update-stats e-this new-stats)
           (add-effect e-this (:effect new-eq)))))
-
