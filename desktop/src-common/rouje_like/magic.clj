@@ -42,25 +42,21 @@
         c-magic (rj.e/get-c-on-e system e-this :magic)
         mp (:mp c-magic)]
     ;; TODO lichen when attacked with fireball applies poison still. (Retaliation?)
-    ;; TODO add a way to take in another keyboard input to tell the direction of fireball.
     ;; TODO add messages to fireball. ("player shoots fireball [up|down|right|left]" "fireball hits [e-this]" "fireball doesn't hit anything")
     ;; (name :keyword) -> keyword
     ;; TODO add applicable class to spells.
     ;; (ex: fireball should be only for mages)
-
-    (if (pos? mp)
-      (as-> (dec-mp system e-this :fireball) system
-            (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
-              (as-> (rj.c/take-damage (rj.e/get-c-on-e system e-target :destructible) e-target damage e-this system) system
-                    (let [e-fireball (br.e/create-entity)]
-                      (rj.e/system<<components
-                        system e-fireball
-                        [[:fireball {}]
-                         [:attacker {:status-effects [(assoc (:fireball rj.cfg/status-effects)
-                                                             :e-from e-this
-                                                             :apply-fn rj.stef/apply-burn)]}]]))
-                    (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
-                      (as-> (rj.d/add-effects system e-target e-fireball) system
-                            (rj.e/kill-e system e-fireball))))
-              system))
-      system)))
+    (as-> (dec-mp system e-this :fireball) system
+          (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
+            (as-> (rj.c/take-damage (rj.e/get-c-on-e system e-target :destructible) e-target damage e-this system) system
+                  (let [e-fireball (br.e/create-entity)]
+                    (rj.e/system<<components
+                     system e-fireball
+                     [[:fireball {}]
+                      [:attacker {:status-effects [(assoc (:fireball rj.cfg/status-effects)
+                                                     :e-from e-this
+                                                     :apply-fn rj.stef/apply-burn)]}]]))
+                  (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
+                    (as-> (rj.d/add-effects system e-target e-fireball) system
+                          (rj.e/kill-e system e-fireball))))
+            system))))
