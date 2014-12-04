@@ -8,7 +8,8 @@
             [rouje-like.mobile :as rj.m]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.config :as rj.cfg]
+            [rouje-like.status-effects :as rj.stef]))
 
 (declare process-input-tick)
 
@@ -49,11 +50,17 @@
                  [:attacker {:atk              (:atk rj.cfg/drake-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   [{:type :burn
+                                                 :duration 6
+                                                 :value 3
+                                                 :e-from e-drake
+                                                 :apply-fn rj.stef/apply-burn}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  rj.cfg/drake-stats)
                                  :max-hp     (:hp  rj.cfg/drake-stats)
                                  :def        (:def rj.cfg/drake-stats)
                                  :can-retaliate? false
+                                 :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp rj.cfg/drake-stats)}]
                  [:tickable {:tick-fn process-input-tick

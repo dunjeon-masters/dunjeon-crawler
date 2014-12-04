@@ -140,6 +140,24 @@
    :atk 0
    :exp 1})
 
+(def hydra-head-stats                                       ;;Currently using giant_amoeba stats.
+  {:hp 4                                                    ;;Reconfigure for all 3 parts
+   :def 1
+   :atk 2
+   :exp 0})
+
+(def hydra-neck-stats
+  {:hp 4
+   :def 1
+   :atk 0
+   :exp 0})
+
+(def hydra-tail-stats
+  {:hp 4
+   :def 1
+   :atk 0
+   :exp 0})
+
 (def potion-stats
   {:health 5})
 
@@ -160,8 +178,9 @@
 (def init-slime% 0.1)
 (def init-drake% 0.01)
 (def init-necro% 0.1)
-(def init-giant_amoeba% 0.1)
+(def init-giant_amoeba% 1)                                  ;;0.1
 (def init-willowisp% 0.1)
+(def init-hydra% 0.3)
 
 ;; Starting floor for certain monsters to spawn on
 (def init-skeleton-floor 2)
@@ -172,5 +191,5 @@
 (def init-slime-floor 3)
 (def init-drake-floor 8)
 (def init-necro-floor 6)
-(def init-giant_amoeba-floor 5)
+(def init-giant_amoeba-floor 1)                             ;;5
 (def init-willowisp-floor 3)

@@ -234,7 +234,19 @@
      :willowisp  {:x 10 :y 2
                      :width 20 :height 20
                      :color {:r 210 :g 138 :b 181 :a 125}
-                     :tile-sheet bisasam-tile-sheet}}))
+                     :tile-sheet bisasam-tile-sheet}
+     :hydra-head  {:x 1 :y 3
+                     :width 12 :height 12
+                     :color {:r 255 :g 255 :b 255 :a 125}
+                     :tile-sheet grim-tile-sheet}
+     :hydra-neck  {:x 2 :y 3
+                     :width 12 :height 12
+                     :color {:r 255 :g 255 :b 255 :a 125}
+                     :tile-sheet grim-tile-sheet}
+     :hydra-tail  {:x 3 :y 3
+                     :width 12 :height 12
+                     :color {:r 255 :g 255 :b 255 :a 125}
+                     :tile-sheet grim-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize

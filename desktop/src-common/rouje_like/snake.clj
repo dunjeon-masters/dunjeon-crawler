@@ -53,11 +53,17 @@
                  [:attacker {:atk              (:atk rj.cfg/snake-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   [{:type :poison
+                                                 :duration 4
+                                                 :value 2
+                                                 :e-from e-snake
+                                                 :apply-fn rj.stef/apply-poison}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         hp
                                  :max-hp     hp
                                  :def        (:def rj.cfg/snake-stats)
                                  :can-retaliate? false
+                                 :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp rj.cfg/snake-stats)}]
                  [:tickable {:tick-fn process-input-tick

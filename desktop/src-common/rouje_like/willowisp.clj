@@ -60,6 +60,7 @@
                                  :max-hp     (:hp rj.cfg/willowisp-stats)
                                  :def        (:def rj.cfg/willowisp-stats)
                                  :can-retaliate? false
+                                 :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp rj.cfg/willowisp-stats)}]
                  [:tickable {:tick-fn process-input-tick

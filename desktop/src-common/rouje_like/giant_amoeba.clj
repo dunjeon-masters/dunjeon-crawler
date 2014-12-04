@@ -8,9 +8,24 @@
             [rouje-like.mobile :as rj.m]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.config :as rj.cfg]
+            [rouje-like.status-effects :as rj.stef]
+            [rouje-like.large_amoeba :as rj.la]))
 
 (declare process-input-tick)
+
+(defn on-death
+  [_ e-this system]
+  (let [c-position (rj.e/get-c-on-e system e-this :position)
+
+        e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        world (nth levels (:z c-position))
+
+        this-tile (get-in world [(:x c-position) (:y c-position)])]
+    (? (rj.la/add-large_amoeba system this-tile)) )
+  )
 
 (defn add-giant_amoeba
   ([{:keys [system z]}]
@@ -49,12 +64,19 @@
                  [:attacker {:atk              (:atk rj.cfg/giant_amoeba-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   [{:type :paralysis
+                                                 :duration 2
+                                                 :value 1
+                                                 :e-from e-giant_amoeba
+                                                 :apply-fn rj.stef/apply-paralysis}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  rj.cfg/giant_amoeba-stats)
                                  :max-hp     (:hp  rj.cfg/giant_amoeba-stats)
                                  :def        (:def rj.cfg/giant_amoeba-stats)
                                  :can-retaliate? false
-                                 :take-damage-fn rj.d/take-damage}]
+                                 :status-effects []
+                                 :take-damage-fn rj.d/take-damage
+                                 :on-death-fn on-death}]
                  [:killable {:experience (:exp rj.cfg/giant_amoeba-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]

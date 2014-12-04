@@ -54,6 +54,7 @@
                                  :max-hp     (:hp  rj.cfg/large_amoeba-stats)
                                  :def        (:def rj.cfg/large_amoeba-stats)
                                  :can-retaliate? false
+                                 :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp rj.cfg/large_amoeba-stats)}]
                  [:tickable {:tick-fn process-input-tick

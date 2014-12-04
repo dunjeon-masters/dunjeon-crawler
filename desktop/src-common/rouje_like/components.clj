@@ -29,6 +29,12 @@
 
 (defrecord Gold [value])
 
+(defrecord HydraHead [])
+
+(defrecord HydraNeck [])
+
+(defrecord HydraTail [])
+
 (defrecord Inventory [slot junk])
 
 (defrecord Item [pickup-fn])
@@ -112,7 +118,8 @@
                          ^Number def
                          status-effects
                          can-retaliate?
-                         ^Fn take-damage-fn]
+                         ^Fn take-damage-fn
+                         on-death-fn]
   IDestructible
   (take-damage     [this e-this damage from system]
     (take-damage-fn this e-this damage from system)))
@@ -149,7 +156,7 @@
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
-            :destructible (type (->Destructible nil nil nil nil nil nil))
+            :destructible (type (->Destructible nil nil nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
             :drake        (type (->Drake))
             :energy       (type (->Energy nil))
@@ -158,6 +165,9 @@
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
             :giant_amoeba (type (->Giant_amoeba))
+            :hydra-head   (type (->HydraHead))
+            :hydra-neck   (type (->HydraNeck))
+            :hydra-tail   (type (->HydraTail))
             :inventory    (type (->Inventory nil nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))

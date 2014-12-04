@@ -1,4 +1,4 @@
-(ns rouje-like.mimic
+(ns rouje-like.hydra-head
   (:require [brute.entity :as br.e]
 
             [rouje-like.entity-wrapper :as rj.e]
@@ -6,13 +6,17 @@
             [rouje-like.components :as rj.c :refer [can-move? move
                                                     can-attack? attack]]
             [rouje-like.mobile :as rj.m]
+            [rouje-like.messaging :as rj.msg]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.status-effects :as rj.stef]
+            [rouje-like.config :as rj.cfg]
+            [clojure.set :refer [union]]))
+
 
 (declare process-input-tick)
 
-(defn add-mimic
+(defn add-hydra-head
   ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
@@ -24,58 +28,44 @@
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
        (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
-         (add-mimic system target-tile)
+         (add-hydra-head system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-mimic (br.e/create-entity)
+         e-hydra-head (br.e/create-entity)
+         hp (:hp rj.cfg/hydra-head-stats)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-mimic
-                                                               :type :hidden-mimic})))))]
+                                            (rj.c/map->Entity {:id   e-hydra-head
+                                                               :type :hydra-head})))))]
      {:system (rj.e/system<<components
-                system e-mimic
-                [[:mimic {}]
+                system e-hydra-head
+                [[:hydra-head {}]
                  [:position {:x    (:x target-tile)
                              :y    (:y target-tile)
                              :z    (:z target-tile)
-                             :type :hidden-mimic}]
+                             :type :hydra-head}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
-                 [:attacker {:atk              (:atk rj.cfg/mimic-stats)
+                 [:attacker {:atk              (:atk rj.cfg/hydra-head-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   []
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/mimic-stats)
-                                 :max-hp     (:hp  rj.cfg/mimic-stats)
-                                 :def        (:def rj.cfg/mimic-stats)
+                 [:destructible {:hp         hp
+                                 :max-hp     hp
+                                 :def        (:def rj.cfg/hydra-head-stats)
                                  :can-retaliate? false
-                                 :status-effects []
-                                 :take-damage-fn (fn [c-this e-this damage e-from system]
-                                                   (as-> (rj.d/take-damage c-this e-this damage e-from system) system
-                                                       (if (rj.e/get-c-on-e system e-this :mimic)
-                                                         (as-> (rj.e/upd-c system e-this :position
-                                                                     (fn [c-position]
-                                                                       (assoc c-position :type :mimic))) system
-                                                               (let [_ (println "updating mimic")
-                                                                     c-position (rj.e/get-c-on-e system e-this :position)]
-                                                                 (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
-                                                                                       (fn [entities]
-                                                                                         (vec
-                                                                                           (conj (remove
-                                                                                                   #(#{e-this} (:id %))
-                                                                                                   entities)
-                                                                                                 (rj.c/map->Entity {:id e-this
-                                                                                                                    :type :mimic})))))))
-                                                         system)))}]
-                 [:killable {:experience (:exp rj.cfg/mimic-stats)}]
+                                 :take-damage-fn rj.d/take-damage
+                                 :status-effects []}]
+                 [:killable {:experience (:exp rj.cfg/hydra-head-stats)}]
                  [:tickable {:tick-fn process-input-tick
-                             :pri 0}]
-                 [:broadcaster {:name-fn (constantly "the mimic")}]])
+                             :pri 1}]
+                 [:broadcaster {:name-fn (constantly "the hydra-head")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to
@@ -97,7 +87,8 @@
                            (and (< (rj.u/taxicab-dist target-pos+offset target-pos)
                                    dist-from-target)
                                 (is-valid-target-tile?
-                                  (:type (rj.u/tile->top-entity (get-in level target-pos+offset))))))]
+                                  (:type (rj.u/tile->top-entity
+                                           (get-in level target-pos+offset))))))]
     (cond
       (isa-closer-tile? (nth->offset-pos 0))
       (get-in level (nth->offset-pos 0))
@@ -143,15 +134,16 @@
                         (rand-nth (conj neighbor-tiles nil))
                         nil))
         e-target (:id (rj.u/tile->top-entity target-tile))]
-    (if (and  (= :mimic (:type c-position)) (not (nil? target-tile)))
-      (cond
-        (and (< (rand-int 100) 80)
-            (can-move? c-mobile e-this target-tile system))
-        (move c-mobile e-this target-tile system)
+    (if (not (nil? target-tile))
+      (-> (cond
+            (and (< (rand-int 100) 80)
+                 (can-move? c-mobile e-this target-tile system))
+            (move c-mobile e-this target-tile system)
 
-        (can-attack? c-attacker e-this e-target system)
-        (attack c-attacker e-this e-target system)
+            (can-attack? c-attacker e-this e-target system)
+            (attack c-attacker e-this e-target system)
 
-        :else system)
+            :else system)
+          (rj.d/apply-effects e-this))
       system)))
 

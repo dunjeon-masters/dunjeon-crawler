@@ -122,6 +122,10 @@
             system)
           system)
 
+        (if-let [on-death (:on-death-fn c-this)]
+          (on-death c-this e-this system)
+          system)
+
         (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
                               (fn [entities]
                                 (vec

@@ -8,7 +8,8 @@
             [rouje-like.mobile :as rj.m]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.config :as rj.cfg]
+            [rouje-like.status-effects :as rj.stef]))
 
 (declare process-input-tick)
 
@@ -49,11 +50,17 @@
                  [:attacker {:atk              (:atk rj.cfg/necro-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   [{:type :paralysis
+                                                 :duration 3
+                                                 :value 1
+                                                 :e-from e-necromancer
+                                                 :apply-fn rj.stef/apply-paralysis}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  rj.cfg/necro-stats)
                                  :max-hp     (:hp  rj.cfg/necro-stats)
                                  :def        (:def rj.cfg/necro-stats)
                                  :can-retaliate? false
+                                 :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp rj.cfg/necro-stats)}]
                  [:tickable {:tick-fn process-input-tick

@@ -8,7 +8,8 @@
             [rouje-like.mobile :as rj.m]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
-            [rouje-like.config :as rj.cfg]))
+            [rouje-like.config :as rj.cfg]
+            [rouje-like.status-effects :as rj.stef]))
 
 (declare process-input-tick)
 
@@ -49,12 +50,18 @@
                  [:attacker {:atk              (:atk rj.cfg/slime-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   [{:type :poison
+                                                 :duration 3
+                                                 :value 2
+                                                 :e-from e-slime
+                                                 :apply-fn rj.stef/apply-poison}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  rj.cfg/slime-stats)
                                  :max-hp     (:hp  rj.cfg/slime-stats)
                                  :def        (:def rj.cfg/slime-stats)
                                  :can-retaliate? false
-                                 :take-damage-fn rj.d/take-damage}]
+                                 :take-damage-fn rj.d/take-damage
+                                 :status-effects []}]
                  [:killable {:experience (:exp rj.cfg/slime-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
@@ -72,7 +79,7 @@
         offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
                                         shuffled-directions)
 
-        is-valid-target-tile? #{:floor :torch :gold :player}
+        is-valid-target-tile? rj.cfg/<valid-mob-targets>
 
         nth->offset-pos (fn [index]
                           (nth offset-shuffled-directions index))

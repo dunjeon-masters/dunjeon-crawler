@@ -16,6 +16,9 @@
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
             [rouje-like.giant_amoeba :as rj.ga]
+            [rouje-like.hydra-head :as rj.hh]
+            [rouje-like.hydra-neck :as rj.hn]
+            [rouje-like.hydra-tail :as rj.ht]
             [rouje-like.large_amoeba :as rj.la]
             [rouje-like.drake :as rj.dr]
             [rouje-like.necromancer :as rj.ne]
@@ -237,7 +240,26 @@
                   (nth (iterate rj.ne/add-necro {:system system :z z})
                        (* (max 0 (min 0.05 (/ (+ rj.cfg/init-necro% (* 0.2 (- z rj.cfg/init-necro-floor))) 100)))
                           (apply * (vals rj.cfg/world-sizes))))
-                  (:system system))
+                  (:system system)
+                  ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
+                  (do (println "core::add-hydra-head " (not (nil? system))) system)
+                  (nth (iterate rj.hh/add-hydra-head {:system system :z z})
+                       (* (/ rj.cfg/init-hydra% 100)
+                          (apply * (vals rj.cfg/world-sizes))))
+                  (:system system)
+                  ;;Spawn Hydra Neck
+                  (do (println "core::add-hydra-neck " (not (nil? system))) system)
+                  (nth (iterate rj.hn/add-hydra-neck {:system system :z z})
+                       (* (/ rj.cfg/init-hydra% 100)
+                          (apply * (vals rj.cfg/world-sizes))))
+                  (:system system)
+                  ;;Spawn Hydra Tail
+                  (do (println "core::add-hydra-tail " (not (nil? system))) system)
+                  (nth (iterate rj.ht/add-hydra-tail {:system system :z z})
+                       (* (/ rj.cfg/init-hydra% 100)
+                          (apply * (vals rj.cfg/world-sizes))))
+                  (:system system)
+                  )
     :forest (as-> system system
                   ;; Spawn Trolls
                   (do (println "core::add-troll " (not (nil? system))) system)
