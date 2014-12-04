@@ -153,7 +153,7 @@
             :fireball     (type (->Fireball))
             :gold         (type (->Gold nil))
             :inspectable  (type (->Inspectable nil))
-            :inventory    (type (->Inventory nil nil nil))
+            :inventory    (type (->Inventory nil nil nil nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
