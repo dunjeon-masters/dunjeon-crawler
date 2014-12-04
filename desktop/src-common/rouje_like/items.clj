@@ -72,7 +72,7 @@
                                        (fn [c-inventory]
                                          (update-in c-inventory [:mp-potion]
                                                     inc)))
-                           (remove-item system [z x y])
+                           (remove-item system [z x y] item-type)
                            (broadcast-pickup system))
 
       :equipment (as-> system system
@@ -224,7 +224,7 @@
     {:system (rj.e/system<<components
                system e-potion
                [[:item {:pickup-fn pickup-item}]
-                [:broadcaster {:name-fn (constantly "a mp potion")}]])
+                [:broadcaster {:name-fn (constantly "an mp potion")}]])
      :z z}))
 
 (defn add-torch
