@@ -122,16 +122,16 @@
             system)
           system)
 
-        (if-let [on-death (:on-death-fn c-this)]
-          (on-death c-this e-this system)
-          system)
-
         (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
                               (fn [entities]
                                 (vec
                                   (remove
                                     #(#{e-this} (:id %))
                                     entities))))
+
+        (if-let [on-death (:on-death-fn c-this)]
+          (on-death c-this e-this system)
+          system)
 
         (if-let [c-killable (rj.e/get-c-on-e system e-this :killable)]
           (let [c-exp (rj.e/get-c-on-e system e-from :experience)

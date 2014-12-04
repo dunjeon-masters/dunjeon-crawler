@@ -20,7 +20,7 @@
   #{:wall :tree :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion :equipment})
+  #{:torch :gold :health-potion :equipment :purchasable :merchant})
 
 (def <empty>
   (union <floors> <items>))
@@ -29,7 +29,7 @@
   (union <walls> #{:lichen}))
 
 (def <valid-move-targets>
-  (union <empty> #{:portal}))
+  (union <empty> #{:portal :m-portal}))
 
 (def <valid-mob-targets>
   (union <empty> #{:player}))
@@ -63,6 +63,68 @@
 
 (def level-exp
   {:exp 1})
+
+(def player-init-pos
+  (let [x (/ (:width  world-sizes) 2)
+        y (/ (:height world-sizes) 2)]
+    [1 x y]))
+
+(def player-sight
+  {:distance 5.0
+   :decline-rate (/ 1 4)
+   :lower-bound 4         ;; Inclusive
+   :upper-bound 11        ;; Exclusive
+   :torch-multiplier 1.})
+
+;; EQUIPMENT CONFIG
+(def weapons
+  (->> (flatten
+         [(repeat 1 [:sword  {:atk 3}])
+          (repeat 1 [:mace   {:atk 2}])
+          (repeat 1 [:axe    {:atk 3}])
+          (repeat 1 [:flail  {:atk 2}])
+          (repeat 1 [:dagger {:atk 1}])])
+       (partition 2)))
+
+(def weapon-qualities
+  (->> (flatten
+         [(repeat 1 [:quick  {:atk  1}])
+          (repeat 1 [:giant  {:atk  2}])
+          (repeat 1 [:great  {:atk  2}])
+          (repeat 1 [:tiny   {:atk  1}])
+          (repeat 1 [:dull   {:atk -1}])
+          (repeat 1 [:dented {:atk -2}])])
+       (partition 2)))
+
+(def weapon-effects
+  (->> (flatten
+         [(repeat 1 [:bloodletting {:atk 1}])
+          (repeat 1 [:pain {:atk 1}])
+          (repeat 1 [:poison])
+          (repeat 1 [:paralysis])
+          (repeat 1 [:power {:atk 2}])
+          (repeat 1 [:death {:atk 2}])
+          (repeat 1 [:fire])
+          (repeat 1 [nil])])
+       (partition 2)))
+
+(def armors
+  (->> (flatten
+         [(repeat 1 [:chestplate {:max-hp 1 :def 1}])
+          (repeat 1 [:chainmail  {:max-hp 3}])
+          (repeat 1 [:tunic      {:max-hp 1}])])
+       (partition 2)))
+
+(def status-effects
+  {:paralysis {:type     :paralysis
+               :duration 2
+               :value    1}
+   :poison    {:type     :poison
+               :duration 2
+               :value    2}
+   :fire      {:type     :fire
+               :duration 2
+               :value    2}})
 
 ;; CREATURE CONFIG
 (def bat-stats
@@ -168,6 +230,7 @@
 (def init-health-potion% 2)
 (def init-lichen% 1)
 (def init-bat% 1)
+(def init-equip% 1)
 
 ;; MONSTER CONFIG
 (def init-skeleton% 0.1)
@@ -193,3 +256,28 @@
 (def init-necro-floor 6)
 (def init-giant_amoeba-floor 1)                             ;;5
 (def init-willowisp-floor 3)
+
+;; MERCHANT CONFIG
+(def merchant-pos
+  {:x 10
+   :y 12})
+
+(def merchant-portal-pos
+  {:x 10
+   :y 14})
+
+(def merchant-player-pos
+  {:x 10
+   :y 8})
+
+(def merchant-level-size
+  {:width 10
+   :height 10})
+
+(def merchant-item-pos
+  [{:x 8  :y 10}
+   {:x 10 :y 10}
+   {:x 12 :y 10}])
+
+(def inspectables
+  [:purchasable :merchant])

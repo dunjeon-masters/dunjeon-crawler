@@ -13,6 +13,7 @@
             [rouje-like.items :as rj.items]
             [rouje-like.lichen :as rj.lc]
             [rouje-like.mimic :as rj.mi]
+            [rouje-like.merchant :as rj.merch]
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
             [rouje-like.giant_amoeba :as rj.ga]
@@ -215,7 +216,7 @@
       (as-> system
             (do (println "core::add-equipment " (not (nil? system))) system)
             (nth (iterate rj.items/add-equipment {:system system :z z})
-                 (* (/ 1 100)
+                 (* (/ rj.cfg/init-equip% 100)
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))))
 
@@ -528,46 +529,106 @@
              ;; CREATE MAZE
              (generate-maze level [width height])))))
 
+;;;; MERCHANT LEVEL CODE
+(defn generate-merchant-level
+  []
+  (generate-random-level rj.cfg/world-sizes 0 :desert))
+
+(defn add-merch-items
+  [system]
+  (reduce (fn [sys tile]
+            (:system (rj.items/add-purchasable sys tile)))
+          system
+          (rj.merch/merchant-item-tiles system)))
+
+(defn remove-merch-items
+  [system]
+  (reduce (fn [sys {x :x y :y}]
+            (rj.items/remove-item sys [0 x y] :purchasable))
+          system
+          rj.cfg/merchant-item-pos))
+
+(defn reset-merch-level
+  [system [z x y]]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        level (nth levels z)
+        target-tile (get-in level [x y])]
+    (as-> system system
+          (remove-merch-items system)
+          (add-merch-items system)
+          (:system (rj.p/add-portal system (rj.merch/merchant-portal-tile system) target-tile :portal)))))
+
+(defn add-merch-portal
+  [system z]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        level (nth levels z)
+        merch-level (nth levels 0)
+
+        merch-player-tile (rj.merch/merchant-player-tile system)
+        get-rand-tile (fn [level]
+                        (get-in level [(rand-int (count level))
+                                       (rand-int (count (first level)))]))]
+    (loop [portal-tile (get-rand-tile level)]
+      (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity portal-tile)))
+        (:system (rj.p/add-portal system portal-tile merch-player-tile :m-portal))
+        (recur (get-rand-tile level))))))
+
 (declare add-level)
 (defn init-world
   [system]
-  (let [z 0
+  (let [z 1
         e-world  (br.e/create-entity)
-        level0 (generate-random-level
-                 rj.cfg/world-sizes z)
-        type0 (:type level0)
-        level0 (:level level0)
+        merch-level (generate-merchant-level)
         level1 (generate-random-level
-                 rj.cfg/world-sizes (inc z))
+                rj.cfg/world-sizes z)
         type1 (:type level1)
-        level1 (:level level1)]
+        level1 (:level level1)
+        level2 (generate-random-level
+                rj.cfg/world-sizes (inc z))
+        type2 (:type level2)
+        level2 (:level level2)]
     (-> system
         (rj.e/add-e e-world)
-        (rj.e/add-c e-world (rj.c/map->World {:levels [level0 level1]
-                                              :add-level-fn add-level}))
+        (rj.e/add-c e-world (rj.c/map->World {:levels [merch-level level1 level2]
+                                              :add-level-fn add-level
+                                              :merchant-level-fn reset-merch-level}))
+        (rj.merch/init-merchant 0)
         (init-entities z)
-        (init-themed-entities z type0)
+        (init-themed-entities z type1)
         (add-portal z)
+        (add-merch-portal z)
         (init-entities (inc z))
-        (init-themed-entities (inc z) type1)
+        (init-themed-entities (inc z) type2)
 
         (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn rj.r/render-world
                                                    :args      {:view-port-sizes rj.cfg/view-port-sizes}})))))
 
 (defn add-level
   [system z]
-  (let [e-world (first (rj.e/all-e-with-c system :world))
-        new-level (generate-random-level rj.cfg/world-sizes z)
-        newtype (:type new-level)
-        new-level (:level new-level)]
-    (-> system
-        (rj.e/upd-c e-world :world
-                    (fn [c-world]
-                      (update-in c-world [:levels]
-                                 (fn [levels]
-                                   (conj levels
-                                         new-level)))))
-        (init-entities z)
-        (init-themed-entities z newtype)
-        (add-portal (dec z)))))
+  (let [e-player (first (rj.e/all-e-with-c system :player))
+        player-pos (rj.e/get-c-on-e system e-player :position)
+        player-z (:z player-pos)
 
+        e-world (first (rj.e/all-e-with-c system :world))
+        levels (:levels (rj.e/get-c-on-e system e-world :world))
+        n-levels (count levels)]
+    (if (= player-z (dec n-levels))
+      (let [new-level (generate-random-level rj.cfg/world-sizes z)
+            newtype (:type new-level)
+            new-level (:level new-level)]
+        (-> system
+            (rj.e/upd-c e-world :world
+                        (fn [c-world]
+                          (update-in c-world [:levels]
+                                     (fn [levels]
+                                       (conj levels
+                                             new-level)))))
+            (init-entities z)
+            (init-themed-entities z newtype)
+            (add-merch-portal (dec z))
+            (add-portal (dec z))))
+      system)))

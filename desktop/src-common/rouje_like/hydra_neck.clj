@@ -116,7 +116,6 @@
               e-player (first (rj.e/all-e-with-c system :hydra-head))]
               (if (nil? e-player)
                 (as-> system system
-                      (do (? c-position) system)
                       (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
                                             (fn [entities]
                                               (vec

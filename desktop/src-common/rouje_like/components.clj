@@ -19,7 +19,7 @@
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
-(defrecord Equipment [equipment])
+(defrecord Equipment [weapon armor])
 
 (defrecord Experience [experience
                        level
@@ -37,6 +37,10 @@
 
 (defrecord Inventory [slot junk])
 
+(defrecord Inspectable [msg])
+
+(defrecord Inventory [slot junk hp-potion])
+
 (defrecord Item [pickup-fn])
 
 (defrecord Killable [experience])
@@ -52,6 +56,10 @@
 
 (defrecord Necromancer [])
 
+(defrecord MPortal [^Number x ^Number y ^Number z])
+
+(defrecord Merchant [])
+
 (defrecord Player [name
                    show-world?])
 
@@ -65,6 +73,8 @@
 
 (defrecord Position [x y z
                      ^Keyword type])
+
+(defrecord Purchasable [value])
 
 (defrecord Race [race])
 
@@ -161,18 +171,21 @@
             :drake        (type (->Drake))
             :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
-            :equipment    (type (->Equipment nil))
+            :equipment    (type (->Equipment nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
             :giant_amoeba (type (->Giant_amoeba))
             :hydra-head   (type (->HydraHead))
             :hydra-neck   (type (->HydraNeck))
             :hydra-tail   (type (->HydraTail))
-            :inventory    (type (->Inventory nil nil))
+            :inventory    (type (->Inventory nil nil nil))
+            :inspectable  (type (->Inspectable nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :large_amoeba (type (->Large_amoeba))
             :lichen       (type (->Lichen nil nil))
+            :m-portal     (type (->MPortal nil nil nil))
+            :merchant     (type (->Merchant))
             :mobile       (type (->Mobile nil nil))
             :mimic        (type (->Mimic))
             :necromancer  (type (->Necromancer))
@@ -180,6 +193,7 @@
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :portal       (type (->Portal nil nil nil))
             :position     (type (->Position nil nil nil nil))
+            :purchasable  (type (->Purchasable nil))
             :race         (type (->Race nil))
             :receiver     (type (->Receiver))
             :relay        (type (->Relay nil nil))

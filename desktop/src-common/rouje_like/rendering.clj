@@ -85,11 +85,16 @@
         status-effects (:status-effects c-destructible)
         max-hp (:max-hp c-destructible)
 
-        junk (:junk (rj.e/get-c-on-e system e-this :inventory))
-        slot (rj.eq/equipment-name (:slot (rj.e/get-c-on-e system e-this :inventory)))
+        c-inv (rj.e/get-c-on-e system e-this :inventory)
+        junk (count (:junk c-inv))
+        slot (rj.eq/equipment-name (or (:weapon (:slot c-inv)) (:armor (:slot c-inv))))
+        hp-potions (:hp-potion c-inv)
+
+        c-equip (rj.e/get-c-on-e system e-this :equipment)
+        armor (rj.eq/equipment-name (:armor c-equip))
+        weapon (rj.eq/equipment-name (:weapon c-equip))
 
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
-
         attack (:atk c-attacker)
 
         c-energy (rj.e/get-c-on-e system e-this :energy)
@@ -111,7 +116,10 @@
                         " - Status: " status-effects
                         "\nEnergy: [" energy "]"
                         " - Junk: [" junk "]"
-                        " - Slot: [" slot "]")
+                        " - Slot: [" slot "]"
+                        " - Armor: [" armor "]"
+                        " - Weapon: [" weapon "]"
+                        " - HP-Potions: [" hp-potions "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
@@ -159,6 +167,10 @@
                        :width 12 :height 12
                        :color {:r 103 :g 133 :b 81 :a 64}
                        :tile-sheet grim-tile-sheet}
+     :merchant {:x 13 :y 4
+                :width 12 :height 12
+                :color {:r 0 :g 0 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
      :torch    {:x 1 :y 2
                 :width 12 :height 12
                 :color {:r 255 :g 0 :b 0 :a 255}
@@ -171,10 +183,18 @@
                  :width 12 :height 12
                  :color {:r 102 :g 0 :b 102 :a 255}
                 :tile-sheet grim-tile-sheet}
+     :m-portal {:x 4 :y 9
+                :width 12 :height 12
+                :color {:r 0 :g 0 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
      :equipment {:x 2 :y 9
                  :width 12 :height 12
                  :color {:r 255 :g 255 :b 255 :a 255}
                  :tile-sheet grim-tile-sheet}
+     :purchasable {:x 2 :y 9
+                   :width 12 :height 12
+                   :color {:r 255 :g 255 :b 0 :a 255}
+                   :tile-sheet grim-tile-sheet}
      :bat      {:x 14 :y 5
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 128}

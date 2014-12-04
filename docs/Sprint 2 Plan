@@ -12,15 +12,14 @@ USER STORIES
 
 USER STORY 1: As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it 
               to].
-  TASK 1: Switch rendering engines (see Anthony). {4.5 ih}
-  TASK 2: Debug messaging system (see Anthony). {10 ih}
-  TASK 3: Just in case not finished, add portals/ladders (see Scott). {1.5 ih}
-  TASK 4: Indicate mob health by changing appearance (perhaps alpha or darkness). {6 ih}
-  TASK 5: Create a main menu. {4 ih}
-  TASK 6: Create a character customization screen. {4 ih}
-  TASK 7: On player interaction, take player to customization screen. {.5 ih}
-  TASK 8: Implement variety of mobs {2 ih}
-  TOTAL: 32.5 ih
+  TASK 1: Debug messaging system (see Anthony). {10 ih}
+  TASK 2: Just in case not finished, add portals/ladders (see Scott). {1.5 ih}
+  TASK 3: Indicate mob health by changing appearance (perhaps alpha or darkness). {6 ih}
+  TASK 4: Create a main menu. {4 ih}
+  TASK 5: Create a character customization screen. {4 ih}
+  TASK 6: On player interaction, take player to customization screen. {.5 ih}
+  TASK 7: Implement variety of mobs {2 ih}
+  TOTAL: 28 ih
 
 USER STORY 2: As a user, I want to have status effects [so that the game is more interesting].
   TASK 1: Come up with possible status effects on paper. {1 ih}
@@ -63,7 +62,7 @@ TEAM ROLES
 	RACHELLE: Developer
 	ANTHONY: Product Owner, Developer
 	SCOTT: Scrum Master, Developer
-	JORDAN: Designer, Play Tester
+	JORDAN: Designer, Developer
 ------------------------------------------------------------------------------------------------------------------------	
 INITIAL TASK ASSIGNMENT
 	RACHELLE: User Story 2, Task 2

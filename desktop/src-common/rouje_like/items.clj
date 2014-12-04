@@ -1,24 +1,26 @@
 (ns rouje-like.items
   (:require [brute.entity :as br.e]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [? update-gold]]
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]
             [rouje-like.inventory :as rj.inv]
+            [rouje-like.messaging :as rj.msg]
             [rouje-like.config :as rj.cfg]))
+
+(defn remove-item
+  [system pos type]
+  (let [e-world (first (rj.e/all-e-with-c system :world))]
+    (rj.u/update-in-world system e-world pos
+                          (fn [entities]
+                            (vec
+                             (remove
+                              #(#{type} (:type %))
+                              entities))))))
 
 (defn pickup-item
   [system e-by e-this [z x y] item-type]
-  (let [remove-item (fn [system this-pos]
-                      (let [e-world (first (rj.e/all-e-with-c system :world))]
-                        (rj.u/update-in-world system e-world this-pos
-                                               (fn [entities]
-                                                 (vec
-                                                   (remove
-                                                     #(#{item-type} (:type %))
-                                                     entities))))))
-
-        c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)
+  (let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)
         e-relay (first (rj.e/all-e-with-c system :relay))
         broadcast-pickup (fn [system]
                            (if (not (nil? c-broadcaster))
@@ -48,40 +50,74 @@
                    (rj.e/upd-c e-by :playersight
                                (fn [c-playersight]
                                  (update-in c-playersight [:distance] inc-sight)))
-                   (remove-item [z x y])
+                   (remove-item [z x y] item-type)
                    (broadcast-pickup)))
 
-      :gold (as-> system system
-              (rj.e/upd-c system e-by :wallet
-                          (fn [c-wallet]
-                            (update-in c-wallet [:gold]
-                                       (partial + (:value (rj.e/get-c-on-e system e-this :gold))))))
-              (remove-item system [z x y])
-              (broadcast-pickup system))
+      :gold (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
+              (as-> system system
+                    (update-gold system e-by value)
+                    (remove-item system [z x y] item-type)
+                    (broadcast-pickup system)))
 
-      :health-potion (let [c-destructible (rj.e/get-c-on-e system e-by :destructible)
-                           max-hp (:max-hp c-destructible)
-                           hp (:hp c-destructible)
-                           hp-potion-val (:health rouje-like.config/potion-stats)]
-                       (as-> system system
-                           (if (> max-hp (+ hp hp-potion-val))
-                             (rj.e/upd-c system e-by :destructible
-                                 (fn [c-destructible]
-                                   (update-in c-destructible [:hp]
-                                              (partial + (:health rj.cfg/potion-stats)))))
-                             (rj.e/upd-c system e-by :destructible
-                                         (fn [c-destructible]
-                                           (update-in c-destructible [:hp]
-                                                      (constantly max-hp)))))
-                           (remove-item system [z x y])
-                           (broadcast-pickup system)))
-      
+      :health-potion (as-> system system
+                           (rj.e/upd-c system e-by :inventory
+                                       (fn [c-inventory]
+                                         (update-in c-inventory [:hp-potion]
+                                                    inc)))
+                           (remove-item system [z x y] item-type)
+                           (broadcast-pickup system))
+
       :equipment (as-> system system
                        (rj.inv/pickup-slot-item system e-by (rj.e/get-c-on-e system e-this :equipment))
-                       (remove-item system [z x y])
+                       (remove-item system [z x y] item-type)
                        (broadcast-pickup system))
 
+      :purchasable (let [c-purchasable (rj.e/get-c-on-e system e-this :purchasable)
+                         price (:value c-purchasable)
+                         item (rj.e/get-c-on-e system e-this :equipment)
+                         gold (:gold (rj.e/get-c-on-e system e-by :wallet))]
+                     ;; check if the player has enough money
+                     (if (<= price gold)
+                       ;; purchase the item
+                       (as-> system system
+                             (rj.inv/pickup-slot-item system e-by item)
+                             (update-gold system e-by (- price))
+                             (remove-item system [z x y] item-type)
+                             (broadcast-pickup system))
+                       ;; otherwise broadcast a message saying unable to purchase
+                       (as-> system system
+                            (rj.msg/add-msg system :static "you do not have enough gold to purchase that"))))
+
+      :merchant (let [junk-value (rj.inv/junk-value system e-by)
+                      c-inv (rj.e/get-c-on-e system e-by :inventory)
+                      junk (:junk c-inv)
+                      njunk (count junk)]
+                  (as-> system system
+                        (rj.msg/add-msg system :static (format "you sold %d pieces of junk for %d gold"
+                                                               njunk junk-value))
+                        (rj.inv/sell-junk system e-by)))
+
       system)))
+
+(defn use-hp-potion
+  [system e-by]
+  (let [c-destructible (rj.e/get-c-on-e system e-by :destructible)
+        max-hp (:max-hp c-destructible)
+        hp (:hp c-destructible)
+        hp-potion-val (:health rouje-like.config/potion-stats)]
+    (as-> system system
+          (if (> max-hp (+ hp hp-potion-val))
+            (rj.e/upd-c system e-by :destructible
+                        (fn [c-destructible]
+                          (update-in c-destructible [:hp]
+                                     (partial + (:health rj.cfg/potion-stats)))))
+            (rj.e/upd-c system e-by :destructible
+                        (fn [c-destructible]
+                          (update-in c-destructible [:hp]
+                                     (constantly max-hp)))))
+          (rj.e/upd-c system e-by :inventory
+                      (fn [c-inventory]
+                        (update-in c-inventory [:hp-potion] dec))))))
 
 (defn ^:private item>>world
   [system is-valid-tile? z item>>entities]
@@ -177,6 +213,33 @@
                                    (str value " gold")))}]])
      :z z}))
 
+(defn add-purchasable
+  [system target-tile]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        e-purchasable (br.e/create-entity)
+        item (rj.eq/generate-random-equipment) ; right now just use equipment
+        item-type (:type item)
+        system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+                                     (fn [entities]
+                                       (vec
+                                        (conj
+                                         (remove #(#{:wall} (:type %)) entities)
+                                         (rj.c/map->Entity {:id   e-purchasable
+                                                            :type :purchasable})))))]
+    {:system (rj.e/system<<components
+              system e-purchasable
+              [[:item {:pickup-fn pickup-item}]
+               [:purchasable {:value (rj.eq/equipment-value item)}]
+               [:inspectable {:msg (format "you see a %s that costs %d gold"
+                                           (rj.eq/equipment-name item) (rj.eq/equipment-value item))}]
+               [:equipment {item-type item}]
+               [:broadcaster {:name-fn (fn [system e-this]
+                                         (let [value (:value (rj.e/get-c-on-e system e-this :purchasable))
+                                               c-eq (rj.e/get-c-on-e system e-this :equipment)
+                                               name (rj.eq/equipment-name (item-type c-eq))]
+                                           (str "a " name " for " value " gold")))}]])
+     :z (:z target-tile)}))
+
 (defn add-equipment
   [{:keys [system z]}]
   (let [e-eq (br.e/create-entity)
@@ -196,10 +259,9 @@
     {:system (rj.e/system<<components
               system e-eq
               [[:item {:pickup-fn pickup-item}]
-               [:equipment {:type eq-type eq-type (eq-type eq)}]
+               [:equipment {eq-type eq}]
                [:broadcaster {:name-fn
                               (fn [system e-this]
-                                (let [name (rj.eq/equipment-name (rj.e/get-c-on-e system e-this :equipment))]
-                                  (str "a" name)))}]])
+                                (let [eq-name (rj.eq/equipment-name (eq-type (rj.e/get-c-on-e system e-this :equipment)))]
+                                  (str "a " eq-name)))}]])
      :z z}))
-

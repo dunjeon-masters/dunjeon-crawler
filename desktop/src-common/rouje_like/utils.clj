@@ -15,6 +15,7 @@
 (def get-default-pri
   {:floor 1
    :forest-floor 1
+   :equipment 2
    :dune 0
    :health-potion 2
    :torch 3
@@ -182,17 +183,19 @@
        (ring-coords origin dist)))
 
 (defn rand-rng
- [start end]
- (+ (rand-int (- (inc end) start)) start))
+  [start end]
+  (+ (rand-int (- (inc end) start)) start))
 
-;;@[turn: xxxx] x = ~x #([rouje_like/skeleton.clj:76])
-(defmacro ? [x]
-  (let [line  (:line (meta &form))
+(defmacro ?
+  [x & [tag]]
+  (let [line (:line (meta &form))
         file *file*]
-    `(let [x# ~x]
-       (println (str "@[" (apply str (drop 5 (str (System/currentTimeMillis)))) "]: ")
-                (pr-str '~x) "=" (pr-str x#)
-                (str "#(" ~file ":" ~line ")"))
+    `(let [x#   ~x
+           tag# ~tag]
+       (println (str (str "#" (if tag# tag# "RJ") " ")
+                     "@[" (apply str (drop 5 (str (System/currentTimeMillis))))
+                     ", " ~file ":" ~line "]:\n"
+                     "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
        x#)))
 
 (defn update-in-world
@@ -206,4 +209,35 @@
                                           (update-in tile [:entities]
                                                      (fn [entities]
                                                        (fn<-entities entities))))))))))
+
+(defn update-gold
+  [system e-this value]
+  "Update the amount of gold on E-THIS by VALUE."
+  (rj.e/upd-c system e-this :wallet
+                          (fn [c-wallet]
+                            (update-in c-wallet [:gold]
+                                       (partial + value)))))
+
+(defn update-pos
+  [pos dir]
+  (let [k (first (keys dir))
+        v (k dir)]
+    (case k
+      :x (update-in pos [1] (fn [val] (+ val v)))
+      :y (update-in pos [2] (fn [val] (+ val v)))
+      :z (update-in pos [0] (fn [val] (+ val v))))))
+
+(defn inspectable?
+  [entity]
+  (let [type (:type entity)]
+    (some #(= type %) rj.cfg/inspectables)))
+
+(defn entities-at-pos
+  [system [z x y]]
+  "Return the entities of the tile at [Z X Y]."
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        level (nth (:levels c-world) z)
+        target-tile (get-in level [x y])]
+    (:entities target-tile)))
 
