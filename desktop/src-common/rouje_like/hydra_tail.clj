@@ -68,7 +68,7 @@
                  [:killable {:experience (:exp rj.cfg/hydra-tail-stats)}]
                  [:tickable {:tick-fn process-input-tick
                              :pri -1}]
-                 [:broadcaster {:name-fn (constantly "the hydra-tail")}]])
+                 [:broadcaster {:name-fn (constantly "the hydra's tail")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to

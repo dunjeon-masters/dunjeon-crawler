@@ -255,18 +255,18 @@
                      :width 20 :height 20
                      :color {:r 210 :g 138 :b 181 :a 125}
                      :tile-sheet bisasam-tile-sheet}
-     :hydra-head  {:x 1 :y 3
-                     :width 12 :height 12
-                     :color {:r 255 :g 255 :b 255 :a 125}
-                     :tile-sheet grim-tile-sheet}
-     :hydra-neck  {:x 2 :y 3
-                     :width 12 :height 12
-                     :color {:r 255 :g 255 :b 255 :a 125}
-                     :tile-sheet grim-tile-sheet}
-     :hydra-tail  {:x 3 :y 3
-                     :width 12 :height 12
-                     :color {:r 255 :g 255 :b 255 :a 125}
-                     :tile-sheet grim-tile-sheet}}))
+     :hydra-head  {:x 6 :y 2
+                     :width 16 :height 16
+                     :color {:r 40 :g 156 :b 23 :a 255}
+                     :tile-sheet darkond-tile-sheet}
+     :hydra-neck  {:x 12 :y 1                               ;;Alt: 14,7
+                     :width 16 :height 16
+                     :color {:r 40 :g 156 :b 23 :a 255}
+                     :tile-sheet darkond-tile-sheet}
+     :hydra-tail  {:x 12 :y 1
+                     :width 16 :height 16
+                     :color {:r 40 :g 156 :b 23 :a 255}
+                     :tile-sheet darkond-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize

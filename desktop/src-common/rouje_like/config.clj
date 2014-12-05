@@ -203,14 +203,14 @@
    :exp 1})
 
 (def hydra-head-stats                                       ;;Currently using giant_amoeba stats.
-  {:hp 4                                                    ;;Reconfigure for all 3 parts
-   :def 1
-   :atk 2
-   :exp 0})
+  {:hp 25                                                    ;;Reconfigure for all 3 parts
+   :def 3
+   :atk 5
+   :exp 10})
 
 (def hydra-neck-stats
   {:hp 4
-   :def 1
+   :def 3
    :atk 0
    :exp 0})
 
