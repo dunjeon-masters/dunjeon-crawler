@@ -127,12 +127,6 @@
    (play/key-code :dpad-right) :right
    (play/key-code :L)          :right})
 
-(def direction->position
-  {:up {:y 1}
-  :left {:x -1}
-  :down {:y -1}
-  :right {:x 1}})
-
 (defn process-keyboard-input
   [system keycode]
   (if @rj.u/cli?
@@ -169,15 +163,16 @@
              (:inspect-mode @input-manager)
              (let [e-player (first (rj.e/all-e-with-c system :player))
                    e-world (first (rj.e/all-e-with-c system :world))
-                   levels (rj.e/get-c-on-e system e-world :levels)
+                   c-world (rj.e/get-c-on-e system e-world :world)
+                   levels (:levels c-world)
                    c-pos (rj.e/get-c-on-e system e-player :position)
-                   player-pos [(:z c-pos) (:x c-pos) (:y c-pos)]
+                   player-pos [(:x c-pos) (:y c-pos)]
 
                    level (nth levels (:z c-pos))
-                   target-pos (rj.u/update-pos player-pos (direction direction->position))
-                   entities (rj.u/entities-at-pos system target-pos)
+                   target-pos (rj.u/coords+offset player-pos (rj.u/direction->offset direction))
+                   target-entities (rj.u/entities-at-pos level target-pos)
 
-                   inspectable (first (filter rj.u/inspectable? entities))]
+                   inspectable (first (filter rj.u/inspectable? target-entities))]
                (reset-input-manager :inspect-mode)
                (if inspectable
                  (let [c-inspectable (rj.e/get-c-on-e system (:id inspectable) :inspectable)
