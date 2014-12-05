@@ -4,6 +4,7 @@
            [rouje-like.entity-wrapper :as rj.e]
            [rouje-like.components :as rj.c]
            [rouje-like.status-effects :as rj.stef]
+           [rouje-like.messaging :as rj.msg]
            [brute.entity :as br.e]
            [rouje-like.destructible :as rj.d]))
 
@@ -46,17 +47,22 @@
     ;; (name :keyword) -> keyword
     ;; TODO add applicable class to spells.
     ;; (ex: fireball should be only for mages)
-    (as-> (dec-mp system e-this :fireball) system
+    (as-> system system
+          (dec-mp system e-this :fireball)
+          (rj.msg/add-msg system :static (format "you shoot a fireball %s" (name direction)))
           (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
-            (as-> (rj.c/take-damage (rj.e/get-c-on-e system e-target :destructible) e-target damage e-this system) system
-                  (let [e-fireball (br.e/create-entity)]
-                    (rj.e/system<<components
-                     system e-fireball
-                     [[:fireball {}]
-                      [:attacker {:status-effects [(assoc (:fireball rj.cfg/status-effects)
-                                                     :e-from e-this
-                                                     :apply-fn rj.stef/apply-burn)]}]]))
-                  (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
-                    (as-> (rj.d/add-effects system e-target e-fireball) system
-                          (rj.e/kill-e system e-fireball))))
+            (let [c-destructible (rj.e/get-c-on-e system e-target :destructible)]
+              (as-> system system
+                    (rj.c/take-damage c-destructible e-target damage e-this system)
+                    (let [e-fireball (br.e/create-entity)]
+                      (rj.e/system<<components
+                       system e-fireball
+                       [[:fireball {}]
+                        [:attacker {:status-effects [(assoc (:fireball rj.cfg/status-effects)
+                                                       :e-from e-this
+                                                       :apply-fn rj.stef/apply-burn)]}]]))
+                    (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
+                      (as-> system system
+                            (rj.d/add-effects system e-target e-fireball)
+                            (rj.e/kill-e system e-fireball)))))
             system))))
