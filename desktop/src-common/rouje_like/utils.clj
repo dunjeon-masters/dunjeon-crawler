@@ -211,14 +211,14 @@
   [system e-this old-type new-type]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-position (rj.e/get-c-on-e system e-this :position)
-        this-pos [(:z c-position) (:y c-position) (:x c-position)]]
+        this-pos [(:z c-position) (:x c-position) (:y c-position)]]
     (as-> system system
       (update-in-world system e-world this-pos
                        (fn [entities]
                          (map #(if (= old-type (:type %))
                                  (assoc % :type new-type)
                                  %)
-                              (? entities))))
+                              entities)))
       (rj.e/upd-c system e-this :position
                   (fn [c-position]
                     (assoc c-position :type new-type))))))

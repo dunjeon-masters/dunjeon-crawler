@@ -43,11 +43,7 @@
       :z (:z target-tile)}))
 
   ([system target-tile e-trap]
-   (let [dir ({:down :up
-               :up   :down
-               :left :left
-               :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
-       (rj.e/system<<components
+   (rj.e/system<<components
          system e-trap
          [[:spike-trap {:visible? 0}]
           [:position {:x    (:x target-tile)
@@ -62,7 +58,7 @@
           [:tickable {:tick-fn process-input-tick
                       :pri 0}]
           [:broadcaster {:name-fn (constantly (str "the "
-                                                   (name :spike-trap)))}]]))))
+                                                   (name :spike-trap)))}]])))
 
 (defn process-input-tick
   [_ e-this system]
@@ -75,37 +71,37 @@
         levels (:levels c-world)
         level (nth levels (:z c-position))
 
-        c-sight (rj.e/get-c-on-e system e-this :sight)
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
 
         c-spike-trap (rj.e/get-c-on-e system e-this :spike-trap)
 
         player-is-adj? (seq (rj.u/get-neighbors-of-type level this-pos [:player]))]
-    (as-> (if player-is-adj?
-            (rj.msg/add-msg system :static
-                            (format "%s hears a shuffling noise"
-                                    (let [e-player (first (rj.e/all-e-with-c system :player))
-                                          player-c-broadcaster (rj.e/get-c-on-e system e-player :broadcaster)]
-                                      ((:name-fn player-c-broadcaster) system e-player))))
-            (let [e-player (first (rj.e/all-e-with-c system :player))
-                  c-player-pos (rj.e/get-c-on-e system e-player :position)
-                  player-pos [(:x c-player-pos) (:y c-player-pos)]]
-              (if (= this-pos player-pos)
-                (let [target-tile (get-in level player-pos nil)
-                      e-target (:id (rj.u/tile->top-entity target-tile))]
-                  (as-> (cond
-                          (can-attack? c-attacker e-this e-target system)
-                          (attack c-attacker e-this e-target system)
+    (as-> system system
+      (if player-is-adj?
+        (rj.msg/add-msg system :static
+                        (format "%s hears a shuffling noise"
+                                (let [e-player (first (rj.e/all-e-with-c system :player))
+                                      player-c-broadcaster (rj.e/get-c-on-e system e-player :broadcaster)]
+                                  ((:name-fn player-c-broadcaster) system e-player))))
+        (let [e-player (first (rj.e/all-e-with-c system :player))
+              c-player-pos (rj.e/get-c-on-e system e-player :position)
+              player-pos [(:x c-player-pos) (:y c-player-pos)]]
+          (if (= this-pos player-pos)
+            (as-> system system
+              (cond
+                (can-attack? c-attacker e-this e-player system)
+                (attack c-attacker e-this e-player system)
 
-                          :else system) system
-                    (rj.e/upd-c system e-this :spike-trap
-                                (fn [c-spike-trap]
-                                  (assoc c-spike-trap :visible? 2)))
-                    (rj.u/change-type system e-this :hidden-spike-trap :spike-trap)))
-                system))) system
-      (if (pos? (? (:visible? c-spike-trap)))
-        (rj.e/upd-c system e-this :spike-trap
-                    (fn [c-spike-trap]
-                      (update-in c-spike-trap [:visible?] dec)))
-        (rj.u/change-type system e-this :spike-trap :hidden-spike-trap)))))
+                :else system)
+              (rj.e/upd-c system e-this :spike-trap
+                          (fn [c-spike-trap]
+                            (assoc c-spike-trap :visible? 3)))
+              (rj.u/change-type system e-this :hidden-spike-trap :spike-trap))
+            system)))
+      (let [c-spike-trap (rj.e/get-c-on-e system e-this :spike-trap)]
+        (if (pos? (:visible? c-spike-trap))
+          (rj.e/upd-c system e-this :spike-trap
+                      (fn [c-spike-trap]
+                        (update-in c-spike-trap [:visible?] dec)))
+          (rj.u/change-type system e-this :spike-trap :hidden-spike-trap))))))
 
