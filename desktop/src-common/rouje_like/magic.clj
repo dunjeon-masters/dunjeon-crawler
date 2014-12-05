@@ -49,10 +49,10 @@
     ;; (ex: fireball should be only for mages)
     (as-> system system
           (dec-mp system e-this :fireball)
-          (rj.msg/add-msg system :static (format "you shoot a fireball %s" (name direction)))
           (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
             (let [c-destructible (rj.e/get-c-on-e system e-target :destructible)]
               (as-> system system
+                    (rj.msg/add-msg system :static (format "you shoot a fireball %s" (name direction)))
                     (rj.c/take-damage c-destructible e-target damage e-this system)
                     (let [e-fireball (br.e/create-entity)]
                       (rj.e/system<<components
@@ -65,4 +65,5 @@
                       (as-> system system
                             (rj.d/add-effects system e-target e-fireball)
                             (rj.e/kill-e system e-fireball)))))
-            system))))
+            (rj.msg/add-msg system :static (format "you shoot a fireball %s, but it didn't hit anything"
+                                                   (name direction)))))))
