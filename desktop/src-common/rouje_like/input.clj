@@ -20,8 +20,13 @@
 (def input-manager (atom {}))
 
 (defn reset-input-manager
+  []
+  (swap! input-manager
+         (reduce-kv (fn [m k v] (assoc m k nil)) {} @input-manager)))
+
+(defn set-input-state
   [mode]
-  (swap! input-manager assoc mode nil))
+  (swap! input-manager assoc mode true))
 
 (defn tick-entities
   [system]
@@ -97,13 +102,15 @@
                                     (let [e-player (first (rj.e/all-e-with-c system :player))]
                                       (rj.inv/equip-slot-item system e-player)))
    (play/key-code :num-1)         (fn [system]
-                                    (swap! input-manager assoc :spell-mode true)
+                                    (reset-input-manager)
+                                    (set-input-state :spell-mode)
                                     system)
 
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
    (play/key-code :I)             (fn [system]
-                                    (swap! input-manager assoc :inspect-mode true)
+                                    (reset-input-manager)
+                                    (set-input-state :inspect-mode)
                                     system)
    (play/key-code :H)             (fn [system]
                                     (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player))))
@@ -149,7 +156,7 @@
              (let [e-player (first (rj.e/all-e-with-c system :player))
                    c-magic (rj.e/get-c-on-e system e-player :magic)
                    mp (:mp c-magic)]
-               (reset-input-manager :spell-mode)
+               (reset-input-manager)
                (if (pos? mp)
                  (as-> system system
                        (rj.mag/use-fireball system e-player direction)
@@ -173,7 +180,7 @@
                    target-entities (rj.u/entities-at-pos level target-pos)
 
                    inspectable (first (filter rj.u/inspectable? target-entities))]
-               (reset-input-manager :inspect-mode)
+               (reset-input-manager)
                (if inspectable
                  (let [c-inspectable (rj.e/get-c-on-e system (:id inspectable) :inspectable)
                        msg (:msg c-inspectable)]
