@@ -149,7 +149,7 @@
                 :tile-sheet grim-tile-sheet}
      :maze-wall {:x 8 :y 5
                  :width 12 :height 12
-                 :color {:r 255 :g 255 :b 255 :a 255}
+                 :color {:r 0 :g 82 :b 3 :a 255}
                  :tile-sheet grim-tile-sheet}
      :gold     {:x 1 :y 9
                 :width 12 :height 12
