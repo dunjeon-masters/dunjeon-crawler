@@ -129,7 +129,9 @@
             (rj.e/upd-c system e-by :inventory
                         (fn [c-inventory]
                           (update-in c-inventory [:hp-potion] dec))))
-      system)))
+       (as-> (rj.msg/add-msg system :static
+                        (format "You do not have any health potions to drink")) system
+        system))))
 
 (defn use-mp-potion
   [system e-by]
@@ -153,7 +155,9 @@
             (rj.e/upd-c system e-by :inventory
                         (fn [c-inventory]
                           (update-in c-inventory [:mp-potion] dec))))
-      system)))
+      (as-> (rj.msg/add-msg system :static
+                            (format "You do not have any mana potions to drink")) system
+            system))))
 
 (defn ^:private item>>world
   [system is-valid-tile? z item>>entities]

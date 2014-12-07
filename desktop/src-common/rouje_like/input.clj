@@ -113,9 +113,11 @@
                                     (set-input-state :inspect-mode)
                                     system)
    (play/key-code :H)             (fn [system]
-                                    (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player))))
+                                    (-> (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player)))
+                                        (tick-entities)))
    (play/key-code :M)             (fn [system]
-                                    (rj.item/use-mp-potion system (first (rj.e/all-e-with-c system :player))))})
+                                    (-> (rj.item/use-mp-potion system (first (rj.e/all-e-with-c system :player)))
+                                        (tick-entities)))})
 
 (def keycode->direction
   {(play/key-code :W)          :up
