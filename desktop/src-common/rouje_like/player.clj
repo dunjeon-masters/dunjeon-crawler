@@ -115,7 +115,11 @@
 
         max-mp (+ (:max-mp rj.cfg/player-stats)
                   (:max-mp (rj.cfg/race->stats player-race))
-                  (:max-mp (rj.cfg/class->stats player-class)))]
+                  (:max-mp (rj.cfg/class->stats player-class)))
+
+        spell (if (= player-class :mage)
+                (get (rj.cfg/class->spell :mage) (rand-int (count (rj.cfg/class->spell :mage)))))]
+
 
     (rj.e/system<<components
       system e-player
@@ -161,7 +165,7 @@
                        :status-effects []}]
        [:magic {:max-mp max-mp
                 :mp max-mp
-                :spells []}]
+                :spells [spell]}]
        [:broadcaster {:name-fn (constantly n)}]])))
 
 (defn add-player

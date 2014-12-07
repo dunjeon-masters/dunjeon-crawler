@@ -41,8 +41,6 @@
         distance (:distance spell)
         damage (:value spell)]
 
-    ;; TODO add applicable class to spells.
-    ;; (ex: fireball should be only for mages)
     (as-> system system
           (dec-mp system e-this :fireball)
           (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
@@ -62,11 +60,24 @@
                                         :def            10000
                                         :can-retaliate? false
                                         :take-damage-fn rj.d/take-damage}]
+                        [:experience {:experience 0
+                                      :level-up-fn (fn [e-this system]
+                                                     system)}]
                         [:broadcaster {:name-fn (constantly "the fireball")}]]))
                     (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
                       (as-> system system
                             (rj.d/add-effects system e-target e-fireball)
                             (rj.c/take-damage c-destructible e-target damage e-fireball system)
+                            (if (pos? (:experience (rj.e/get-c-on-e system e-fireball :experience)))
+                              (->> (rj.e/upd-c system e-this :experience
+                                               (fn [c-experience]
+                                                 (update-in c-experience [:experience]
+                                                            #(+ % (:experience (rj.e/get-c-on-e system e-fireball :experience))))))
+                                   ((:level-up-fn (rj.e/get-c-on-e system e-this :experience)) e-this))
+                              system)
                             (rj.e/kill-e system e-fireball)))))
             (rj.msg/add-msg system :static (format "you shoot a fireball %s, but it didn't hit anything"
                                                    (name direction)))))))
+
+;;TODO use this to apply the appropriate spells when different class spells are implemented
+(def spell->use-fn {:fireball use-fireball})

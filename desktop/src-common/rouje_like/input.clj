@@ -144,7 +144,7 @@
     (let [action (keycode->action keycode)]
       (if (not (nil? action))
         (action system)
-
+        ;;TODO change this code to accept different spells per class
         (let [e-this (first (rj.e/all-e-with-c system :player))
               c-energy (rj.e/get-c-on-e system e-this :energy)
               energy (:energy c-energy)
@@ -155,16 +155,29 @@
              (:spell-mode @input-manager)
              (let [e-player (first (rj.e/all-e-with-c system :player))
                    c-magic (rj.e/get-c-on-e system e-player :magic)
+                   spells (:spells c-magic)
+                   ;checks to see if they can or cannot cast fireball
+                   ;-1 means they do not have fireball
+                   fireball? (if (= -1 (.indexOf spells :fireball))
+                               false
+                               true)
                    mp (:mp c-magic)]
                (reset-input-manager)
-               (if (pos? mp)
+               (if (and (not (neg? (- mp (:fireball rouje-like.config/spell->mp-cost))))
+                        fireball?)
                  (as-> system system
                        (rj.mag/use-fireball system e-player direction)
                        (tick-entities system)
                        (rj.d/apply-effects system e-player))
                  (as-> system system
-                       (rj.msg/add-msg system :static "you have no mp left")
-                       (tick-entities system))))
+                       (if fireball?
+                         (as-> system system
+                               (rj.msg/add-msg system :static "you have no mp left")
+                               (tick-entities system))
+                         (as-> system system
+                               (rj.msg/add-msg system :static "you do not have that spell")
+                               (tick-entities system)))
+                       )))
 
             ;; are we inspecting something
              (:inspect-mode @input-manager)
