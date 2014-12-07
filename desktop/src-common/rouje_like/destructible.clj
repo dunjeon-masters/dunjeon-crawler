@@ -54,7 +54,7 @@
 (defn apply-effects
   [system e-this]
   "Applies status effects from e-this's destructible status-effects to e-this"
-  (? (not (nil? system)))
+  (not (nil? system))
   (let [c-destructible (rj.e/get-c-on-e system e-this :destructible)
         statuses (:status-effects c-destructible)
         dec-status-effects (fn [status-effects]
@@ -75,7 +75,7 @@
                                         (:status-effects (rj.e/get-c-on-e system e-this :destructible))))]
                   ((:apply-fn (first status)) system e-this (first status))
                   system)))
-            system (? statuses))))
+            system statuses)))
 
 (defn take-damage
   [c-this e-this damage e-from system]

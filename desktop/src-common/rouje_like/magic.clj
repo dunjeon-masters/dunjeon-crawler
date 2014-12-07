@@ -39,12 +39,8 @@
         world (nth levels (:z c-position))
         spell (:fireball rj.cfg/spell-effects)
         distance (:distance spell)
-        damage (:value spell)
-        c-magic (rj.e/get-c-on-e system e-this :magic)
-        mp (:mp c-magic)]
-    ;; TODO lichen when attacked with fireball applies poison still. (Retaliation?)
-    ;; TODO add messages to fireball. ("player shoots fireball [up|down|right|left]" "fireball hits [e-this]" "fireball doesn't hit anything")
-    ;; (name :keyword) -> keyword
+        damage (:value spell)]
+
     ;; TODO add applicable class to spells.
     ;; (ex: fireball should be only for mages)
     (as-> system system
@@ -53,17 +49,24 @@
             (let [c-destructible (rj.e/get-c-on-e system e-target :destructible)]
               (as-> system system
                     (rj.msg/add-msg system :static (format "you shoot a fireball %s" (name direction)))
-                    (rj.c/take-damage c-destructible e-target damage e-this system)
                     (let [e-fireball (br.e/create-entity)]
                       (rj.e/system<<components
                        system e-fireball
                        [[:fireball {}]
                         [:attacker {:status-effects [(assoc (:fireball rj.cfg/status-effects)
-                                                       :e-from e-this
-                                                       :apply-fn rj.stef/apply-burn)]}]]))
+                                                            :e-from e-this
+                                                            :apply-fn rj.stef/apply-burn)]}]
+                        [:destructible {:hp             1000000
+                                        :max-hp         1000000
+                                        :status-effects []
+                                        :def            10000
+                                        :can-retaliate? false
+                                        :take-damage-fn rj.d/take-damage}]
+                        [:broadcaster {:name-fn (constantly "the fireball")}]]))
                     (let [e-fireball (first (rj.e/all-e-with-c system :fireball))]
                       (as-> system system
                             (rj.d/add-effects system e-target e-fireball)
+                            (rj.c/take-damage c-destructible e-target damage e-fireball system)
                             (rj.e/kill-e system e-fireball)))))
             (rj.msg/add-msg system :static (format "you shoot a fireball %s, but it didn't hit anything"
                                                    (name direction)))))))
