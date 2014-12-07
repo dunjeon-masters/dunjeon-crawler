@@ -168,6 +168,9 @@
                    powerattack? (if (= -1 (.indexOf spells :powerattack))
                                   false
                                   true)
+                   pickpocket? (if (= -1 (.indexOf spells :pickpocket))
+                                  false
+                                  true)
                    mp (:mp c-magic)]
                (reset-input-manager)
                (if fireball?
@@ -189,9 +192,18 @@
                      (as-> system system
                            (rj.msg/add-msg system :static "you do not have enough mp to cast power attack")
                            (tick-entities system)))
-                   (as-> system system
-                         (rj.msg/add-msg system :static "you do not have a spell to cast")
-                         (tick-entities system)))))
+                   (if pickpocket?
+                     (if (not (neg? (- mp (:pickpocket rj.cfg/spell->mp-cost))))
+                       (as-> system system
+                             (rj.mag/use-pickpocket system e-player direction)
+                             (tick-entities system)
+                             (rj.d/apply-effects system e-player))
+                       (as-> system system
+                             (rj.msg/add-msg system :static "you do not have enough mp to cast pickpocket")
+                             (tick-entities system)))
+                     (as-> system system
+                           (rj.msg/add-msg system :static "you do not have a spell to cast")
+                           (tick-entities system))))))
 
             ;; are we inspecting something
              (:inspect-mode @input-manager)

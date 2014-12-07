@@ -68,10 +68,11 @@
                      :max-mp 2})
 
 (def spell->mp-cost {:fireball 3
-                     :powerattack 2})
+                     :powerattack 2
+                     :pickpocket 2})
 
 (def class->spell {:mage [:fireball]
-                   :rogue []
+                   :rogue [:pickpocket]
                    :warrior [:powerattack]})
 
 (def level-exp
@@ -148,7 +149,11 @@
                   :value 3}
    :powerattack {:type :powerattack
                  :distance 1
-                 :value 2}})
+                 :value 2}                                     ;amount of additional damage dealt
+   :pickpocket {:type :pickpocket
+                :distance 1
+                :atk-reduction -2
+                :value 1}})                                 ;amount of gold stolen
 
 ;; CREATURE CONFIG
 (def bat-stats

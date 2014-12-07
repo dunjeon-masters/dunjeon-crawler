@@ -108,3 +108,40 @@
                                           (update-in c-attacker [:atk] + (- 0 damage)))))))
             (rj.msg/add-msg system :static (format "you use power attack %s, but it didn't hit anything"
                                                    (name direction)))))))
+
+(defn use-pickpocket
+  "E-THIS steals gold from entity to DIRECTION"
+  [system e-this direction]
+  (let [c-position (rj.e/get-c-on-e system e-this :position)
+        e-this-pos  [(:x c-position) (:y c-position)]
+        e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        world (nth levels (:z c-position))
+        spell (:pickpocket rj.cfg/spell-effects)
+        distance (:distance spell)
+        damage-reduction (:atk-reduction spell)
+        additional-gold (:value spell)]
+
+    (as-> system system
+          (dec-mp system e-this :pickpocket)
+          (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
+            (let [c-destructible (rj.e/get-c-on-e system e-target :destructible)]
+              (as-> system system
+                    (rj.msg/add-msg system :static (format "you use pickpocket %s" (name direction)))
+                    (as-> system system
+                          ;reduce attack
+                          (rj.e/upd-c system e-this :attacker
+                                      (fn [c-attacker]
+                                        (update-in c-attacker [:atk] + damage-reduction)))
+                          ;give e-this gold
+                          (rj.e/upd-c system e-this :wallet
+                                      (fn [c-wallet]
+                                        (update-in c-wallet [:gold] + additional-gold)))
+                          (rj.c/take-damage c-destructible e-target (:atk (rj.e/get-c-on-e system e-this :attacker)) e-this system)
+                          ;raise attack again
+                          (rj.e/upd-c system e-this :attacker
+                                      (fn [c-attacker]
+                                        (update-in c-attacker [:atk] + (- 0 damage-reduction)))))))
+            (rj.msg/add-msg system :static (format "you use pickpocket %s, but there was no pocket to pick"
+                                                   (name direction)))))))
