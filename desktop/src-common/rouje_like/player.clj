@@ -118,7 +118,12 @@
                   (:max-mp (rj.cfg/class->stats player-class)))
 
         spell (if (= player-class :mage)
-                (get (rj.cfg/class->spell :mage) (rand-int (count (rj.cfg/class->spell :mage)))))]
+                (get (rj.cfg/class->spell :mage) (rand-int (count (rj.cfg/class->spell :mage))))
+                (if (= player-class :warrior)
+                  (get (rj.cfg/class->spell :warrior) (rand-int (count (rj.cfg/class->spell :mage))))))
+        ;if warrior get a warrior spell (TEMPORARY TO DEBUG)
+        ;warrior spell will be granted on level ups
+        ]
 
 
     (rj.e/system<<components

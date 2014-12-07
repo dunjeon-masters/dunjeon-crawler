@@ -3,6 +3,7 @@
 
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.world :as rj.w]
+            [rouje-like.utils :refer [?]]
             [rouje-like.utils :as rj.u]
             [rouje-like.player :as rj.pl]
             [rouje-like.components :as rj.c :refer [tick]]
@@ -10,6 +11,7 @@
             [rouje-like.inventory :as rj.inv]
             [rouje-like.items :as rj.item]
             [rouje-like.destructible :as rj.d]
+            [rouje-like.config :as rj.cfg]
             [clojure.string :as s]
             [brute.entity]
             [rouje-like.magic :as rj.mag]))
@@ -163,23 +165,33 @@
                    fireball? (if (= -1 (.indexOf spells :fireball))
                                false
                                true)
+                   powerattack? (if (= -1 (.indexOf spells :powerattack))
+                                  false
+                                  true)
                    mp (:mp c-magic)]
                (reset-input-manager)
-               (if (and (not (neg? (- mp (:fireball rouje-like.config/spell->mp-cost))))
-                        fireball?)
-                 (as-> system system
-                       (rj.mag/use-fireball system e-player direction)
-                       (tick-entities system)
-                       (rj.d/apply-effects system e-player))
-                 (as-> system system
-                       (if fireball?
-                         (as-> system system
-                               (rj.msg/add-msg system :static "you have no mp left")
-                               (tick-entities system))
-                         (as-> system system
-                               (rj.msg/add-msg system :static "you do not have that spell")
-                               (tick-entities system)))
-                       )))
+               (if fireball?
+                 (if (not (neg? (- mp (:fireball rj.cfg/spell->mp-cost))))
+                   (as-> system system
+                         (rj.mag/use-fireball system e-player direction)
+                         (tick-entities system)
+                         (rj.d/apply-effects system e-player))
+                   (as-> system system
+                         (rj.msg/add-msg system :static "you do not have enough mp to cast fireball")
+                         (tick-entities system))
+                   )
+                 (if powerattack?
+                   (if (not (neg? (- mp (:powerattack rj.cfg/spell->mp-cost))))
+                     (as-> system system
+                           (rj.mag/use-powerattack system e-player direction)
+                           (tick-entities system)
+                           (rj.d/apply-effects system e-player))
+                     (as-> system system
+                           (rj.msg/add-msg system :static "you do not have enough mp to cast power attack")
+                           (tick-entities system)))
+                   (as-> system system
+                         (rj.msg/add-msg system :static "you do not have a spell to cast")
+                         (tick-entities system)))))
 
             ;; are we inspecting something
              (:inspect-mode @input-manager)

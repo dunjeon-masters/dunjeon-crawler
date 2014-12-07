@@ -67,11 +67,12 @@
                      :def 1
                      :max-mp 2})
 
-(def spell->mp-cost {:fireball 3})
+(def spell->mp-cost {:fireball 3
+                     :powerattack 2})
 
 (def class->spell {:mage [:fireball]
                    :rogue []
-                   :warrior []})
+                   :warrior [:powerattack]})
 
 (def level-exp
   {:exp 1})
@@ -142,9 +143,12 @@
                :value    2}})
 
 (def spell-effects
-  {:fireball {:type :fire
-              :distance 3
-              :value 3}})
+  {:fireball     {:type :fire
+                  :distance 3
+                  :value 3}
+   :powerattack {:type :powerattack
+                 :distance 1
+                 :value 2}})
 
 ;; CREATURE CONFIG
 (def bat-stats

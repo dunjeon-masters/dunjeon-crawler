@@ -79,5 +79,32 @@
             (rj.msg/add-msg system :static (format "you shoot a fireball %s, but it didn't hit anything"
                                                    (name direction)))))))
 
-;;TODO use this to apply the appropriate spells when different class spells are implemented
-(def spell->use-fn {:fireball use-fireball})
+(defn use-powerattack
+  "E-THIS has increased attack in DIRECTION for 1 turn"
+  [system e-this direction]
+  (let [c-position (rj.e/get-c-on-e system e-this :position)
+        e-this-pos  [(:x c-position) (:y c-position)]
+        e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        world (nth levels (:z c-position))
+        spell (:powerattack rj.cfg/spell-effects)
+        distance (:distance spell)
+        damage (:value spell)]
+
+    (as-> system system
+          (dec-mp system e-this :powerattack)
+          (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
+            (let [c-destructible (rj.e/get-c-on-e system e-target :destructible)]
+              (as-> system system
+                    (rj.msg/add-msg system :static (format "you use power attack %s" (name direction)))
+                      (as-> system system
+                            (rj.e/upd-c system e-this :attacker
+                                        (fn [c-attacker]
+                                          (update-in c-attacker [:atk] + damage)))
+                            (rj.c/take-damage c-destructible e-target (:atk (rj.e/get-c-on-e system e-this :attacker)) e-this system)
+                            (rj.e/upd-c system e-this :attacker
+                                        (fn [c-attacker]
+                                          (update-in c-attacker [:atk] + (- 0 damage)))))))
+            (rj.msg/add-msg system :static (format "you use power attack %s, but it didn't hit anything"
+                                                   (name direction)))))))
