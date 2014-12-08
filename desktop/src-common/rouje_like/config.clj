@@ -1,20 +1,31 @@
 (ns rouje-like.config
-  (:require [clojure.set :refer [union]]))
+  (:require [clojure.set :refer [union]]
+            [play-clj.core :refer [graphics!]]))
 
 #_(use 'rouje-like.config :reload)
 
-;; WORLD CONFIG
-(def block-size 18)                                         ;; To see start screen, revert to 36
+;; ===== WORLD CONFIG =====
 (def padding-sizes {:top   3
                     :btm   2
                     :left  1
                     :right 1})
+
 (def view-port-sizes [20 20])
+
+(defn block-size []
+  (let [block-size (try (let [height (graphics! :get-height)
+                              width  (graphics! :get-width)
+                              [vp-x vp-y] view-port-sizes
+                              {:keys [top btm left right]} padding-sizes]
+                          (/ height (+ top btm vp-y)))
+                        (catch Exception e
+                          36))]
+    (max 27 block-size)))
 
 (def world-sizes {:width  20
                   :height 20})
 
-;; TILE TYPES
+;; ===== TILE TYPES =====
 (def <floors>
   #{:open-door :dune :floor :forest-floor})
 
@@ -51,7 +62,7 @@
    :spike-trap {:hp 1
                 :atk 2}})
 
-;; PLAYER CONFIG
+;; ===== PLAYER CONFIG =====
 (def player-stats
   {:max-hp 100
    :atk 4
@@ -88,7 +99,7 @@
    :upper-bound 11        ;; Exclusive
    :torch-multiplier 1.})
 
-;; EQUIPMENT CONFIG
+;; ===== EQUIPMENT CONFIG =====
 (def weapons
   (->> (flatten
          [(repeat 1 [:sword  {:atk 3}])
@@ -138,7 +149,7 @@
                :duration 2
                :value    2}})
 
-;; CREATURE CONFIG
+;; ===== CREATURE CONFIG =====
 (def bat-stats
   {:hp  2
    :def 0})
@@ -214,7 +225,7 @@
    :atk 0
    :exp 1})
 
-(def hydra-head-stats                                       ;;Currently using giant_amoeba stats.
+(def hydra-head-stats ;;Currently using giant_amoeba stats.
   {:hp 4                                                    ;;Reconfigure for all 3 parts
    :def 1
    :atk 2
@@ -238,7 +249,7 @@
 (def potion-stats
   {:health 5})
 
-;; WORLD CONFIG
+;; ===== WORLD CONFIG =====
 (def init-wall% 45)
 (def init-torch% 2)
 (def init-gold% 5)
@@ -247,7 +258,7 @@
 (def init-bat% 1)
 (def init-equip% 1)
 
-;; MONSTER CONFIG
+;; ===== MONSTER CONFIG =====
 (def init-skeleton% 0.1)
 (def init-snake% 0.3)
 (def init-troll% 0.1)
@@ -256,11 +267,11 @@
 (def init-slime% 0.1)
 (def init-drake% 0.01)
 (def init-necro% 0.1)
-(def init-giant_amoeba% 1)                                  ;;0.1
+(def init-giant_amoeba% 1) ;;0.1
 (def init-willowisp% 0.1)
 (def init-hydra% 0.3)
 
-;; Starting floor for certain monsters to spawn on
+;; ===== Starting floor for certain monsters to spawn on =====
 (def init-skeleton-floor 2)
 (def init-snake-floor 1)
 (def init-troll-floor 4)
@@ -269,10 +280,10 @@
 (def init-slime-floor 3)
 (def init-drake-floor 8)
 (def init-necro-floor 6)
-(def init-giant_amoeba-floor 1)                             ;;5
+(def init-giant_amoeba-floor 1) ;;5
 (def init-willowisp-floor 3)
 
-;; MERCHANT CONFIG
+;; ===== MERCHANT CONFIG =====
 (def merchant-pos
   {:x 10
    :y 12})
