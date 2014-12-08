@@ -4,7 +4,7 @@
 #_(use 'rouje-like.config :reload)
 
 ;; WORLD CONFIG
-(def block-size 18)                                         ;; To see start screen, revert to 36
+(def block-size 27)                                         ;; To see start screen, revert to 36
 (def padding-sizes {:top   3
                     :btm   2
                     :left  1
@@ -256,7 +256,7 @@
 (def init-slime% 0.1)
 (def init-drake% 0.01)
 (def init-necro% 0.1)
-(def init-giant_amoeba% 1)                                  ;;0.1
+(def init-giant_amoeba% 0.1)                                ;;FOR EASY TESTING, SET TO 1
 (def init-willowisp% 0.1)
 (def init-hydra% 0.3)
 
@@ -269,7 +269,7 @@
 (def init-slime-floor 3)
 (def init-drake-floor 8)
 (def init-necro-floor 6)
-(def init-giant_amoeba-floor 1)                             ;;5
+(def init-giant_amoeba-floor 5)                             ;;FOR EASY TESTING: SET TO 1
 (def init-willowisp-floor 3)
 
 ;; MERCHANT CONFIG

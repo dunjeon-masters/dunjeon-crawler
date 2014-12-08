@@ -129,7 +129,7 @@
                                     #(#{e-this} (:id %))
                                     entities))))
 
-        (if-let [on-death (:on-death-fn c-this)]
+        #_(if-let [on-death (:on-death-fn c-this)]
           (on-death c-this e-this system)
           system)
 
