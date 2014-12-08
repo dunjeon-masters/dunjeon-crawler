@@ -128,23 +128,27 @@
   :on-show
   (fn [screen _]
     (update! screen :renderer (stage))
-    (vector
-      (label (str "Welcome to Dunjeon Crawler\n"
-                  "type \"name <name>\" \"race <race>\" \"class <class>\"\n"
-                  "and \"start game\" to begin!")
-             (color :green)
-             :set-x (float 250)
-             :set-y (float 550)
-             :set-width (float 250)
-             :set-wrap true)
-      (assoc (label "" (color :green)
-                    :set-x (float 250)
-                    :set-y (float 525))
-             :id :user)
-      (assoc (label "" (color :green)
-                    :set-x (float 250)
-                    :set-y (float 500))
-             :id :cmdl)))
+    (let [height (graphics! :get-height)
+          width (graphics! :get-height)
+          starting-x (+ -25 (* width 1/4))
+          starting-y (* height 4/7)]
+      (vector
+        (label (str "Welcome to Dunjeon Crawler\n"
+                    "type \"name <name>\" \"race <race>\" \"class <class>\"\n"
+                    "and \"start game\" to begin!")
+               (color :green)
+               :set-x (float starting-x)
+               :set-y (float (+ 50 starting-y))
+               :set-width (float (* width 1/2))
+               :set-wrap true)
+        (assoc (label "" (color :green)
+                      :set-x (float starting-x)
+                      :set-y (float (+ 25 starting-y)))
+               :id :user)
+        (assoc (label "" (color :green)
+                      :set-x (float starting-x)
+                      :set-y (float (+ 0 starting-y)))
+               :id :cmdl))))
 
   :on-render
   (fn [screen entities]
