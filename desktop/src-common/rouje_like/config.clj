@@ -11,7 +11,7 @@
                     :left  1
                     :right 1})
 
-(def view-port-sizes [20 20])
+(def view-port-sizes [60 60])
 
 (defn block-size []
   (let [min-block-size 27
