@@ -147,9 +147,33 @@
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 128}
                 :tile-sheet grim-tile-sheet}
+     :temple-wall {:x 3 :y 2
+                   :width 12 :height 12
+                   :color {:r 218 :g 165 :b 32 :a 128}
+                   :tile-sheet grim-tile-sheet}
+     :door     {:x 11 :y 2
+                :width 12 :height 12
+                :color {:r 255 :g 255 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :open-door {:x 12 :y 5
+                 :width 12 :height 12
+                 :color {:r 255 :g 255 :b 255 :a 128}
+                 :tile-sheet grim-tile-sheet}
+     :hidden-spike-trap {:x 14 :y 2
+                         :width 12 :height 12
+                         :color {:r 255 :g 140 :b 0 :a 255}
+                         :tile-sheet grim-tile-sheet}
+     :spike-trap {:x 4 :y 14
+                  :width 16 :height 16
+                  :color {:r 218 :g 165 :b 32 :a 255}
+                  :tile-sheet darkond-tile-sheet}
+     :arrow-trap {:x 3 :y 2
+                  :width 12 :height 12
+                  :color {:r 218 :g 165 :b 32 :a 255}
+                  :tile-sheet grim-tile-sheet}
      :maze-wall {:x 8 :y 5
                  :width 12 :height 12
-                 :color {:r 255 :g 255 :b 255 :a 255}
+                 :color {:r 0 :g 82 :b 3 :a 255}
                  :tile-sheet grim-tile-sheet}
      :gold     {:x 1 :y 9
                 :width 12 :height 12
@@ -180,8 +204,8 @@
                 :color {:r 21 :g 54 :b 21 :a 255}
                 :tile-sheet bisasam-tile-sheet}
      :portal   {:x 4 :y 9
-                 :width 12 :height 12
-                 :color {:r 102 :g 0 :b 102 :a 255}
+                :width 12 :height 12
+                :color {:r 102 :g 0 :b 102 :a 255}
                 :tile-sheet grim-tile-sheet}
      :m-portal {:x 4 :y 9
                 :width 12 :height 12
