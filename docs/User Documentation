@@ -1,0 +1,60 @@
+Product Name: Dunjeon Crawler
+Team Name: Dunjeon Masters
+Revision Number: 1
+Revision Date: 11/25/2014
+------------------------------------------------------------------------------------------------------------------------------
+INSTALLATION INSTRUCTIONS
+  -Minimum Requirements
+    -Computer with latest version of Java.
+  -How To Install
+    -No need to install.
+  -How To Run
+    -Double click jar file.
+------------------------------------------------------------------------------------------------------------------------------
+USER GUIDE/REFERENCE MANUAL
+  CONTROLS:
+  -WASD to move
+  -H for healing potion
+  -M for mana potion
+  -F5 for new game
+  -E for equip item in slot
+  -; to enter command line mode
+    -"save game" to save player stats
+    -"load game" to load saved player stats
+  -[1..4] to start cast spell bound to number key
+    -Then WASD to cast spell in that direction
+  -X to examine items
+  
+  GAMEPLAY:
+  -Auto pickup of potions and equipment
+  -Walk into things to interact
+  -Gain experience by killing monsters
+  -Level up when you have a certain amout of experience and increases random stat
+  -Monsters may give you status effects that harm you over time
+  -Potions give you health or mana but will not exceed your max health or mana
+  
+  MONSTERNOMICON:
+  -"+" and "\" are closed and opened doors respectively
+  -"!" are torches
+  -White "S" are skeletons
+  -Green * like entities are lichen (spikey fungi)
+  -Green "s" are snakes
+  -Blue potions are mana potions
+  -Red potions are health potions
+  -"T" are trolls (trollololololoolloll)
+  -And many more...
+------------------------------------------------------------------------------------------------------------------------------
+DESCRIPTION OF SUPPORTED FUNCTIONALITY
+  -Messaging/dialog system
+  -Worlds with multiple randomly generated levels
+  -Players are able to choose race and class of character
+  -Advanced mob system
+  -Have the ability to give and receive status effects
+  -Traps and terrain interaction exist
+  -Themed levels randomly appear with themed mobs and traps 
+  -Player can pick up and equip armor, weapons, and accessories 
+  -Player can consume items to heal. 
+  -Players can aquire and use spells and magic 
+  -Boss monsters occasionally spawn 
+  -Merchants appear in the world, so player can buy and sell item 
+  -You can save your characters' stats and load them later 

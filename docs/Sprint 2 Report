@@ -1,0 +1,74 @@
+Sprint 2 Report
+Product Name: Dunjeon Crawler
+Team Name: Dunjeon Masters
+Date: 11/12/2014
+Revision: 2
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO STOP DOING
+	-Stop missing team meetings
+		-Team members who miss team meetings fall behind on changes made and they cannot add their feedback on ideas.
+		 It is detrimental to their knowledge and to the quality of the product.
+	-Commiting to work on something at the scrum meeting and not doing it
+		-Team members has to be honest with what they will do so that we can trust them to finish their work.
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO START DOING
+	-Come to all planned team meetings
+		-Team meetings are important times to collaborate on how to approach problems. If you miss the meeting, you
+		 cannot contribute to product as efficiently as possible.
+	-Finish work we commit to at the scrum meetings
+		-Team membesr say we would do something and not actually do it. If we are waiting on someone to finish
+		 something, we expect them to follow through. If you can't do anything until next meeting, just say you
+		 can't.
+	-Use the same format in all functions and written code.
+		-For components we use c-name which allows all users to easily see what is a component. Being inconsistent and
+		 writing name-comp makes it more difficult to read your code.
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO KEEP DOING
+	-Getting help when you are stuck
+		-Team members should reach out to each other if they are stuck to get more insight into their problems. This
+		 way we can effectively work through bugs and waste less time.
+	-Committing bug free code to the master branch
+		-Team members have done a good job of only submitting bug free code to master so we always have a working
+		 prototype of the game.
+------------------------------------------------------------------------------------------------------------------------	
+WORK COMPLETED/NOT COMPLETED
+-Completed:
+	-As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it to].
+    	-As a user, I want to have status effects [so that the game is more interesting].
+    	-As a user, I want armor, weapons, and accessories [so that I can protect myself and fight monsters more efficiently].
+    	-As a user, I want consumable items [so that I can heal].
+    	-As a user, I want traps and terrain interaction [so that the floors have more user interaction and are more 
+    	interesting to play through]. 
+    	-As a user, I want themed levels with themed mobs and traps [so that the floors are unique and not so monotonous]. 
+-Not Completed:
+	None.
+------------------------------------------------------------------------------------------------------------------------	
+WORK COMPLETION RATE FOR SPRINT 1
+	Total User Stories: 4
+	Total Story Points: 24
+	Total Tasks: 25
+	Total Days in Sprint: 14
+	Total Ideal Hours Worked: 25.25
+	Story Points/Day: 1.71
+	Ideal Hours/Day: 1.8
+------------------------------------------------------------------------------------------------------------------------
+WORK COMPLETION RATE FOR SPRINT 2
+	Total User Stories: 6
+	Total Story Points: 31
+	Total Tasks: 29
+	Total Days in Sprint: 14
+	Total Ideal Hours Worked: 117.5
+	Story Points/Day: 2.21
+	Ideal Hours/Day: 8.39
+------------------------------------------------------------------------------------------------------------------------
+AVERAGE WORK COMPLETION RATE
+	Total User Stories: 5
+	Total Story Points: 27.5
+	Total Tasks: 28
+	Total Days in Sprint: 14
+	Total Ideal Hours Worked: 71.375
+	Story Points/Day: 1.96
+	Ideal Hours/Day: 5.1
+------------------------------------------------------------------------------------------------------------------------
+FINAL SCRUM BOARD AND BURN UP CHART
+	https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing

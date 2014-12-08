@@ -7,11 +7,19 @@
             [rouje-like.player :as rj.pl]
             [rouje-like.components :as rj.c :refer [tick]]
             [rouje-like.messaging :as rj.msg]
+            [rouje-like.inventory :as rj.inv]
+            [rouje-like.items :as rj.item]
             [clojure.string :as s]
             [brute.entity]))
 
 #_(in-ns 'rouje-like.input)
 #_(use 'rouje-like.input :reload)
+
+(def input-manager (atom {}))
+
+(defn reset-input-manager
+  [mode]
+  (swap! input-manager assoc mode nil))
 
 (defn tick-entities
   [system]
@@ -83,8 +91,15 @@
                                                           (update-in c-player [:show-world?]
                                                                      (fn [prev]
                                                                        (not prev))))))
+   (play/key-code :E)             (fn [system]
+                                    (rj.inv/equip-slot-item system (first (rj.e/all-e-with-c system :player))))
    (play/key-code :enter)         (fn [system]
-                                    (tick-entities system))})
+                                    (tick-entities system))
+   (play/key-code :I)             (fn [system]
+                                    (swap! input-manager assoc :inspect-mode true)
+                                    system)
+   (play/key-code :H)             (fn [system]
+                                    (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player))))})
 
 (def keycode->direction
   {(play/key-code :W)          :up
@@ -103,6 +118,12 @@
    (play/key-code :dpad-right) :right
    (play/key-code :L)          :right})
 
+(def direction->position
+  {:up {:y 1}
+  :left {:x -1}
+  :down {:y -1}
+  :right {:x 1}})
+
 (defn process-keyboard-input
   [system keycode]
   (if @rj.u/cli?
@@ -119,27 +140,50 @@
               energy (:energy c-energy)
               direction (keycode->direction keycode)]
           (if (not (nil? direction))
-            (as-> system system
-              (if (pos? energy)
-                (rj.pl/process-input-tick system direction)
-                (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-                  (rj.msg/add-msg system :static
-                                  (format "%s was paralyzed, and couldn't move this turn"
-                                          ((:name-fn c-broadcaster) system e-this)))
-                  system))
-              (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
-                (tick-entities system)
-                system)
-              (let [energetic-entities (rj.e/all-e-with-c system :energy)]
-                (reduce (fn [system entity]
-                          (rj.e/upd-c system entity :energy
-                                      (fn [c-energy]
-                                        (update-in c-energy [:energy]
-                                                   (fn [energy]
-                                                     (if (< energy 1)
-                                                       (inc energy)
-                                                       energy))))))
-                        system energetic-entities)))
+            (if (:inspect-mode @input-manager)
+              (let [e-player (first (rj.e/all-e-with-c system :player))
+                    e-world (first (rj.e/all-e-with-c system :world))
+                    levels (rj.e/get-c-on-e system e-world :levels)
+                    c-pos (rj.e/get-c-on-e system e-player :position)
+                    player-pos [(:z c-pos) (:x c-pos) (:y c-pos)]
+
+                    level (nth levels (:z c-pos))
+                    target-pos (rj.u/update-pos player-pos (direction direction->position))
+                    entities (rj.u/entities-at-pos system target-pos)
+
+                    inspectable (first (filter rj.u/inspectable? entities))]
+                (if inspectable
+                  (let [c-inspectable (rj.e/get-c-on-e system (:id inspectable) :inspectable)
+                        msg (:msg c-inspectable)]
+                    (reset-input-manager :inspect-mode)
+                    (as-> system system
+                          (rj.msg/add-msg system :static msg)
+                          (tick-entities system)))
+                  (do (reset-input-manager :inspect-mode)
+                      (as-> system system
+                            (rj.msg/add-msg system :static "there is nothing to inspect there")
+                            (tick-entities system)))))
+              (as-> system system
+                    (if (pos? energy)
+                      (rj.pl/process-input-tick system direction)
+                      (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+                        (rj.msg/add-msg system :static
+                                        (format "%s was paralyzed, and couldn't move this turn"
+                                                ((:name-fn c-broadcaster) system e-this)))
+                        system))
+                    (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
+                      (tick-entities system)
+                      system)
+                    (let [energetic-entities (rj.e/all-e-with-c system :energy)]
+                      (reduce (fn [system entity]
+                                (rj.e/upd-c system entity :energy
+                                            (fn [c-energy]
+                                              (update-in c-energy [:energy]
+                                                         (fn [energy]
+                                                           (if (< energy 1)
+                                                             (inc energy)
+                                                             energy))))))
+                              system energetic-entities))))
             system))))))
 
 (defn process-fling-input

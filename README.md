@@ -8,6 +8,8 @@ Will be using github and this README as a message board. Check periodically for 
 
 11/9: [Armor/Weapons/Consumables thus far.](https://docs.google.com/a/ucsc.edu/document/d/1HD_VH_KtgKsAfmLSafig0YqoChKScHf81xySMMOXCPo/edit?usp=sharing) -Jordan
 
+11/17: [Spell ideas thus far.](https://docs.google.com/a/ucsc.edu/document/d/1bz_cdIKKk-3F8eOK8qZhGk6EdoZEmTnargMD2R9S2yc/edit?usp=sharing) -Jordan
+
 ## Introduction
 
 A play-clj rogue like.

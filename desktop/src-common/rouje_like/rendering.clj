@@ -13,7 +13,9 @@
             [clojure.math.numeric-tower :as math]
 
             [rouje-like.components :refer [render]]
+
             [rouje-like.utils :as rj.u :refer [?]]
+            [rouje-like.equipment :as rj.eq]
             [rouje-like.config :as rj.cfg]
             [rouje-like.entity-wrapper     :as rj.e]))
 
@@ -56,6 +58,9 @@
   [_ e-this {:keys [view-port-sizes]} system]
   (let [[_ vheight] view-port-sizes
 
+        c-player (rj.e/get-c-on-e system e-this :player)
+        player-name (:name c-player)
+
         c-race (rj.e/get-c-on-e system e-this :race)
         race (:race c-race)
 
@@ -80,6 +85,15 @@
         status-effects (:status-effects c-destructible)
         max-hp (:max-hp c-destructible)
 
+        c-inv (rj.e/get-c-on-e system e-this :inventory)
+        junk (count (:junk c-inv))
+        slot (rj.eq/equipment-name (or (:weapon (:slot c-inv)) (:armor (:slot c-inv))))
+        hp-potions (:hp-potion c-inv)
+
+        c-equip (rj.e/get-c-on-e system e-this :equipment)
+        armor (rj.eq/equipment-name (:armor c-equip))
+        weapon (rj.eq/equipment-name (:weapon c-equip))
+
         c-attacker (rj.e/get-c-on-e system e-this :attacker)
         attack (:atk c-attacker)
 
@@ -88,18 +102,24 @@
 
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (str "Gold: [" gold "]"
-                        " -  Position: [" x "," y "," z "]"
-                        " -  HP: [" hp  "/" max-hp "]"
-                        " -  Attack: [" attack "]"
-                        " -  Defense: [" def "]"
-                        " -  Race: [" race "]"
-                        " -  Class: [" class "]"
+    (label! (label (str "Name: " player-name
+                        " - Gold: [" gold "]"
+                        " - Position: [" x "," y "," z "]"
+                        " - HP: [" hp  "/" max-hp "]"
+                        " - Attack: [" attack "]"
+                        " - Defense: [" def "]"
+                        " - Race: [" race "]"
+                        " - Class: [" class "]"
                         "\nExperience: [" experience "]"
-                        " -  Level: [" level "]"
-                        " -  cli: " @rj.u/cli
-                        " - " "Status: " status-effects
-                        "\nEnergy: [" energy "]")
+                        " - Level: [" level "]"
+                        " - cli: " @rj.u/cli
+                        " - Status: " status-effects
+                        "\nEnergy: [" energy "]"
+                        " - Junk: [" junk "]"
+                        " - Slot: [" slot "]"
+                        " - Armor: [" armor "]"
+                        " - Weapon: [" weapon "]"
+                        " - HP-Potions: [" hp-potions "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
@@ -153,7 +173,7 @@
                   :tile-sheet grim-tile-sheet}
      :maze-wall {:x 8 :y 5
                  :width 12 :height 12
-                 :color {:r 255 :g 255 :b 255 :a 255}
+                 :color {:r 0 :g 82 :b 3 :a 255}
                  :tile-sheet grim-tile-sheet}
      :gold     {:x 1 :y 9
                 :width 12 :height 12
@@ -171,6 +191,10 @@
                        :width 12 :height 12
                        :color {:r 103 :g 133 :b 81 :a 64}
                        :tile-sheet grim-tile-sheet}
+     :merchant {:x 13 :y 4
+                :width 12 :height 12
+                :color {:r 0 :g 0 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
      :torch    {:x 1 :y 2
                 :width 12 :height 12
                 :color {:r 255 :g 0 :b 0 :a 255}
@@ -183,6 +207,18 @@
                 :width 12 :height 12
                 :color {:r 102 :g 0 :b 102 :a 255}
                 :tile-sheet grim-tile-sheet}
+     :m-portal {:x 4 :y 9
+                :width 12 :height 12
+                :color {:r 0 :g 0 :b 255 :a 255}
+                :tile-sheet grim-tile-sheet}
+     :equipment {:x 2 :y 9
+                 :width 12 :height 12
+                 :color {:r 255 :g 255 :b 255 :a 255}
+                 :tile-sheet grim-tile-sheet}
+     :purchasable {:x 2 :y 9
+                   :width 12 :height 12
+                   :color {:r 255 :g 255 :b 0 :a 255}
+                   :tile-sheet grim-tile-sheet}
      :bat      {:x 14 :y 5
                 :width 12 :height 12
                 :color {:r 255 :g 255 :b 255 :a 128}
