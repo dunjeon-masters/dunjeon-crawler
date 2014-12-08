@@ -19,7 +19,7 @@
                               {:keys [top btm left right]} padding-sizes]
                           (/ height (+ top btm vp-y)))
                         (catch Exception e
-                          36))]
+                          27))]
     (max 27 block-size)))
 
 (def world-sizes {:width  20
