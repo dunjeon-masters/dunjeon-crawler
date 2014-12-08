@@ -24,8 +24,8 @@
                           min-block-size))]
     (max min-block-size block-size)))
 
-(def world-sizes {:width  20
-                  :height 20})
+(def world-sizes {:width  60
+                  :height 60})
 
 ;; ===== TILE TYPES =====
 (def <floors>

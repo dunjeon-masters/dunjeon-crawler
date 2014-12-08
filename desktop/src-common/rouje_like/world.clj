@@ -39,14 +39,14 @@
 #_(in-ns 'rouje-like.world)
 #_(use 'rouje-like.world :reload)
 
-(defn ^:private block->freqs
+(defn- block->freqs
   [block]
   (frequencies
     (map (fn [tile]
            (:type (rj.u/tile->top-entity tile)))
          block)))
 
-(defn ^:private get-smoothed-tile
+(defn- get-smoothed-tile
   [block-d1 block-d2 x y z]
   (let [wall-threshold-d1 5
         wall-bound-d2 2
@@ -77,7 +77,7 @@
                                                         :type :wall}))
                                entities)))))
 
-(defn ^:private get-smoothed-col
+(defn- get-smoothed-col
   [level [x z] max-dist]
   {:pre [(#{1 2} max-dist)]}
   (mapv (fn [y]
@@ -89,21 +89,21 @@
             x y z))
         (range (count (first level)))))
 
-(defn ^:private smooth-level-v1
+(defn- smooth-level-v1
   [{:keys [level z]}]
   {:level (mapv (fn [x]
                   (get-smoothed-col level [x z] 2))
                 (range (count level)))
    :z z})
 
-(defn ^:private smooth-level-v2
+(defn- smooth-level-v2
   [{:keys [level z]}]
   {:level (mapv (fn [x]
                   (get-smoothed-col level [x z] 1))
                 (range (count level)))
    :z z})
 
-(defn ^:private forest:get-smoothed-tile
+(defn- forest:get-smoothed-tile
   [block-d1 block-d2 x y z]
   (let [wall-threshold-d1 5
         wall-bound-d2 2
@@ -134,7 +134,7 @@
                                                         :type :tree}))
                                entities)))))
 
-(defn ^:private forest:get-smoothed-col
+(defn- forest:get-smoothed-col
   [level [x z] max-dist]
   {:pre [(#{1 2} max-dist)]}
   (mapv (fn [y]
@@ -146,21 +146,21 @@
             x y z))
         (range (count (first level)))))
 
-(defn ^:private forest:smooth-level-v1
+(defn- forest:smooth-level-v1
   [{:keys [level z]}]
   {:level (mapv (fn [x]
                   (forest:get-smoothed-col level [x z] 2))
                 (range (count level)))
    :z z})
 
-(defn ^:private forest:smooth-level-v2
+(defn- forest:smooth-level-v2
   [{:keys [level z]}]
   {:level (mapv (fn [x]
                   (forest:get-smoothed-col level [x z] 1))
                 (range (count level)))
    :z z})
 
-(defn entity-ize-level
+(defn- entity-ize-level
   [system z]
   (letfn [(entity-ize-wall [system tile]
             (let [entities (:entities tile)
@@ -251,7 +251,7 @@
                         system [entity-ize-wall entity-ize-arrow-trap entity-ize-spike-trap entity-ize-door]))
               system (flatten level)))))
 
-(defn ^:private init-entities
+(defn- init-entities
   [system z]
   (-> system
       (as-> system
@@ -285,7 +285,7 @@
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))))
 
-(defn ^:private init-themed-entities
+(defn- init-themed-entities
   [system z theme]
   (case theme
     :desert (as-> system system
@@ -386,7 +386,7 @@
                 (:system system))
     system))
 
-(defn ^:private add-portal
+(defn- add-portal
   [system z]
   ;; Add portal
   (as-> system system
@@ -410,11 +410,11 @@
    :up    [0 -1]
    :down  [0  1]})
 
-(defn ^:private maze:coords+offset
+(defn- maze:coords+offset
   [[x y] [dx dy]]
   [(+ x dx) (+ y dy)])
 
-(defn ^:private maze:get-neighbors-coords
+(defn- maze:get-neighbors-coords
   [origin target]
   (if origin
     (let [y-eq? (= (origin 0) (target 0))]
@@ -425,7 +425,7 @@
     (map maze:coords+offset
          (repeat target) (vals maze:direction4->offset))))
 
-(defn ^:private maze:get-neighbors-of-type
+(defn- maze:get-neighbors-of-type
   [level mark pos typ]
   (let [neighbors (maze:get-neighbors-coords mark pos)
         neighbors (map #(get-in level % nil)
@@ -433,7 +433,7 @@
         neighbors (filter identity neighbors)]
     (filter #(= typ (% 2)) neighbors)))
 
-(defn ^:private maze:get-first-valid-neighbor
+(defn- maze:get-first-valid-neighbor
   [level _ neighbors mark]
   (let [neighbors (shuffle neighbors)]
     (loop [candidate (first neighbors)
@@ -448,16 +448,17 @@
             (recur (first candidates)
                    (rest candidates))))
         nil))))
-(defn ^:private maze:floor-it
+
+(defn- maze:floor-it
   [tile]
   (assoc tile 2 :f))
 
-(defn ^:private maze:floor-in-level
+(defn- maze:floor-in-level
   [level pos]
   (update-in level pos
              maze:floor-it))
 
-(defn ^:private maze:get-candidate
+(defn- maze:get-candidate
   [cells alg perc]
   (case alg
     :rand  (rand-nth cells)
@@ -474,7 +475,7 @@
                   (last cells))
     :else (first cells)))
 
-(defn ^:private maze:growing-tree
+(defn- maze:growing-tree
   [level]
   (let [init-tile (rand-nth (rand-nth level))
         init-tile (maze:floor-it init-tile)
@@ -496,7 +497,7 @@
                    level)))
         level))))
 
-(defn ^:private maze:gen-walls
+(defn- maze:gen-walls
   [width height]
   (vec
     (for [x (range width)]
@@ -504,7 +505,7 @@
         (for [y (range height)]
           [x y :w])))))
 
-(defn ^:private generate-maze
+(defn- generate-maze
   [level [width height]]
   (let [maze (maze:growing-tree (maze:gen-walls width height))]
     (reduce (fn [level cell]
@@ -518,7 +519,7 @@
                 level))
             level (map vec (partition 3 (flatten maze))))))
 
-(defn ^:private generate-desert
+(defn- generate-desert
   [level [width height]]
   (let [desert (:level (rj.rm/print-level
                          (rj.rm/gen-level-with-rooms
