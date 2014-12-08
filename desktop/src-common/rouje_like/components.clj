@@ -2,6 +2,11 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
+#_(use 'rouje-like.components :reload)
+
+(defrecord ArrowTrap [dir
+                      ready?])
+
 (defrecord Bat [])
 
 (defrecord Broadcaster [name-fn])
@@ -10,6 +15,8 @@
 
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
+
+(defrecord Door [])
 
 (defrecord Energy [energy])
 
@@ -68,10 +75,14 @@
 
 (defrecord Skeleton [])
 
+(defrecord SpikeTrap [visible?])
+
 (defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
 
 (defrecord Torch [brightness])
+
+(defrecord Trap [])
 
 (defrecord Wallet [^Number gold])
 
@@ -131,13 +142,15 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
+  get-type {:arrow-trap   (type (->ArrowTrap nil nil))
+            :attacker     (type (->Attacker nil nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
             :destructible (type (->Destructible nil nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
+            :door         (type (->Door))
             :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
             :equipment    (type (->Equipment nil nil))
@@ -162,8 +175,10 @@
             :renderable   (type (->Renderable nil nil))
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
+            :spike-trap   (type (->SpikeTrap nil))
             :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
+            :trap         (type (->Trap))
             :wallet       (type (->Wallet nil))
             :world        (type (->World nil nil))})

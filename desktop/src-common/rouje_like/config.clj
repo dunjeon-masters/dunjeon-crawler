@@ -1,6 +1,8 @@
 (ns rouje-like.config
   (:require [clojure.set :refer [union]]))
 
+#_(use 'rouje-like.config :reload)
+
 ;; WORLD CONFIG
 (def block-size 36)
 (def padding-sizes {:top   3
@@ -13,10 +15,13 @@
 
 ;; TILE TYPES
 (def <floors>
-  #{:dune :floor :forest-floor})
+  #{:open-door :dune :floor :forest-floor})
 
 (def <walls>
-  #{:wall :tree :maze-wall})
+  #{:temple-wall :door :wall :tree :maze-wall})
+
+(def <indestructible-walls>
+  #{:temple-wall :maze-wall})
 
 (def <items>
   #{:torch :gold :health-potion :equipment :purchasable :merchant})
@@ -25,18 +30,25 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  (union <walls> #{:lichen}))
+  (union <walls> #{:arrow-trap :lichen}))
 
 (def <valid-move-targets>
-  (union <empty> #{:portal :m-portal}))
+  (union <empty> #{:portal :m-portal :spike-trap :hidden-spike-trap}))
 
 (def <valid-mob-targets>
   (union <empty> #{:player}))
 
 (def wall->stats
-  {:wall      {:hp 2}
-   :tree      {:hp 1}
-   :maze-wall {:hp 100}})
+  {:wall        {:hp 2}
+   :tree        {:hp 1}
+   :maze-wall   {:hp 100}
+   :temple-wall {:hp 100}})
+
+(def trap->stats
+  {:arrow-trap {:hp 1
+                :atk 2}
+   :spike-trap {:hp 1
+                :atk 2}})
 
 ;; PLAYER CONFIG
 (def player-stats
@@ -140,6 +152,9 @@
    :def 1
    :atk 3
    :exp 1})
+
+(def trap-types
+  [:arrow])
 
 (def potion-stats
   {:health 5})
