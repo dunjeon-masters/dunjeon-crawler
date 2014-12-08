@@ -16,11 +16,11 @@
                          (merge save
                                 {k-comp (->save-state c-comp)})))
                      {} saveable-components)]
-    (spit (str save-name ".edn") (pr-str save))
+    (spit (str save-name ".save.edn") (pr-str save))
     system))
 
 (defn load-game [system save-name]
-  (if-let [saved-state (try (slurp (str save-name ".edn"))
+  (if-let [saved-state (try (slurp (str save-name ".save.edn"))
                             (catch Exception e))]
     (let [save-state (read-string saved-state)
 
@@ -31,4 +31,4 @@
                               (let [saved-comp (k-saved-comp save-state)]
                                 (merge c saved-comp)))))
               system (keys save-state)))
-    (rj.msg/add-msg system :blocking (str "No file called " save-name ".edn found"))))
+    (rj.msg/add-msg system :blocking (str "No file called " save-name ".save.edn found"))))
