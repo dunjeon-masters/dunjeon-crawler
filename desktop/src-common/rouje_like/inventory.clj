@@ -1,16 +1,41 @@
 (ns rouje-like.inventory
-  (:require [rouje-like.utils :refer [?]]
+  (:require [rouje-like.utils :refer [? update-gold]]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]
             [rouje-like.status-effects :as rj.stef]))
 
+(defn update-junk
+  [system e-this upd-fn]
+  "Update the junk on E-THIS using UPD-FN. UPD-FN is a function that
+   takes the current junk on E-THIS and returns a value that replaces it."
+  (rj.e/upd-c system e-this :inventory
+              (fn [c-inv]
+                (update-in c-inv [:junk]
+                           upd-fn))))
+
 (defn add-junk
   [system e-this item]
-  "Increment the amount of junk E-THIS is carrying."
-  (rj.e/upd-c system e-this :inventory
-              (fn [inv-comp]
-                (update-in inv-comp [:junk]
-                           conj item))))
+  "Add ITEM to E-THIS's junk pile."
+  (update-junk system e-this
+               (fn [junk]
+                 (conj junk item))))
+
+(defn junk-value
+  [system e-this]
+  "Return the value of the junk E-THIS carries."
+  (let [c-inv (rj.e/get-c-on-e system e-this :inventory)
+        junk (:junk c-inv)]
+    (reduce (fn [v i]
+              (+ v (rj.eq/equipment-value i)))
+            0 junk)))
+
+(defn sell-junk
+  [system e-this]
+  "Sell the junk E-THIS carries and add it to their wallet."
+  (let [junk-value (junk-value system e-this)]
+    (as-> system system
+          (update-junk system e-this (fn [junk] nil))
+          (update-gold system e-this junk-value))))
 
 (defn switch-slot-item
   [system e-this & [item]]

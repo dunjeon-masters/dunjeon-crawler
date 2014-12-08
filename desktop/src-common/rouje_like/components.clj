@@ -7,6 +7,9 @@
 (defprotocol ISaveState
   (->save-state [this]))
 
+(defrecord ArrowTrap [dir
+                      ready?])
+
 (defrecord Bat [])
 
 (defrecord Broadcaster [name-fn])
@@ -20,6 +23,10 @@
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
+
+(defrecord Door [])
+
+(defrecord Energy [energy])
 
 (defrecord Entity [^Keyword id
                    ^Keyword type])
@@ -39,6 +46,8 @@
       (zipmap (keys this) (vals this)))))
 
 (defrecord Gold [value])
+
+(defrecord Inspectable [msg])
 
 (defrecord Inventory [slot
                       junk
@@ -66,6 +75,10 @@
 (defrecord Lichen [grow-chance%
                    max-blob-size])
 
+(defrecord MPortal [^Number x ^Number y ^Number z])
+
+(defrecord Merchant [])
+
 (defrecord Player [name
                    show-world?]
   ISaveState
@@ -86,6 +99,8 @@
 (defrecord Position [x y z
                      ^Keyword type])
 
+(defrecord Purchasable [value])
+
 (defrecord Race [race]
   ISaveState
   (->save-state [this]
@@ -100,15 +115,21 @@
 
 (defrecord Skeleton [])
 
+(defrecord SpikeTrap [visible?])
+
 (defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
 
 (defrecord Torch [brightness])
 
+(defrecord Trap [])
+
 (defrecord Wallet [^Number gold]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
+
+(defrecord Wallet [^Number gold])
 
 (defrecord World [levels
                   add-level-fn])
@@ -173,35 +194,43 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
+  get-type {:arrow-trap   (type (->ArrowTrap nil nil))
+            :attacker     (type (->Attacker nil nil nil nil nil))
             :bat          (type (->Bat))
             :broadcaster  (type (->Broadcaster nil))
             :class        (type (->Klass nil))
             :counter      (type (->Counter nil))
             :destructible (type (->Destructible nil nil nil nil nil nil))
             :digger       (type (->Digger nil nil))
+            :door         (type (->Door))
             :energy       (type (->Energy nil))
             :entity       (type (->Entity nil nil))
             :equipment    (type (->Equipment nil nil))
             :experience   (type (->Experience nil nil nil))
             :gold         (type (->Gold nil))
+            :inspectable  (type (->Inspectable nil))
             :inventory    (type (->Inventory nil nil nil))
             :item         (type (->Item nil))
             :killable     (type (->Killable nil))
             :lichen       (type (->Lichen nil nil))
+            :m-portal     (type (->MPortal nil nil nil))
+            :merchant     (type (->Merchant))
             :mobile       (type (->Mobile nil nil))
             :player       (type (->Player nil nil))
             :playersight  (type (->PlayerSight nil nil nil nil nil))
             :portal       (type (->Portal nil nil nil))
             :position     (type (->Position nil nil nil nil))
+            :purchasable  (type (->Purchasable nil))
             :race         (type (->Race nil))
             :receiver     (type (->Receiver))
             :relay        (type (->Relay nil nil))
             :renderable   (type (->Renderable nil nil))
             :sight        (type (->Sight nil))
             :skeleton     (type (->Skeleton))
+            :spike-trap   (type (->SpikeTrap nil))
             :tickable     (type (->Tickable nil nil))
             :tile         (type (->Tile nil nil nil nil))
             :torch        (type (->Torch nil))
+            :trap         (type (->Trap))
             :wallet       (type (->Wallet nil))
             :world        (type (->World nil nil))})

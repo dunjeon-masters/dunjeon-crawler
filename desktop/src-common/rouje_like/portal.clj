@@ -21,7 +21,7 @@
        (let [portal-tile-good? (rj.cfg/<floors> (:type (rj.u/tile->top-entity portal-tile)))
              target-tile-good? (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))]
          (cond (and portal-tile-good? target-tile-good?)
-               (add-portal system portal-tile target-tile)
+               (add-portal system portal-tile target-tile :portal)
 
                portal-tile-good?
                (recur portal-tile (get-rand-tile level+))
@@ -31,7 +31,7 @@
 
                :else
                (recur (get-rand-tile level) (get-rand-tile level+)))))))
-  ([system portal-tile target-tile]
+  ([system portal-tile target-tile p-type]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-portal (br.e/create-entity)
          system (rj.u/update-in-world system e-world [(:z portal-tile) (:x portal-tile) (:y portal-tile)]
@@ -40,22 +40,22 @@
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-portal
-                                                               :type :portal})))))]
+                                                               :type p-type})))))]
      {:system (rj.e/system<<components
-                system e-portal
-                [[:portal {:x (:x target-tile)
-                           :y (:y target-tile)
-                           :z (:z target-tile)}]
-                 [:position {:x (:x portal-tile)
-                             :y (:y portal-tile)
-                             :z (:z portal-tile)
-                             :type :portal}]])
+               system e-portal
+               [[:portal {:x (:x target-tile)
+                          :y (:y target-tile)
+                          :z (:z target-tile)}]
+                [:position {:x (:x portal-tile)
+                            :y (:y portal-tile)
+                            :z (:z portal-tile)
+                            :type p-type}]])
       :z (:z target-tile)})))
 
 (defn portal-target-pos [system portal]
-  (let [target-pos (rj.e/get-c-on-e system (:id portal) :portal)]
+  (let [target-pos portal]
     [(:z target-pos) (:x target-pos) (:y target-pos)]))
 
 (defn is-portal? [entity]
-  (= (:type entity) :portal))
+  (or (= (:type entity) :portal) (= (:type entity) :m-portal)))
 
