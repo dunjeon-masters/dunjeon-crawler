@@ -17,10 +17,10 @@
                      (* (+ (:left padding-sizes)
                            (:right padding-sizes)
                            (view-port-sizes 0))
-                        block-size)
+                        (block-size))
                      (* (+ (:btm padding-sizes)
                            (:top padding-sizes)
                            (view-port-sizes 1))
-                        block-size))
+                        (block-size)))
   (Keyboard/enableRepeatEvents true))
 

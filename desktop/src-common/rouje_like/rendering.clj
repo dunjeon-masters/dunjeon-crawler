@@ -127,7 +127,7 @@
                                              (:btm rj.cfg/padding-sizes))
                                           2))
 
-                                    rj.cfg/block-size)))
+                                    (rj.cfg/block-size))))
             :draw renderer 1.0)
     (.end renderer)))
 
@@ -365,10 +365,10 @@
                  (:object texture-entity)
                  (float (* (+ (- x start-x)
                               (:left rj.cfg/padding-sizes))
-                           rj.cfg/block-size))
+                           (rj.cfg/block-size)))
                  (float (* (+ (- y start-y)
                               (:btm rj.cfg/padding-sizes))
-                           rj.cfg/block-size))
-                 (float rj.cfg/block-size) (float rj.cfg/block-size)))))
+                           (rj.cfg/block-size)))
+                 (float (rj.cfg/block-size)) (float (rj.cfg/block-size))))))
     (.end renderer)))
 
