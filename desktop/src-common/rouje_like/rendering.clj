@@ -32,7 +32,7 @@
         (render c-renderable e-renderable args system))))
   system)
 
-(defn render-static-messages
+(defn render-messages
   [_ e-this _ system]
   (let [c-relay (rj.e/get-c-on-e system e-this :relay)
 
@@ -41,14 +41,17 @@
         current-turn (:turn c-counter)
 
         statics (:static c-relay)
-        current-messages (filter #(= (:turn %) (dec current-turn))
-                                 statics)
-        static-messages (mapcat #(str (:message %) ". \n")
-                                current-messages)
+        blocking (:blocking c-relay)
+        current-messages (concat
+                           (filter #(= (:turn %) (dec current-turn))
+                                   statics)
+                           blocking)
+        current-messages (mapcat #(str (:message %) ". \n")
+                                 current-messages)
 
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (apply str (into [] static-messages))
+    (label! (label (apply str (into [] current-messages))
                    (color :green)
                    :set-y (float 0))
             :draw renderer 1.0)

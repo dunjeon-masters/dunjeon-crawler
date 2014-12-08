@@ -26,8 +26,6 @@
 
 (defrecord Door [])
 
-(defrecord Energy [energy])
-
 (defrecord Entity [^Keyword id
                    ^Keyword type])
 
@@ -128,8 +126,6 @@
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
-
-(defrecord Wallet [^Number gold])
 
 (defrecord World [levels
                   add-level-fn])

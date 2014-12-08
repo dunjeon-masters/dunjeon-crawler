@@ -9,6 +9,7 @@
             [rouje-like.messaging :as rj.msg]
             [rouje-like.inventory :as rj.inv]
             [rouje-like.items :as rj.item]
+            [rouje-like.save-game :as rj.save]
             [clojure.string :as s]
             [brute.entity]))
 
@@ -54,7 +55,11 @@
                                  (rj.e/upd-c system e-player :class
                                              (fn [c-class]
                                                (assoc c-class :class
-                                                      (keyword c))))))}
+                                                      (keyword c))))))
+                     "save"  (fn [system save-name]
+                               (rj.save/save-game system save-name))
+                     "load"  (fn [system save-name]
+                               (rj.save/load-game system save-name))}
         cmd&arg (first (partition 2 (s/split cmds #" ")))
         action (cmd->action (first cmd&arg) (fn [s _] identity s))
         arg (second cmd&arg)]
