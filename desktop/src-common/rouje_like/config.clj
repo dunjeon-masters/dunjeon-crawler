@@ -13,14 +13,15 @@
 (def view-port-sizes [20 20])
 
 (defn block-size []
-  (let [block-size (try (let [height (graphics! :get-height)
+  (let [min-block-size 27
+        block-size (try (let [height (graphics! :get-height)
                               width  (graphics! :get-width)
                               [vp-x vp-y] view-port-sizes
                               {:keys [top btm left right]} padding-sizes]
                           (/ height (+ top btm vp-y)))
                         (catch Exception e
-                          27))]
-    (max 27 block-size)))
+                          min-block-size))]
+    (max min-block-size block-size)))
 
 (def world-sizes {:width  20
                   :height 20})
