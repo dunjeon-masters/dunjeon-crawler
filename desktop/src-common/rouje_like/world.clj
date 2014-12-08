@@ -277,7 +277,7 @@
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
-      ;; Spawn equipment for testing
+      ;; Spawn equipment
       (as-> system
             (do (println "core::add-equipment " (not (nil? system))) system)
             (nth (iterate rj.items/add-equipment {:system system :z z})

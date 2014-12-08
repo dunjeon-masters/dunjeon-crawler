@@ -119,27 +119,33 @@
                       (fn [c-inventory]
                         (update-in c-inventory [:hp-potion] dec))))))
 
-(defn ^:private item>>world
+(defn- item>>world
   [system is-valid-tile? z item>>entities]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels z)]
-    (loop [system system]
-      (let [x (rand-int (count world))
-            y (rand-int (count (first world)))]
+        world (nth levels z)
+        width (count world)
+        height (count (first world))]
+    (loop [system system
+           i 5]
+      (let [x (rand-int width)
+            y (rand-int height)]
         (if (is-valid-tile? world [x y])
           (rj.u/update-in-world system e-world [z x y]
-                                 (fn [entities]
-                                   (item>>entities entities)))
-          (recur system))))))
+                                (fn [entities]
+                                  (item>>entities entities)))
+          (if (neg? i)
+            system
+            (recur system
+                   (dec i))))))))
 
-(defn ^:private only-floor?
+(defn- only-floor?
   [tile]
   (every? #(rj.cfg/<floors> (:type %))
           (:entities tile)))
 
-(defn ^:private item>>entities
+(defn- item>>entities
   [entities e-id e-type]
   (conj entities
         (rj.c/map->Entity {:id   e-id
