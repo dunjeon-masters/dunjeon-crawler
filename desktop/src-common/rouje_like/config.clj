@@ -273,7 +273,7 @@
 (def init-willowisp% 0.1)
 (def init-hydra% 0.3)
 
-;; ===== Starting floor for certain monsters to spawn on =====
+;; ===== STARTING FLOOR FOR MOBS =====
 (def init-skeleton-floor 2)
 (def init-snake-floor 1)
 (def init-troll-floor 4)
