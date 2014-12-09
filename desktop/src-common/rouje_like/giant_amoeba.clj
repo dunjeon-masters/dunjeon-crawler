@@ -10,6 +10,7 @@
             [rouje-like.attacker :as rj.atk]
             [rouje-like.config :as rj.cfg]
             [rouje-like.status-effects :as rj.stef]
+            [rouje-like.messaging :as rj.msg]
             [rouje-like.large_amoeba :as rj.la]))
 
 (declare process-input-tick)
@@ -24,7 +25,9 @@
         world (nth levels (:z c-position))
 
         this-tile (get-in world [(:x c-position) (:y c-position)])]
-    (:system (rj.la/add-large_amoeba system this-tile))))
+    (as-> system system
+          (rj.msg/add-msg system :static "the giant amoeba split into large amoebas")
+          (:system (rj.la/add-large_amoeba system this-tile)))))
 
 (defn add-giant_amoeba
   ([{:keys [system z]}]
