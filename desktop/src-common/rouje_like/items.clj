@@ -22,14 +22,13 @@
   [system e-by e-this [z x y] item-type]
   (let [broadcast-pickup
         (fn [system]
-          (if (not (nil? c-broadcaster))
+          (let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
             (rj.msg/add-msg system :static
                             (format "%s picked up %s"
                                     (let [by-c-broadcaster (rj.e/get-c-on-e system e-by
                                                                             :broadcaster)]
                                       ((:name-fn by-c-broadcaster) system e-by))
-                                    ((:name-fn c-broadcaster) system e-this)))
-            system))]
+                                    ((:name-fn c-broadcaster) system e-this)))))]
     (case item-type
       :torch (let [c-playersight (rj.e/get-c-on-e system e-by :playersight)
                    sight-upper-bound (:upper-bound c-playersight)
