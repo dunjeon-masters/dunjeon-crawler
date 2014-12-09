@@ -29,7 +29,7 @@
    :else 99
    :player 100})
 
-(defn sort-by-type
+(defn- sort-by-type
   [entities get-pri]
   (sort (fn [arg1 arg2]
           (let [t1 (:type arg1)
@@ -114,7 +114,7 @@
   [[x y] [dx dy]]
   [(+ x dx) (+ y dy)])
 
-(defn ^:private get-neighbors-coords
+(defn get-neighbors-coords
   "Return the coordinates of all neighboring
   (ie: up/down/left/right)
   squares of the given [x y] pos."
@@ -163,7 +163,7 @@
                                                                     1))))))
             (get-entities-radially world origin dist-fn)))
 
-(defn ^:private ring-coords
+(defn ring-coords
   [[x y] dist]
   (let [∆x|y (vec (range (- 0 dist) (inc dist)))]
     (for [dx ∆x|y
