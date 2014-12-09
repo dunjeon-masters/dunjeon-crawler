@@ -18,16 +18,34 @@
 (defn on-death
   [_ e-this system]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
+        this-pos [(:x c-position) (:y c-position)]
 
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
         world (nth levels (:z c-position))
 
-        this-tile (get-in world [(:x c-position) (:y c-position)])]
-    (as-> system system
-          (rj.msg/add-msg system :static "the giant amoeba split into large amoebas")
-          (:system (rj.la/add-large_amoeba system this-tile)))))
+        ring-coords (rj.u/get-ring-around world this-pos 1)]
+    ;; spawn large amoebas at the first two open spots around the giant amoeba
+    (loop [ring-tiles ring-coords
+           amoebas 0
+           spawn-tiles nil]
+      (let [target-tile (first ring-tiles)]
+        (cond (empty? ring-tiles)
+              system
+
+              (= amoebas 2) ; controls # of large amoebas to spawn
+              (as-> system system
+                    (rj.msg/add-msg system :static (format "the giant amoeba split into %d large amoebas"
+                                                           amoebas))
+                    (:system (rj.la/add-large_amoeba system (first spawn-tiles)))
+                    (:system (rj.la/add-large_amoeba system (last spawn-tiles))))
+
+              (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
+              (recur (rest ring-tiles) (inc amoebas) (conj spawn-tiles target-tile))
+
+              :else
+              (recur (rest ring-tiles) amoebas spawn-tiles))))))
 
 (defn add-giant_amoeba
   ([{:keys [system z]}]
