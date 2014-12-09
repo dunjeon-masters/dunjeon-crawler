@@ -243,6 +243,10 @@
                      :width 12 :height 12
                      :color {:r 116 :g 84 :b 141 :a 255}
                      :tile-sheet grim-tile-sheet}
+     :colossal_amoeba  {:x 7 :y 12
+                        :width 16 :height 16
+                        :color {:r 111 :g 246 :b 255 :a 125}
+                        :tile-sheet darkond-tile-sheet}
      :giant_amoeba  {:x 7 :y 12
                      :width 16 :height 16
                      :color {:r 111 :g 246 :b 255 :a 125}
@@ -347,4 +351,3 @@
                            rj.cfg/block-size))
                  (float rj.cfg/block-size) (float rj.cfg/block-size)))))
     (.end renderer)))
-

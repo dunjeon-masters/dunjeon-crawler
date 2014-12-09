@@ -16,7 +16,7 @@
             [rouje-like.merchant :as rj.merch]
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
-            [rouje-like.giant_amoeba :as rj.ga]
+            [rouje-like.colossal_amoeba :as rj.ca]
             [rouje-like.hydra-head :as rj.hh]
             [rouje-like.hydra-neck :as rj.hn]
             [rouje-like.hydra-tail :as rj.ht]
@@ -259,8 +259,7 @@
                   #_(nth (iterate rj.ht/add-hydra-tail {:system system :z z})
                        (* (/ rj.cfg/init-hydra% 100)
                           (apply * (vals rj.cfg/world-sizes))))
-                  #_(:system system)
-                  )
+                  #_(:system system))
     :forest (as-> system system
                   ;; Spawn Trolls
                   (do (println "core::add-troll " (not (nil? system))) system)
@@ -274,13 +273,14 @@
                        (* (max 0 (min 0.05 (/ (+ rj.cfg/init-spider% (* 0.2 (- z rj.cfg/init-spider-floor))) 100)))
                           (apply * (vals rj.cfg/world-sizes))))
                   (:system system)
-                  ;; Giant Amoeba (NOTE: LARGE AMOEBA IMPLEMENTATION STILL NEEDED)
-                  (do (println "core::add-giant_amoeba " (not (nil? system))) system)
-                  (nth (iterate rj.ga/add-giant_amoeba {:system system :z z})
-                       (* (max 0 (min 0.05 (/ (+ rj.cfg/init-giant_amoeba% (* 0.2 (- z rj.cfg/init-giant_amoeba-floor))) 100)))
+                  ;; Spawn Colossal Amoeba
+                  (do (println "core::add-colossal_amoeba " (not (nil? system))) system)
+                  (nth (iterate rj.ca/add-colossal_amoeba {:system system :z z})
+                       (* (max 0 (min 0.05 (/ (+ rj.cfg/init-colossal_amoeba%
+                                                 (* 0.2 (- z rj.cfg/init-colossal_amoeba-floor)))
+                                              100)))
                           (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  )
+                  (:system system))
     :maze (as-> system system
                 ;; Spawn Slimes
                 (do (println "core::add-slime " (not (nil? system))) system)
