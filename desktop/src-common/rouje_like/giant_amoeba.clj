@@ -39,8 +39,9 @@
               (as-> system system
                     (rj.msg/add-msg system :static (format "the giant amoeba split into %d large amoebas"
                                                            amoebas))
-                    (:system (rj.la/add-large_amoeba system (first spawn-tiles)))
-                    (:system (rj.la/add-large_amoeba system (last spawn-tiles))))
+                    (reduce (fn [sys tile]
+                              (:system (rj.la/add-large_amoeba sys tile)))
+                            system spawn-tiles))
 
               (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
               (recur (rest ring-tiles) (inc amoebas) (conj spawn-tiles target-tile))
