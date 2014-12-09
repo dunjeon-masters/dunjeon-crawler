@@ -509,7 +509,9 @@
   [level [width height]]
   (let [maze (maze:growing-tree (maze:gen-walls width height))]
     (reduce (fn [level cell]
-              (if (= :f (cell 2))
+              (if (or (= :f (cell 2))
+                      (and (= :w (cell 2))
+                           (< (rand-int 100) 20)))
                 (update-in level [(cell 0) (cell 1)]
                            (fn [tile]
                              (update-in tile [:entities]
