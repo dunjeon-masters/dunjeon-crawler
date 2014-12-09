@@ -24,9 +24,7 @@
         world (nth levels (:z c-position))
 
         this-tile (get-in world [(:x c-position) (:y c-position)])]
-    (? (rj.la/add-large_amoeba system this-tile))
-    )
-  )
+    (:system (rj.la/add-large_amoeba system this-tile))))
 
 (defn add-giant_amoeba
   ([{:keys [system z]}]
@@ -160,4 +158,3 @@
 
         :else system)
       system)))
-
