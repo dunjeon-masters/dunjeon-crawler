@@ -38,7 +38,7 @@
                                       (fn [entities]
                                         (vec
                                           (conj
-                                            (remove #(#{:wall} (:type %)) entities)
+                                            (remove #( rj.cfg/<walls> (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-hydra-head
                                                                :type :hydra-head})))))]
      {:system (rj.e/system<<components
@@ -50,7 +50,7 @@
                              :type :hydra-head}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
-                 [:sight {:distance 4}]
+                 [:sight {:distance 999}]
                  [:attacker {:atk              (:atk rj.cfg/hydra-head-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack

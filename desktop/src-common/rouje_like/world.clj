@@ -242,25 +242,27 @@
                        (* (max 0 (min 0.05 (/ (+ rj.cfg/init-necro% (* 0.2 (- z rj.cfg/init-necro-floor))) 100)))
                           (apply * (vals rj.cfg/world-sizes))))
                   (:system system)
-                  ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
-                  (do (println "core::add-hydra-head " (not (nil? system))) system)
-                  (nth (iterate rj.hh/add-hydra-head {:system system :z z})
-                       (* (/ rj.cfg/init-hydra% 100)
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  ;;Spawn Hydra Neck
-                  (do (println "core::add-hydra-neck " (not (nil? system))) system)
-                  (nth (iterate rj.hn/add-hydra-neck {:system system :z z})
-                       (* (/ rj.cfg/init-hydra% 100)
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  ;;Spawn Hydra Tail
-                  (do (println "core::add-hydra-tail " (not (nil? system))) system)
-                  (nth (iterate rj.ht/add-hydra-tail {:system system :z z})
-                       (* (/ rj.cfg/init-hydra% 100)
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
                   )
+    :hmaze (as-> system system
+                ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
+                (do (println "core::add-hydra-head " (not (nil? system))) system)
+                (nth (iterate rj.hh/add-hydra-head {:system system :z z})
+                     (* (/ rj.cfg/init-hydra% 100)
+                        (apply * (vals rj.cfg/world-sizes))))
+                (:system system)
+                ;;Spawn Hydra Neck
+                (do (println "core::add-hydra-neck " (not (nil? system))) system)
+                (nth (iterate rj.hn/add-hydra-neck {:system system :z z})
+                     (* (/ rj.cfg/init-hydra% 100)
+                        (apply * (vals rj.cfg/world-sizes))))
+                (:system system)
+                ;;Spawn Hydra Tail
+                (do (println "core::add-hydra-tail " (not (nil? system))) system)
+                (nth (iterate rj.ht/add-hydra-tail {:system system :z z})
+                     (* (/ rj.cfg/init-hydra% 100)
+                        (apply * (vals rj.cfg/world-sizes))))
+                (:system system)
+                )
     :forest (as-> system system
                   ;; Spawn Trolls
                   (do (println "core::add-troll " (not (nil? system))) system)
@@ -455,10 +457,15 @@
 
 (defn generate-random-level
   ([level-sizes z]
-   (let [world-types [:cave :desert :maze :forest]
+   (if (? (= (mod z 5) 0))
+     (let [world-types [:hmaze]                             ;;Array of boss floors
+           world-type (rand-nth world-types)]
+       {:type world-type
+        :level (generate-random-level level-sizes z world-type)})
+     (let [world-types [:cave :desert :maze :forest]
          world-type (rand-nth world-types)]
      {:type world-type
-      :level (generate-random-level level-sizes z world-type)}))
+      :level (generate-random-level level-sizes z world-type)})))
 
   ([{:keys [width height]} z world-type]
    (case world-type
@@ -527,7 +534,21 @@
                                                               (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                  :type :maze-wall})]})))))]
              ;; CREATE MAZE
-             (generate-maze level [width height])))))
+             (generate-maze level [width height]))
+
+     :hmaze (let [level (vec
+                         (map vec
+                              (for [x (range width)]
+                                (for [y (range height)]
+                                  (rj.c/map->Tile {:x x :y y :z z
+                                                   :entities [(rj.c/map->Entity {:id nil
+                                                                                 :type :floor})
+                                                              (rj.c/map->Entity {:id   (br.e/create-entity)
+                                                                                 :type :maze-wall})]})))))]
+             ;; CREATE HMAZE
+             (generate-maze level [width height]))
+
+     )))
 
 ;;;; MERCHANT LEVEL CODE
 (defn generate-merchant-level

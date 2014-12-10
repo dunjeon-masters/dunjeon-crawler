@@ -25,23 +25,25 @@
          e-head (first (rj.e/all-e-with-c system :hydra-head))
          c-head-pos (rj.e/get-c-on-e system e-head :position)
          head-pos [(:x c-head-pos) (:y c-head-pos)]
-         head-neighbors (rj.u/get-neighbors-of-type world head-pos [:dune])
+         head-neighbors (rj.u/get-neighbors-of-type world head-pos [:floor :maze-wall])
          n-pos (first head-neighbors)
 
          get-head-tile (fn [world]
                          (get-in world [(:x n-pos)
-                                        (:y n-pos)]))]
+                                        (:y n-pos)]
+                                 nil))]
      (loop [target-tile (get-head-tile world)]
        (add-hydra-neck system target-tile))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-hydra-neck (br.e/create-entity)
          hp (:hp rj.cfg/hydra-neck-stats)
+         _ (? target-tile)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
-                                            (remove #(#{:wall} (:type %)) entities)
+                                            (remove #( rj.cfg/<walls> (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-hydra-neck
                                                                :type :hydra-neck})))))]
      {:system (rj.e/system<<components

@@ -25,7 +25,7 @@
          e-neck (first (rj.e/all-e-with-c system :hydra-neck))
          c-neck-pos (rj.e/get-c-on-e system e-neck :position)
          neck-pos [(:x c-neck-pos) (:y c-neck-pos)]
-         neck-neighbors (rj.u/get-neighbors-of-type world neck-pos [:dune])
+         neck-neighbors (rj.u/get-neighbors-of-type world neck-pos [:floor :maze-wall])
          n-pos (first neck-neighbors)
 
          get-neck-tile (fn [world]
@@ -41,7 +41,7 @@
                                       (fn [entities]
                                         (vec
                                           (conj
-                                            (remove #(#{:wall} (:type %)) entities)
+                                            (remove #( rj.cfg/<walls> (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-hydra-tail
                                                                :type :hydra-tail})))))]
      {:system (rj.e/system<<components
