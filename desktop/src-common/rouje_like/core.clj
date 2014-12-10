@@ -73,7 +73,7 @@
                 (as-> (rj.in/process-keyboard-input @sys key-code) system
                   (if (empty? (rj.e/all-e-with-c system :player))
                     (-> (br.e/create-system)
-                        (init-entities)
+                        (init-entities @user)
                         (register-system-fns))
                     system))))))
 
@@ -126,28 +126,28 @@
 (defscreen main-menu-screen
   :on-show
   (fn [screen _]
-    (println "on-show main-menu-screen")
     (update! screen :renderer (stage))
-    (label "START SCREEN" (color :green)
-            :set-x (float 300)
-            :set-y (float 600))
-    (vector
-      (label (str "Welcome to Dunjeon Crawler\n"
-                  "type \"name <name>\" \"race <race>\" \"class <class>\"\n"
-                  "and \"start game\" to begin!")
-             (color :green)
-             :set-x (float 250)
-             :set-y (float 550)
-             :set-width (float 250)
-             :set-wrap true)
-      (assoc (label "" (color :green)
-                    :set-x (float 250)
-                    :set-y (float 525))
-             :id :user)
-      (assoc (label "" (color :green)
-                    :set-x (float 250)
-                    :set-y (float 500))
-             :id :cmdl)))
+    (let [height (graphics! :get-height)
+          width (graphics! :get-height)
+          starting-x (+ -25 (* width 1/4))
+          starting-y (* height 4/7)]
+      (vector
+        (label (str "Welcome to Dunjeon Crawler\n"
+                    "type \"name <name>\" \"race <race>\" \"class <class>\"\n"
+                    "and \"start game\" to begin!")
+               (color :green)
+               :set-x (float starting-x)
+               :set-y (float (+ 50 starting-y))
+               :set-width (float (* width 1/2))
+               :set-wrap true)
+        (assoc (label "" (color :green)
+                      :set-x (float starting-x)
+                      :set-y (float (+ 25 starting-y)))
+               :id :user)
+        (assoc (label "" (color :green)
+                      :set-x (float starting-x)
+                      :set-y (float (+ 0 starting-y)))
+               :id :cmdl))))
 
   :on-render
   (fn [screen entities]
@@ -157,7 +157,8 @@
              :cmdl (doto entity
                      (label! :set-text (str ">? " @cmdl)))
              :user (doto entity
-                     (label! :set-text (str @user))) entity))
+                     (label! :set-text (str @user)))
+             entity))
          (render! screen)))
 
   :on-key-down

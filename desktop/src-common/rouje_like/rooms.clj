@@ -27,9 +27,10 @@
                 :f  "_"
                 :d  "+"
                 :at "!"
-                :st "v")
+                :st "v"
+                "Q")
              row)))
-  :as LEVEL)
+  LEVEL)
 
 (defn valid-door-locs
   [x y w h]
@@ -176,6 +177,7 @@
 
 (defn gen-level-with-rooms
   [width height number-of-rooms room-size]
+  (assert (> (* width height 1/2) (* number-of-rooms room-size room-size)))
   (let [rand-pos (fn [] [(rand-int width) (rand-int height)])]
     (loop [level (gen-level width height :f)
            i number-of-rooms]
