@@ -575,7 +575,7 @@
            world-type (rand-nth world-types)]
        {:type world-type
         :level (generate-random-level level-sizes z world-type)})
-     (let [world-types (drop-last 2 (drop 1 [:cave :desert :maze :forest]))
+     (let [world-types [:cave :desert :maze :forest]
          world-type (rand-nth world-types)]
      {:type world-type
       :level (generate-random-level level-sizes z world-type)})))
