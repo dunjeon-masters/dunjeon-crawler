@@ -98,6 +98,7 @@
   "Returns map of status effect in weapon-status-effects"
   (effect rj.cfg/status-effects))
 
+;;TODO move to status effects
 (defn add-effect
   [system e-this effect]
   "Add effect to e-this"
@@ -111,6 +112,7 @@
                                conj (assoc stat-map :e-from e-this))))
       system)))
 
+;;TODO move to status effects
 (defn remove-effects
   [system e-this]
   (rj.e/upd-c system e-this :attacker

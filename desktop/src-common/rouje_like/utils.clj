@@ -18,14 +18,16 @@
    :dune 0
    :open-door 1
    :health-potion 2
+   :magic-potion 2
    :equipment 2
-   :torch 2
-   :gold 2
-   :wall 3
-   :tree 3
-   :lichen 4
-   :bat 4
-   :skeleton 4
+   :torch 3
+   :gold 4
+   :wall 5
+   :tree 5
+   :lichen 6
+   :bat 7
+   :skeleton 8
+   :door 9
    :else 99
    :player 100})
 
@@ -236,25 +238,13 @@
                             (update-in c-wallet [:gold]
                                        (partial + value)))))
 
-(defn update-pos
-  [pos dir]
-  (let [k (first (keys dir))
-        v (k dir)]
-    (case k
-      :x (update-in pos [1] (fn [val] (+ val v)))
-      :y (update-in pos [2] (fn [val] (+ val v)))
-      :z (update-in pos [0] (fn [val] (+ val v))))))
-
 (defn inspectable?
   [entity]
   (let [type (:type entity)]
     (some #(= type %) rj.cfg/inspectables)))
 
 (defn entities-at-pos
-  [system [z x y]]
+  [level pos]
   "Return the entities of the tile at [Z X Y]."
-  (let [e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        level (nth (:levels c-world) z)
-        target-tile (get-in level [x y])]
+  (let [target-tile (get-in level pos nil)]
     (:entities target-tile)))

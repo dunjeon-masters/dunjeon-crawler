@@ -39,6 +39,8 @@
                        level
                        level-up-fn])
 
+(defrecord Fireball [])
+
 (defrecord Giant_amoeba [])
 
 (defrecord Gold [value])
@@ -55,7 +57,7 @@
 
 (defrecord Inspectable [msg])
 
-(defrecord Inventory [slot junk hp-potion])
+(defrecord Inventory [slot junk hp-potion mp-potion])
 
 (defrecord Item [pickup-fn])
 
@@ -65,6 +67,10 @@
 
 (defrecord Lichen [grow-chance%
                    max-blob-size])
+
+(defrecord Magic [mp
+                  max-mp
+                  spells])
 
 (defrecord Large_amoeba [])
 
@@ -195,23 +201,26 @@
             :counter          (type (->Counter nil))
             :destructible     (type (->Destructible nil nil nil nil nil nil nil))
             :digger           (type (->Digger nil nil))
+            :door             (type (->Door))
             :drake            (type (->Drake))
             :energy           (type (->Energy nil))
             :entity           (type (->Entity nil nil))
             :equipment        (type (->Equipment nil nil))
             :experience       (type (->Experience nil nil nil))
+            :fireball         (type (->Fireball))
             :gold             (type (->Gold nil))
             :giant_amoeba     (type (->Giant_amoeba))
             :hydra-head       (type (->HydraHead))
             :hydra-neck       (type (->HydraNeck))
             :hydra-tail       (type (->HydraTail))
             :hydra-rear       (type (->HydraRear))
-            :inventory        (type (->Inventory nil nil nil))
+            :inventory        (type (->Inventory nil nil nil nil))
             :inspectable      (type (->Inspectable nil))
             :item             (type (->Item nil))
             :killable         (type (->Killable nil))
             :large_amoeba     (type (->Large_amoeba))
             :lichen           (type (->Lichen nil nil))
+            :magic            (type (->Magic nil nil nil))
             :m-portal         (type (->MPortal nil nil nil))
             :merchant         (type (->Merchant))
             :mobile           (type (->Mobile nil nil))

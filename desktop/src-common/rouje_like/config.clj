@@ -4,7 +4,7 @@
 
 #_(use 'rouje-like.config :reload)
 
-(def block-size 27)                                         ;; To see start screen, revert to 36
+(def block-size 27) ;; To see start screen, revert to 36
 ;; ===== WORLD CONFIG =====
 (def padding-sizes {:top   3
                     :btm   2
@@ -38,7 +38,7 @@
   #{:temple-wall :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion :equipment :purchasable :merchant})
+  #{:torch :gold :health-potion :equipment :purchasable :merchant :magic-potion})
 
 (def <empty>
   (union <floors> <items>))
@@ -67,27 +67,42 @@
 ;; ===== PLAYER CONFIG =====
 (def player-stats
   {:max-hp 100
+   :max-mp 15
    :atk 4
    :def 1})
 
-(def class->stats {:rogue   {}
-                   :warrior {}
-                   :mage    {}})
+;; should we include defense?
+(def class->stats {:rogue   {:max-hp 2 :max-mp 2  :atk 1}
+                   :warrior {:max-hp 5 :max-mp -5 :atk 2}
+                   :mage    {:max-hp -5 :max-mp 5 :atk -2}})
 
-(def race->stats {:human {:max-hp 10  :atk 1}
-                  :orc   {:max-hp 20  :atk 2}
-                  :elf   {:max-hp -5  :atk 0}})
+(def race->stats {:human {:max-hp 10  :atk 1 :max-mp 0}
+                  :orc   {:max-hp 20  :atk 2 :max-mp -1}
+                  :elf   {:max-hp -5  :atk 0 :max-mp 3}})
 
 (def stat->comp {:max-hp :destructible
+                 :hp :destructible
                  :atk :attacker
-                 :def :destructible})
+                 :def :destructible
+                 :max-mp :magic
+                 :mp :magic})
 
+;; TODO add magic-atk
 (def stat->pointinc {:max-hp 5
                      :atk 1
-                     :def 1})
+                     :def 1
+                     :max-mp 2})
+
+(def spell->mp-cost {:fireball 3
+                     :powerattack 2
+                     :pickpocket 2})
+
+(def class->spell {:mage [:fireball]
+                   :rogue [:pickpocket]
+                   :warrior [:powerattack]})
 
 (def level-exp
-  {:exp 1})
+  {:exp 3})
 
 (def player-init-pos
   (let [x (/ (:width  world-sizes) 2)
@@ -148,8 +163,23 @@
                :duration 2
                :value    2}
    :fire      {:type     :fire
+               :duration 4
+               :value    1}
+   :fireball  {:type     :fire
                :duration 2
                :value    2}})
+
+(def spell-effects
+  {:fireball     {:type :fire
+                  :distance 3
+                  :value 3}
+   :powerattack {:type :powerattack
+                 :distance 1
+                 :value 2}                                     ;amount of additional damage dealt
+   :pickpocket {:type :pickpocket
+                :distance 1
+                :atk-reduction -2
+                :value 1}})                                 ;amount of gold stolen
 
 ;; ===== CREATURE CONFIG =====
 (def bat-stats
@@ -265,13 +295,14 @@
   [:arrow])
 
 (def potion-stats
-  {:health 5})
+  {:health 5 :magic 3})
 
 ;; ===== WORLD CONFIG =====
 (def init-wall% 45)
 (def init-torch% 2)
 (def init-gold% 5)
-(def init-health-potion% 2)
+(def init-health-potion% 1)
+(def init-magic-potion% 1)
 (def init-lichen% 1)
 (def init-bat% 1)
 (def init-equip% 1)

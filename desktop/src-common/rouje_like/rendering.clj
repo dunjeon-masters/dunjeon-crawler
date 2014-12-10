@@ -89,6 +89,7 @@
         junk (count (:junk c-inv))
         slot (rj.eq/equipment-name (or (:weapon (:slot c-inv)) (:armor (:slot c-inv))))
         hp-potions (:hp-potion c-inv)
+        mp-potions (:mp-potion c-inv)
 
         c-equip (rj.e/get-c-on-e system e-this :equipment)
         armor (rj.eq/equipment-name (:armor c-equip))
@@ -100,12 +101,17 @@
         c-energy (rj.e/get-c-on-e system e-this :energy)
         energy (:energy c-energy)
 
+        c-magic (rj.e/get-c-on-e system e-this :magic)
+        mp (:mp c-magic)
+        max-mp (:max-mp c-magic)
+
         renderer (new SpriteBatch)]
     (.begin renderer)
     (label! (label (str "Name: " player-name
                         " - Gold: [" gold "]"
                         " - Position: [" x "," y "," z "]"
                         " - HP: [" hp  "/" max-hp "]"
+                        " - MP: [" mp "/" max-mp "]"
                         " - Attack: [" attack "]"
                         " - Defense: [" def "]"
                         " - Race: [" race "]"
@@ -119,7 +125,8 @@
                         " - Slot: [" slot "]"
                         " - Armor: [" armor "]"
                         " - Weapon: [" weapon "]"
-                        " - HP-Potions: [" hp-potions "]")
+                        " - HP-Potions: [" hp-potions "]"
+                        " - MP-Potions: [" mp-potions "]")
 
                    (color :green)
                    :set-y (float (* (+ vheight
@@ -232,9 +239,9 @@
                 :color {:r 255 :g 140 :b 0 :a 255}
                 :tile-sheet grim-tile-sheet}
      :health-potion {:x 13 :y 10
-                    :width 12 :height 12
-                    :color {:r 255 :g 0 :b 0 :a 255}
-                    :tile-sheet grim-tile-sheet}
+                     :width 12 :height 12
+                     :color {:r 255 :g 0 :b 0 :a 255}
+                     :tile-sheet grim-tile-sheet}
      :snake    {:x 3 :y 7
                 :width 16 :height 16
                 :color {:r 1 :g 255 :b 1 :a 255}
@@ -243,62 +250,66 @@
                 :width 12 :height 12
                 :color {:r 255 :g 140 :b 1 :a 255}
                 :tile-sheet grim-tile-sheet}
-     :mimic    {:x 15 :y 8
+:mimic    {:x 15 :y 8
+           :width 12 :height 12
+           :color {:r 255 :g 241 :b 36 :a 255}
+           :tile-sheet grim-tile-sheet}
+:hidden-mimic {:x 1 :y 9
+               :width 12 :height 12
+               :color {:r 128 :g 255 :b 1 :a 255}
+               :tile-sheet grim-tile-sheet}
+:spider   {:x 14 :y 9
+           :width 16 :height 16
+           :color {:r 183 :g 21 :b 3 :a 255}
+           :tile-sheet darkond-tile-sheet}
+:slime   {:x 7 :y 15
+          :width 16 :height 16
+          :color {:r 72 :g 223 :b 7 :a 125}
+          :tile-sheet darkond-tile-sheet}
+:drake   {:x 13 :y 0
+          :width 16 :height 16
+          :color {:r 222 :g 5 :b 48 :a 255}
+          :tile-sheet darkond-tile-sheet}
+:necromancer   {:x 10 :y 14
                 :width 12 :height 12
-                :color {:r 255 :g 241 :b 36 :a 255}
+                :color {:r 116 :g 84 :b 141 :a 255}
                 :tile-sheet grim-tile-sheet}
-     :hidden-mimic {:x 1 :y 9
-                    :width 12 :height 12
-                    :color {:r 128 :g 255 :b 1 :a 255}
-                    :tile-sheet grim-tile-sheet}
-     :spider   {:x 14 :y 9
-                :width 16 :height 16
-                :color {:r 183 :g 21 :b 3 :a 255}
-                :tile-sheet darkond-tile-sheet}
-     :slime   {:x 7 :y 15
-               :width 16 :height 16
-               :color {:r 72 :g 223 :b 7 :a 125}
-               :tile-sheet darkond-tile-sheet}
-     :drake   {:x 13 :y 0
-               :width 16 :height 16
-               :color {:r 222 :g 5 :b 48 :a 255}
-               :tile-sheet darkond-tile-sheet}
-     :necromancer   {:x 10 :y 14
-                     :width 12 :height 12
-                     :color {:r 116 :g 84 :b 141 :a 255}
-                     :tile-sheet grim-tile-sheet}
-     :colossal_amoeba  {:x 7 :y 12
-                        :width 16 :height 16
-                        :color {:r 111 :g 246 :b 255 :a 125}
-                        :tile-sheet darkond-tile-sheet}
-     :giant_amoeba  {:x 7 :y 12
-                     :width 16 :height 16
-                     :color {:r 111 :g 246 :b 255 :a 125}
-                     :tile-sheet darkond-tile-sheet}
-     :large_amoeba  {:x 7 :y 12
-                     :width 16 :height 16
-                     :color {:r 175 :g 251 :b 255 :a 125}
-                     :tile-sheet darkond-tile-sheet}
-     :willowisp  {:x 10 :y 2
-                     :width 20 :height 20
-                     :color {:r 210 :g 138 :b 181 :a 125}
-                     :tile-sheet bisasam-tile-sheet}
-     :hydra-head  {:x 6 :y 2
-                     :width 16 :height 16
-                     :color {:r 40 :g 156 :b 23 :a 255}
-                     :tile-sheet darkond-tile-sheet}
-     :hydra-neck  {:x 12 :y 1                               ;;Alt: 14,7
-                     :width 16 :height 16
-                     :color {:r 40 :g 156 :b 23 :a 255}
-                     :tile-sheet darkond-tile-sheet}
-     :hydra-tail  {:x 12 :y 1
-                     :width 16 :height 16
-                     :color {:r 40 :g 156 :b 23 :a 255}
-                     :tile-sheet darkond-tile-sheet}
-     :hydra-rear  {:x 12 :y 1
+:colossal_amoeba  {:x 7 :y 12
                    :width 16 :height 16
-                   :color {:r 40 :g 156 :b 23 :a 255}
-                   :tile-sheet darkond-tile-sheet}}))
+                   :color {:r 111 :g 246 :b 255 :a 125}
+                   :tile-sheet darkond-tile-sheet}
+:giant_amoeba  {:x 7 :y 12
+                :width 16 :height 16
+                :color {:r 111 :g 246 :b 255 :a 125}
+                :tile-sheet darkond-tile-sheet}
+:large_amoeba  {:x 7 :y 12
+                :width 16 :height 16
+                :color {:r 175 :g 251 :b 255 :a 125}
+                :tile-sheet darkond-tile-sheet}
+:willowisp  {:x 10 :y 2
+             :width 20 :height 20
+             :color {:r 210 :g 138 :b 181 :a 125}
+             :tile-sheet bisasam-tile-sheet}
+:hydra-head  {:x 6 :y 2
+              :width 16 :height 16
+              :color {:r 40 :g 156 :b 23 :a 255}
+              :tile-sheet darkond-tile-sheet}
+:hydra-neck  {:x 12 :y 1 ;;Alt: 14,7
+              :width 16 :height 16
+              :color {:r 40 :g 156 :b 23 :a 255}
+              :tile-sheet darkond-tile-sheet}
+:hydra-tail  {:x 12 :y 1
+              :width 16 :height 16
+              :color {:r 40 :g 156 :b 23 :a 255}
+              :tile-sheet darkond-tile-sheet}
+:hydra-rear  {:x 12 :y 1
+              :width 16 :height 16
+              :color {:r 40 :g 156 :b 23 :a 255}
+              :tile-sheet darkond-tile-sheet}
+:magic-potion {:x 13 :y 10
+               :width 12 :height 12
+               :color {:r 0 :g 0 :b 255 :a 255}
+               :tile-sheet grim-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize

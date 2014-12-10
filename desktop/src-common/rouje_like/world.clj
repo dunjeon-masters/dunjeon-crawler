@@ -277,6 +277,12 @@
                  (* (/ rj.cfg/init-health-potion% 100)
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
+      (as-> system
+            (do (println "core::add-magic-potion " (not (nil? system))) system)
+            (nth (iterate rj.items/add-magic-potion {:system system :z z})
+                 (* (/ rj.cfg/init-magic-potion% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
 
       ;; Spawn equipment
       (as-> system
@@ -290,103 +296,103 @@
   [system z theme]
   (case theme
     :desert (as-> system system
-                  ;; Spawn Will-o-Wisps
-                  (do (println "core::add-willowisp " (not (nil? system))) system)
-                  (nth (iterate rj.ww/add-willowisp {:system system :z z})
-                       (* (max 0 (min 0.05 (/ (+ rj.cfg/init-willowisp% (* 0.2 (- z rj.cfg/init-willowisp-floor))) 100)))
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  ;; Spawn Snakes
-                  (do (println "core::add-snake " (not (nil? system))) system)
-                  (nth (iterate rj.snk/add-snake {:system system :z z})
-                       (* (max 0 (min 0.05 (/ (+ rj.cfg/init-snake% (* 0.2 (- z rj.cfg/init-snake-floor))) 100)))
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  ;;Spawn Necromancer
-                  (do (println "core::add-necro " (not (nil? system))) system)
-                  (nth (iterate rj.ne/add-necro {:system system :z z})
-                       (* (max 0 (min 0.05 (/ (+ rj.cfg/init-necro% (* 0.2 (- z rj.cfg/init-necro-floor))) 100)))
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  )
+              ;; Spawn Will-o-Wisps
+              (do (println "core::add-willowisp " (not (nil? system))) system)
+              (nth (iterate rj.ww/add-willowisp {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-willowisp% (* 0.2 (- z rj.cfg/init-willowisp-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              ;; Spawn Snakes
+              (do (println "core::add-snake " (not (nil? system))) system)
+              (nth (iterate rj.snk/add-snake {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-snake% (* 0.2 (- z rj.cfg/init-snake-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              ;;Spawn Necromancer
+              (do (println "core::add-necro " (not (nil? system))) system)
+              (nth (iterate rj.ne/add-necro {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-necro% (* 0.2 (- z rj.cfg/init-necro-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              )
     :hydrarena (as-> system system
-                     ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
-                     (do (println "core::add-hydra-head " (not (nil? system))) system)
-                     (:system (rj.hh/add-hydra-head {:system system :z z}))
-                     ;;Spawn Hydra Neck
-                     (do (println "core::add-hydra-neck " (not (nil? system))) system)
-                     (:system (rj.hn/add-hydra-neck {:system system :z z}))
-                     ;;Spawn Hydra Tail
-                     (do (println "core::add-hydra-tail " (not (nil? system))) system)
-                     (:system (rj.ht/add-hydra-tail {:system system :z z}))
-                     ;;Spawn Hydra Rear
-                     (do (println "core::add-hydra-rear " (not (nil? system))) system)
-                     (:system (rj.hr/add-hydra-rear {:system system :z z})))
+                 ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
+                 (do (println "core::add-hydra-head " (not (nil? system))) system)
+                 (:system (rj.hh/add-hydra-head {:system system :z z}))
+                 ;;Spawn Hydra Neck
+                 (do (println "core::add-hydra-neck " (not (nil? system))) system)
+                 (:system (rj.hn/add-hydra-neck {:system system :z z}))
+                 ;;Spawn Hydra Tail
+                 (do (println "core::add-hydra-tail " (not (nil? system))) system)
+                 (:system (rj.ht/add-hydra-tail {:system system :z z}))
+                 ;;Spawn Hydra Rear
+                 (do (println "core::add-hydra-rear " (not (nil? system))) system)
+                 (:system (rj.hr/add-hydra-rear {:system system :z z})))
     :amoebarena (as-> system system
-                      ;; Spawn Colossal Amoeba
-                      (do (println "core::add-colossal_amoeba " (not (nil? system))) system)
-                      (nth (iterate rj.ca/add-colossal_amoeba {:system system :z z})
-                           (* (/ rj.cfg/init-boss% 100)
-                              (apply * (vals rj.cfg/world-sizes))))
-                      (:system system))
+                  ;; Spawn Colossal Amoeba
+                  (do (println "core::add-colossal_amoeba " (not (nil? system))) system)
+                  (nth (iterate rj.ca/add-colossal_amoeba {:system system :z z})
+                       (* (/ rj.cfg/init-boss% 100)
+                          (apply * (vals rj.cfg/world-sizes))))
+                  (:system system))
     :forest (as-> system system
-                  ;; Spawn Trolls
-                  (do (println "core::add-troll " (not (nil? system))) system)
-                  (nth (iterate rj.tr/add-troll {:system system :z z})
-                       (* (max 0 (min 0.05 (/ (+ rj.cfg/init-troll% (* 0.2 (- z rj.cfg/init-troll-floor))) 100)))
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  ;; Spawn Spider
-                  (do (println "core::add-spider " (not (nil? system))) system)
-                  (nth (iterate rj.sp/add-spider {:system system :z z})
-                       (* (max 0 (min 0.05 (/ (+ rj.cfg/init-spider% (* 0.2 (- z rj.cfg/init-spider-floor))) 100)))
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  ;; Spawn Giant Amoeba
-                  (do (println "core::add-giant_amoeba " (not (nil? system))) system)
-                  (nth (iterate rj.ga/add-giant_amoeba {:system system :z z})
-                       (* (max 0 (min 0.05 (/ (+ rj.cfg/init-giant_amoeba% (* 0.2 (- z rj.cfg/init-giant_amoeba-floor))) 100)))
-                          (apply * (vals rj.cfg/world-sizes))))
-                  (:system system)
-                  )
+              ;; Spawn Trolls
+              (do (println "core::add-troll " (not (nil? system))) system)
+              (nth (iterate rj.tr/add-troll {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-troll% (* 0.2 (- z rj.cfg/init-troll-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              ;; Spawn Spider
+              (do (println "core::add-spider " (not (nil? system))) system)
+              (nth (iterate rj.sp/add-spider {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-spider% (* 0.2 (- z rj.cfg/init-spider-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              ;; Spawn Giant Amoeba
+              (do (println "core::add-giant_amoeba " (not (nil? system))) system)
+              (nth (iterate rj.ga/add-giant_amoeba {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-giant_amoeba% (* 0.2 (- z rj.cfg/init-giant_amoeba-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              )
     :maze (as-> system system
-                ;; Spawn Slimes
-                (do (println "core::add-slime " (not (nil? system))) system)
-                (nth (iterate rj.sl/add-slime {:system system :z z})
-                     (* (max 0 (min 0.05 (/ (+ rj.cfg/init-slime% (* 0.2 (- z rj.cfg/init-slime-floor))) 100)))
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system)
-                ;; Spawn Skeleton
-                (do (println "core::add-skeleton " (not (nil? system))) system)
-                (nth (iterate rj.sk/add-skeleton {:system system :z z})
-                     (* (max 0 (min 0.05 (/ (+ rj.cfg/init-skeleton% (* 0.2 (- z rj.cfg/init-skeleton-floor))) 100)))
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system)
-                ;; Spawn Mimics
-                (do (println "core::add-mimic " (not (nil? system))) system)
-                (nth (iterate rj.mi/add-mimic {:system system :z z})
-                     (* (max 0 (min 0.05 (/ (+ rj.cfg/init-mimic% (* 0.2 (- z rj.cfg/init-mimic-floor))) 100)))
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system))
+            ;; Spawn Slimes
+            (do (println "core::add-slime " (not (nil? system))) system)
+            (nth (iterate rj.sl/add-slime {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ rj.cfg/init-slime% (* 0.2 (- z rj.cfg/init-slime-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            ;; Spawn Skeleton
+            (do (println "core::add-skeleton " (not (nil? system))) system)
+            (nth (iterate rj.sk/add-skeleton {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ rj.cfg/init-skeleton% (* 0.2 (- z rj.cfg/init-skeleton-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            ;; Spawn Mimics
+            (do (println "core::add-mimic " (not (nil? system))) system)
+            (nth (iterate rj.mi/add-mimic {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ rj.cfg/init-mimic% (* 0.2 (- z rj.cfg/init-mimic-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
     :cave (as-> system system
-                ;; Spawn Lichen
-                (do (println "core::add-lichen " (not (nil? system))) system)
-                (nth (iterate rj.lc/add-lichen {:system system :z z})
-                     (* (/ rj.cfg/init-lichen% 100)
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system)
-                ;; Spawn Bats
-                (do (println "core::add-bat " (not (nil? system))) system)
-                (nth (iterate rj.bt/add-bat {:system system :z z})
-                     (* (/ rj.cfg/init-bat% 100)
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system)
-                ;; Spawn Drakes
-                (do (println "core::add-drake " (not (nil? system))) system)
-                (nth (iterate rj.dr/add-drake {:system system :z z})
-                     (* (max 0 (min 0.05 (/ (+ rj.cfg/init-drake% (* 0.2 (- z rj.cfg/init-drake-floor))) 100)))
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system))
+            ;; Spawn Lichen
+            (do (println "core::add-lichen " (not (nil? system))) system)
+            (nth (iterate rj.lc/add-lichen {:system system :z z})
+                 (* (/ rj.cfg/init-lichen% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            ;; Spawn Bats
+            (do (println "core::add-bat " (not (nil? system))) system)
+            (nth (iterate rj.bt/add-bat {:system system :z z})
+                 (* (/ rj.cfg/init-bat% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            ;; Spawn Drakes
+            (do (println "core::add-drake " (not (nil? system))) system)
+            (nth (iterate rj.dr/add-drake {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ rj.cfg/init-drake% (* 0.2 (- z rj.cfg/init-drake-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
     system))
 
 (defn- add-portal

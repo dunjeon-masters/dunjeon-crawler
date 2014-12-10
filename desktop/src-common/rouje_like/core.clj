@@ -170,6 +170,13 @@
         (cmdl-action)))
     entities))
 
+(set-screen-wrapper! (fn [screen screen-fn]
+                       (try (screen-fn)
+                            (catch Exception e
+                              (.printStackTrace e)
+                              (reset! sys {})
+                              (set-screen! rouje-like screen)))))
+
 (defgame rouje-like
   :on-create
   (fn [this]

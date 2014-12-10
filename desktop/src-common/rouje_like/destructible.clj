@@ -1,12 +1,13 @@
 (ns rouje-like.destructible
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :refer [can-attack? attack]]
-            [rouje-like.utils :as rj.u]
+            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.messaging :as rj.msg]
             [clojure.set :refer [intersection difference]]))
 
 (defn add-effects
   [system e-this e-from]
+  "Adds applicable status effects from e-from to e-this."
   (let  [c-attacker (rj.e/get-c-on-e system e-from :attacker)
          attacker-effects (:status-effects c-attacker)
          c-destructible (rj.e/get-c-on-e system e-this :destructible)
@@ -22,7 +23,9 @@
          status->value (fn [status]
                          (* (:value status)
                             (:duration status)))]
-    (as-> (if-let [intersection (seq (vec (status-intersection attacker-effects status)))]
+    (as->
+      ;; Add/keep the better status effect
+      (if-let [intersection (seq (vec (status-intersection attacker-effects status)))]
             (reduce (fn [system status]
                       (rj.e/upd-c system e-this :destructible
                                   (fn [c-destructible]
@@ -38,6 +41,7 @@
                                                            status-effects)))))))
                     system intersection)
             system) system
+          ;; Add status effects that e-this does not have
           (if-let [diff (seq (vec (status-difference attacker-effects status)))]
             (rj.e/upd-c system e-this :destructible
                         (fn [c-destructible]
@@ -49,6 +53,8 @@
 
 (defn apply-effects
   [system e-this]
+  "Applies status effects from e-this's destructible status-effects to e-this"
+  (not (nil? system))
   (let [c-destructible (rj.e/get-c-on-e system e-this :destructible)
         statuses (:status-effects c-destructible)
         dec-status-effects (fn [status-effects]

@@ -103,20 +103,38 @@
         valid-class? (into #{} (keys rj.cfg/class->stats))
         player-class (if (valid-class? (keyword c))
                        (keyword c) (rand-nth (keys rj.cfg/class->stats)))
+        _ (? player-class)
 
         valid-race? (into #{} (keys rj.cfg/race->stats))
         player-race (if (valid-race? (keyword r))
                       (keyword r) (rand-nth (keys rj.cfg/race->stats)))
 
         max-hp (+ (:max-hp rj.cfg/player-stats)
-                  (:max-hp (rj.cfg/race->stats player-race)))]
+                  (:max-hp (rj.cfg/race->stats player-race))
+                  (:max-hp (rj.cfg/class->stats player-class)))
+
+        max-mp (+ (:max-mp rj.cfg/player-stats)
+                  (:max-mp (rj.cfg/race->stats player-race))
+                  (:max-mp (rj.cfg/class->stats player-class)))
+
+        cfg-mage-spells (rj.cfg/class->spell :mage)
+        spell (rand-nth cfg-mage-spells)
+        cfg-spell-effect (rj.cfg/spell-effects spell)
+        spell (if (= player-class :mage)
+                (conj [] {:name spell
+                          :distance (:distance cfg-spell-effect)
+                          :value (:value cfg-spell-effect)
+                          :type (:type cfg-spell-effect)
+                          :atk-reduction (:atk-reduction cfg-spell-effect)})
+                [])]
+
     (rj.e/system<<components
       system e-player
       [[:player {:name n
                  :show-world? false}]
        [:klass {:class player-class}]
        [:race {:race player-race}]
-       [:experience {:experience 0
+       [:experience {:experience 1
                      :level 1
                      :level-up-fn rj.exp/level-up}]
        [:position {:x x-pos
@@ -125,14 +143,15 @@
                    :type :player}]
        [:equipment {:weapon nil
                     :armor nil}]
-       [:inventory {:slot nil :junk [] :hp-potion 0}]
+       [:inventory {:slot nil :junk [] :hp-potion 0 :mp-potion 0}]
        [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]
        [:digger {:can-dig?-fn can-dig?
                  :dig-fn      dig}]
        [:attacker {:atk              (+ (:atk rj.cfg/player-stats)
-                                        (:atk (rj.cfg/race->stats player-race)))
+                                        (:atk (rj.cfg/race->stats player-race))
+                                        (:atk (rj.cfg/class->stats player-class)))
                    :status-effects   []
                    :can-attack?-fn   rj.atk/can-attack?
                    :attack-fn        rj.atk/attack
@@ -151,6 +170,9 @@
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage
                        :status-effects []}]
+       [:magic {:max-mp max-mp
+                :mp max-mp
+                :spells spell}]
        [:broadcaster {:name-fn (constantly n)}]])))
 
 (defn add-player
@@ -162,4 +184,3 @@
                             (vec (conj (filter #(rj.cfg/<floors> (:type %)) entities)
                                        (rj.c/map->Entity {:id   e-player
                                                           :type :player})))))))
-
