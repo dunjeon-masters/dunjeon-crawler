@@ -2,6 +2,7 @@
   (:use midje.sweet)
   (:require [rouje-like.core :as rj.core]
             [brute.entity :as br.e]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :refer :all]
             [rouje-like.components :as rj.c :refer [->3DPoint]]
             [rouje-like.world :as rj.w]))
@@ -127,6 +128,6 @@
                  c-position (rj.e/get-c-on-e system e-player :position)
                  this-pos (->3DPoint c-position)]
              (and (#{:reyalp} (:type c-position))
-                 (seq
-                   (filter #(= :reyalp (:type %))
-                           (entities-at-pos system this-pos)))))))
+                  (seq
+                    (filter #(= :reyalp (:type %))
+                            (entities-at-pos system this-pos)))))))
