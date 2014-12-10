@@ -16,11 +16,11 @@
             [rouje-like.merchant :as rj.merch]
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
-            [rouje-like.giant_amoeba :as rj.ga]
+            [rouje-like.colossal_amoeba :as rj.ca]
             [rouje-like.hydra-head :as rj.hh]
             [rouje-like.hydra-neck :as rj.hn]
             [rouje-like.hydra-tail :as rj.ht]
-            [rouje-like.large_amoeba :as rj.la]
+            [rouje-like.giant_amoeba :as rj.ga]
             [rouje-like.drake :as rj.dr]
             [rouje-like.necromancer :as rj.ne]
             [rouje-like.skeleton :as rj.sk]
@@ -247,22 +247,30 @@
                 ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
                 (do (println "core::add-hydra-head " (not (nil? system))) system)
                 (nth (iterate rj.hh/add-hydra-head {:system system :z z})
-                     (* (/ rj.cfg/init-hydra% 100)
+                     (* (/ rj.cfg/init-boss% 100)
                         (apply * (vals rj.cfg/world-sizes))))
                 (:system system)
                 ;;Spawn Hydra Neck
                 (do (println "core::add-hydra-neck " (not (nil? system))) system)
                 (nth (iterate rj.hn/add-hydra-neck {:system system :z z})
-                     (* (/ rj.cfg/init-hydra% 100)
+                     (* (/ rj.cfg/init-boss% 100)
                         (apply * (vals rj.cfg/world-sizes))))
                 (:system system)
                 ;;Spawn Hydra Tail
                 (do (println "core::add-hydra-tail " (not (nil? system))) system)
                 (nth (iterate rj.ht/add-hydra-tail {:system system :z z})
-                     (* (/ rj.cfg/init-hydra% 100)
+                     (* (/ rj.cfg/init-boss% 100)
                         (apply * (vals rj.cfg/world-sizes))))
                 (:system system)
                 )
+    :amoebarena (as-> system system
+                      ;; Spawn Colossal Amoeba
+                      (do (println "core::add-colossal_amoeba " (not (nil? system))) system)
+                      (nth (iterate rj.ca/add-colossal_amoeba {:system system :z z})
+                           (* (/ rj.cfg/init-boss% 100)
+                              (apply * (vals rj.cfg/world-sizes))))
+                      (:system system)
+                      )
     :forest (as-> system system
                   ;; Spawn Trolls
                   (do (println "core::add-troll " (not (nil? system))) system)
@@ -276,7 +284,7 @@
                        (* (max 0 (min 0.05 (/ (+ rj.cfg/init-spider% (* 0.2 (- z rj.cfg/init-spider-floor))) 100)))
                           (apply * (vals rj.cfg/world-sizes))))
                   (:system system)
-                  ;; Giant Amoeba (NOTE: LARGE AMOEBA IMPLEMENTATION STILL NEEDED)
+                  ;; Spawn Giant Amoeba
                   (do (println "core::add-giant_amoeba " (not (nil? system))) system)
                   (nth (iterate rj.ga/add-giant_amoeba {:system system :z z})
                        (* (max 0 (min 0.05 (/ (+ rj.cfg/init-giant_amoeba% (* 0.2 (- z rj.cfg/init-giant_amoeba-floor))) 100)))
@@ -458,7 +466,7 @@
 (defn generate-random-level
   ([level-sizes z]
    (if (? (= (mod z 5) 0))
-     (let [world-types [:hmaze]                             ;;Array of boss floors
+     (let [world-types [:hmaze :amoebarena]                             ;;Array of boss floors
            world-type (rand-nth world-types)]
        {:type world-type
         :level (generate-random-level level-sizes z world-type)})
@@ -547,6 +555,12 @@
                                                                                  :type :maze-wall})]})))))]
              ;; CREATE HMAZE
              (generate-maze level [width height]))
+     :amoebarena (vec (map vec
+                       (for [x (range width)]
+                         (for [y (range height)]
+                           (rj.c/map->Tile {:x x :y y :z z
+                                            :entities [(rj.c/map->Entity {:id   nil
+                                                                          :type :dune})]})))))
 
      )))
 

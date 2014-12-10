@@ -184,11 +184,21 @@
    :atk 4
    :exp 5})
 
+(def colossal_amoeba-stats
+  {:hp 6
+   :def 1
+   :atk 3
+   :exp 0})
+
+(def colossal_amoeba-split-rate 3)
+
 (def giant_amoeba-stats
   {:hp 4
    :def 1
    :atk 2
    :exp 0})
+
+(def giant_amoeba-split-rate 2)
 
 (def large_amoeba-stats
   {:hp 2
@@ -241,9 +251,10 @@
 (def init-slime% 0.1)
 (def init-drake% 0.01)
 (def init-necro% 0.1)
-(def init-giant_amoeba% 1)                                  ;;0.1
+(def init-colossal_amoeba% 1)
+(def init-giant_amoeba% 0.1)
 (def init-willowisp% 0.1)
-(def init-hydra% 0.3)
+(def init-boss% 0.3)
 
 ;; Starting floor for certain monsters to spawn on
 (def init-skeleton-floor 2)
@@ -254,7 +265,7 @@
 (def init-slime-floor 3)
 (def init-drake-floor 8)
 (def init-necro-floor 6)
-(def init-giant_amoeba-floor 1)                             ;;5
+(def init-giant_amoeba-floor 5)
 (def init-willowisp-floor 3)
 
 ;; MERCHANT CONFIG
