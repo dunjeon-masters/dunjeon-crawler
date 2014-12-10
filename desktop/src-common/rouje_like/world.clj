@@ -310,39 +310,25 @@
                   (:system system)
                   )
     :hydrarena (as-> system system
-                ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
-                (do (println "core::add-hydra-head " (not (nil? system))) system)
-                (nth (iterate rj.hh/add-hydra-head {:system system :z z})
-                     (* (/ rj.cfg/init-boss% 100)
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system)
-                ;;Spawn Hydra Neck
-                (do (println "core::add-hydra-neck " (not (nil? system))) system)
-                (nth (iterate rj.hn/add-hydra-neck {:system system :z z})
-                     (* (/ rj.cfg/init-boss% 100)
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system)
-                ;;Spawn Hydra Tail
-                (do (println "core::add-hydra-tail " (not (nil? system))) system)
-                (nth (iterate rj.ht/add-hydra-tail {:system system :z z})
-                     (* (/ rj.cfg/init-boss% 100)
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system)
-                ;;Spawn Hydra Rear
-                (do (println "core::add-hydra-rear " (not (nil? system))) system)
-                (nth (iterate rj.hr/add-hydra-rear {:system system :z z})
-                     (* (/ rj.cfg/init-boss% 100)
-                        (apply * (vals rj.cfg/world-sizes))))
-                (:system system)
-                )
+                     ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
+                     (do (println "core::add-hydra-head " (not (nil? system))) system)
+                     (:system (rj.hh/add-hydra-head {:system system :z z}))
+                     ;;Spawn Hydra Neck
+                     (do (println "core::add-hydra-neck " (not (nil? system))) system)
+                     (:system (rj.hn/add-hydra-neck {:system system :z z}))
+                     ;;Spawn Hydra Tail
+                     (do (println "core::add-hydra-tail " (not (nil? system))) system)
+                     (:system (rj.ht/add-hydra-tail {:system system :z z}))
+                     ;;Spawn Hydra Rear
+                     (do (println "core::add-hydra-rear " (not (nil? system))) system)
+                     (:system (rj.hr/add-hydra-rear {:system system :z z})))
     :amoebarena (as-> system system
                       ;; Spawn Colossal Amoeba
                       (do (println "core::add-colossal_amoeba " (not (nil? system))) system)
                       (nth (iterate rj.ca/add-colossal_amoeba {:system system :z z})
                            (* (/ rj.cfg/init-boss% 100)
                               (apply * (vals rj.cfg/world-sizes))))
-                      (:system system)
-                      )
+                      (:system system))
     :forest (as-> system system
                   ;; Spawn Trolls
                   (do (println "core::add-troll " (not (nil? system))) system)
