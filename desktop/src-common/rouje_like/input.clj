@@ -12,9 +12,11 @@
             [rouje-like.items :as rj.item]
             [rouje-like.destructible :as rj.d]
             [rouje-like.config :as rj.cfg]
+            [rouje-like.save-game :as rj.save]
+            [rouje-like.magic :as rj.mag]
+
             [clojure.string :as s]
-            [brute.entity]
-            [rouje-like.magic :as rj.mag]))
+            [brute.entity]))
 
 #_(in-ns 'rouje-like.input)
 #_(use 'rouje-like.input :reload)
@@ -63,7 +65,11 @@
                                  (rj.e/upd-c system e-player :class
                                              (fn [c-class]
                                                (assoc c-class :class
-                                                      (keyword c))))))}
+                                                      (keyword c))))))
+                     "save"  (fn [system save-name]
+                               (rj.save/save-game system save-name))
+                     "load"  (fn [system save-name]
+                               (rj.save/load-game system save-name))}
         cmd&arg (first (partition 2 (s/split cmds #" ")))
         action (cmd->action (first cmd&arg) (fn [s _] identity s))
         arg (second cmd&arg)]
@@ -160,9 +166,9 @@
              (let [e-player (first (rj.e/all-e-with-c system :player))
                    c-magic (rj.e/get-c-on-e system e-player :magic)
                    spells (:spells c-magic)
-                   fireball (? (first (filter #(= (:name %) :fireball) spells)))
-                   powerattack (? (first (filter #(= (:name %) :powerattack) spells)))
-                   pickpocket (? (first (filter #(= (:name %) :pickpocket) spells)))
+                   fireball (first (filter #(= (:name %) :fireball) spells))
+                   powerattack (first (filter #(= (:name %) :powerattack) spells))
+                   pickpocket (first (filter #(= (:name %) :pickpocket) spells))
                    mp (:mp c-magic)]
                (reset-input-manager)
                (cond

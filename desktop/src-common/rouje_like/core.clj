@@ -12,7 +12,6 @@
 
             [clojure.string :as s]
 
-            [rouje-like.components :as rj.c]
             [rouje-like.destructible :as rj.d]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.rendering :as rj.r]
@@ -181,4 +180,3 @@
   :on-create
   (fn [this]
     (set-screen! this main-menu-screen)))
-

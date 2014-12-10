@@ -137,7 +137,7 @@
         potion-count (:mp-potion c-inv)]
     (if (> potion-count 0)
       (as-> system system
-            (if (> max-mp (+ mp mp-potion-val))
+            (if (> (? max-mp) (+ (? mp) (? mp-potion-val)))
               (rj.e/upd-c system e-by :magic
                           (fn [c-magic]
                             (update-in c-magic [:mp]
