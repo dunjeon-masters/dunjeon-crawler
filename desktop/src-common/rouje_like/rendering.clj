@@ -270,7 +270,11 @@
      :hydra-tail  {:x 12 :y 1
                      :width 16 :height 16
                      :color {:r 40 :g 156 :b 23 :a 255}
-                     :tile-sheet darkond-tile-sheet}}))
+                     :tile-sheet darkond-tile-sheet}
+     :hydra-rear  {:x 12 :y 1
+                   :width 16 :height 16
+                   :color {:r 40 :g 156 :b 23 :a 255}
+                   :tile-sheet darkond-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize

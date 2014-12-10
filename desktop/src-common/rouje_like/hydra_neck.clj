@@ -25,7 +25,7 @@
          e-head (first (rj.e/all-e-with-c system :hydra-head))
          c-head-pos (rj.e/get-c-on-e system e-head :position)
          head-pos [(:x c-head-pos) (:y c-head-pos)]
-         head-neighbors (rj.u/get-neighbors-of-type world head-pos [:floor :maze-wall])
+         head-neighbors (rj.u/get-neighbors-of-type world head-pos [:dune])
          n-pos (first head-neighbors)
 
          get-head-tile (fn [world]

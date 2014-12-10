@@ -20,6 +20,7 @@
             [rouje-like.hydra-head :as rj.hh]
             [rouje-like.hydra-neck :as rj.hn]
             [rouje-like.hydra-tail :as rj.ht]
+            [rouje-like.hydra-rear :as rj.hr]
             [rouje-like.giant_amoeba :as rj.ga]
             [rouje-like.drake :as rj.dr]
             [rouje-like.necromancer :as rj.ne]
@@ -243,7 +244,7 @@
                           (apply * (vals rj.cfg/world-sizes))))
                   (:system system)
                   )
-    :hmaze (as-> system system
+    :hydrarena (as-> system system
                 ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
                 (do (println "core::add-hydra-head " (not (nil? system))) system)
                 (nth (iterate rj.hh/add-hydra-head {:system system :z z})
@@ -259,6 +260,12 @@
                 ;;Spawn Hydra Tail
                 (do (println "core::add-hydra-tail " (not (nil? system))) system)
                 (nth (iterate rj.ht/add-hydra-tail {:system system :z z})
+                     (* (/ rj.cfg/init-boss% 100)
+                        (apply * (vals rj.cfg/world-sizes))))
+                (:system system)
+                ;;Spawn Hydra Rear
+                (do (println "core::add-hydra-rear " (not (nil? system))) system)
+                (nth (iterate rj.hr/add-hydra-rear {:system system :z z})
                      (* (/ rj.cfg/init-boss% 100)
                         (apply * (vals rj.cfg/world-sizes))))
                 (:system system)
@@ -465,8 +472,8 @@
 
 (defn generate-random-level
   ([level-sizes z]
-   (if (? (= (mod z 5) 0))
-     (let [world-types [:hmaze :amoebarena]                             ;;Array of boss floors
+   (if (= (mod z 5) 0)
+     (let [world-types [:hydrarena :amoebarena]                             ;;Array of boss floors
            world-type (rand-nth world-types)]
        {:type world-type
         :level (generate-random-level level-sizes z world-type)})
@@ -544,17 +551,12 @@
              ;; CREATE MAZE
              (generate-maze level [width height]))
 
-     :hmaze (let [level (vec
-                         (map vec
-                              (for [x (range width)]
-                                (for [y (range height)]
-                                  (rj.c/map->Tile {:x x :y y :z z
-                                                   :entities [(rj.c/map->Entity {:id nil
-                                                                                 :type :floor})
-                                                              (rj.c/map->Entity {:id   (br.e/create-entity)
-                                                                                 :type :maze-wall})]})))))]
-             ;; CREATE HMAZE
-             (generate-maze level [width height]))
+     :hydrarena (vec (map vec
+                      (for [x (range width)]
+                        (for [y (range height)]
+                          (rj.c/map->Tile {:x x :y y :z z
+                                           :entities [(rj.c/map->Entity {:id   nil
+                                                                         :type :dune})]})))))
      :amoebarena (vec (map vec
                        (for [x (range width)]
                          (for [y (range height)]

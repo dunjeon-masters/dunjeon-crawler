@@ -1,4 +1,4 @@
-(ns rouje-like.hydra-tail
+(ns rouje-like.hydra-rear
   (:require [brute.entity :as br.e]
 
             [rouje-like.entity-wrapper :as rj.e]
@@ -16,13 +16,13 @@
 
 (declare process-input-tick)
 
-(defn add-hydra-tail
+(defn add-hydra-rear
   ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
          levels (:levels c-world)
          world (nth levels z)
-         e-neck (first (rj.e/all-e-with-c system :hydra-neck))
+         e-neck (first (rj.e/all-e-with-c system :hydra-tail))
          c-neck-pos (rj.e/get-c-on-e system e-neck :position)
          neck-pos [(:x c-neck-pos) (:y c-neck-pos)]
          neck-neighbors (rj.u/get-neighbors-of-type world neck-pos [:dune])
@@ -32,42 +32,42 @@
                          (get-in world [(:x n-pos)
                                         (:y n-pos)]))]
      (loop [target-tile (get-neck-tile world)]
-       (add-hydra-tail system target-tile))))
+       (add-hydra-rear system target-tile))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-hydra-tail (br.e/create-entity)
-         hp (:hp rj.cfg/hydra-tail-stats)
+         e-hydra-rear (br.e/create-entity)
+         hp (:hp rj.cfg/hydra-rear-stats)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
                                             (remove #( rj.cfg/<walls> (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-hydra-tail
-                                                               :type :hydra-tail})))))]
+                                            (rj.c/map->Entity {:id   e-hydra-rear
+                                                               :type :hydra-rear})))))]
      {:system (rj.e/system<<components
-                system e-hydra-tail
-                [[:hydra-tail {}]
+                system e-hydra-rear
+                [[:hydra-rear {}]
                  [:position {:x    (:x target-tile)
                              :y    (:y target-tile)
                              :z    (:z target-tile)
-                             :type :hydra-tail}]
+                             :type :hydra-rear}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 100}]                     ;;4
-                 [:attacker {:atk              (:atk rj.cfg/hydra-tail-stats)
+                 [:attacker {:atk              (:atk rj.cfg/hydra-rear-stats)
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   []
-                             :is-valid-target? (partial #{:hydra-neck})}]
+                             :is-valid-target? (partial #{:hydra-tail})}]
                  [:destructible {:hp         hp
                                  :max-hp     hp
-                                 :def        (:def rj.cfg/hydra-tail-stats)
+                                 :def        (:def rj.cfg/hydra-rear-stats)
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
                                  :status-effects []}]
-                 [:killable {:experience (:exp rj.cfg/hydra-tail-stats)}]
+                 [:killable {:experience (:exp rj.cfg/hydra-rear-stats)}]
                  [:tickable {:tick-fn process-input-tick
-                             :pri -1}]
+                             :pri -2}]
                  [:broadcaster {:name-fn (constantly "the hydra's tail")}]])
       :z (:z target-tile)})))
 
@@ -113,7 +113,7 @@
               this-pos [(:x c-position) (:y c-position)]
               c-mobile (rj.e/get-c-on-e system e-this :mobile)
               e-world (first (rj.e/all-e-with-c system :world))
-              e-player (first (rj.e/all-e-with-c system :hydra-neck))]
+              e-player (first (rj.e/all-e-with-c system :hydra-tail))]
           (if (nil? e-player)
             (as-> system system
                   (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
@@ -134,7 +134,7 @@
                   neighbor-tiles (rj.u/get-neighbors level [(:x c-position) (:y c-position)])
 
                   c-sight (rj.e/get-c-on-e system e-this :sight)
-                  is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:hydra-neck]
+                  is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:hydra-tail]
                                                                                   #(<= %  (:distance c-sight))))
 
 
@@ -155,7 +155,7 @@
         (let [c-position (rj.e/get-c-on-e system e-this :position)
               this-pos [(:x c-position) (:y c-position)]
               c-mobile (rj.e/get-c-on-e system e-this :mobile)
-              e-player (first (rj.e/all-e-with-c system :hydra-neck))]
+              e-player (first (rj.e/all-e-with-c system :hydra-tail))]
           (if (nil? e-player)
             system
             (let [c-player-pos (rj.e/get-c-on-e system e-player :position)
@@ -169,7 +169,7 @@
                   neighbor-tiles (rj.u/get-neighbors level [(:x c-position) (:y c-position)])
 
                   c-sight (rj.e/get-c-on-e system e-this :sight)
-                  is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:hydra-neck]
+                  is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:hydra-tail]
                                                                                   #(<= %  (:distance c-sight))))
 
 

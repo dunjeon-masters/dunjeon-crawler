@@ -37,6 +37,8 @@
 
 (defrecord HydraTail [])
 
+(defrecord HydraRear [])
+
 (defrecord Inventory [slot junk])
 
 (defrecord Inspectable [msg])
@@ -181,6 +183,7 @@
             :hydra-head       (type (->HydraHead))
             :hydra-neck       (type (->HydraNeck))
             :hydra-tail       (type (->HydraTail))
+            :hydra-rear       (type (->HydraRear))
             :inventory        (type (->Inventory nil nil nil))
             :inspectable      (type (->Inspectable nil))
             :item             (type (->Item nil))

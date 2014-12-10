@@ -219,13 +219,19 @@
    :exp 10})
 
 (def hydra-neck-stats
-  {:hp 4
+  {:hp 20
    :def 3
    :atk 0
    :exp 0})
 
 (def hydra-tail-stats
-  {:hp 4
+  {:hp 20
+   :def 1
+   :atk 0
+   :exp 0})
+
+(def hydra-rear-stats
+  {:hp 20
    :def 1
    :atk 0
    :exp 0})
