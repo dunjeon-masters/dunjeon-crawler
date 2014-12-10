@@ -129,7 +129,7 @@
                                     #(#{e-this} (:id %))
                                     entities))))
 
-        #_(if-let [on-death (:on-death-fn c-this)]
+        (if-let [on-death (:on-death-fn c-this)]
           (on-death c-this e-this system)
           system)
 
@@ -144,4 +144,3 @@
                  (level-up-fn e-from)))
           system)
         (rj.e/kill-e system e-this)))))
-
