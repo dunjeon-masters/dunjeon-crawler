@@ -7,7 +7,8 @@
       (->CamelCase "foo") => "Foo")
 
 (fact "keyword->new-component"
-      (keyword->new-component :asdf) =expands-to=> rouje-like.components/map->Asdf)
+      (keyword->new-component :asdf)
+      =expands-to=> rouje-like.components/map->Asdf)
 
 (fact "partition->add-c"
       (let [system :system
