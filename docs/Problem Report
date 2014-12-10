@@ -1,0 +1,14 @@
+Problem Report
+Product Name: Dunjeon Crawler				      Release Name: Dunjeon Crawler
+Team Name: Dunjeon Masters					          Release Date: 12/10/2014
+Revision Number: 1
+Revision Date: 12/10/2014 
+-------------------------------------------------------------------------------------------------------------------------
+Known Problems With Prototype:
+-Crash on player death
+  -The player dying in any way will cause the whole game to crash.
+  -One remedy we tried was restarting the game when the player dies, but this caused a bug where the game would tick multiple
+  times on one input
+  -Another remedy may be to check if the player is dead more often before trying to access it's data
+  -The crash occurs in the file associated with the mob type that kills us
+    -Example: If a spider kills the player, there will be a crash in the spider.clj file.
