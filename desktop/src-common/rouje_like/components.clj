@@ -2,6 +2,15 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
+#_(use 'rouje-like.components :reload)
+
+(defprotocol IPoint
+  (->3DPoint [this])
+  (->2DPoint [this]))
+
+(defrecord ArrowTrap [dir
+                      ready?])
+
 (defrecord Bat [])
 
 (defrecord Broadcaster [name-fn])
@@ -13,7 +22,10 @@
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
 
+
 (defrecord Drake [])
+
+(defrecord Door [])
 
 (defrecord Energy [energy])
 
@@ -76,7 +88,12 @@
 (defrecord Portal [^Number x ^Number y ^Number z])
 
 (defrecord Position [x y z
-                     ^Keyword type])
+                     ^Keyword type]
+  IPoint
+  (->3DPoint [{:keys [x y z]}]
+    [z x y])
+  (->2DPoint [{:keys [x y]}]
+    [x y]))
 
 (defrecord Purchasable [value])
 
@@ -99,10 +116,14 @@
 
 (defrecord Troll [])
 
+(defrecord SpikeTrap [visible?])
+
 (defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
 
 (defrecord Torch [brightness])
+
+(defrecord Trap [])
 
 (defrecord Wallet [^Number gold])
 
@@ -165,7 +186,8 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker         (type (->Attacker nil nil nil nil nil))
+  get-type {:arrow-trap       (type (->ArrowTrap nil nil))
+            :attacker         (type (->Attacker nil nil nil nil nil))
             :bat              (type (->Bat))
             :broadcaster      (type (->Broadcaster nil))
             :class            (type (->Klass nil))
@@ -208,6 +230,7 @@
             :skeleton         (type (->Skeleton))
             :slime            (type (->Slime))
             :spider           (type (->Spider))
+            :spike-trap       (type (->SpikeTrap nil))
             :snake            (type (->Snake))
             :tickable         (type (->Tickable nil nil))
             :tile             (type (->Tile nil nil nil nil))

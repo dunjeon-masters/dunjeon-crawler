@@ -19,7 +19,7 @@
 
                  [org.clojure/tools.trace "0.7.8"]
                  [org.clojure/math.numeric-tower "0.0.4"]]
-
+  :profiles {:dev {:dependencies [[midje "1.6.3"]]}}
   :source-paths ["src" "src-common" ]
 
   :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]

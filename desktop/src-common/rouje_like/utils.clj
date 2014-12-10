@@ -13,22 +13,23 @@
 (def cli? (atom false))
 
 (def get-default-pri
-  {:floor 1
-   :forest-floor 1
-   :equipment 2
+  {:floor 0
+   :forest-floor 0
    :dune 0
+   :open-door 1
    :health-potion 2
-   :torch 3
-   :gold 4
-   :wall 5
-   :tree 5
-   :lichen 6
-   :bat 7
-   :skeleton 8
+   :equipment 2
+   :torch 2
+   :gold 2
+   :wall 3
+   :tree 3
+   :lichen 4
+   :bat 4
+   :skeleton 4
    :else 99
    :player 100})
 
-(defn sort-by-type
+(defn- sort-by-type
   [entities get-pri]
   (sort (fn [arg1 arg2]
           (let [t1 (:type arg1)
@@ -113,7 +114,7 @@
   [[x y] [dx dy]]
   [(+ x dx) (+ y dy)])
 
-(defn ^:private get-neighbors-coords
+(defn get-neighbors-coords
   "Return the coordinates of all neighboring
   (ie: up/down/left/right)
   squares of the given [x y] pos."
@@ -140,7 +141,8 @@
 (defn get-entities-radially
   [world origin within-range?]
   (->> (flatten world)
-       (filter #(within-range? (radial-distance origin [(:x %) (:y %)])))))
+       (filter #(within-range?
+                  (radial-distance origin [(:x %) (:y %)])))))
 
 (defn get-neighbors-of-type-within
   [world origin type dist-fn]
@@ -162,7 +164,7 @@
                                                                     1))))))
             (get-entities-radially world origin dist-fn)))
 
-(defn ^:private ring-coords
+(defn ring-coords
   [[x y] dist]
   (let [∆x|y (vec (range (- 0 dist) (inc dist)))]
     (for [dx ∆x|y
@@ -210,6 +212,22 @@
                                                      (fn [entities]
                                                        (fn<-entities entities))))))))))
 
+(defn change-type
+  [system e-this old-type new-type]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
+        c-position (rj.e/get-c-on-e system e-this :position)
+        this-pos [(:z c-position) (:x c-position) (:y c-position)]]
+    (as-> system system
+      (update-in-world system e-world this-pos
+                       (fn [entities]
+                         (map #(if (= old-type (:type %))
+                                 (assoc % :type new-type)
+                                 %)
+                              entities)))
+      (rj.e/upd-c system e-this :position
+                  (fn [c-position]
+                    (assoc c-position :type new-type))))))
+
 (defn update-gold
   [system e-this value]
   "Update the amount of gold on E-THIS by VALUE."
@@ -240,4 +258,3 @@
         level (nth (:levels c-world) z)
         target-tile (get-in level [x y])]
     (:entities target-tile)))
-

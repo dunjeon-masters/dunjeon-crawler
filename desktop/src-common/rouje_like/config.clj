@@ -1,23 +1,41 @@
 (ns rouje-like.config
-  (:require [clojure.set :refer [union]]))
+  (:require [clojure.set :refer [union]]
+            [play-clj.core :refer [graphics!]]))
 
-;; WORLD CONFIG
-(def block-size 18)                                         ;; To see start screen, revert to 36
+#_(use 'rouje-like.config :reload)
+
+(def block-size 27)                                         ;; To see start screen, revert to 36
+;; ===== WORLD CONFIG =====
 (def padding-sizes {:top   3
                     :btm   2
                     :left  1
                     :right 1})
+
 (def view-port-sizes [20 20])
 
-(def world-sizes {:width  20
-                  :height 20})
+(defn block-size []
+  (let [min-block-size 27
+        block-size (try (let [height (graphics! :get-height)
+                              width  (graphics! :get-width)
+                              [vp-x vp-y] view-port-sizes
+                              {:keys [top btm left right]} padding-sizes]
+                          (/ height (+ top btm vp-y)))
+                        (catch Exception e
+                          min-block-size))]
+    (max min-block-size block-size)))
 
-;; TILE TYPES
+(def world-sizes {:width  40
+                  :height 40})
+
+;; ===== TILE TYPES =====
 (def <floors>
-  #{:dune :floor :forest-floor})
+  #{:open-door :dune :floor :forest-floor})
 
 (def <walls>
-  #{:wall :tree :maze-wall})
+  #{:temple-wall :door :wall :tree :maze-wall})
+
+(def <indestructible-walls>
+  #{:temple-wall :maze-wall})
 
 (def <items>
   #{:torch :gold :health-potion :equipment :purchasable :merchant})
@@ -26,20 +44,27 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  (union <walls> #{:lichen}))
+  (union <walls> #{:arrow-trap :lichen}))
 
 (def <valid-move-targets>
-  (union <empty> #{:portal :m-portal}))
+  (union <empty> #{:portal :m-portal :spike-trap :hidden-spike-trap}))
 
 (def <valid-mob-targets>
   (union <empty> #{:player}))
 
 (def wall->stats
-  {:wall      {:hp 2}
-   :tree      {:hp 1}
-   :maze-wall {:hp 100}})
+  {:wall        {:hp 2}
+   :tree        {:hp 1}
+   :maze-wall   {:hp 100}
+   :temple-wall {:hp 100}})
 
-;; PLAYER CONFIG
+(def trap->stats
+  {:arrow-trap {:hp 1
+                :atk 2}
+   :spike-trap {:hp 1
+                :atk 2}})
+
+;; ===== PLAYER CONFIG =====
 (def player-stats
   {:max-hp 100
    :atk 4
@@ -76,7 +101,7 @@
    :upper-bound 11        ;; Exclusive
    :torch-multiplier 1.})
 
-;; EQUIPMENT CONFIG
+;; ===== EQUIPMENT CONFIG =====
 (def weapons
   (->> (flatten
          [(repeat 1 [:sword  {:atk 3}])
@@ -126,7 +151,7 @@
                :duration 2
                :value    2}})
 
-;; CREATURE CONFIG
+;; ===== CREATURE CONFIG =====
 (def bat-stats
   {:hp  2
    :def 0})
@@ -236,10 +261,13 @@
    :atk 0
    :exp 0})
 
+(def trap-types
+  [:arrow])
+
 (def potion-stats
   {:health 5})
 
-;; WORLD CONFIG
+;; ===== WORLD CONFIG =====
 (def init-wall% 45)
 (def init-torch% 2)
 (def init-gold% 5)
@@ -248,7 +276,7 @@
 (def init-bat% 1)
 (def init-equip% 1)
 
-;; MONSTER CONFIG
+;; ===== MONSTER CONFIG =====
 (def init-skeleton% 0.1)
 (def init-snake% 0.3)
 (def init-troll% 0.1)
@@ -262,7 +290,7 @@
 (def init-willowisp% 0.1)
 (def init-boss% 0.3)
 
-;; Starting floor for certain monsters to spawn on
+;; ===== STARTING FLOOR FOR MOBS =====
 (def init-skeleton-floor 2)
 (def init-snake-floor 1)
 (def init-troll-floor 4)
@@ -274,7 +302,7 @@
 (def init-giant_amoeba-floor 5)
 (def init-willowisp-floor 3)
 
-;; MERCHANT CONFIG
+;; ===== MERCHANT CONFIG =====
 (def merchant-pos
   {:x 10
    :y 12})
