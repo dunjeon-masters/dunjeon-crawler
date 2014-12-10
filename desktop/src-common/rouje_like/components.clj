@@ -4,6 +4,10 @@
 
 #_(use 'rouje-like.components :reload)
 
+(defprotocol IPoint
+  (->3DPoint [this])
+  (->2DPoint [this]))
+
 (defrecord ArrowTrap [dir
                       ready?])
 
@@ -80,7 +84,12 @@
 (defrecord Portal [^Number x ^Number y ^Number z])
 
 (defrecord Position [x y z
-                     ^Keyword type])
+                     ^Keyword type]
+  IPoint
+  (->3DPoint [{:keys [x y z]}]
+    [z x y])
+  (->2DPoint [{:keys [x y]}]
+    [x y]))
 
 (defrecord Purchasable [value])
 

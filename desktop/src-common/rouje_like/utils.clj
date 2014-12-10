@@ -141,7 +141,8 @@
 (defn get-entities-radially
   [world origin within-range?]
   (->> (flatten world)
-       (filter #(within-range? (radial-distance origin [(:x %) (:y %)])))))
+       (filter #(within-range?
+                  (radial-distance origin [(:x %) (:y %)])))))
 
 (defn get-neighbors-of-type-within
   [world origin type dist-fn]
