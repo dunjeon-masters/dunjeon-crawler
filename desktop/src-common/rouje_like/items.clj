@@ -20,21 +20,15 @@
 
 (defn pickup-item
   [system e-by e-this [z x y] item-type]
-  (let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)
-        e-relay (first (rj.e/all-e-with-c system :relay))
-        broadcast-pickup (fn [system]
-                           (if (not (nil? c-broadcaster))
-                             (rj.e/upd-c system e-relay :relay
-                                         (fn [c-relay]
-                                           (update-in c-relay [:static]
-                                                      conj {:message (format "%s picked up %s"
-                                                                             (let [by-c-broadcaster (rj.e/get-c-on-e system e-by :broadcaster)]
-                                                                               ((:name-fn by-c-broadcaster) system e-by))
-                                                                             ((:name-fn c-broadcaster) system e-this))
-                                                            :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
-                                                                        c-counter (rj.e/get-c-on-e system e-counter :counter)]
-                                                                    (:turn c-counter))})))
-                             system))]
+  (let [broadcast-pickup
+        (fn [system]
+          (let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+            (rj.msg/add-msg system :static
+                            (format "%s picked up %s"
+                                    (let [by-c-broadcaster (rj.e/get-c-on-e system e-by
+                                                                            :broadcaster)]
+                                      ((:name-fn by-c-broadcaster) system e-by))
+                                    ((:name-fn c-broadcaster) system e-this)))))]
     (case item-type
       :torch (let [c-playersight (rj.e/get-c-on-e system e-by :playersight)
                    sight-upper-bound (:upper-bound c-playersight)
@@ -55,30 +49,30 @@
 
       :gold (let [value (:value (rj.e/get-c-on-e system e-this :gold))]
               (as-> system system
-                    (update-gold system e-by value)
-                    (remove-item system [z x y] item-type)
-                    (broadcast-pickup system)))
+                (update-gold system e-by value)
+                (remove-item system [z x y] item-type)
+                (broadcast-pickup system)))
 
       :health-potion (as-> system system
-                           (rj.e/upd-c system e-by :inventory
-                                       (fn [c-inventory]
-                                         (update-in c-inventory [:hp-potion]
-                                                    inc)))
-                           (remove-item system [z x y] item-type)
-                           (broadcast-pickup system))
-
-      :magic-potion (as-> system system
-                           (rj.e/upd-c system e-by :inventory
-                                       (fn [c-inventory]
-                                         (update-in c-inventory [:mp-potion]
-                                                    inc)))
-                           (remove-item system [z x y] item-type)
-                           (broadcast-pickup system))
-
-      :equipment (as-> system system
-                       (rj.inv/pickup-slot-item system e-by (rj.e/get-c-on-e system e-this :equipment))
+                       (rj.e/upd-c system e-by :inventory
+                                   (fn [c-inventory]
+                                     (update-in c-inventory [:hp-potion]
+                                                inc)))
                        (remove-item system [z x y] item-type)
                        (broadcast-pickup system))
+
+      :magic-potion (as-> system system
+                      (rj.e/upd-c system e-by :inventory
+                                  (fn [c-inventory]
+                                    (update-in c-inventory [:mp-potion]
+                                               inc)))
+                      (remove-item system [z x y] item-type)
+                      (broadcast-pickup system))
+
+      :equipment (as-> system system
+                   (rj.inv/pickup-slot-item system e-by (rj.e/get-c-on-e system e-this :equipment))
+                   (remove-item system [z x y] item-type)
+                   (broadcast-pickup system))
 
       :purchasable (let [c-purchasable (rj.e/get-c-on-e system e-this :purchasable)
                          price (:value c-purchasable)
@@ -88,22 +82,22 @@
                      (if (<= price gold)
                        ;; purchase the item
                        (as-> system system
-                             (rj.inv/pickup-slot-item system e-by item)
-                             (update-gold system e-by (- price))
-                             (remove-item system [z x y] item-type)
-                             (broadcast-pickup system))
+                         (rj.inv/pickup-slot-item system e-by item)
+                         (update-gold system e-by (- price))
+                         (remove-item system [z x y] item-type)
+                         (broadcast-pickup system))
                        ;; otherwise broadcast a message saying unable to purchase
                        (as-> system system
-                            (rj.msg/add-msg system :static "you do not have enough gold to purchase that"))))
+                         (rj.msg/add-msg system :static "you do not have enough gold to purchase that"))))
 
       :merchant (let [junk-value (rj.inv/junk-value system e-by)
                       c-inv (rj.e/get-c-on-e system e-by :inventory)
                       junk (:junk c-inv)
                       njunk (count junk)]
                   (as-> system system
-                        (rj.msg/add-msg system :static (format "you sold %d pieces of junk for %d gold"
-                                                               njunk junk-value))
-                        (rj.inv/sell-junk system e-by)))
+                    (rj.msg/add-msg system :static (format "you sold %d pieces of junk for %d gold"
+                                                           njunk junk-value))
+                    (rj.inv/sell-junk system e-by)))
 
       system)))
 
@@ -159,27 +153,33 @@
                             (format "You do not have any mana potions to drink")) system
             system))))
 
-(defn ^:private item>>world
+(defn- item>>world
   [system is-valid-tile? z item>>entities]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels z)]
-    (loop [system system]
-      (let [x (rand-int (count world))
-            y (rand-int (count (first world)))]
+        world (nth levels z)
+        width (count world)
+        height (count (first world))]
+    (loop [system system
+           i 5]
+      (let [x (rand-int width)
+            y (rand-int height)]
         (if (is-valid-tile? world [x y])
           (rj.u/update-in-world system e-world [z x y]
-                                 (fn [entities]
-                                   (item>>entities entities)))
-          (recur system))))))
+                                (fn [entities]
+                                  (item>>entities entities)))
+          (if (neg? i)
+            system
+            (recur system
+                   (dec i))))))))
 
-(defn ^:private only-floor?
+(defn- only-floor?
   [tile]
   (every? #(rj.cfg/<floors> (:type %))
           (:entities tile)))
 
-(defn ^:private item>>entities
+(defn- item>>entities
   [entities e-id e-type]
   (conj entities
         (rj.c/map->Entity {:id   e-id

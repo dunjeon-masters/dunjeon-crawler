@@ -6,6 +6,8 @@
             [rouje-like.config :as rj.cfg]
             [clojure.set :refer [union]]))
 
+#_(use 'rouje-like.mobile :reload)
+
 (defn can-move?
   [_ _ target-tile _]
   (rj.cfg/<valid-move-targets> (:type (rj.u/tile->top-entity target-tile))))

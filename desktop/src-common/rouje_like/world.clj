@@ -10,28 +10,44 @@
             [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u :refer [?]]
+            [rouje-like.attacker :as rj.atk]
             [rouje-like.items :as rj.items]
             [rouje-like.rooms :as rj.rm]
             [rouje-like.lichen :as rj.lc]
+            [rouje-like.mimic :as rj.mi]
             [rouje-like.merchant :as rj.merch]
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
+            [rouje-like.colossal_amoeba :as rj.ca]
+            [rouje-like.hydra-head :as rj.hh]
+            [rouje-like.hydra-neck :as rj.hn]
+            [rouje-like.hydra-tail :as rj.ht]
+            [rouje-like.hydra-rear :as rj.hr]
+            [rouje-like.giant_amoeba :as rj.ga]
+            [rouje-like.drake :as rj.dr]
+            [rouje-like.necromancer :as rj.ne]
             [rouje-like.skeleton :as rj.sk]
-            [rouje-like.traps :as rj.trap]
+            [rouje-like.slime :as rj.sl]
+            [rouje-like.snake :as rj.snk]
+            [rouje-like.spider :as rj.sp]
+            [rouje-like.troll :as rj.tr]
+            [rouje-like.willowisp :as rj.ww]
+            [rouje-like.arrow-trap :as rj.arrow-trap]
+            [rouje-like.spike-trap :as rj.spike-trap]
             [rouje-like.portal :as rj.p]
             [rouje-like.config :as rj.cfg]))
 
 #_(in-ns 'rouje-like.world)
 #_(use 'rouje-like.world :reload)
 
-(defn ^:private block->freqs
+(defn- block->freqs
   [block]
   (frequencies
     (map (fn [tile]
            (:type (rj.u/tile->top-entity tile)))
          block)))
 
-(defn ^:private get-smoothed-tile
+(defn- get-smoothed-tile
   [block-d1 block-d2 x y z]
   (let [wall-threshold-d1 5
         wall-bound-d2 2
@@ -62,7 +78,7 @@
                                                         :type :wall}))
                                entities)))))
 
-(defn ^:private get-smoothed-col
+(defn- get-smoothed-col
   [level [x z] max-dist]
   {:pre [(#{1 2} max-dist)]}
   (mapv (fn [y]
@@ -74,21 +90,21 @@
             x y z))
         (range (count (first level)))))
 
-(defn ^:private smooth-level-v1
+(defn- smooth-level-v1
   [{:keys [level z]}]
   {:level (mapv (fn [x]
                   (get-smoothed-col level [x z] 2))
                 (range (count level)))
    :z z})
 
-(defn ^:private smooth-level-v2
+(defn- smooth-level-v2
   [{:keys [level z]}]
   {:level (mapv (fn [x]
                   (get-smoothed-col level [x z] 1))
                 (range (count level)))
    :z z})
 
-(defn ^:private forest:get-smoothed-tile
+(defn- forest:get-smoothed-tile
   [block-d1 block-d2 x y z]
   (let [wall-threshold-d1 5
         wall-bound-d2 2
@@ -119,7 +135,7 @@
                                                         :type :tree}))
                                entities)))))
 
-(defn ^:private forest:get-smoothed-col
+(defn- forest:get-smoothed-col
   [level [x z] max-dist]
   {:pre [(#{1 2} max-dist)]}
   (mapv (fn [y]
@@ -131,56 +147,116 @@
             x y z))
         (range (count (first level)))))
 
-(defn ^:private forest:smooth-level-v1
+(defn- forest:smooth-level-v1
   [{:keys [level z]}]
   {:level (mapv (fn [x]
                   (forest:get-smoothed-col level [x z] 2))
                 (range (count level)))
    :z z})
 
-(defn ^:private forest:smooth-level-v2
+(defn- forest:smooth-level-v2
   [{:keys [level z]}]
   {:level (mapv (fn [x]
                   (forest:get-smoothed-col level [x z] 1))
                 (range (count level)))
    :z z})
 
-(defn entity-ize-walls
+(defn- entity-ize-level
   [system z]
-  (let [e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
-        level (nth levels z)]
-    (reduce (fn [system tile]
-              (let [entities (:entities tile)
-                    wall (filter #(rj.cfg/<walls> (:type %)) entities)]
-                (if (seq wall)
-                  (let [wall (first wall)
-                        wall-type (:type wall)
-                        e-wall (:id wall)
-                        hp (:hp (rj.cfg/wall->stats wall-type))]
-                    (rj.e/system<<components
-                      system e-wall
-                      [[:position {:x (:x tile)
-                                   :y (:y tile)
-                                   :z z
-                                   :type wall-type}]
-                       [:destructible {:hp hp
-                                       :max-hp hp
-                                       :def 0
-                                       :take-damage-fn (if (= :maze-wall wall-type)
-                                                        (fn [c e _ f s]
-                                                          (rj.d/take-damage c e 0 f s))
-                                                        rj.d/take-damage)}]]))
-                  system)))
-            system (flatten level))))
+  (letfn [(entity-ize-wall [system tile]
+            (let [entities (:entities tile)
+                  wall (filter #(rj.cfg/<walls> (:type %)) entities)]
+              (if (seq wall)
+                (let [wall (first wall)
+                      wall-type (:type wall)
+                      e-wall (:id wall)
+                      hp (:hp (rj.cfg/wall->stats wall-type))]
+                  (rj.e/system<<components
+                    system e-wall
+                    [[:position {:x (:x tile)
+                                 :y (:y tile)
+                                 :z z
+                                 :type wall-type}]
+                     [:destructible {:hp hp
+                                     :max-hp hp
+                                     :def 0
+                                     :take-damage-fn (if (rj.cfg/<indestructible-walls> wall-type)
+                                                       (fn [c e _ f s]
+                                                         (rj.d/take-damage c e 0 f s))
+                                                       rj.d/take-damage)}]]))
+                system)))
+          (entity-ize-spike-trap [system tile]
+            (let [entities (:entities tile)
+                  trap (filter #(#{:hidden-spike-trap} (:type %)) entities)]
+              (if (seq trap)
+                (let [trap (first trap)
+                      trap-type (:type trap)
+                      e-trap (:id trap)]
+                  (rj.spike-trap/add-trap system tile e-trap))
+                system)))
+          (entity-ize-arrow-trap [system tile]
+            (let [entities (:entities tile)
+                  trap (filter #(#{:arrow-trap} (:type %)) entities)]
+              (if (seq trap)
+                (let [trap (first trap)
+                      trap-type (:type trap)
+                      e-trap (:id trap)]
+                  (rj.arrow-trap/add-trap system tile e-trap))
+                system)))
+          (door-take-damage-fn [c-this e-this damage e-from system]
+            (if-let [c-door (rj.e/get-c-on-e system e-this :door)]
+              (as-> (rj.e/upd-c system e-this :position
+                                (fn [c-position]
+                                  (assoc-in c-position [:type]
+                                            :open-door))) system
+                (let [c-position (rj.e/get-c-on-e system e-this :position)
+                      e-world (first (rj.e/all-e-with-c system :world))]
+                  (rj.u/update-in-world system e-world
+                                        [(:z c-position) (:x c-position) (:y c-position)]
+                                        (fn [entities]
+                                          (map
+                                            #(if (#{e-this} (:id %))
+                                               (assoc-in % [:type]
+                                                         :open-door)
+                                               %)
+                                            entities)))))
+              system))
+          (entity-ize-door [system tile]
+            (let [entities (:entities tile)
+                  door (filter #(#{:door} (:type %)) entities)]
+              (if (seq door)
+                (let [door (first door)
+                      door-type (:type door)
+                      e-door (:id door)
+                      target-tile tile]
+                  (rj.e/system<<components
+                    system e-door
+                    [[:door {}]
+                     [:position {:x (:x tile)
+                                 :y (:y tile)
+                                 :z z
+                                 :type :door}]
+                     [:destructible {:hp 1
+                                     :max-hp 1
+                                     :def 0
+                                     :take-damage-fn
+                                     door-take-damage-fn}]]))
+                system)))]
+    (let [e-world (first (rj.e/all-e-with-c system :world))
+          c-world (rj.e/get-c-on-e system e-world :world)
+          levels (:levels c-world)
+          level (nth levels z)]
+      (reduce (fn [system tile]
+                (reduce (fn [system entity-izer]
+                          (entity-izer system tile))
+                        system [entity-ize-wall entity-ize-arrow-trap entity-ize-spike-trap entity-ize-door]))
+              system (flatten level)))))
 
-(defn ^:private init-entities
+(defn- init-entities
   [system z]
   (-> system
-      ;; If wall, add an entity to it
       (as-> system
-        (entity-ize-walls system z))
+        (entity-ize-level system z))
 
       ;; Add Items: Gold, Torches...
       (as-> system
@@ -208,38 +284,7 @@
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
-      ;; Spawn lichens
-      (as-> system
-        (do (println "core::add-lichen " (not (nil? system))) system)
-        (nth (iterate rj.lc/add-lichen {:system system :z z})
-             (* (/ rj.cfg/init-lichen% 100)
-                (apply * (vals rj.cfg/world-sizes))))
-        (:system system))
-
-      ;; Spawn bats
-      (as-> system
-        (do (println "core::add-bat " (not (nil? system))) system)
-        (nth (iterate rj.bt/add-bat {:system system :z z})
-             (* (/ rj.cfg/init-bat% 100)
-                (apply * (vals rj.cfg/world-sizes))))
-        (:system system))
-
-      ;; Spawn Skeletons
-      (as-> system
-        (do (println "core::add-skeleton " (not (nil? system))) system)
-        (nth (iterate rj.sk/add-skeleton {:system system :z z})
-             (* (/ rj.cfg/init-skeleton% 100)
-                (apply * (vals rj.cfg/world-sizes))))
-        (:system system))
-
-      ;; Spawn Traps
-      (as-> system
-        (do (println "core::add-trap " (not (nil? system))) system)
-        (nth (iterate rj.trap/add-trap {:system system :z z})
-             5)
-        (:system system))
-
-      ;; Spawn equipment for testing
+      ;; Spawn equipment
       (as-> system
             (do (println "core::add-equipment " (not (nil? system))) system)
             (nth (iterate rj.items/add-equipment {:system system :z z})
@@ -247,7 +292,110 @@
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))))
 
-(defn ^:private add-portal
+(defn- init-themed-entities
+  [system z theme]
+  (case theme
+    :desert (as-> system system
+              ;; Spawn Will-o-Wisps
+              (do (println "core::add-willowisp " (not (nil? system))) system)
+              (nth (iterate rj.ww/add-willowisp {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-willowisp% (* 0.2 (- z rj.cfg/init-willowisp-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              ;; Spawn Snakes
+              (do (println "core::add-snake " (not (nil? system))) system)
+              (nth (iterate rj.snk/add-snake {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-snake% (* 0.2 (- z rj.cfg/init-snake-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              ;;Spawn Necromancer
+              (do (println "core::add-necro " (not (nil? system))) system)
+              (nth (iterate rj.ne/add-necro {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-necro% (* 0.2 (- z rj.cfg/init-necro-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              )
+    :hydrarena (as-> system system
+                 ;;Spawn Hydra Head (currently using G.Amoeba spawn stats)
+                 (do (println "core::add-hydra-head " (not (nil? system))) system)
+                 (:system (rj.hh/add-hydra-head {:system system :z z}))
+                 ;;Spawn Hydra Neck
+                 (do (println "core::add-hydra-neck " (not (nil? system))) system)
+                 (:system (rj.hn/add-hydra-neck {:system system :z z}))
+                 ;;Spawn Hydra Tail
+                 (do (println "core::add-hydra-tail " (not (nil? system))) system)
+                 (:system (rj.ht/add-hydra-tail {:system system :z z}))
+                 ;;Spawn Hydra Rear
+                 (do (println "core::add-hydra-rear " (not (nil? system))) system)
+                 (:system (rj.hr/add-hydra-rear {:system system :z z})))
+    :amoebarena (as-> system system
+                  ;; Spawn Colossal Amoeba
+                  (do (println "core::add-colossal_amoeba " (not (nil? system))) system)
+                  (nth (iterate rj.ca/add-colossal_amoeba {:system system :z z})
+                       (* (/ rj.cfg/init-boss% 100)
+                          (apply * (vals rj.cfg/world-sizes))))
+                  (:system system))
+    :forest (as-> system system
+              ;; Spawn Trolls
+              (do (println "core::add-troll " (not (nil? system))) system)
+              (nth (iterate rj.tr/add-troll {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-troll% (* 0.2 (- z rj.cfg/init-troll-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              ;; Spawn Spider
+              (do (println "core::add-spider " (not (nil? system))) system)
+              (nth (iterate rj.sp/add-spider {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-spider% (* 0.2 (- z rj.cfg/init-spider-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              ;; Spawn Giant Amoeba
+              (do (println "core::add-giant_amoeba " (not (nil? system))) system)
+              (nth (iterate rj.ga/add-giant_amoeba {:system system :z z})
+                   (* (max 0 (min 0.05 (/ (+ rj.cfg/init-giant_amoeba% (* 0.2 (- z rj.cfg/init-giant_amoeba-floor))) 100)))
+                      (apply * (vals rj.cfg/world-sizes))))
+              (:system system)
+              )
+    :maze (as-> system system
+            ;; Spawn Slimes
+            (do (println "core::add-slime " (not (nil? system))) system)
+            (nth (iterate rj.sl/add-slime {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ rj.cfg/init-slime% (* 0.2 (- z rj.cfg/init-slime-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            ;; Spawn Skeleton
+            (do (println "core::add-skeleton " (not (nil? system))) system)
+            (nth (iterate rj.sk/add-skeleton {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ rj.cfg/init-skeleton% (* 0.2 (- z rj.cfg/init-skeleton-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            ;; Spawn Mimics
+            (do (println "core::add-mimic " (not (nil? system))) system)
+            (nth (iterate rj.mi/add-mimic {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ rj.cfg/init-mimic% (* 0.2 (- z rj.cfg/init-mimic-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+    :cave (as-> system system
+            ;; Spawn Lichen
+            (do (println "core::add-lichen " (not (nil? system))) system)
+            (nth (iterate rj.lc/add-lichen {:system system :z z})
+                 (* (/ rj.cfg/init-lichen% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            ;; Spawn Bats
+            (do (println "core::add-bat " (not (nil? system))) system)
+            (nth (iterate rj.bt/add-bat {:system system :z z})
+                 (* (/ rj.cfg/init-bat% 100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            ;; Spawn Drakes
+            (do (println "core::add-drake " (not (nil? system))) system)
+            (nth (iterate rj.dr/add-drake {:system system :z z})
+                 (* (max 0 (min 0.05 (/ (+ rj.cfg/init-drake% (* 0.2 (- z rj.cfg/init-drake-floor))) 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system))
+    system))
+
+(defn- add-portal
   [system z]
   ;; Add portal
   (as-> system system
@@ -271,11 +419,11 @@
    :up    [0 -1]
    :down  [0  1]})
 
-(defn ^:private maze:coords+offset
+(defn- maze:coords+offset
   [[x y] [dx dy]]
   [(+ x dx) (+ y dy)])
 
-(defn ^:private maze:get-neighbors-coords
+(defn- maze:get-neighbors-coords
   [origin target]
   (if origin
     (let [y-eq? (= (origin 0) (target 0))]
@@ -286,7 +434,7 @@
     (map maze:coords+offset
          (repeat target) (vals maze:direction4->offset))))
 
-(defn ^:private maze:get-neighbors-of-type
+(defn- maze:get-neighbors-of-type
   [level mark pos typ]
   (let [neighbors (maze:get-neighbors-coords mark pos)
         neighbors (map #(get-in level % nil)
@@ -294,13 +442,13 @@
         neighbors (filter identity neighbors)]
     (filter #(= typ (% 2)) neighbors)))
 
-(defn ^:private maze:get-first-valid-neighbor
-  [level cells neighbors mark]
+(defn- maze:get-first-valid-neighbor
+  [level _ neighbors mark]
   (let [neighbors (shuffle neighbors)]
     (loop [candidate (first neighbors)
            candidates (rest neighbors)]
       (if candidate
-        (let [[x y t] candidate
+        (let [[x y _] candidate
               candidate-pos [x y]
               cand-neighbors (maze:get-neighbors-of-type level mark candidate-pos :w)
               wall-count (count cand-neighbors)]
@@ -309,16 +457,17 @@
             (recur (first candidates)
                    (rest candidates))))
         nil))))
-(defn ^:private maze:floor-it
+
+(defn- maze:floor-it
   [tile]
   (assoc tile 2 :f))
 
-(defn ^:private maze:floor-in-level
+(defn- maze:floor-in-level
   [level pos]
   (update-in level pos
              maze:floor-it))
 
-(defn ^:private maze:get-candidate
+(defn- maze:get-candidate
   [cells alg perc]
   (case alg
     :rand  (rand-nth cells)
@@ -335,20 +484,20 @@
                   (last cells))
     :else (first cells)))
 
-(defn ^:private maze:growing-tree
+(defn- maze:growing-tree
   [level]
   (let [init-tile (rand-nth (rand-nth level))
         init-tile (maze:floor-it init-tile)
-        [x y t] init-tile]
+        [x y _] init-tile]
     (loop [cells [init-tile]
            level (maze:floor-in-level level [x y])]
       (if (seq cells)
         (let [candidate (maze:get-candidate cells :first/last 0.5)
-              [x y t] candidate
+              [x y _] candidate
               candidate-pos [x y]
               neighbors (maze:get-neighbors-of-type level nil candidate-pos :w)
               valid-neighbor (maze:get-first-valid-neighbor level cells neighbors candidate)
-              [x y t] valid-neighbor
+              [x y _] valid-neighbor
               valid-neighbor-pos [x y]]
           (if valid-neighbor
             (recur (conj cells (maze:floor-it valid-neighbor))
@@ -357,7 +506,7 @@
                    level)))
         level))))
 
-(defn ^:private maze:gen-walls
+(defn- maze:gen-walls
   [width height]
   (vec
     (for [x (range width)]
@@ -365,11 +514,13 @@
         (for [y (range height)]
           [x y :w])))))
 
-(defn ^:private generate-maze
+(defn- generate-maze
   [level [width height]]
   (let [maze (maze:growing-tree (maze:gen-walls width height))]
     (reduce (fn [level cell]
-              (if (= :f (cell 2))
+              (if (or (= :f (cell 2))
+                      (and (= :w (cell 2))
+                           (< (rand-int 100) 20)))
                 (update-in level [(cell 0) (cell 1)]
                            (fn [tile]
                              (update-in tile [:entities]
@@ -379,43 +530,55 @@
                 level))
             level (map vec (partition 3 (flatten maze))))))
 
-(defn ^:private generate-desert
+(defn- generate-desert
   [level [width height]]
-  (let [desert (rj.rm/add-room (rj.rm/gen-level width height :f) (rj.rm/create-room [5 5] [5 5]))]
+  (let [desert (:level (rj.rm/print-level
+                         (rj.rm/gen-level-with-rooms
+                           width height (/ (* width height) 100) 5)))]
     (reduce (fn [level cell]
               (case (cell 2)
                 :w (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]
-                                           (fn [entities]
-                                             conj (rj.c/map->Entity {:id (br.e/create-entity)
-                                                                     :type :wall})))))
+                                           conj (rj.c/map->Entity {:id (br.e/create-entity)
+                                                                   :type :temple-wall}))))
                 :f (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]
                                            (fn [entities]
                                              (remove #(#{:wall} (:type %))
                                                      entities)))))
-                :t (update-in level [(cell 0) (cell 1)]
+                :st (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]
-                                           (fn [entities]
-                                             conj (rj.c/map->Entity {:id (br.e/create-entity)
-                                                                 :type :arrow-trap})))))
+                                           conj (rj.c/map->Entity {:id (br.e/create-entity)
+                                                                   :type :hidden-spike-trap
+                                                                   :extra (cell 3)}))))
+                :at (update-in level [(cell 0) (cell 1)]
+                              (fn [tile]
+                                (update-in tile [:entities]
+                                           conj (rj.c/map->Entity {:id (br.e/create-entity)
+                                                                   :type :arrow-trap
+                                                                   :extra (cell 3)}))))
                 :d (update-in level [(cell 0) (cell 1)]
                               (fn [tile]
                                 (update-in tile [:entities]
-                                           (fn [entities]
-                                             conj (rj.c/map->Entity {:id (br.e/create-entity)
-                                                                 :type :door})))))
+                                           conj (rj.c/map->Entity {:id (br.e/create-entity)
+                                                                   :type :door}))))
                 level))
-            level (map vec (partition 3 (flatten desert))))))
+            level (map vec (partition 4 (flatten desert))))))
 
 (defn generate-random-level
   ([level-sizes z]
-   (let [world-types [:cave :desert :maze :forest]
+   (if (= (mod z 5) 0)
+     (let [world-types [:hydrarena :amoebarena]                             ;;Array of boss floors
+           world-type (rand-nth world-types)]
+       {:type world-type
+        :level (generate-random-level level-sizes z world-type)})
+     (let [world-types (drop-last 2 (drop 1 [:cave :desert :maze :forest]))
          world-type (rand-nth world-types)]
-     (generate-random-level level-sizes z world-type)))
+     {:type world-type
+      :level (generate-random-level level-sizes z world-type)})))
 
   ([{:keys [width height]} z world-type]
    (case world-type
@@ -452,30 +615,37 @@
                                                                                    :type :dune})]})))))]
                (generate-desert level [width height]))
 
-     :forest (let [level (vec
-                         (map vec
-                              (for [x (range width)]
-                                (for [y (range height)]
-                                  (update-in (rj.c/map->Tile {:x x :y y :z z
-                                                              :entities [(rj.c/map->Entity {:id   nil
-                                                                                            :type :forest-floor})]})
-                                             [:entities] (fn [entities]
-                                                           (if (< (rand-int 100) rj.cfg/init-wall%)
-                                                             (conj entities
-                                                                   (rj.c/map->Entity {:id   (br.e/create-entity)
-                                                                                      :type :tree}))
-                                                             entities)))))))]
+     :merchant (vec
+                 (map vec
+                      (for [x (range width)]
+                        (for [y (range height)]
+                          (rj.c/map->Tile {:x x :y y :z z
+                                           :entities [(rj.c/map->Entity {:id   nil
+                                                                         :type :dune})]})))))
 
-             ;; SMOOTH-WORLD
-             (as-> level level
-               (nth (iterate forest:smooth-level-v1 {:level level
-                                                     :z z})
-                    2)
-               (:level level)
-               (nth (iterate forest:smooth-level-v2 {:level level
-                                                     :z z})
-                    3)
-               (:level level)))
+     :forest (let [level (vec
+                           (map vec
+                                (for [x (range width)]
+                                  (for [y (range height)]
+                                    (update-in (rj.c/map->Tile {:x x :y y :z z
+                                                                :entities [(rj.c/map->Entity {:id   nil
+                                                                                              :type :forest-floor})]})
+                                               [:entities] (fn [entities]
+                                                             (if (< (rand-int 100) rj.cfg/init-wall%)
+                                                               (conj entities
+                                                                     (rj.c/map->Entity {:id   (br.e/create-entity)
+                                                                                        :type :tree}))
+                                                               entities)))))))]
+               ;; SMOOTH-WORLD
+               (as-> level level
+                 (nth (iterate forest:smooth-level-v1 {:level level
+                                                       :z z})
+                      2)
+                 (:level level)
+                 (nth (iterate forest:smooth-level-v2 {:level level
+                                                       :z z})
+                      3)
+                 (:level level)))
 
      :maze (let [level (vec
                          (map vec
@@ -487,12 +657,27 @@
                                                               (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                  :type :maze-wall})]})))))]
              ;; CREATE MAZE
-             (generate-maze level [width height])))))
+             (generate-maze level [width height]))
+
+     :hydrarena (vec (map vec
+                      (for [x (range width)]
+                        (for [y (range height)]
+                          (rj.c/map->Tile {:x x :y y :z z
+                                           :entities [(rj.c/map->Entity {:id   nil
+                                                                         :type :dune})]})))))
+     :amoebarena (vec (map vec
+                       (for [x (range width)]
+                         (for [y (range height)]
+                           (rj.c/map->Tile {:x x :y y :z z
+                                            :entities [(rj.c/map->Entity {:id   nil
+                                                                          :type :dune})]})))))
+
+     )))
 
 ;;;; MERCHANT LEVEL CODE
 (defn generate-merchant-level
   []
-  (generate-random-level rj.cfg/world-sizes 0 :desert))
+  (generate-random-level rj.cfg/world-sizes 0 :merchant))
 
 (defn add-merch-items
   [system]
@@ -545,8 +730,12 @@
         merch-level (generate-merchant-level)
         level1 (generate-random-level
                 rj.cfg/world-sizes z)
+        type1 (:type level1)
+        level1 (:level level1)
         level2 (generate-random-level
-                rj.cfg/world-sizes (inc z))]
+                rj.cfg/world-sizes (inc z))
+        type2 (:type level2)
+        level2 (:level level2)]
     (-> system
         (rj.e/add-e e-world)
         (rj.e/add-c e-world (rj.c/map->World {:levels [merch-level level1 level2]
@@ -554,9 +743,11 @@
                                               :merchant-level-fn reset-merch-level}))
         (rj.merch/init-merchant 0)
         (init-entities z)
+        (init-themed-entities z type1)
         (add-portal z)
         (add-merch-portal z)
         (init-entities (inc z))
+        (init-themed-entities (inc z) type2)
 
         (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn rj.r/render-world
                                                    :args      {:view-port-sizes rj.cfg/view-port-sizes}})))))
@@ -571,7 +762,9 @@
         levels (:levels (rj.e/get-c-on-e system e-world :world))
         n-levels (count levels)]
     (if (= player-z (dec n-levels))
-      (let [new-level (generate-random-level rj.cfg/world-sizes z)]
+      (let [new-level (generate-random-level rj.cfg/world-sizes z)
+            newtype (:type new-level)
+            new-level (:level new-level)]
         (-> system
             (rj.e/upd-c e-world :world
                         (fn [c-world]
@@ -580,6 +773,7 @@
                                        (conj levels
                                              new-level)))))
             (init-entities z)
+            (init-themed-entities z newtype)
             (add-merch-portal (dec z))
             (add-portal (dec z))))
       system)))

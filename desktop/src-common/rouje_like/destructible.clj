@@ -135,6 +135,10 @@
                                     #(#{e-this} (:id %))
                                     entities))))
 
+        (if-let [on-death (:on-death-fn c-this)]
+          (on-death c-this e-this system)
+          system)
+
         (if-let [c-killable (rj.e/get-c-on-e system e-this :killable)]
           (let [c-exp (rj.e/get-c-on-e system e-from :experience)
                 level-up-fn (:level-up-fn c-exp)]
@@ -146,4 +150,3 @@
                  (level-up-fn e-from)))
           system)
         (rj.e/kill-e system e-this)))))
-

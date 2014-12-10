@@ -1,5 +1,5 @@
 (ns rouje-like.attacker
-  (:require [rouje-like.utils :as rj.u]
+  (:require [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.components :as rj.c]
             [rouje-like.destructible :as rj.d]))
@@ -12,7 +12,7 @@
   (let [is-valid-target? (:is-valid-target? c-this)
         target-type (:type (rj.e/get-c-on-e system e-target :position))]
     (and (not (nil? (rj.e/get-c-on-e system e-target :destructible)))
-         (is-valid-target? target-type))))
+            (is-valid-target? target-type))))
 
 (defn attack
   [c-this e-this e-target system]

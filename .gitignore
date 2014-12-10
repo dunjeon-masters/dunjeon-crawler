@@ -5,6 +5,8 @@ desktop/target
 *.iml
 *.swp
 target/
-
+*.save.*
 
 desktop/src-common/rouje_like/test.clj
+
+desktop/.lein-failures

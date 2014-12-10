@@ -2,16 +2,33 @@
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
            [clojure.lang Atom Fn Keyword PersistentVector]))
 
+#_(use 'rouje-like.components :reload)
+
+(defprotocol IPoint
+  (->3DPoint [this])
+  (->2DPoint [this]))
+
+(defrecord ArrowTrap [dir
+                      ready?])
+
 (defrecord Bat [])
 
 (defrecord Broadcaster [name-fn])
+
+(defrecord Colossal_amoeba [])
 
 (defrecord Counter [turn])
 
 (defrecord Digger [^Fn can-dig?-fn
                    ^Fn dig-fn])
 
+
+(defrecord Drake [])
+
+(defrecord Door [])
+
 (defrecord Energy [energy])
+
 
 (defrecord Entity [^Keyword id
                    ^Keyword type])
@@ -24,7 +41,19 @@
 
 (defrecord Fireball [])
 
+(defrecord Giant_amoeba [])
+
 (defrecord Gold [value])
+
+(defrecord HydraHead [])
+
+(defrecord HydraNeck [])
+
+(defrecord HydraTail [])
+
+(defrecord HydraRear [])
+
+(defrecord Inventory [slot junk])
 
 (defrecord Inspectable [msg])
 
@@ -43,6 +72,12 @@
                   max-mp
                   spells])
 
+(defrecord Large_amoeba [])
+
+(defrecord Mimic [])
+
+(defrecord Necromancer [])
+
 (defrecord MPortal [^Number x ^Number y ^Number z])
 
 (defrecord Merchant [])
@@ -59,7 +94,12 @@
 (defrecord Portal [^Number x ^Number y ^Number z])
 
 (defrecord Position [x y z
-                     ^Keyword type])
+                     ^Keyword type]
+  IPoint
+  (->3DPoint [{:keys [x y z]}]
+    [z x y])
+  (->2DPoint [{:keys [x y]}]
+    [x y]))
 
 (defrecord Purchasable [value])
 
@@ -74,6 +114,16 @@
 
 (defrecord Skeleton [])
 
+(defrecord Slime [])
+
+(defrecord Snake [])
+
+(defrecord Spider [])
+
+(defrecord Troll [])
+
+(defrecord SpikeTrap [visible?])
+
 (defrecord Tile [^Number x ^Number y ^Number z
                  ^PersistentVector entities])
 
@@ -82,6 +132,8 @@
 (defrecord Trap [])
 
 (defrecord Wallet [^Number gold])
+
+(defrecord Willowisp [])
 
 (defrecord World [levels
                   add-level-fn])
@@ -107,7 +159,8 @@
                          ^Number def
                          status-effects
                          can-retaliate?
-                         ^Fn take-damage-fn]
+                         ^Fn take-damage-fn
+                         on-death-fn]
   IDestructible
   (take-damage     [this e-this damage from system]
     (take-damage-fn this e-this damage from system)))
@@ -139,42 +192,59 @@
     (tick-fn this e-this system)))
 
 (def ^{:doc "Workaround for not being able to get record's type 'statically'"}
-  get-type {:attacker     (type (->Attacker nil nil nil nil nil))
-            :bat          (type (->Bat))
-            :broadcaster  (type (->Broadcaster nil))
-            :class        (type (->Klass nil))
-            :counter      (type (->Counter nil))
-            :destructible (type (->Destructible nil nil nil nil nil nil))
-            :digger       (type (->Digger nil nil))
-            :energy       (type (->Energy nil))
-            :entity       (type (->Entity nil nil))
-            :equipment    (type (->Equipment nil nil))
-            :experience   (type (->Experience nil nil nil))
-            :fireball     (type (->Fireball))
-            :gold         (type (->Gold nil))
-            :inspectable  (type (->Inspectable nil))
-            :inventory    (type (->Inventory nil nil nil nil))
-            :item         (type (->Item nil))
-            :killable     (type (->Killable nil))
-            :lichen       (type (->Lichen nil nil))
-            :magic        (type (->Magic nil nil nil))
-            :m-portal     (type (->MPortal nil nil nil))
-            :merchant     (type (->Merchant))
-            :mobile       (type (->Mobile nil nil))
-            :player       (type (->Player nil nil))
-            :playersight  (type (->PlayerSight nil nil nil nil nil))
-            :portal       (type (->Portal nil nil nil))
-            :position     (type (->Position nil nil nil nil))
-            :purchasable  (type (->Purchasable nil))
-            :race         (type (->Race nil))
-            :receiver     (type (->Receiver))
-            :relay        (type (->Relay nil nil))
-            :renderable   (type (->Renderable nil nil))
-            :sight        (type (->Sight nil))
-            :skeleton     (type (->Skeleton))
-            :tickable     (type (->Tickable nil nil))
-            :tile         (type (->Tile nil nil nil nil))
-            :torch        (type (->Torch nil))
-            :trap         (type (->Trap))
-            :wallet       (type (->Wallet nil))
-            :world        (type (->World nil nil))})
+  get-type {:arrow-trap       (type (->ArrowTrap nil nil))
+            :attacker         (type (->Attacker nil nil nil nil nil))
+            :bat              (type (->Bat))
+            :broadcaster      (type (->Broadcaster nil))
+            :class            (type (->Klass nil))
+            :colossal_amoeba  (type (->Colossal_amoeba))
+            :counter          (type (->Counter nil))
+            :destructible     (type (->Destructible nil nil nil nil nil nil nil))
+            :digger           (type (->Digger nil nil))
+            :door             (type (->Door))
+            :drake            (type (->Drake))
+            :energy           (type (->Energy nil))
+            :entity           (type (->Entity nil nil))
+            :equipment        (type (->Equipment nil nil))
+            :experience       (type (->Experience nil nil nil))
+            :fireball         (type (->Fireball))
+            :gold             (type (->Gold nil))
+            :giant_amoeba     (type (->Giant_amoeba))
+            :hydra-head       (type (->HydraHead))
+            :hydra-neck       (type (->HydraNeck))
+            :hydra-tail       (type (->HydraTail))
+            :hydra-rear       (type (->HydraRear))
+            :inventory        (type (->Inventory nil nil nil nil))
+            :inspectable      (type (->Inspectable nil))
+            :item             (type (->Item nil))
+            :killable         (type (->Killable nil))
+            :large_amoeba     (type (->Large_amoeba))
+            :lichen           (type (->Lichen nil nil))
+            :magic            (type (->Magic nil nil nil))
+            :m-portal         (type (->MPortal nil nil nil))
+            :merchant         (type (->Merchant))
+            :mobile           (type (->Mobile nil nil))
+            :mimic            (type (->Mimic))
+            :necromancer      (type (->Necromancer))
+            :player           (type (->Player nil nil))
+            :playersight      (type (->PlayerSight nil nil nil nil nil))
+            :portal           (type (->Portal nil nil nil))
+            :position         (type (->Position nil nil nil nil))
+            :purchasable      (type (->Purchasable nil))
+            :race             (type (->Race nil))
+            :receiver         (type (->Receiver))
+            :relay            (type (->Relay nil nil))
+            :renderable       (type (->Renderable nil nil))
+            :sight            (type (->Sight nil))
+            :skeleton         (type (->Skeleton))
+            :slime            (type (->Slime))
+            :spider           (type (->Spider))
+            :spike-trap       (type (->SpikeTrap nil))
+            :snake            (type (->Snake))
+            :tickable         (type (->Tickable nil nil))
+            :tile             (type (->Tile nil nil nil nil))
+            :torch            (type (->Torch nil))
+            :troll            (type (->Troll))
+            :wallet           (type (->Wallet nil))
+            :willowisp        (type (->Willowisp))
+            :world            (type (->World nil nil))})
