@@ -106,7 +106,7 @@
       (-> (br.e/create-system)
           (rj.core/init-entities {})))))
 
-(fact "update-in-world"
+#_(fact "update-in-world"
       (let [system (get-system)
             e-world (first (rj.e/all-e-with-c system :world))
             e-player (first (rj.e/all-e-with-c system :player))]
@@ -119,7 +119,7 @@
            (let [es (entities-at-pos system [1 3 3])]
              (= (:type (first es)) :fact))))
 
-(fact "change-type"
+#_(fact "change-type"
       (let [system (get-system)
             e-player (first (rj.e/all-e-with-c system :player))]
         (change-type system e-player :player :reyalp))

@@ -1,4 +1,4 @@
-(ns rouje-like.t-items
+#_(ns rouje-like.t-items
   (:use [midje.sweet]
         [rouje-like.items])
   (:require [rouje-like.utils :as rj.u :refer [?]]
@@ -8,19 +8,19 @@
             [rouje-like.components :as rj.c]
             [rouje-like.world :as rj.w]))
 
-(defn get-system []
+#_(defn get-system []
   (with-open [w (clojure.java.io/writer "NUL")]
     (binding [*out* w]
       (-> (br.e/create-system)
           (rj.core/init-entities {})))))
 
-(def level (rj.w/generate-random-level
+#_(def level (rj.w/generate-random-level
              {:width 3 :height 3} 1 :merchant))
-(def wall-e (rj.c/map->Entity {:type :wall}))
-(def level+wall (update-in level [0 1 :entities]
+#_(def wall-e (rj.c/map->Entity {:type :wall}))
+#_(def level+wall (update-in level [0 1 :entities]
                            conj wall-e))
 
-(let [system get-system
+#_(let [system get-system
       e-world (first (rj.e/all-e-with-c system :world))
       c-world (rj.e/get-c-on-e system e-world :world)
       levels (:levels c-world)
