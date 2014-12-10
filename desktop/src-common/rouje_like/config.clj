@@ -76,7 +76,7 @@
                    :warrior [:powerattack]})
 
 (def level-exp
-  {:exp 1})
+  {:exp 3})
 
 (def player-init-pos
   (let [x (/ (:width  world-sizes) 2)

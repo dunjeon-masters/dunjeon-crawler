@@ -118,17 +118,14 @@
                   (:max-mp (rj.cfg/class->stats player-class)))
 
         cfg-mage-spells (rj.cfg/class->spell :mage)
-
         spell (rand-nth cfg-mage-spells)
-
-        cfg-spell-effect (spell rj.cfg/spell-effects)
-
+        cfg-spell-effect (rj.cfg/spell-effects spell)
         spell (if (= player-class :mage)
-                (conj [] {(rand-nth cfg-mage-spells)
-                          {:distance (:distance cfg-spell-effect)
-                           :value (:value cfg-spell-effect)
-                           :type (:type cfg-spell-effect)
-                           :atk-reduction (:atk-reduction cfg-spell-effect)}})
+                (conj [] {:name spell
+                          :distance (:distance cfg-spell-effect)
+                          :value (:value cfg-spell-effect)
+                          :type (:type cfg-spell-effect)
+                          :atk-reduction (:atk-reduction cfg-spell-effect)})
                 [])]
 
     (rj.e/system<<components
@@ -137,8 +134,8 @@
                  :show-world? false}]
        [:klass {:class player-class}]
        [:race {:race player-race}]
-       [:experience {:experience 4
-                     :level 4
+       [:experience {:experience 1
+                     :level 1
                      :level-up-fn rj.exp/level-up}]
        [:position {:x x-pos
                    :y y-pos
@@ -187,4 +184,3 @@
                             (vec (conj (filter #(rj.cfg/<floors> (:type %)) entities)
                                        (rj.c/map->Entity {:id   e-player
                                                           :type :player})))))))
-

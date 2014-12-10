@@ -160,42 +160,46 @@
              (let [e-player (first (rj.e/all-e-with-c system :player))
                    c-magic (rj.e/get-c-on-e system e-player :magic)
                    spells (:spells c-magic)
-                   fireball (? (first (filter :fireball spells)))
-                   powerattack (? (first (filter :powerattack spells)))
-                   pickpocket (? (first (filter :pickpocket spells)))
+                   fireball (? (first (filter #(= (:name %) :fireball) spells)))
+                   powerattack (? (first (filter #(= (:name %) :powerattack) spells)))
+                   pickpocket (? (first (filter #(= (:name %) :pickpocket) spells)))
                    mp (:mp c-magic)]
                (reset-input-manager)
-               (if fireball
+               (cond
+                 fireball
                  (if (not (neg? (- mp (:fireball rj.cfg/spell->mp-cost))))
                    (as-> system system
-                         (rj.mag/use-fireball system e-player fireball direction)
-                         (tick-entities system)
-                         (rj.d/apply-effects system e-player))
+                     (rj.mag/use-fireball system e-player fireball direction)
+                     (tick-entities system)
+                     (rj.d/apply-effects system e-player))
                    (as-> system system
-                         (rj.msg/add-msg system :static "you do not have enough mp to cast fireball")
-                         (tick-entities system))
-                   )
-                 (if powerattack
-                   (if (not (neg? (- mp (:powerattack rj.cfg/spell->mp-cost))))
-                     (as-> system system
-                           (rj.mag/use-powerattack system e-player powerattack direction)
-                           (tick-entities system)
-                           (rj.d/apply-effects system e-player))
-                     (as-> system system
-                           (rj.msg/add-msg system :static "you do not have enough mp to cast power attack")
-                           (tick-entities system)))
-                   (if pickpocket
-                     (if (not (neg? (- mp (:pickpocket rj.cfg/spell->mp-cost))))
-                       (as-> system system
-                             (rj.mag/use-pickpocket system e-player pickpocket direction)
-                             (tick-entities system)
-                             (rj.d/apply-effects system e-player))
-                       (as-> system system
-                             (rj.msg/add-msg system :static "you do not have enough mp to cast pickpocket")
-                             (tick-entities system)))
-                     (as-> system system
+                     (rj.msg/add-msg system :static "you do not have enough mp to cast fireball")
+                     (tick-entities system)))
+
+                 powerattack
+                 (if (not (neg? (- mp (:powerattack rj.cfg/spell->mp-cost))))
+                   (as-> system system
+                     (rj.mag/use-powerattack system e-player powerattack direction)
+                     (tick-entities system)
+                     (rj.d/apply-effects system e-player))
+                   (as-> system system
+                     (rj.msg/add-msg system :static "you do not have enough mp to cast power attack")
+                     (tick-entities system)))
+
+                 pickpocket
+                 (if (not (neg? (- mp (:pickpocket rj.cfg/spell->mp-cost))))
+                   (as-> system system
+                     (rj.mag/use-pickpocket system e-player pickpocket direction)
+                     (tick-entities system)
+                     (rj.d/apply-effects system e-player))
+                   (as-> system system
+                     (rj.msg/add-msg system :static "you do not have enough mp to cast pickpocket")
+                     (tick-entities system)))
+
+                 :else
+                 (as-> system system
                            (rj.msg/add-msg system :static "you do not have a spell to cast")
-                           (tick-entities system))))))
+                           (tick-entities system))))
 
             ;; are we inspecting something
              (:inspect-mode @input-manager)
