@@ -234,7 +234,7 @@
 (def ^:private type->texture
   (memoize
     (fn [^Keyword type]
-      (let [tile-info (? (type->tile-info (? type)))
+      (let [tile-info (type->tile-info type)
             tile-sheet (:tile-sheet tile-info)
             width (:width tile-info)
             height (:height tile-info)

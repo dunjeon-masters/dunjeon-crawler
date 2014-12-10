@@ -117,15 +117,19 @@
                   (:max-mp (rj.cfg/race->stats player-race))
                   (:max-mp (rj.cfg/class->stats player-class)))
 
-        spell (if (= player-class :mage)
-                (get (rj.cfg/class->spell :mage) (rand-int (count (rj.cfg/class->spell :mage))))
-                (if (= player-class :warrior)
-                  (get (rj.cfg/class->spell :warrior) (rand-int (count (rj.cfg/class->spell :warrior))))
-                  (get (rj.cfg/class->spell :rogue) (rand-int (count (rj.cfg/class->spell :rogue))))))
-        ;if warrior get a warrior spell (TEMPORARY TO DEBUG)
-        ;warrior spell will be granted on level ups
-        ]
+        cfg-mage-spells (rj.cfg/class->spell :mage)
 
+        spell (rand-nth cfg-mage-spells)
+
+        cfg-spell-effect (spell rj.cfg/spell-effects)
+
+        spell (if (= player-class :mage)
+                (conj [] {(rand-nth cfg-mage-spells)
+                          {:distance (:distance cfg-spell-effect)
+                           :value (:value cfg-spell-effect)
+                           :type (:type cfg-spell-effect)
+                           :atk-reduction (:atk-reduction cfg-spell-effect)}})
+                [])]
 
     (rj.e/system<<components
       system e-player
@@ -133,8 +137,8 @@
                  :show-world? false}]
        [:klass {:class player-class}]
        [:race {:race player-race}]
-       [:experience {:experience 0
-                     :level 1
+       [:experience {:experience 4
+                     :level 4
                      :level-up-fn rj.exp/level-up}]
        [:position {:x x-pos
                    :y y-pos
@@ -171,7 +175,7 @@
                        :status-effects []}]
        [:magic {:max-mp max-mp
                 :mp max-mp
-                :spells [spell]}]
+                :spells spell}]
        [:broadcaster {:name-fn (constantly n)}]])))
 
 (defn add-player

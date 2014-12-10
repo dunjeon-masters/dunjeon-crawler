@@ -160,42 +160,34 @@
              (let [e-player (first (rj.e/all-e-with-c system :player))
                    c-magic (rj.e/get-c-on-e system e-player :magic)
                    spells (:spells c-magic)
-                   ;checks to see if they can or cannot cast fireball
-                   ;-1 means they do not have fireball
-                   fireball? (if (= -1 (.indexOf spells :fireball))
-                               false
-                               true)
-                   powerattack? (if (= -1 (.indexOf spells :powerattack))
-                                  false
-                                  true)
-                   pickpocket? (if (= -1 (.indexOf spells :pickpocket))
-                                  false
-                                  true)
+                   fireball (? (first (filter :fireball spells)))
+                   powerattack (? (first (filter :powerattack spells)))
+                   pickpocket (? (first (filter :pickpocket spells)))
                    mp (:mp c-magic)]
                (reset-input-manager)
-               (if fireball?
+               (if fireball
                  (if (not (neg? (- mp (:fireball rj.cfg/spell->mp-cost))))
                    (as-> system system
-                         (rj.mag/use-fireball system e-player direction)
+                         (rj.mag/use-fireball system e-player fireball direction)
                          (tick-entities system)
                          (rj.d/apply-effects system e-player))
                    (as-> system system
                          (rj.msg/add-msg system :static "you do not have enough mp to cast fireball")
                          (tick-entities system))
                    )
-                 (if powerattack?
+                 (if powerattack
                    (if (not (neg? (- mp (:powerattack rj.cfg/spell->mp-cost))))
                      (as-> system system
-                           (rj.mag/use-powerattack system e-player direction)
+                           (rj.mag/use-powerattack system e-player powerattack direction)
                            (tick-entities system)
                            (rj.d/apply-effects system e-player))
                      (as-> system system
                            (rj.msg/add-msg system :static "you do not have enough mp to cast power attack")
                            (tick-entities system)))
-                   (if pickpocket?
+                   (if pickpocket
                      (if (not (neg? (- mp (:pickpocket rj.cfg/spell->mp-cost))))
                        (as-> system system
-                             (rj.mag/use-pickpocket system e-player direction)
+                             (rj.mag/use-pickpocket system e-player pickpocket direction)
                              (tick-entities system)
                              (rj.d/apply-effects system e-player))
                        (as-> system system

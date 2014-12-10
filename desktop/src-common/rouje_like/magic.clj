@@ -30,16 +30,15 @@
 
 (defn use-fireball
   "E-THIS shoots a fireball in DIRECTION"
-  [system e-this direction]
+  [system e-this fireball-map direction]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
         e-this-pos  [(:x c-position) (:y c-position)]
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
         world (nth levels (:z c-position))
-        spell (:fireball rj.cfg/spell-effects)
-        distance (:distance spell)
-        damage (:value spell)]
+        distance (:distance (:fireball fireball-map))
+        damage (:value (:fireball fireball-map))]
 
     (as-> system system
           (dec-mp system e-this :fireball)
@@ -81,16 +80,15 @@
 
 (defn use-powerattack
   "E-THIS has increased attack in DIRECTION for 1 turn"
-  [system e-this direction]
+  [system e-this powerattack-map direction]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
         e-this-pos  [(:x c-position) (:y c-position)]
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
         world (nth levels (:z c-position))
-        spell (:powerattack rj.cfg/spell-effects)
-        distance (:distance spell)
-        damage (:value spell)]
+        distance (:distance (:powerattack powerattack-map))
+        damage (:value (:powerattack powerattack-map))]
 
     (as-> system system
           (dec-mp system e-this :powerattack)
@@ -111,17 +109,16 @@
 
 (defn use-pickpocket
   "E-THIS steals gold from entity to DIRECTION"
-  [system e-this direction]
+  [system e-this pickpocket-map direction]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
         e-this-pos  [(:x c-position) (:y c-position)]
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
         world (nth levels (:z c-position))
-        spell (:pickpocket rj.cfg/spell-effects)
-        distance (:distance spell)
-        damage-reduction (:atk-reduction spell)
-        additional-gold (:value spell)]
+        damage-reduction (:atk-reduction (:pickpocket pickpocket-map))
+        additional-gold (:value (:pickpocket pickpocket-map))
+        distance (:distance (:pickpocket pickpocket-map))]
 
     (as-> system system
           (dec-mp system e-this :pickpocket)
