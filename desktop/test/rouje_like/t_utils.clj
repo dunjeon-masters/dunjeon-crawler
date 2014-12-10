@@ -101,7 +101,7 @@
       => (has every? (roughly 5 5)))
 
 (defn get-system []
-  (with-open [w (clojure.java.io/writer "/dev/null")]
+  (with-open [w (clojure.java.io/writer "NUL")]
     (binding [*out* w]
       (-> (br.e/create-system)
           (rj.core/init-entities {})))))
