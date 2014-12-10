@@ -7,6 +7,12 @@
             [rouje-like.components :as rj.c :refer [->3DPoint]]
             [rouje-like.world :as rj.w]))
 
+(defn get-system []
+  (with-open [w (clojure.java.io/writer "NUL")]
+    (binding [*out* w]
+      (-> (br.e/create-system)
+          (rj.core/init-entities {})))))
+
 (def level (rj.w/generate-random-level
              {:width 3 :height 3} 1 :merchant))
 (def wall-e (rj.c/map->Entity {:type :wall}))
@@ -99,12 +105,6 @@
 (fact "rand-rng"
       (take 100 (repeatedly #(rand-rng 1 10)))
       => (has every? (roughly 5 5)))
-
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
 
 (fact "update-in-world"
       (let [system (get-system)
