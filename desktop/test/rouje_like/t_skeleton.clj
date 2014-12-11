@@ -14,4 +14,9 @@
       (-> (br.e/create-system)
           (rj.core/init-entities {})))))
 
-(fact "add-skeleton")
+(let [system (get-system)]
+  (fact "add-skeleton"
+        (as-> system system
+              (:system (add-skeleton {:system system :z 1}))
+              (nil? (rj.e/get-c-on-e system (first (rj.e/all-e-with-c system :skeleton)) :position)))
+        => false))
