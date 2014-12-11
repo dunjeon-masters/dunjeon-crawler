@@ -6,7 +6,8 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :refer :all]
             [rouje-like.components :as rj.c :refer [->3DPoint]]
-            [rouje-like.world :as rj.w]))
+            [rouje-like.world :as rj.w]
+            [rouje-like.config :as rj.cfg]))
 
 (defn get-system []
   (with-open [w (clojure.java.io/writer "NUL")]
@@ -15,17 +16,65 @@
           (rj.core/init-entities {})))))
 
 (let [system (get-system)
-      system (#'rouje-like.world/init-themed-entities system 1 :maze)
-      e-player (first (rj.e/all-e-with-c system :player))
-      c-attacker (rj.e/get-c-on-e system e-player :attacker)
-      e-slime (first (rj.e/all-e-with-c system :slime))
-      e-skeleton (first (rj.e/all-e-with-c system :skeleton))
-      c-attacker-skeleton (rj.e/get-c-on-e system e-skeleton :attacker)]
+      e-player (first (rj.e/all-e-with-c system :player))]
 
-  (fact "level-exp")
+  (fact "level->exp"
+        (level->exp 5) => (* 5 (:exp rj.cfg/level-exp))
+        (level->exp 7) => (* 7 (:exp rj.cfg/level-exp)))
 
-  (fact "wrand")
+  (fact "wrand"
+        (wrand [2 2 1]) =future=> "ANTHONY WILL DO THIS")
 
-  (fact "level-up-stats")
+  (facts "level-up-stats"
+         (fact "successfully increment players attribute"
+               (as-> system system
+                     (rj.e/upd-c system e-player :experience
+                                 (fn [c-experience]
+                                   (update-in c-experience [:level]
+                                              + 4)))
+                     (let [s (level-up-stats system e-player :atk)]
+                       (:atk
+                         (rj.e/get-c-on-e s
+                                          (first (rj.e/all-e-with-c s :player))
+                                          :attacker)))) => (inc (:atk (rj.e/get-c-on-e system e-player :attacker))))
 
-  (fact "level-up"))
+         (fact "successfully give player a spell at level 5"
+               (as-> system system
+                     (rj.e/upd-c system e-player :experience
+                                 (fn [c-experience]
+                                   (update-in c-experience [:level]
+                                              + 4)))
+                     (let [s (level-up-stats system e-player)]
+                       (count (:spells
+                                (rj.e/get-c-on-e s
+                                                 (first (rj.e/all-e-with-c s :player))
+                                                 :magic))))) => 1)
+
+         #_(fact "successfully upgrade a spell at level 10"
+               (as-> system system
+                     (let [c-magic (rj.e/get-c-on-e system e-player :magic)
+                           spells (:spells c-magic)
+                           spell (spells 0)]
+                       (rj.e/upd-c system e-player :experience
+                                   (fn [c-experience]
+                                     (update-in c-experience [:level]
+                                                + 9)))
+
+                       (let [s (level-up-stats system e-player)]
+                         (? (:value ((:spells
+                                  (rj.e/get-c-on-e s
+                                                   (first (rj.e/all-e-with-c s :player))
+                                                   :magic)) 0))))
+                       =future=> (+ 2 (:value spell))))))
+
+  (fact "level-up"
+        (as-> system system
+              (rj.e/upd-c system e-player :experience
+                          (fn [c-experience]
+                            (update-in c-experience [:experience]
+                                       + (level->exp 2))))
+              (let [s (level-up e-player system)]
+                (:level
+                  (rj.e/get-c-on-e s
+                                   (first (rj.e/all-e-with-c s :player))
+                                   :experience)) => 2))))

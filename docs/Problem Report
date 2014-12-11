@@ -1,7 +1,7 @@
 Problem Report
 Product Name: Dunjeon Crawler				      Release Name: Dunjeon Crawler
 Team Name: Dunjeon Masters					          Release Date: 12/10/2014
-Revision Number: 1
+Revision Number: 2
 Revision Date: 12/10/2014 
 -------------------------------------------------------------------------------------------------------------------------
 Known Problems With Prototype:
@@ -12,3 +12,14 @@ Known Problems With Prototype:
   -Another remedy may be to check if the player is dead more often before trying to access it's data
   -The crash occurs in the file associated with the mob type that kills us
     -Example: If a spider kills the player, there will be a crash in the spider.clj file.
+-Player race and class selections not validated until game has started
+  -We give the user the choice to choose their race and class and the system appears to accept any value
+  -We can add more conditions to that input function to check to see their selections are valid and send a message saying they
+  are invalid if that is the case.
+  -This bug appears anytime you start the game and type "race incorrect-race" or "class incorrect-class"
+-Player can only level up one time per kill
+  -If player should level up multiple times after killing a monster that gives out a lot of experience, it only levels up
+  once.
+  -We could try to remove this problem by looping aroudn the if statement in the level-up function until expereince is not
+  greater than the level needed to be the next level.
+  -Bug occurs in the rouje-like experience file, most likely at the if loop at line 89.

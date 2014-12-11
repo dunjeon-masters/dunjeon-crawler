@@ -246,5 +246,6 @@
 (defn entities-at-pos
   [level pos]
   "Return the entities of the tile at [Z X Y]."
-  (let [target-tile (get-in level pos nil)]
+  (let [target-tile (get-in level pos :err)]
+    (assert (not= :err target-tile))
     (:entities target-tile)))

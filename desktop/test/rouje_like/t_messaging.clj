@@ -16,7 +16,8 @@
   (fact "add-msg :static"
         (-> (add-msg system :static "static")
             (rj.e/get-c-on-e e-relay :relay)
-            (:static)) => (just {:message "static", :turn 1}))
+            (:static)) => (just {:message "static"
+                                 :turn 1}))
   (fact "add-msg :dynamic"
         (-> system
             (rj.e/upd-c e-relay :renderable

@@ -1,0 +1,77 @@
+Sprint 2 Report
+Product Name: Dunjeon Crawler
+Team Name: Dunjeon Masters
+Date: 12/10/2014
+Revision: 1
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO STOP DOING
+	-Stop being late/missing team meetings
+		-Team members who miss team meetings fall behind on changes made and they cannot add their feedback on ideas.
+		 It is detrimental to their knowledge and to the quality of the product.
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO START DOING
+	-Come to all planned team meetings
+		-Team meetings are important times to collaborate on how to approach problems. If you miss the meeting, you
+		 cannot contribute to product as efficiently as possible.
+------------------------------------------------------------------------------------------------------------------------
+ACTIONS TO KEEP DOING
+	-Getting help when you are stuck
+		-Team members should reach out to each other if they are stuck to get more insight into their problems. This
+		 way we can effectively work through bugs and waste less time.
+	-Committing bug free code to the master branch
+		-Team members have done a good job of only submitting bug free code to master so we always have a working
+		 prototype of the game.
+	-Use the same format in all functions and written code.
+		-For components we use c-name which allows all users to easily see what is a component. Being inconsistent and
+		 writing name-comp makes it more difficult to read your code.
+------------------------------------------------------------------------------------------------------------------------	
+WORK COMPLETED/NOT COMPLETED
+-Completed:
+	-As a developer, I want to make upgrades to the system and fix bugs [so that the game runs the way I want it to].
+  -As a user, I want to use magic and spells [so that I can have a larger variety of attacks]. 
+  -As a user, I want to encounter boss monsters [so that the game is more challenging]. 
+  -As a user, I want to encounter merchants [so that I can sell my items and purchase items I would not be able to get 
+    through other methods]. 
+  -As a user, I want a save feature [so that I don’t have to play the whole playthrough in one sitting]. 
+  -As a developer, I'd like these traps to be finished [so that we more variety beyond arrow traps].
+-Not Completed:
+	None.
+------------------------------------------------------------------------------------------------------------------------	
+WORK COMPLETION RATE FOR SPRINT 1
+	Total User Stories: 4
+	Total Story Points: 24
+	Total Tasks: 25
+	Total Days in Sprint: 14
+	Total Ideal Hours Worked: 25.25
+	Story Points/Day: 1.71
+	Ideal Hours/Day: 1.8
+------------------------------------------------------------------------------------------------------------------------
+WORK COMPLETION RATE FOR SPRINT 2
+	Total User Stories: 6
+	Total Story Points: 31
+	Total Tasks: 29
+	Total Days in Sprint: 14
+	Total Ideal Hours Worked: 117.5
+	Story Points/Day: 2.21
+	Ideal Hours/Day: 8.39
+------------------------------------------------------------------------------------------------------------------------
+WORK COMPLETION RATE FOR SPRINT 3
+	Total User Stories: 6
+	Total Story Points: 23
+	Total Tasks: 21
+	Total Days in Sprint: 29
+	Total Ideal Hours Worked: 76.25
+	Story Points/Day: 0.79
+	Ideal Hours/Day: 2.63
+------------------------------------------------------------------------------------------------------------------------
+AVERAGE WORK COMPLETION RATE
+	Total User Stories: 5.33
+	Total Story Points: 26
+	Total Tasks: 25
+	Total Days in Sprint: 19
+	Total Ideal Hours Worked: 73
+	Story Points/Day: 1.37
+	Ideal Hours/Day: 3.84
+------------------------------------------------------------------------------------------------------------------------
+FINAL SCRUM BOARD AND BURN UP CHART
+	https://docs.google.com/spreadsheets/d/1DkYFBsiAuHbRM2h9hCxzOWg_1d6Fl8DcaVvOdwqzVYI/edit?usp=sharing

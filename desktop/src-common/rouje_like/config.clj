@@ -23,9 +23,9 @@
                         (catch Exception e
                           min-block-size))]
     (max min-block-size block-size)))
-
-(def world-sizes {:width  40
-                  :height 40})
+                                                      +
+(def world-sizes {:width  20
+                  :height 20})
 
 ;; ===== TILE TYPES =====
 (def <floors>

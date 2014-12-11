@@ -14,11 +14,13 @@
        (fact "bad type"
              (with-out-str
                (print-level (gen-level 3 3 :wrong)))
-             => "  (0 1 2)\r\n0 (Q Q Q)\r\n1 (Q Q Q)\r\n2 (Q Q Q)\r\n")
+             => (or "  (0 1 2)\n0 (Q Q Q)\n1 (Q Q Q)\n2 (Q Q Q)\n"
+                    "  (0 1 2)\r\n0 (Q Q Q)\r\n1 (Q Q Q)\r\n2 (Q Q Q)\r\n"))
        (fact "good values"
              (with-out-str
                (print-level (gen-level 3 3 :f)))
-             => "  (0 1 2)\r\n0 (_ _ _)\r\n1 (_ _ _)\r\n2 (_ _ _)\r\n"))
+             => (or "  (0 1 2)\n0 (_ _ _)\n1 (_ _ _)\n2 (_ _ _)\n"
+                    "  (0 1 2)\r\n0 (_ _ _)\r\n1 (_ _ _)\r\n2 (_ _ _)\r\n")))
 
 (facts "valid-door-locs"
        (fact "odd dimensions"
