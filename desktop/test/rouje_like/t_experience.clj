@@ -30,59 +30,56 @@
                     #(wrand [2 2 1]))))
           {0 :a, 1 :b, 2 :c})
         => (fn [{:keys [a b c]}]
-             ((roughly 2 1/10)
+             ((roughly 2 1/5)
               (/ (* 1/2 (+ a b)) c))))
 
   (facts "level-up-stats"
          (fact "successfully increment players attribute"
                (as-> system system
-                     (rj.e/upd-c system e-player :experience
-                                 (fn [c-experience]
-                                   (update-in c-experience [:level]
-                                              + 4)))
-                     (let [s (level-up-stats system e-player :atk)]
-                       (:atk
-                         (rj.e/get-c-on-e s
-                                          (first (rj.e/all-e-with-c s :player))
-                                          :attacker)))) => (inc (:atk (rj.e/get-c-on-e system e-player :attacker))))
+                 (rj.e/upd-c system e-player :experience
+                             (fn [c-experience]
+                               (update-in c-experience [:level]
+                                          + 4)))
+                 (let [s (level-up-stats system e-player :atk)]
+                   (:atk
+                     (rj.e/get-c-on-e s
+                                      (first (rj.e/all-e-with-c s :player))
+                                      :attacker)))) => (inc (:atk (rj.e/get-c-on-e system e-player :attacker))))
 
          (fact "successfully give player a spell at level 5"
                (as-> system system
-                     (rj.e/upd-c system e-player :experience
-                                 (fn [c-experience]
-                                   (update-in c-experience [:level]
-                                              + 4)))
-                     (let [s (level-up-stats system e-player)]
-                       (count (:spells
-                                (rj.e/get-c-on-e s
-                                                 (first (rj.e/all-e-with-c s :player))
-                                                 :magic))))) => 1)
+                 (rj.e/upd-c system e-player :experience
+                             (fn [c-experience]
+                               (update-in c-experience [:level]
+                                          + 4)))
+                 (let [s (level-up-stats system e-player)]
+                   (count (:spells
+                            (rj.e/get-c-on-e s
+                                             (first (rj.e/all-e-with-c s :player))
+                                             :magic))))) => 1)
 
-         #_(fact "successfully upgrade a spell at level 10"
-               (as-> system system
-                     (let [c-magic (rj.e/get-c-on-e system e-player :magic)
-                           spells (:spells c-magic)
-                           spell (first spells)]
-                       (rj.e/upd-c system e-player :experience
-                                   (fn [c-experience]
-                                     (update-in c-experience [:level]
-                                                + 9)))
+         (fact "successfully upgrade a spell at level 10"
+               (let [system (rj.e/upd-c system e-player :experience
+                               (fn [c-experience]
+                                 (update-in c-experience [:level]
+                                            + 9)))
+                     system (level-up-stats system e-player)
+                     {:keys [spells]} (rj.e/get-c-on-e system e-player :magic)
+                     spell (first spells)
 
-                       (let [s (level-up-stats system e-player)]
-                         (? (:value (first (:spells
-                                  (rj.e/get-c-on-e s
-                                                   (first (rj.e/all-e-with-c s :player))
-                                                   :magic))))))
-                       =future=> (+ 2 (:value spell))))))
+                     system (level-up-stats system e-player)
+                     {:keys [spells]} (rj.e/get-c-on-e system e-player :magic)]
+                 (:value (first spells))
+                 => (+ 2 (:value spell)))))
 
   (fact "level-up"
         (as-> system system
-              (rj.e/upd-c system e-player :experience
-                          (fn [c-experience]
-                            (update-in c-experience [:experience]
-                                       + (level->exp 2))))
-              (let [s (level-up e-player system)]
-                (:level
-                  (rj.e/get-c-on-e s
-                                   (first (rj.e/all-e-with-c s :player))
-                                   :experience)) => 2))))
+          (rj.e/upd-c system e-player :experience
+                      (fn [c-experience]
+                        (update-in c-experience [:experience]
+                                   + (level->exp 2))))
+          (let [s (level-up e-player system)]
+            (:level
+              (rj.e/get-c-on-e s
+                               (first (rj.e/all-e-with-c s :player))
+                               :experience)) => 2))))
