@@ -23,7 +23,15 @@
         (level->exp 7) => (* 7 (:exp rj.cfg/level-exp)))
 
   (fact "wrand"
-        (wrand [2 2 1]) =future=> "ANTHONY WILL DO THIS")
+        (clojure.set/rename-keys
+          (frequencies
+            (take 10000
+                  (repeatedly
+                    #(wrand [2 2 1]))))
+          {0 :a, 1 :b, 2 :c})
+        => (fn [{:keys [a b c]}]
+             ((roughly 2 1/10)
+              (/ (* 1/2 (+ a b)) c))))
 
   (facts "level-up-stats"
          (fact "successfully increment players attribute"
@@ -54,17 +62,17 @@
                (as-> system system
                      (let [c-magic (rj.e/get-c-on-e system e-player :magic)
                            spells (:spells c-magic)
-                           spell (spells 0)]
+                           spell (first spells)]
                        (rj.e/upd-c system e-player :experience
                                    (fn [c-experience]
                                      (update-in c-experience [:level]
                                                 + 9)))
 
                        (let [s (level-up-stats system e-player)]
-                         (? (:value ((:spells
+                         (? (:value (first (:spells
                                   (rj.e/get-c-on-e s
                                                    (first (rj.e/all-e-with-c s :player))
-                                                   :magic)) 0))))
+                                                   :magic))))))
                        =future=> (+ 2 (:value spell))))))
 
   (fact "level-up"
