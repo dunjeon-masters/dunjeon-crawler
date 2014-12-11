@@ -106,28 +106,33 @@
       (-> (br.e/create-system)
           (rj.core/init-entities {})))))
 
-#_(fact "update-in-world"
+(fact "update-in-world"
       (let [system (get-system)
             e-world (first (rj.e/all-e-with-c system :world))
-            e-player (first (rj.e/all-e-with-c system :player))]
-        (update-in-world system e-world [1 3 3];[z x y]
-                         (fn [es]
-                           [(rj.c/map->Entity
-                              {:id nil
-                               :type :fact})])))
-      => (fn [system]
-           (let [es (entities-at-pos system [1 3 3])]
-             (= (:type (first es)) :fact))))
+            e-player (first (rj.e/all-e-with-c system :player))
+            system (update-in-world system e-world [1 3 3];[z x y]
+                                    (fn [es]
+                                      [(rj.c/map->Entity
+                                         {:id nil
+                                          :type :fact})]))
+            c-world (rj.e/get-c-on-e system e-world :world)
+            levels (:levels c-world)]
+        (entities-at-pos levels [1 3 3]))
+      => (fn [es]
+           (= (:type (first es)) :fact)))
 
-#_(fact "change-type"
+(fact "change-type"
       (let [system (get-system)
-            e-player (first (rj.e/all-e-with-c system :player))]
-        (change-type system e-player :player :reyalp))
-      => (fn [system]
-           (let [e-player (first (rj.e/all-e-with-c system :player))
-                 c-position (rj.e/get-c-on-e system e-player :position)
-                 this-pos (->3DPoint c-position)]
-             (and (#{:reyalp} (:type c-position))
+            e-player (first (rj.e/all-e-with-c system :player))
+            system (change-type system e-player :player :reyalp)
+            c-position (rj.e/get-c-on-e system e-player :position)
+            e-world (first (rj.e/all-e-with-c system :world))
+            levels (:levels (rj.e/get-c-on-e system e-world :world))
+            entities (entities-at-pos levels (->3DPoint c-position))]
+        {:c-position c-position
+         :entities  entities})
+      => (fn [{:keys [c-position entities]}]
+           (and (#{:reyalp} (:type c-position))
                   (seq
                     (filter #(= :reyalp (:type %))
-                            (entities-at-pos system this-pos)))))))
+                            entities)))))

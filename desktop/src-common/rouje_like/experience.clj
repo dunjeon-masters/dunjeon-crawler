@@ -7,10 +7,12 @@
             [rouje-like.messaging :as rj.msg]))
 
 (defn level->exp
+  "[int level] gets the minimum amount of experience needed to be LEVEL"
   [level]
   (* level (:exp rj.cfg/level-exp)))
 
 (defn wrand
+  "[int vector slices] returns a random index chosen with the weights provided in SLICES"
   [slices]
   (let [total (reduce + slices)
         r (rand total)]
@@ -81,6 +83,9 @@
         level (:level c-this)
         experience (:experience c-this)]
 
+    ;Does not handle if player should level up multiple times in one turn
+    ;If player needs 3 exp per level and gains 9 from killing a boss, it will
+    ;only level up once. Perhaps use a loop?
     (if (> experience (level->exp level))
       (-> system
           (rj.e/upd-c e-this :experience
