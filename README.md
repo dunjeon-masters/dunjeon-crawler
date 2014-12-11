@@ -14,6 +14,11 @@ Will be using github and this README as a message board. Check periodically for 
 
 A play-clj rogue like.
 
+## Public Demo
+
+There is a .jar file located under the release directory for public testing. To run, you just need java and you run it like
+any other .jar file. All known bugs can be found in docs under the problem report.
+
 ## Building
 
 All projects can be built using [Nightcode](https://nightcode.info/), or on the command line using [Leiningen](https://github.com/technomancy/leiningen) with the [lein-droid](https://github.com/clojure-android/lein-droid) and [lein-fruit](https://github.com/oakes/lein-fruit) plugins.
