@@ -57,58 +57,72 @@ is dealt or received].
   -Expected input: A queue of messages to be printed
   -Expected output: The label in the bottom left corner of the screen should print
                     those messages
+                    
 -As a user, I want to navigate multiple levels [so that the game has longer gameplay].
   -Expected input: Player walks through portal to new level
   -Expected output: New level is generated
+  
 -As a user, I want to be able to build my character (races and classes) and level up 
 [so that the game feels customized and I can progress over time].
   -Expected input: Player types something like class mage or race orc in the command line
                    at the start of the game
   -Expected output: Player's race, class, and/or name are changed for the duration of
                     the game
+                    
 -As a user, I want an advanced mob system [so the monsters are unique and more challenging 
 to fight].
   -Expected input: Receive and empty level with no monsters
   -Expected output: Return populated level with monsters fitting for that level. (Monsters have
                     specific floors that they can spawn on)
+                    
 -As a developer, I want to make upgrades to the system and fix bugs [so that the game runs 
 the way I want it to].
   -Expected input: Code that has bugs and crashes
   -Expected output: Code that runs smoothly and has minimal crashes
+  
 -As a user, I want to have status effects [so that the game is more interesting].
   -Expected input: Player with no status effects (such as poison)
   -Expected output: Player that has a new status effect that applies to them at the end 
-                    of the turn.
+                    of the turn
+                    
 -As a user, I want traps and terrain interaction [so that the floors have more user 
 interaction and are more interesting to play through]. 
   -Expected input: World with no traps and terrain interaction
   -Expected output: World that has traps and interactable items such as doors
+  
 -As a user, I want themed levels with themed mobs and traps [so that the floors are unique 
 and not so monotonous]. 
   -Expected input: World that is only caves
   -Expected output: World that has multiple levles such as mazes, forests, caves, etc.
+  
 -As a user, I want armor, weapons, and accessories [so that I can protect myself and fight 
 monsters more efficiently]. 
   -Expected input: Player that cannot find or equip equipment
   -Expected output: World spawns equipment and the player can equip it.
+  
 -As a user, I want consumable items [so that I can heal]. 
   -Expected input: World with no potions and no way of healing
   -Expected output: World that has potions that allow the player to regenerate health or mana
+  
 -As a user, I want to use magic and spells [so that I can have a larger variety of attacks] 
   -Expected input: Player and mobs that cannot cast spells
   -Expected output: Player and mobs can cast spells when applicable (they have a spell to cast)
+  
 -As a user, I want to encounter boss monsters [so that the game is more challenging]. 
   -Expected input: World with no boss monsters
   -Expected output: World where boss monsters randomly spawn
+  
 -As a user, I want to encounter merchants [so that I can sell my items and purchase items I 
 would not be able to get through other methods]. 
   -Expected input: World with no merchants/merchant portals
   -Expected output: World spawns merchant portal and allows the player to buy and sell items
+  
 -As a user, I want a save feature [so that I don’t have to play the whole playthrough in 
 one sitting]. 
   -Expected input: Player is unable to save or load game
   -Expected output: Player can save and load the game using the commands load save-name and
                     save save-name.
+                    
 -As a developer, I'd like these traps to be finished [so that we more variety beyond arrow 
 traps].
   -Expected input: World with only arrow traps
