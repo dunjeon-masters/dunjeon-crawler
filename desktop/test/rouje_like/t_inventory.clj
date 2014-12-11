@@ -4,6 +4,7 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]
             [rouje-like.status-effects :as rj.stef]
+            [rouje-like.items :as rj.i]
             [rouje-like.core :as rj.core]
             [brute.entity :as br.e]
             [rouje-like.inventory :as rj.inv]
@@ -50,4 +51,14 @@
               (rj.inv/pickup-slot-item system e-player item2)
               [(:slot (rj.e/get-c-on-e system e-player :inventory))
                (first (:junk (rj.e/get-c-on-e system e-player :inventory)))])
-        => [item2 item]))
+        => [item2 item])
+  (fact "equip-slot-item"
+        ;; equip-slot-item expects an equipment component, like the one below,
+        ;; to be in the slot. It can't be just a regular item.
+        (let [equip #rouje_like.components.Equipment{:weapon nil, :armor
+                                                     {:type :armor, :stats {:max-hp 3}, :name :chainmail}}]
+          (as-> system system
+                (rj.inv/switch-slot-item system e-player equip)
+                (rj.inv/equip-slot-item system e-player)
+                (let [c-equip (rj.e/get-c-on-e system e-player :equipment)]
+                  (:armor c-equip) => (:armor equip))))))
