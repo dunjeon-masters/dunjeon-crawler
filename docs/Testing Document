@@ -1,7 +1,7 @@
 Product Name: Dunjeon Crawler
 Team Name: Dunjeon Masters
-Revision Number: 1
-Revision Date: 11/25/2014
+Revision Number: 2
+Revision Date: 12/10/2014
 -----------------------------------------------------------------------------
 SYSTEM TEST
   - One or more scenarios to cover each user story
@@ -14,14 +14,18 @@ UNIT TEST
     – Equivalence classes of inputs
       » E.g. valid email address
     – Test cases selected covering classes
+-----------------------------------------------------------------------------
+TESTING PLAN
 
+SYSTEM TEST
 Our plan for System Testing is to write up a description of each User Story
-that we feel accurately describes what the inputs, outputs of the US are, so
-as to help us categorize and prioritize our Unit Tests, but also possibly
+that we feel accurately describes what the inputs, outputs of the US are, 
+to help us categorize and prioritize our Unit Tests, but also possibly
 find any gaps in our testing coverage or implementation.
 
-Our plan for Unit Testing is to test
-each function with a comprehensive, but minimal, set of inputs and outputs.
+UNIT TEST
+Our plan for Unit Testing is to test each function with a comprehensive, 
+but minimal, set of inputs and outputs.
 Currently we'll be dividing the responsiblity according to who wrote what,
 with the full acknowledgement that Anthony will be testing more of the code
 as had worked on this project before this class.
@@ -38,13 +42,81 @@ a library, such as Midje or Speclj, for their extra features. Our plan for
 testing the rendering part of our game will involve us attacking the problem
 in two steps. First, because rendering modifies state that we do not have
 simple access to, we'll be verifing, through White-Box Testing, at least our
-helper functions are working as intended. After that we'll be implementing
-one or more of the following solutions based on their feasability:
-    - Take and compare screenshots of the same game state, with always one
-        screenshot being stored that is verified to be correct.
-    - Give up on testing it programmatically, and simply verify we are
-        rendering correctly on playthrough.
+helper functions are working as intended. After that we'll verify that rendering
+is working as anticipated through extensive play testing, since we do not know
+a way to test rendering in code.
+-----------------------------------------------------------------------------
+IMPLEMENTING TESTS
 
-If we have enough time after implementing the previously described tests,
-we'll also be looking into adding an optional type checking system, such
-as core.typed or prismatic's schema, to assist our testing efforts.
+SYSTEM TEST
+Below, I have listed all of our completed userstories and have included a sub-bullet
+indicating our anticipated input and output.
+
+-As a user, I want a messaging/dialog system [so that I can be informed when damage 
+is dealt or received].
+  -Expected input: A queue of messages to be printed
+  -Expected output: The label in the bottom left corner of the screen should print
+                    those messages
+-As a user, I want to navigate multiple levels [so that the game has longer gameplay].
+  -Expected input: Player walks through portal to new level
+  -Expected output: New level is generated
+-As a user, I want to be able to build my character (races and classes) and level up 
+[so that the game feels customized and I can progress over time].
+  -Expected input: Player types something like class mage or race orc in the command line
+                   at the start of the game
+  -Expected output: Player's race, class, and/or name are changed for the duration of
+                    the game
+-As a user, I want an advanced mob system [so the monsters are unique and more challenging 
+to fight].
+  -Expected input: Receive and empty level with no monsters
+  -Expected output: Return populated level with monsters fitting for that level. (Monsters have
+                    specific floors that they can spawn on)
+-As a developer, I want to make upgrades to the system and fix bugs [so that the game runs 
+the way I want it to].
+  -Expected input: Code that has bugs and crashes
+  -Expected output: Code that runs smoothly and has minimal crashes
+-As a user, I want to have status effects [so that the game is more interesting].
+  -Expected input: Player with no status effects (such as poison)
+  -Expected output: Player that has a new status effect that applies to them at the end 
+                    of the turn.
+-As a user, I want traps and terrain interaction [so that the floors have more user 
+interaction and are more interesting to play through]. 
+  -Expected input: World with no traps and terrain interaction
+  -Expected output: World that has traps and interactable items such as doors
+-As a user, I want themed levels with themed mobs and traps [so that the floors are unique 
+and not so monotonous]. 
+  -Expected input: World that is only caves
+  -Expected output: World that has multiple levles such as mazes, forests, caves, etc.
+-As a user, I want armor, weapons, and accessories [so that I can protect myself and fight 
+monsters more efficiently]. 
+  -Expected input: Player that cannot find or equip equipment
+  -Expected output: World spawns equipment and the player can equip it.
+-As a user, I want consumable items [so that I can heal]. 
+  -Expected input: World with no potions and no way of healing
+  -Expected output: World that has potions that allow the player to regenerate health or mana
+-As a user, I want to use magic and spells [so that I can have a larger variety of attacks] 
+  -Expected input: Player and mobs that cannot cast spells
+  -Expected output: Player and mobs can cast spells when applicable (they have a spell to cast)
+-As a user, I want to encounter boss monsters [so that the game is more challenging]. 
+  -Expected input: World with no boss monsters
+  -Expected output: World where boss monsters randomly spawn
+-As a user, I want to encounter merchants [so that I can sell my items and purchase items I 
+would not be able to get through other methods]. 
+  -Expected input: World with no merchants/merchant portals
+  -Expected output: World spawns merchant portal and allows the player to buy and sell items
+-As a user, I want a save feature [so that I don’t have to play the whole playthrough in 
+one sitting]. 
+  -Expected input: Player is unable to save or load game
+  -Expected output: Player can save and load the game using the commands load save-name and
+                    save save-name.
+-As a developer, I'd like these traps to be finished [so that we more variety beyond arrow 
+traps].
+  -Expected input: World with only arrow traps
+  -Expected output: World with a variety of other traps (such as spike trap)
+
+UNIT TEST
+All unit tests can be found on our github page under src-common\rouge_like\experience.clj
+These tests verify that our functions produce the correct output is for the input given.
+We ended up using the Midje testing library to aid our efforts in testing. Due to time
+restraints, we were unable to finish all of our tests, but we were able to achieve
+approximately 90% test coverage.
