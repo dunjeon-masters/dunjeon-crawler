@@ -18,7 +18,6 @@
           (rj.core/init-entities {})))))
 
 (let [system (get-system)]
-
   (fact "add-slime"
         (as-> system system
               (:system (rj.sp/add-slime {:system system :z 1}))

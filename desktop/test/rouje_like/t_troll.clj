@@ -18,9 +18,8 @@
           (rj.core/init-entities {})))))
 
 (let [system (get-system)]
-
-  (fact "add-bat"
+  (fact "add-troll"
         (as-> system system
-              (:system (rj.tr/add-troll {:system system :z 1}))
+              (:system (add-troll {:system system :z 1}))
               (nil? (rj.e/get-c-on-e system (first (rj.e/all-e-with-c system :troll)) :position)))
         => false))

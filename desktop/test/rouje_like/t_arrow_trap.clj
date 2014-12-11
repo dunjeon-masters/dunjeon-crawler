@@ -1,6 +1,6 @@
-(ns rouje-like.t-necromancer
+(ns rouje-like.t-arrow_trap
   (:use [midje.sweet]
-        [rouje-like.necromancer])
+        [rouje-like.arrow-trap])
   (:require [rouje-like.core :as rj.core]
             [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]
@@ -15,8 +15,8 @@
           (rj.core/init-entities {})))))
 
 (let [system (get-system)]
-  (fact "add-necromancer"
+  (fact "add-trap"
         (as-> system system
-              (:system (add-necro {:system system :z 1}))
-              (nil? (rj.e/get-c-on-e system (first (rj.e/all-e-with-c system :necromancer)) :position)))
+              (:system (add-trap {:system system :z 1}))
+              (nil? (rj.e/get-c-on-e system (first (rj.e/all-e-with-c system :arrow-trap)) :position)))
         => false))
