@@ -1,5 +1,6 @@
 (ns rouje-like.t-troll
-  (:use midje.sweet)
+  (:use [midje.sweet]
+        [rouje-like.troll])
   (:require [brute.entity :as br.e]
             [rouje-like.components :as rj.c :refer [can-move? move]]
             [rouje-like.entity-wrapper :as rj.e]
