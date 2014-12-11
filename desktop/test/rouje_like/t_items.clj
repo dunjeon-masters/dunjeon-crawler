@@ -17,42 +17,125 @@
 (let [system (get-system)
       e-world (first (rj.e/all-e-with-c system :world))
       {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-      world (nth levels 1)]
+      world (nth levels 1)
+      e-player (first (rj.e/all-e-with-c system :player))]
 
-  (fact "remove-item")
+  (fact "remove-item"
+        (let [e-world (first (rj.e/all-e-with-c system :world))
+              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+              level (nth levels 1)
+              portals (filter (fn [{:keys [entities]}]
+                                (seq (filter #(= :portal %)
+                                             (map :type entities))))
+                              (flatten level))]
+          (:entities (first portals)))
+        => (contains #(#{:portal}
+                        (:type %))))
 
-  (fact "pickup-item")
+  (fact "pickup-item"
+        )
 
-  (fact "use-hp-potion")
+  (facts "use-hp-potion"
+         (fact "use-hp-potion: no potions"
+               (let [system (use-hp-potion system e-player)
+                     e-relay (first (rj.e/all-e-with-c system :relay))
+                     {:keys [static]} (rj.e/get-c-on-e system e-relay :relay)]
+                 static)
+               => (contains
+                    #(= "You do not have any health potions to drink"
+                        (:message %))))
+         (fact "use-hp-potion: have potions, need health"
+               (let [system (rj.e/upd-c system e-player :destructible
+                                        #(assoc % :hp 10))
+                     system (rj.e/upd-c system e-player :inventory
+                                        #(assoc % :hp-potion 1))
+                     system (use-hp-potion system e-player)
+                     {:keys [hp]} (rj.e/get-c-on-e system e-player :destructible)]
+                 hp) => 15)
+         (fact "use-hp-potion: have potions, dont need health"
+               (let [system (rj.e/upd-c system e-player :inventory
+                                        #(assoc % :hp-potion 1))
+                     system (use-hp-potion system e-player)
+                     {:keys [hp]} (rj.e/get-c-on-e system e-player :destructible)]
+                 hp) => (:max-hp (rj.e/get-c-on-e system e-player :destructible))))
 
-  (fact "use-mp-potion")
+  (facts "use-mp-potion"
+         (fact "use-mp-potion: no potions"
+               (let [system (use-mp-potion system e-player)
+                     e-relay (first (rj.e/all-e-with-c system :relay))
+                     {:keys [static]} (rj.e/get-c-on-e system e-relay :relay)]
+                 static)
+               => (contains
+                    #(= "You do not have any mana potions to drink"
+                        (:message %))))
+         (fact "use-mp-potion: have potions, need mana"
+               (let [system (rj.e/upd-c system e-player :magic
+                                        #(assoc % :mp 0))
+                     system (rj.e/upd-c system e-player :inventory
+                                        #(assoc % :mp-potion 1))
+                     system (use-mp-potion system e-player)
+                     {:keys [mp]} (rj.e/get-c-on-e system e-player :magic)]
+                 mp) => 3)
+         (fact "use-mp-potion: have potions, dont need mana"
+               (let [system (rj.e/upd-c system e-player :inventory
+                                        #(assoc % :mp-potion 1))
+                     system (use-mp-potion system e-player)
+                     {:keys [mp]} (rj.e/get-c-on-e system e-player :magic)]
+                 mp) => (:max-mp (rj.e/get-c-on-e system e-player :magic))))
 
-  (fact "item>>world")
+  (fact "item>>world"
+        (let [system (item>>world system (fn [world [x y]]
+                                           (let [tile (get-in world [x y])]
+                                             (only-floor? tile)))
+                                  0 (fn [entities]
+                                      (item>>entities entities :e-torch :torch)))
+              e-world (first (rj.e/all-e-with-c system :world))
+              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+              m-level (nth levels 0)
+              target-tile (first (flatten m-level))]
+          (:entities (first (filter (fn [{:keys [entities]}]
+                    (seq (filter #(= :torch %)
+                                 (map :type entities))))
+                  (flatten m-level)))))
+        => (contains #(#{:torch}
+                        (:type %))))
 
-  (fact "only-floor?")
+  (fact "only-floor?"
+        (let [e-world (first (rj.e/all-e-with-c system :world))
+              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+              m-level (nth levels 0)
+              target-tile (first (flatten m-level))]
+          (only-floor? target-tile)) => truthy)
 
-  (fact "item>>entities")
+  (fact "item>>entities"
+        (let [e-world (first (rj.e/all-e-with-c system :world))
+              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+              m-level (nth levels 0)
+              {:keys [entities]} (rand-nth (flatten m-level))]
+          (item>>entities entities :e-id :e-type))
+        => (contains #(#{:e-id}
+                        (:id %))))
 
   (fact "add-health-potion"
         (let [system (:system
-                       (add-magic-potion {:system system
-                                   :z 0}))
+                       (add-health-potion {:system system
+                                           :z 0}))
               e-world (first (rj.e/all-e-with-c system :world))
               {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
               m-level (nth levels 0)]
           (:entities
             (first
               (filter (fn [{:keys [entities]}]
-                        (seq (filter #(= :magic-potion %)
+                        (seq (filter #(= :health-potion %)
                                      (map :type entities))))
                       (flatten m-level)))))
-        => (contains #(#{:magic-potion}
+        => (contains #(#{:health-potion}
                         (:type %))))
 
   (fact "add-magic-potion"
         (let [system (:system
                        (add-magic-potion {:system system
-                                   :z 0}))
+                                          :z 0}))
               e-world (first (rj.e/all-e-with-c system :world))
               {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
               m-level (nth levels 0)]
@@ -97,37 +180,37 @@
         => (contains #(#{:gold}
                         (:type %))))
 
-  (fact "add-purchasable"
-        (let [e-world (first (rj.e/all-e-with-c system :world))
-              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-              m-level (nth levels 0)
-              target-tile (rand-nth (flatten m-level))
-              system (:system
-                       (add-purchasable system target-tile))
+(fact "add-purchasable"
+      (let [e-world (first (rj.e/all-e-with-c system :world))
+            {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+            m-level (nth levels 0)
+            target-tile (rand-nth (flatten m-level))
+            system (:system
+                     (add-purchasable system target-tile))
 
-              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-              m-level (nth levels 0)]
-          (:entities
-            (first
-              (filter (fn [{:keys [entities]}]
-                        (seq (filter #(= :purchasable %)
-                                     (map :type entities))))
-                      (flatten m-level)))))
-        => (contains #(#{:purchasable}
-                        (:type %))))
+            {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+            m-level (nth levels 0)]
+        (:entities
+          (first
+            (filter (fn [{:keys [entities]}]
+                      (seq (filter #(= :purchasable %)
+                                   (map :type entities))))
+                    (flatten m-level)))))
+      => (contains #(#{:purchasable}
+                      (:type %))))
 
-  (fact "add-equipment"
-        (let [system (:system
-                       (add-equipment {:system system
-                                       :z 0}))
-              e-world (first (rj.e/all-e-with-c system :world))
-              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-              m-level (nth levels 0)]
-          (:entities
-            (first
-              (filter (fn [{:keys [entities]}]
-                        (seq (filter #(= :equipment %)
-                                     (map :type entities))))
-                      (flatten m-level)))))
-        => (contains #(#{:equipment}
-                        (:type %)))))
+(fact "add-equipment"
+      (let [system (:system
+                     (add-equipment {:system system
+                                     :z 0}))
+            e-world (first (rj.e/all-e-with-c system :world))
+            {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+            m-level (nth levels 0)]
+        (:entities
+          (first
+            (filter (fn [{:keys [entities]}]
+                      (seq (filter #(= :equipment %)
+                                   (map :type entities))))
+                    (flatten m-level)))))
+      => (contains #(#{:equipment}
+                      (:type %)))))

@@ -137,7 +137,7 @@
         potion-count (:mp-potion c-inv)]
     (if (> potion-count 0)
       (as-> system system
-            (if (> (? max-mp) (+ (? mp) (? mp-potion-val)))
+            (if (> max-mp (+ mp mp-potion-val))
               (rj.e/upd-c system e-by :magic
                           (fn [c-magic]
                             (update-in c-magic [:mp]
@@ -153,7 +153,7 @@
                             (format "You do not have any mana potions to drink")) system
             system))))
 
-(defn- item>>world
+(defn item>>world
   [system is-valid-tile? z item>>entities]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
@@ -174,12 +174,12 @@
             (recur system
                    (dec i))))))))
 
-(defn- only-floor?
+(defn only-floor?
   [tile]
   (every? #(rj.cfg/<floors> (:type %))
           (:entities tile)))
 
-(defn- item>>entities
+(defn item>>entities
   [entities e-id e-type]
   (conj entities
         (rj.c/map->Entity {:id   e-id
