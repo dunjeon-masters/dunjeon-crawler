@@ -22,29 +22,42 @@
       item (rj.eq/generate-random-equipment)
       item2 (rj.eq/generate-random-equipment)
       junk (:junk c-inv)]
-  (fact "update-junk"
-        (rj.inv/update-junk system e-player _)=future=> truthy)
+
+  (facts "update-junk"
+         (let [system (rj.inv/add-junk system e-player item)
+               junk (:junk (rj.e/get-c-on-e system e-player :inventory))]
+           (fact "there is something in the junk pile"
+                 junk => truthy)
+           (let [system (rj.inv/update-junk system e-player (fn [junk] nil))
+                 junk (:junk (rj.e/get-c-on-e system e-player :inventory))]
+             (fact "now there's nothing in the junk pile"
+                   junk => empty?))))
+
   (fact "add-junk"
         (as-> system system
               (rj.inv/add-junk system e-player item)
               (:junk (rj.e/get-c-on-e system e-player :inventory)))
         => (conj junk item))
+
   (fact "junk-value"
         (as-> system system
               (rj.inv/add-junk system e-player item)
               (rj.inv/junk-value system e-player))
         => (rj.eq/equipment-value item))
+
   (fact "sell-junk"
         (as-> system system
               (rj.inv/add-junk system e-player item)
               (rj.inv/sell-junk system e-player)
               (:gold (rj.e/get-c-on-e system e-player :wallet)))
         => (rj.eq/equipment-value item))
+
   (fact "switch-slot-item"
         (as-> system system
               (rj.inv/switch-slot-item system e-player item)
               (:slot (rj.e/get-c-on-e system e-player :inventory)))
         => item)
+
   (fact "pickup-slot-item"
         (as-> system system
               (rj.inv/switch-slot-item system e-player item)
@@ -52,6 +65,7 @@
               [(:slot (rj.e/get-c-on-e system e-player :inventory))
                (first (:junk (rj.e/get-c-on-e system e-player :inventory)))])
         => [item2 item])
+
   (fact "equip-slot-item"
         ;; equip-slot-item expects an equipment component, like the one below,
         ;; to be in the slot. It can't be just a regular item.
