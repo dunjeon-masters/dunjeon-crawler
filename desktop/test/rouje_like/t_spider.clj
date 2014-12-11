@@ -14,4 +14,9 @@
       (-> (br.e/create-system)
           (rj.core/init-entities {})))))
 
-(fact "add-spider")
+(let [system (get-system)]
+  (fact "add-spider"
+        (as-> system system
+              (:system (add-spider {:system system :z 1}))
+              (nil? (rj.e/get-c-on-e system (first (rj.e/all-e-with-c system :spider)) :position)))
+        => false))
