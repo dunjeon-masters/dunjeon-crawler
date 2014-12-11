@@ -1,11 +1,11 @@
 Product Name: Dunjeon Crawler
 Team Name: Dunjeon Masters
-Revision Number: 1
-Revision Date: 11/25/2014
+Revision Number: 2
+Revision Date: 12/10/2014
 ------------------------------------------------------------------------------------------------------------------------------
 INSTALLATION INSTRUCTIONS
   -Minimum Requirements
-    -Computer with latest version of Java.
+    -Works with any operating system that works with the latest version of Java.
   -How To Install
     -No need to install.
   -How To Run
@@ -14,24 +14,31 @@ INSTALLATION INSTRUCTIONS
 USER GUIDE/REFERENCE MANUAL
   CONTROLS:
   -WASD to move
+    -W for up
+    -A for left
+    -S for down
+    -D for right
   -H for healing potion
   -M for mana potion
   -F5 for new game
-  -E for equip item in slot
+  -E for equip item in your slot (displayed on the top of the page)
   -; to enter command line mode
-    -"save game" to save player stats
-    -"load game" to load saved player stats
-  -[1..4] to start cast spell bound to number key
+    -"save save-name" to save player stats to save-name
+    -"load save-name" to load saved player stats from save-name
+  -1 to start cast spell that is automatically bound to number key
     -Then WASD to cast spell in that direction
-  -X to examine items
+  -I to examine items
   
   GAMEPLAY:
   -Auto pickup of potions and equipment
-  -Walk into things to interact
+  -Walk into things to interact/attack them
   -Gain experience by killing monsters
-  -Level up when you have a certain amout of experience and increases random stat
-  -Monsters may give you status effects that harm you over time
+  -Level up when you have a the required amount of experience for your next level
+    -Leveling up increases a random statistic (attack, defense, etc.) and may give you or upgrade a spell
+  -Monsters may give you status effects (poison, burn, etc.) that harm you over time
   -Potions give you health or mana but will not exceed your max health or mana
+  -Gold can be found in the dungeon or can be obtained by selling old equipment
+  -Equipped item effects automatically apply once equipped (not in slot).
   
   MONSTERNOMICON:
   -"+" and "\" are closed and opened doors respectively
@@ -45,7 +52,7 @@ USER GUIDE/REFERENCE MANUAL
   -And many more...
 ------------------------------------------------------------------------------------------------------------------------------
 DESCRIPTION OF SUPPORTED FUNCTIONALITY
-  -Messaging/dialog system
+  -Messaging/dialog system to communicate events to the player
   -Worlds with multiple randomly generated levels
   -Players are able to choose race and class of character
   -Advanced mob system
@@ -57,4 +64,5 @@ DESCRIPTION OF SUPPORTED FUNCTIONALITY
   -Players can aquire and use spells and magic 
   -Boss monsters occasionally spawn 
   -Merchants appear in the world, so player can buy and sell item 
-  -You can save your characters' stats and load them later 
+  -You can save your characters' stats and load them later
+  -You can have multiple saves
