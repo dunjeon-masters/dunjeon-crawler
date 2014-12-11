@@ -4,6 +4,7 @@
   (:require [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.core :as rj.core]
             [brute.entity :as br.e]
+            [rouje-like.skeleton :refer [add-skeleton]]
             [rouje-like.entity-wrapper :as rj.e]))
 
 (defn get-system []
@@ -13,17 +14,23 @@
           (rj.core/init-entities {})))))
 
 (let [system (get-system)
-      system (#'rouje-like.world/init-themed-entities system 1 :maze)
+      system (:system
+               (add-skeleton {:system system
+                              :z 1}))
       e-player (first (rj.e/all-e-with-c system :player))
       c-attacker (rj.e/get-c-on-e system e-player :attacker)
-      e-slime (first (rj.e/all-e-with-c system :slime))
       e-skeleton (first (rj.e/all-e-with-c system :skeleton))
       c-attacker-skeleton (rj.e/get-c-on-e system e-skeleton :attacker)]
   (facts "can-attack?"
          (fact "success"
-               (can-attack? c-attacker nil e-slime system)) => true
+               (can-attack? c-attacker nil e-player system) => truthy)
          (fact "failure"
-               (can-attack? c-attacker-skeleton nil e-slime system) => false))
+               (can-attack? c-attacker-skeleton nil e-skeleton system) => falsey))
 
-  #_(fact "attack"
-        (attack (? c-attacker) (? e-player) (? e-skeleton) (? system)) => truthy))
+  (let [system (attack c-attacker e-skeleton e-player system)
+        {:keys [max-hp hp]} (rj.e/get-c-on-e system e-player :destructible)]
+    (fact "attack"
+         hp => (fn [hp]
+                 (into #{}
+                       (take (:atk c-attacker-skeleton)
+                             (iterate dec max-hp))) hp))))
