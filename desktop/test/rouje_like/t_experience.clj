@@ -6,7 +6,8 @@
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :refer :all]
             [rouje-like.components :as rj.c :refer [->3DPoint]]
-            [rouje-like.world :as rj.w]))
+            [rouje-like.world :as rj.w]
+            [rouje-like.config :as rj.cfg]))
 
 (defn get-system []
   (with-open [w (clojure.java.io/writer "NUL")]
@@ -22,10 +23,15 @@
       e-skeleton (first (rj.e/all-e-with-c system :skeleton))
       c-attacker-skeleton (rj.e/get-c-on-e system e-skeleton :attacker)]
 
-  (fact "level-exp")
+  (fact "level->exp"
+        (level->exp 5) => (* 5 (:exp rj.cfg/level-exp))
+        (level->exp 7) => (* 7 (:exp rj.cfg/level-exp)))
 
-  (fact "wrand")
+  (fact "wrand"
+        (wrand [2 2 1]) =future=> "ANTHONY WILL DO THIS")
 
-  (fact "level-up-stats")
+  (fact "level-up-stats"
+        (level-up-stats system e-player) =future=> true)
 
-  (fact "level-up"))
+  (fact "level-up"
+        (level-up e-player system) =future=> true))

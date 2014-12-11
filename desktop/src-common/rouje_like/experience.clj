@@ -7,10 +7,12 @@
             [rouje-like.messaging :as rj.msg]))
 
 (defn level->exp
+  "[int level] gets the amount of experience to be LEVEL"
   [level]
   (* level (:exp rj.cfg/level-exp)))
 
 (defn wrand
+  "[int vector slices] returns a random index chosen with the weights provided in SLICES"
   [slices]
   (let [total (reduce + slices)
         r (rand total)]
