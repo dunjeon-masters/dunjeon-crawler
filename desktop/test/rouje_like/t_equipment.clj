@@ -2,12 +2,7 @@
   (:use [midje.sweet]
         [rouje-like.equipment])
   (:require [brute.entity :as br.e]
-            [rouje-like.world :as rj.w]
-            [rouje-like.components :as rj.c]
             [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.config :as rj.cfg]
-            [rouje-like.items :as rj.i]
-            [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.core :as rj.core]))
 
 (defn start []
