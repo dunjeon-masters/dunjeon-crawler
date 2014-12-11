@@ -48,7 +48,6 @@
         (as-> system system
               (rj.inv/switch-slot-item system e-player item)
               (rj.inv/pickup-slot-item system e-player item2)
-              (? (first (:junk (rj.e/get-c-on-e system e-player :inventory))))
               [(:slot (rj.e/get-c-on-e system e-player :inventory))
                (first (:junk (rj.e/get-c-on-e system e-player :inventory)))])
-        =future=> [item2 item]))
+        => [item2 item]))

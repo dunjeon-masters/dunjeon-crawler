@@ -52,7 +52,7 @@
   (let [old-slot (:slot (rj.e/get-c-on-e system e-this :inventory))]
     (if old-slot
       (-> system
-          (add-junk e-this item)
+          (add-junk e-this old-slot)
           (switch-slot-item e-this item))
       (switch-slot-item system e-this item))))
 
