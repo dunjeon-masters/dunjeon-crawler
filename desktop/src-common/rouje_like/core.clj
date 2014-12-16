@@ -87,18 +87,15 @@
 (defn cmds->action
   [cmds]
   (let [cmd->action {"name"  (fn [n]
-                               (println "name: " n)
                                (swap! user #(assoc % :n n)))
                      "race"  (fn [r]
-                               (println "race: " r)
                                (swap! user #(assoc % :r r)))
                      "class" (fn [c]
-                               (println "class: " c)
                                (swap! user #(assoc % :c c)))
                      "start" (fn [_]
-                               (println "STARTING GAME")
+                               (? "STARTING GAME")
                                (set-screen! rouje-like game-screen)
-                               (println "DONE SWITCHING SCREENS"))}
+                               (? "GAME LOADED"))}
         cmd&arg (first (partition 2 (s/split cmds #" ")))
         action (cmd->action (first cmd&arg))
         arg (second cmd&arg)]

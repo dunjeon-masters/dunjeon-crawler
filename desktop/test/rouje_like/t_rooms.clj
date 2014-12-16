@@ -83,8 +83,6 @@
 
 (defn check-num-rooms
   [level num-rooms]
-  (print-level level)
-  (? num-rooms)
   (let [floor (:level level)
         type-vec (filter #(= :d (% 2))
                          (flatten-level floor))]

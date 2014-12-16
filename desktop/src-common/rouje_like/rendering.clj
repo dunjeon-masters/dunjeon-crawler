@@ -290,6 +290,7 @@
                 :color {:r 175 :g 251 :b 255 :a 125}
                 :tile-sheet darkond-tile-sheet}
 :willow-wisp  {:x 10 :y 2
+
              :width 20 :height 20
              :color {:r 210 :g 138 :b 181 :a 125}
              :tile-sheet bisasam-tile-sheet}
@@ -317,16 +318,12 @@
 (def ^:private type->texture
   (memoize
     (fn [^Keyword type]
-      (let [tile-info (type->tile-info type)
-            tile-sheet (:tile-sheet tile-info)
-            width (:width tile-info)
-            height (:height tile-info)
-            x (* width (:x tile-info))
-            y (* height (:y tile-info))
-            tile-color (:color tile-info)]
+      (let [{:keys [x y width height
+                    color tile-sheet]}
+            (type->tile-info type)]
         (assoc (texture tile-sheet
                         :set-region x y width height)
-               :color tile-color)))))
+               :color color)))))
 
 (defn render-world
   [_ e-this {:keys [view-port-sizes]} system]

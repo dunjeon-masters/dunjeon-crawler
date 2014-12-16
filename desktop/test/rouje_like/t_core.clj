@@ -4,4 +4,5 @@
   (:require [rouje-like.core :as rj.core]))
 
 (fact "about `core`"
-  (rj.core/cmds->action "name pancia") => {:n "pancia"})
+      (rj.core/cmds->action "name pancia")
+      => (just {:n "pancia"}))

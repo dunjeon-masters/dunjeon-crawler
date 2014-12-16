@@ -191,10 +191,10 @@
   (letfn [(rand-pos [] [(rand-int width) (rand-int height)])]
     (loop [level (gen-level width height :f)
            rooms-left number-of-rooms]
-      (if (pos? (? rooms-left))
+      (if (pos? rooms-left)
         (if (and (:last-add? level)
-                 (? (= (? (count (:rooms level)))
-                       (? (- number-of-rooms rooms-left -1)))))
+                 (= (count (:rooms level))
+                    (- number-of-rooms rooms-left -1)))
           (recur (add-room
                    level
                    (create-room (rand-pos) [room-size room-size]))
@@ -204,4 +204,3 @@
                    (create-room (rand-pos) [room-size room-size]))
                  rooms-left))
         level))))
-
