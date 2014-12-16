@@ -12,7 +12,7 @@
   ([]
    (with-open [w (clojure.java.io/writer "NUL")]
      (binding [*out* w]
-       (-> (br.e/create-system)
+       (-> (init)
            (rj.core/init-entities {})))))
   ([system]
    (with-open [w (clojure.java.io/writer "NUL")]

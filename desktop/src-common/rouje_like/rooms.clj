@@ -1,4 +1,5 @@
 (ns rouje-like.rooms
+  (:import [clojure.lang PersistentArrayMap PersistentVector])
   (:require [rouje-like.utils :refer [?]]
             [clojure.math.numeric-tower :as math]))
 
@@ -31,6 +32,14 @@
                 "Q")
              row)))
   LEVEL)
+
+(defmulti flatten-level type)
+(defmethod flatten-level PersistentArrayMap
+  [level]
+  (flatten-level (:level level)))
+(defmethod flatten-level PersistentVector
+  [level]
+  (vec (map vec (partition 4 (flatten level)))))
 
 (defn valid-door-locs
   [x y w h]
@@ -177,19 +186,22 @@
 
 (defn gen-level-with-rooms
   [width height number-of-rooms room-size]
-  (assert (> (* width height 1/2) (* number-of-rooms room-size room-size)))
-  (let [rand-pos (fn [] [(rand-int width) (rand-int height)])]
+  (assert (> (* width height 1/3)
+             (* number-of-rooms room-size room-size)))
+  (letfn [(rand-pos [] [(rand-int width) (rand-int height)])]
     (loop [level (gen-level width height :f)
-           i number-of-rooms]
-      (if (pos? i)
-        (if (:last-add? level)
+           rooms-left number-of-rooms]
+      (if (pos? (? rooms-left))
+        (if (and (:last-add? level)
+                 (? (= (? (count (:rooms level)))
+                       (? (- number-of-rooms rooms-left -1)))))
           (recur (add-room
                    level
                    (create-room (rand-pos) [room-size room-size]))
-                 (dec i))
+                 (dec rooms-left))
           (recur (add-room
                    level
                    (create-room (rand-pos) [room-size room-size]))
-                 i))
+                 rooms-left))
         level))))
 

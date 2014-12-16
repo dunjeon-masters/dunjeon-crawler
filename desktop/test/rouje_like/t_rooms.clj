@@ -23,6 +23,9 @@
              => (or "  (0 1 2)\n0 (_ _ _)\n1 (_ _ _)\n2 (_ _ _)\n"
                     "  (0 1 2)\r\n0 (_ _ _)\r\n1 (_ _ _)\r\n2 (_ _ _)\r\n")))
 
+(facts "flatten-level"
+       (flatten-level (gen-level 3 3)) =future=> falsey)
+
 (facts "valid-door-locs"
        (fact "odd dimensions"
              (valid-door-locs 1 1 3 3) => [[1 2] [2 1] [2 3] [3 2]])
@@ -80,12 +83,15 @@
 
 (defn check-num-rooms
   [level num-rooms]
+  (print-level level)
+  (? num-rooms)
   (let [floor (:level level)
-        type-vec (filter #(= :d (% 2)) floor)]
-  (= (count type-vec) num-rooms)))
+        type-vec (filter #(= :d (% 2))
+                         (flatten-level floor))]
+    (= (count type-vec) num-rooms)))
 
 (fact "gen-level-with-rooms"
-      (gen-level-with-rooms 10 10 1 3) =future=> #(check-num-rooms % 1)
-      (gen-level-with-rooms 12 12 2 3) =future=> #(check-num-rooms % 2)
-      (gen-level-with-rooms 12 12 4 2) =future=> #(check-num-rooms % 4)
+      (gen-level-with-rooms 10 10 1 5) => #(check-num-rooms % 1)
+      (gen-level-with-rooms 12 12 2 3) => #(check-num-rooms % 2)
+      (gen-level-with-rooms 12 12 4 3) => #(check-num-rooms % 4)
       (gen-level-with-rooms 2 2 4 2) => (throws java.lang.AssertionError))
