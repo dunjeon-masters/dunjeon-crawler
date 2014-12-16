@@ -1,4 +1,4 @@
-(ns rouje-like.willowisp
+(ns rouje-like.willow-wisp
   (:require [brute.entity :as br.e]
 
             [rouje-like.entity-wrapper :as rj.e]

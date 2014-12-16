@@ -1,4 +1,4 @@
-(ns rouje-like.large_amoeba
+(ns rouje-like.large-amoeba
   (:require [brute.entity :as br.e]
 
             [rouje-like.entity-wrapper :as rj.e]
@@ -12,7 +12,7 @@
 
 (declare process-input-tick)
 
-(defn add-large_amoeba
+(defn add-large-amoeba
   ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
@@ -24,42 +24,42 @@
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
        (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
-         (add-large_amoeba system target-tile)
+         (add-large-amoeba system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-large_amoeba (br.e/create-entity)
+         e-large-amoeba (br.e/create-entity)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-large_amoeba
-                                                               :type :large_amoeba})))))]
+                                            (rj.c/map->Entity {:id   e-large-amoeba
+                                                               :type :large-amoeba})))))]
      {:system (rj.e/system<<components
-                system e-large_amoeba
-                [[:large_amoeba {}]
+                system e-large-amoeba
+                [[:large-amoeba {}]
                  [:position {:x    (:x target-tile)
                              :y    (:y target-tile)
                              :z    (:z target-tile)
-                             :type :large_amoeba}]
+                             :type :large-amoeba}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 2}]
-                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :large_amoeba))
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :large-amoeba))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :large_amoeba))
-                                 :max-hp     (:hp  (rj.cfg/entity->stats :large_amoeba))
-                                 :def        (:def (rj.cfg/entity->stats :large_amoeba))
+                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :large-amoeba))
+                                 :max-hp     (:hp  (rj.cfg/entity->stats :large-amoeba))
+                                 :def        (:def (rj.cfg/entity->stats :large-amoeba))
                                  :can-retaliate? false
                                  :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp (rj.cfg/entity->stats :large_amoeba))}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :large-amoeba))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
-                 [:broadcaster {:name-fn (constantly "the large_amoeba")}]])
+                 [:broadcaster {:name-fn (constantly "the large-amoeba")}]])
       :z (:z target-tile)})))
 
 (defn get-closest-tile-to

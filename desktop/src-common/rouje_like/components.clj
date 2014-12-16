@@ -17,7 +17,7 @@
 
 (defrecord Broadcaster [name-fn])
 
-(defrecord Colossal_amoeba [])
+(defrecord ColossalAmoeba [])
 
 (defrecord Counter [turn])
 
@@ -53,7 +53,7 @@
 
 (defrecord Fireball [])
 
-(defrecord Giant_amoeba [])
+(defrecord GiantAmoeba [])
 
 (defrecord Gold [value])
 
@@ -100,7 +100,7 @@
                   max-mp
                   spells])
 
-(defrecord Large_amoeba [])
+(defrecord LargeAmoeba [])
 
 (defrecord Mimic [])
 
@@ -245,7 +245,7 @@
    :bat              (type (->Bat))
    :broadcaster      (type (->Broadcaster nil))
    :class            (type (->Klass nil))
-   :colossal_amoeba  (type (->Colossal_amoeba))
+   :colossal-amoeba  (type (->ColossalAmoeba))
    :counter          (type (->Counter nil))
    :destructible     (type (->Destructible nil nil nil nil nil nil nil))
    :digger           (type (->Digger nil nil))
@@ -257,7 +257,7 @@
    :experience       (type (->Experience nil nil nil))
    :fireball         (type (->Fireball))
    :gold             (type (->Gold nil))
-   :giant_amoeba     (type (->Giant_amoeba))
+   :giant-amoeba     (type (->GiantAmoeba))
    :hydra-head       (type (->HydraHead))
    :hydra-neck       (type (->HydraNeck))
    :hydra-tail       (type (->HydraTail))
@@ -266,7 +266,7 @@
    :inspectable      (type (->Inspectable nil))
    :item             (type (->Item nil))
    :killable         (type (->Killable nil))
-   :large_amoeba     (type (->Large_amoeba))
+   :large-amoeba     (type (->LargeAmoeba))
    :lichen           (type (->Lichen nil nil))
    :magic            (type (->Magic nil nil nil))
    :m-portal         (type (->MPortal nil nil nil))

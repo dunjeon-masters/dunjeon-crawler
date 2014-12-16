@@ -4,7 +4,6 @@
 
 #_(use 'rouje-like.config :reload)
 
-(def block-size 36)
 ;; ===== WORLD CONFIG =====
 (def padding-sizes {:top   3
                     :btm   2
@@ -14,7 +13,7 @@
 (def view-port-sizes [20 20])
 
 (defn block-size []
-  (let [min-block-size 27
+  (let [min-block-size 36
         block-size (try (let [height (graphics! :get-height)
                               width  (graphics! :get-width)
                               [vp-x vp-y] view-port-sizes
@@ -23,7 +22,7 @@
                         (catch Exception e
                           min-block-size))]
     (max min-block-size block-size)))
-                                                      +
+
 (def world-sizes {:width  20
                   :height 20})
 
@@ -188,8 +187,8 @@
                   :value 1}})
 
 ;; ===== CREATURE CONFIG =====
-(def colossal_amoeba-split-rate 3)
-(def giant_amoeba-split-rate 2)
+(def colossal-amoeba-split-rate 3)
+(def giant-amoeba-split-rate 2)
 
 (def entity->stats
   {:wall            {:hp 2}
@@ -237,15 +236,15 @@
                      :def 3
                      :atk 4
                      :exp 5}
-   :colossal_amoeba {:hp 6
+   :colossal-amoeba {:hp 6
                      :def 1
                      :atk 3
                      :exp 0}
-   :giant_amoeba    {:hp 4
+   :giant-amoeba    {:hp 4
                      :def 1
                      :atk 2
                      :exp 0}
-   :large_amoeba    {:hp 2
+   :large-amoeba    {:hp 2
                      :def 1
                      :atk 1
                      :exp 2}
@@ -289,8 +288,8 @@
 ;; ===== MONSTER CONFIG =====
 (def mob->init-spawn%
   {:willow-wisp     0.1
-   :giant_amoeba    0.1
-   :colossal_amoeba 1
+   :giant-amoeba    0.1
+   :colossal-amoeba 1
    :bat             1
    :lichen          1
    :necro           0.1
@@ -307,7 +306,7 @@
 (def mob->init-floor
   {:skeleton      2
    :willow-wisp   3
-   :giant_amoeba  5
+   :giant-amoeba  5
    :necro         6
    :drake         8
    :slime         3

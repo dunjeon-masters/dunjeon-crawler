@@ -18,12 +18,12 @@
             [rouje-like.merchant :as rj.merch]
             [rouje-like.destructible :as rj.d]
             [rouje-like.bat :as rj.bt]
-            [rouje-like.colossal_amoeba :as rj.ca]
+            [rouje-like.colossal-amoeba :as rj.ca]
             [rouje-like.hydra-head :as rj.hh]
             [rouje-like.hydra-neck :as rj.hn]
             [rouje-like.hydra-tail :as rj.ht]
             [rouje-like.hydra-rear :as rj.hr]
-            [rouje-like.giant_amoeba :as rj.ga]
+            [rouje-like.giant-amoeba :as rj.ga]
             [rouje-like.drake :as rj.dr]
             [rouje-like.necromancer :as rj.ne]
             [rouje-like.skeleton :as rj.sk]
@@ -31,7 +31,7 @@
             [rouje-like.snake :as rj.snk]
             [rouje-like.spider :as rj.sp]
             [rouje-like.troll :as rj.tr]
-            [rouje-like.willowisp :as rj.ww]
+            [rouje-like.willow-wisp :as rj.ww]
             [rouje-like.arrow-trap :as rj.arrow-trap]
             [rouje-like.spike-trap :as rj.spike-trap]
             [rouje-like.portal :as rj.p]
@@ -302,7 +302,7 @@
   (case theme
     :desert (as-> system system
               ;; Spawn Will-o-Wisps
-              (do (println "core::add-willowisp " (not (nil? system))) system)
+              (do (println "core::add-willow-wisp " (not (nil? system))) system)
               (nth (iterate rj.ww/add-willow-wisp {:system system :z z})
                    (* (max 0
                            (min 0.05
@@ -346,8 +346,8 @@
                    (:system (rj.hr/add-hydra-rear {:system system :z z})))
     :amoeba-arena (as-> system system
                     ;; Spawn Colossal Amoeba
-                    (do (println "core::add-colossal_amoeba " (not (nil? system))) system)
-                    (nth (iterate rj.ca/add-colossal_amoeba {:system system :z z})
+                    (do (println "core::add-colossal-amoeba " (not (nil? system))) system)
+                    (nth (iterate rj.ca/add-colossal-amoeba {:system system :z z})
                          (* (/ (:boss rj.cfg/mob->init-spawn%)
                                100)
                             (apply * (vals rj.cfg/world-sizes))))
@@ -374,12 +374,12 @@
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system)
               ;; Spawn Giant Amoeba
-              (do (println "core::add-giant_amoeba " (not (nil? system))) system)
-              (nth (iterate rj.ga/add-giant_amoeba {:system system :z z})
+              (do (println "core::add-giant-amoeba " (not (nil? system))) system)
+              (nth (iterate rj.ga/add-giant-amoeba {:system system :z z})
                    (* (max 0
                            (min 0.05
-                                (/ (+ (:giant_amoeba rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z (:giant_amoeba rj.cfg/mob->init-floor))))
+                                (/ (+ (:giant-amoeba rj.cfg/mob->init-spawn%)
+                                      (* 0.2 (- z (:giant-amoeba rj.cfg/mob->init-floor))))
                                    100)))
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system))
