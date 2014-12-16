@@ -290,10 +290,9 @@
                 :color {:r 175 :g 251 :b 255 :a 125}
                 :tile-sheet darkond-tile-sheet}
 :willow-wisp  {:x 10 :y 2
-
-             :width 20 :height 20
-             :color {:r 210 :g 138 :b 181 :a 125}
-             :tile-sheet bisasam-tile-sheet}
+               :width 20 :height 20
+               :color {:r 210 :g 138 :b 181 :a 125}
+               :tile-sheet bisasam-tile-sheet}
 :hydra-head  {:x 6 :y 2
               :width 16 :height 16
               :color {:r 40 :g 156 :b 23 :a 255}
@@ -320,7 +319,9 @@
     (fn [^Keyword type]
       (let [{:keys [x y width height
                     color tile-sheet]}
-            (type->tile-info type)]
+            (type->tile-info type)
+            x (* x width)
+            y (* y height)]
         (assoc (texture tile-sheet
                         :set-region x y width height)
                :color color)))))
