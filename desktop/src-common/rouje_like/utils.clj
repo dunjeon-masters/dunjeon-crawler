@@ -191,16 +191,25 @@
   (+ (rand-int (- (inc end) start)) start))
 
 (defmacro ?
-  [x & [tag]]
-  (let [line (:line (meta &form))
-        file *file*]
-    `(let [x#   ~x
-           tag# ~tag]
-       (println (str (str "#" (if tag# tag# "RJ") " ")
-                     "@[" (apply str (drop 5 (str (System/currentTimeMillis))))
-                     ", " ~file ":" ~line "]:\n"
-                     "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
-       x#)))
+  ([x]
+   (let [line (:line (meta &form))
+         file *file*]
+     `(let [x#   ~x]
+        (println (str (str "#" "RJ" " ")
+                      "@[" (apply str (drop 5 (str (System/currentTimeMillis))))
+                      ", " ~file ":" ~line "]:\n"
+                      "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
+        x#)))
+  ([tag x]
+   (let [line (:line (meta &form))
+         file *file*]
+     `(let [x#   ~x
+            tag# ~tag]
+        (println (str (str "#" tag# " ")
+                      "@[" (apply str (drop 5 (str (System/currentTimeMillis))))
+                      ", " ~file ":" ~line "]:\n"
+                      "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
+        x#))))
 
 (defn update-in-world
   [system e-world [z x y] fn<-entities]
