@@ -47,7 +47,7 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
-                 [:attacker {:atk              (:atk rj.cfg/willowisp-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :willow-wisp))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   [{:type :burn
@@ -56,13 +56,13 @@
                                                  :e-from e-willow-wisp
                                                  :apply-fn rj.stef/apply-burn}]
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/willowisp-stats)
-                                 :max-hp     (:hp rj.cfg/willowisp-stats)
-                                 :def        (:def rj.cfg/willowisp-stats)
+                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :willow-wisp))
+                                 :max-hp     (:hp (rj.cfg/entity->stats :willow-wisp))
+                                 :def        (:def (rj.cfg/entity->stats :willow-wisp))
                                  :can-retaliate? false
                                  :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp rj.cfg/willowisp-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :willow-wisp))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the will-o-wisp")}]])

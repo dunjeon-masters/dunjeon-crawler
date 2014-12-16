@@ -46,17 +46,17 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 2}]
-                 [:attacker {:atk              (:atk rj.cfg/large_amoeba-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :large_amoeba))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/large_amoeba-stats)
-                                 :max-hp     (:hp  rj.cfg/large_amoeba-stats)
-                                 :def        (:def rj.cfg/large_amoeba-stats)
+                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :large_amoeba))
+                                 :max-hp     (:hp  (rj.cfg/entity->stats :large_amoeba))
+                                 :def        (:def (rj.cfg/entity->stats :large_amoeba))
                                  :can-retaliate? false
                                  :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp rj.cfg/large_amoeba-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :large_amoeba))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the large_amoeba")}]])

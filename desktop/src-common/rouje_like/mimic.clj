@@ -46,13 +46,13 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
-                 [:attacker {:atk              (:atk rj.cfg/mimic-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :mimic))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/mimic-stats)
-                                 :max-hp     (:hp  rj.cfg/mimic-stats)
-                                 :def        (:def rj.cfg/mimic-stats)
+                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :mimic))
+                                 :max-hp     (:hp  (rj.cfg/entity->stats :mimic))
+                                 :def        (:def (rj.cfg/entity->stats :mimic))
                                  :can-retaliate? false
                                  :status-effects []
                                  :take-damage-fn (fn [c-this e-this damage e-from system]
@@ -72,7 +72,7 @@
                                                                                                  (rj.c/map->Entity {:id e-this
                                                                                                                     :type :mimic})))))))
                                                          system)))}]
-                 [:killable {:experience (:exp rj.cfg/mimic-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :mimic))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the mimic")}]])

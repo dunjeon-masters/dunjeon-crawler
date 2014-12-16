@@ -37,13 +37,13 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-hydra-neck (br.e/create-entity)
-         hp (:hp rj.cfg/hydra-neck-stats)
+         hp (:hp (rj.cfg/entity->stats :hydra-neck))
          _ (? target-tile)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
-                                            (remove #( rj.cfg/<walls> (:type %)) entities)
+                                            (remove #(rj.cfg/<walls> (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-hydra-neck
                                                                :type :hydra-neck})))))]
      {:system (rj.e/system<<components
@@ -56,18 +56,18 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 100}]                     ;;4
-                 [:attacker {:atk              (:atk rj.cfg/hydra-neck-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :hydra-neck))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   []
                              :is-valid-target? (partial #{:hydra-head})}]
                  [:destructible {:hp         hp
                                  :max-hp     hp
-                                 :def        (:def rj.cfg/hydra-neck-stats)
+                                 :def        (:def (rj.cfg/entity->stats :hydra-neck))
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
                                  :status-effects []}]
-                 [:killable {:experience (:exp rj.cfg/hydra-neck-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :hydra-neck))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the hydra's neck")}]])

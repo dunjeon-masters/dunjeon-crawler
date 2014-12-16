@@ -87,7 +87,7 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-skeleton (br.e/create-entity)
-         hp (:hp rj.cfg/skeleton-stats)
+         hp (:hp (rj.cfg/entity->stats :skeleton))
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
@@ -107,18 +107,18 @@
                                                 (rj.m/can-move? c-mobile e-this t-tile system)))
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
-                 [:attacker {:atk              (:atk rj.cfg/skeleton-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :skeleton))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   []
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         hp
                                  :max-hp     hp
-                                 :def        (:def rj.cfg/skeleton-stats)
+                                 :def        (:def (rj.cfg/entity->stats :skeleton))
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
                                  :status-effects []}]
-                 [:killable {:experience (:exp rj.cfg/skeleton-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :skeleton))}]
                  [:tickable {:tick-fn rj.t/process-input-tick
                              :target-tile-fn get-target-tile
                              :pri 0}]

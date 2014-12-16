@@ -29,16 +29,24 @@
 
 ;; ===== TILE TYPES =====
 (def <floors>
-  #{:open-door :dune :floor :forest-floor})
+  #{:open-door :dune
+    :floor :forest-floor})
 
 (def <walls>
-  #{:temple-wall :door :wall :tree :maze-wall})
+  #{:temple-wall
+    :door :wall
+    :tree :maze-wall})
 
 (def <indestructible-walls>
   #{:temple-wall :maze-wall})
 
 (def <items>
-  #{:torch :gold :health-potion :equipment :purchasable :merchant :magic-potion})
+  #{:torch :gold
+    :health-potion
+    :equipment
+    :purchasable
+    :merchant
+    :magic-potion})
 
 (def <empty>
   (union <floors> <items>))
@@ -47,22 +55,13 @@
   (union <walls> #{:arrow-trap :lichen}))
 
 (def <valid-move-targets>
-  (union <empty> #{:portal :m-portal :spike-trap :hidden-spike-trap}))
+  (union <empty> #{:portal
+                   :m-portal
+                   :spike-trap
+                   :hidden-spike-trap}))
 
 (def <valid-mob-targets>
   (union <empty> #{:player}))
-
-(def wall->stats
-  {:wall        {:hp 2}
-   :tree        {:hp 1}
-   :maze-wall   {:hp 100}
-   :temple-wall {:hp 100}})
-
-(def trap->stats
-  {:arrow-trap {:hp 1
-                :atk 2}
-   :spike-trap {:hp 1
-                :atk 2}})
 
 ;; ===== PLAYER CONFIG =====
 (def player-stats
@@ -71,35 +70,40 @@
    :atk 4
    :def 1})
 
-;; should we include defense?
-(def class->stats {:rogue   {:max-hp 2 :max-mp 2  :atk 1}
-                   :warrior {:max-hp 5 :max-mp -5 :atk 2}
-                   :mage    {:max-hp -5 :max-mp 5 :atk -2}})
+(def class->stats
+  {:rogue   {:max-hp  2 :max-mp  2 :atk  1}
+   :warrior {:max-hp  5 :max-mp -5 :atk  2}
+   :mage    {:max-hp -5 :max-mp  5 :atk -2}})
 
-(def race->stats {:human {:max-hp 10  :atk 1 :max-mp 0}
-                  :orc   {:max-hp 20  :atk 2 :max-mp -1}
-                  :elf   {:max-hp -5  :atk 0 :max-mp 3}})
+(def race->stats
+  {:human {:max-hp 10  :atk 1 :max-mp 0}
+   :orc   {:max-hp 20  :atk 2 :max-mp -1}
+   :elf   {:max-hp -5  :atk 0 :max-mp 3}})
 
-(def stat->comp {:max-hp :destructible
-                 :hp :destructible
-                 :atk :attacker
-                 :def :destructible
-                 :max-mp :magic
-                 :mp :magic})
+(def stat->comp
+  {:max-hp :destructible
+   :hp :destructible
+   :atk :attacker
+   :def :destructible
+   :max-mp :magic
+   :mp :magic})
 
 ;; TODO add magic-atk
-(def stat->pointinc {:max-hp 5
-                     :atk 1
-                     :def 1
-                     :max-mp 2})
+(def stat->pointinc
+  {:max-hp 5
+   :atk 1
+   :def 1
+   :max-mp 2})
 
-(def spell->mp-cost {:fireball 3
-                     :powerattack 2
-                     :pickpocket 2})
+(def spell->mp-cost
+  {:fireball 3
+   :powerattack 2
+   :pickpocket 2})
 
-(def class->spell {:mage [:fireball]
-                   :rogue [:pickpocket]
-                   :warrior [:powerattack]})
+(def class->spell
+  {:mage [:fireball]
+   :rogue [:pickpocket]
+   :warrior [:powerattack]})
 
 (def level-exp
   {:exp 3})
@@ -170,140 +174,117 @@
                :value    2}})
 
 (def spell-effects
+  "In the spell map, :value's effect is based on what
+  type of a spell it is, eg extra dmg or gold stolen."
   {:fireball     {:type :fire
                   :distance 3
                   :value 3}
-   :powerattack {:type :powerattack
-                 :distance 1
-                 :value 2}                                     ;amount of additional damage dealt
-   :pickpocket {:type :pickpocket
-                :distance 1
-                :atk-reduction -2
-                :value 1}})                                 ;amount of gold stolen
+   :powerattack  {:type :powerattack
+                  :distance 1
+                  :value 2}
+   :pickpocket   {:type :pickpocket
+                  :distance 1
+                  :atk-reduction -2
+                  :value 1}})
 
 ;; ===== CREATURE CONFIG =====
-(def bat-stats
-  {:hp  2
-   :def 0})
-
-(def lichen-stats
-  {:hp  4
-   :atk 0
-   :def 1})
-
-(def skeleton-stats
-  {:hp  8
-   :def 1
-   :atk 3
-   :exp 1})
-
-(def snake-stats
-  {:hp  2
-   :def 1
-   :atk 2
-   :exp 1})
-
-(def troll-stats
-  {:hp  8
-   :def 2
-   :atk 4
-   :exp 4})
-
-(def mimic-stats
-  {:hp 5
-   :def 2
-   :atk 3
-   :exp 3})
-
-(def spider-stats
-  {:hp 2
-   :def 0
-   :atk 1
-   :exp 1})
-
-(def slime-stats
-  {:hp 2
-   :def 0
-   :atk 1
-   :exp 1})
-
-(def drake-stats
-  {:hp 6
-   :def 3
-   :atk 4
-   :exp 5})
-
-(def necro-stats
-  {:hp 6
-   :def 3
-   :atk 4
-   :exp 5})
-
-(def colossal_amoeba-stats
-  {:hp 6
-   :def 1
-   :atk 3
-   :exp 0})
-
 (def colossal_amoeba-split-rate 3)
-
-(def giant_amoeba-stats
-  {:hp 4
-   :def 1
-   :atk 2
-   :exp 0})
-
 (def giant_amoeba-split-rate 2)
 
-(def large_amoeba-stats
-  {:hp 2
-   :def 1
-   :atk 1
-   :exp 2})
-
-(def willowisp-stats
-  {:hp 3
-   :def 0
-   :atk 0
-   :exp 1})
-
-(def hydra-head-stats
-  {:hp 25
-   :def 3
-   :atk 5
-   :exp 10})
-
-(def hydra-neck-stats
-  {:hp 20
-   :def 3
-   :atk 0
-   :exp 0})
-
-(def hydra-tail-stats
-  {:hp 20
-   :def 1
-   :atk 0
-   :exp 0})
-
-(def hydra-rear-stats
-  {:hp 20
-   :def 1
-   :atk 0
-   :exp 0})
+(def entity->stats
+  {:wall            {:hp 2}
+   :tree            {:hp 1}
+   :maze-wall       {:hp 100}
+   :temple-wall     {:hp 100}
+   :arrow-trap      {:hp 1
+                     :atk 2}
+   :spike-trap      {:hp 1
+                     :atk 2}
+   :bat             {:hp 1
+                     :def 0}
+   :lichen          {:hp 4
+                     :atk 0
+                     :def 1}
+   :skeleton        {:hp 8
+                     :def 1
+                     :atk 3
+                     :exp 1}
+   :snake           {:hp  2
+                     :def 1
+                     :atk 2
+                     :exp 1}
+   :troll           {:hp  8
+                     :def 2
+                     :atk 4
+                     :exp 4}
+   :mimic           {:hp 5
+                     :def 2
+                     :atk 3
+                     :exp 3}
+   :spider          {:hp 2
+                     :def 0
+                     :atk 1
+                     :exp 1}
+   :slime           {:hp 2
+                     :def 0
+                     :atk 1
+                     :exp 1}
+   :drake           {:hp 6
+                     :def 3
+                     :atk 4
+                     :exp 5}
+   :necro           {:hp 6
+                     :def 3
+                     :atk 4
+                     :exp 5}
+   :colossal_amoeba {:hp 6
+                     :def 1
+                     :atk 3
+                     :exp 0}
+   :giant_amoeba    {:hp 4
+                     :def 1
+                     :atk 2
+                     :exp 0}
+   :large_amoeba    {:hp 2
+                     :def 1
+                     :atk 1
+                     :exp 2}
+   :willowisp       {:hp 3
+                     :def 0
+                     :atk 0
+                     :exp 1}
+   :hydra-head      {:hp 25
+                     :def 3
+                     :atk 5
+                     :exp 10}
+   :hydra-neck      {:hp 20
+                     :def 3
+                     :atk 0
+                     :exp 0}
+   :hydra-tail      {:hp 20
+                     :def 1
+                     :atk 0
+                     :exp 0}
+   :hydra-rear      {:hp 20
+                     :def 1
+                     :atk 0
+                     :exp 0}})
 
 (def trap-types
   [:arrow])
 
 (def potion-stats
-  {:health 5 :magic 3})
+  {:health 5
+   :magic 3})
 
 ;; ===== WORLD CONFIG =====
-(def init-wall% 45)
-(def init-torch% 2)
-(def init-gold% 5)
-(def init-health-potion% 1)
-(def init-magic-potion% 1)
-(def init-equip% 1)
+(def world-entity->spawn%
+  {:wall  45
+   :torch 2
+   :gold  5
+   :hp    1
+   :mp    1
+   :eq    1})
 
 ;; ===== MONSTER CONFIG =====
 (def mob->init-spawn%

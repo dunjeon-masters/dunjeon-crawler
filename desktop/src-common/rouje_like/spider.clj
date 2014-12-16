@@ -47,7 +47,7 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 3}]
-                 [:attacker {:atk              (:atk rj.cfg/spider-stats)
+                 [:attacker {:atk              (:atk (:spider rj.cfg/entity->stats))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   [{:type :poison
@@ -56,13 +56,13 @@
                                                  :e-from e-spider
                                                  :apply-fn rj.stef/apply-poison}]
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/spider-stats)
-                                 :max-hp     (:hp  rj.cfg/spider-stats)
-                                 :def        (:def rj.cfg/spider-stats)
+                 [:destructible {:hp         (:hp  (:spider rj.cfg/entity->stats))
+                                 :max-hp     (:hp  (:spider rj.cfg/entity->stats))
+                                 :def        (:def (:spider rj.cfg/entity->stats))
                                  :can-retaliate? false
                                  :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp rj.cfg/spider-stats)}]
+                 [:killable {:experience (:exp (:spider rj.cfg/entity->stats))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the spider")}]])

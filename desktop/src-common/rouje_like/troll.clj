@@ -46,16 +46,16 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 7}]
-                 [:attacker {:atk              (:atk rj.cfg/troll-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :troll))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/troll-stats)
-                                 :max-hp     (:hp  rj.cfg/troll-stats)
-                                 :def        (:def rj.cfg/troll-stats)
+                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :troll))
+                                 :max-hp     (:hp  (rj.cfg/entity->stats :troll))
+                                 :def        (:def (rj.cfg/entity->stats :troll))
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp rj.cfg/troll-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :troll))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the troll")}]])

@@ -170,7 +170,7 @@
                 (let [wall (first wall)
                       wall-type (:type wall)
                       e-wall (:id wall)
-                      hp (:hp (rj.cfg/wall->stats wall-type))]
+                      hp (:hp (rj.cfg/entity->stats wall-type))]
                   (rj.e/system<<components
                     system e-wall
                     [[:position {:x (:x tile)
@@ -262,25 +262,29 @@
       (as-> system
         (do (println "core::add-gold: " (not (nil? system))) system)
         (nth (iterate rj.items/add-gold {:system system :z z})
-             (* (/ rj.cfg/init-gold% 100)
+             (* (/ (:gold rj.cfg/world-entity->spawn%)
+                   100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
       (as-> system
         (do (println "core::add-torch " (not (nil? system))) system)
         (nth (iterate rj.items/add-torch {:system system :z z})
-             (* (/ rj.cfg/init-torch% 100)
+             (* (/ (:torch rj.cfg/world-entity->spawn%)
+                   100)
                 (apply * (vals rj.cfg/world-sizes))))
         (:system system))
       (as-> system
             (do (println "core::add-health-potion " (not (nil? system))) system)
             (nth (iterate rj.items/add-health-potion {:system system :z z})
-                 (* (/ rj.cfg/init-health-potion% 100)
+                 (* (/ (:hp rj.cfg/world-entity->spawn%)
+                       100)
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
       (as-> system
             (do (println "core::add-magic-potion " (not (nil? system))) system)
             (nth (iterate rj.items/add-magic-potion {:system system :z z})
-                 (* (/ rj.cfg/init-magic-potion% 100)
+                 (* (/ (:mp rj.cfg/world-entity->spawn%)
+                       100)
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
 
@@ -288,7 +292,8 @@
       (as-> system
             (do (println "core::add-equipment " (not (nil? system))) system)
             (nth (iterate rj.items/add-equipment {:system system :z z})
-                 (* (/ rj.cfg/init-equip% 100)
+                 (* (/ (:eq rj.cfg/world-entity->spawn%)
+                       100)
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))))
 
@@ -631,7 +636,8 @@
                                                               :entities [(rj.c/map->Entity {:id   nil
                                                                                             :type :floor})]})
                                              [:entities] (fn [entities]
-                                                           (if (< (rand-int 100) rj.cfg/init-wall%)
+                                                           (if (< (rand-int 100)
+                                                                  (:wall rj.cfg/world-entity->spawn%))
                                                              (conj entities
                                                                    (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                       :type :wall}))
@@ -672,7 +678,8 @@
                                                                 :entities [(rj.c/map->Entity {:id   nil
                                                                                               :type :forest-floor})]})
                                                [:entities] (fn [entities]
-                                                             (if (< (rand-int 100) rj.cfg/init-wall%)
+                                                             (if (< (rand-int 100)
+                                                                    (:wall rj.cfg/world-entity->spawn%))
                                                                (conj entities
                                                                      (rj.c/map->Entity {:id   (br.e/create-entity)
                                                                                         :type :tree}))

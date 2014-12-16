@@ -27,7 +27,7 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-bat (br.e/create-entity)
-         hp (:hp  rj.cfg/bat-stats)
+         hp (:hp (:bat rj.cfg/entity->stats))
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
@@ -46,7 +46,7 @@
                            :move-fn      rj.m/move}]
                  [:destructible {:hp  hp
                                  :max-hp hp
-                                 :def (:def rj.cfg/bat-stats)
+                                 :def (:def (:bat rj.cfg/entity->stats))
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
                                  :status-effects []}]

@@ -33,7 +33,7 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-hydra-head (br.e/create-entity)
-         hp (:hp rj.cfg/hydra-head-stats)
+         hp (:hp (rj.cfg/entity->stats :hydra-head) )
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
@@ -51,18 +51,18 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 999}]
-                 [:attacker {:atk              (:atk rj.cfg/hydra-head-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :hydra-head))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   []
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         hp
                                  :max-hp     hp
-                                 :def        (:def rj.cfg/hydra-head-stats)
+                                 :def        (:def (rj.cfg/entity->stats :hydra-head))
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
                                  :status-effects []}]
-                 [:killable {:experience (:exp rj.cfg/hydra-head-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :hydra-head))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 1}]
                  [:broadcaster {:name-fn (constantly "the hydra's head'")}]])

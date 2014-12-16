@@ -47,7 +47,7 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 5}]
-                 [:attacker {:atk              (:atk rj.cfg/drake-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :drake))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   [{:type :burn
@@ -56,13 +56,13 @@
                                                  :e-from e-drake
                                                  :apply-fn rj.stef/apply-burn}]
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/drake-stats)
-                                 :max-hp     (:hp  rj.cfg/drake-stats)
-                                 :def        (:def rj.cfg/drake-stats)
+                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :drake))
+                                 :max-hp     (:hp  (rj.cfg/entity->stats :drake))
+                                 :def        (:def (rj.cfg/entity->stats :drake))
                                  :can-retaliate? false
                                  :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp rj.cfg/drake-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :drake))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the drake")}]])

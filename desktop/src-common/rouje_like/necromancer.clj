@@ -47,7 +47,7 @@
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 5}]
-                 [:attacker {:atk              (:atk rj.cfg/necro-stats)
+                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :necro))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   [{:type :paralysis
@@ -56,13 +56,13 @@
                                                  :e-from e-necromancer
                                                  :apply-fn rj.stef/apply-paralysis}]
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/necro-stats)
-                                 :max-hp     (:hp  rj.cfg/necro-stats)
-                                 :def        (:def rj.cfg/necro-stats)
+                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :necro))
+                                 :max-hp     (:hp  (rj.cfg/entity->stats :necro))
+                                 :def        (:def (rj.cfg/entity->stats :necro))
                                  :can-retaliate? false
                                  :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
-                 [:killable {:experience (:exp rj.cfg/necro-stats)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :necro))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the necromancer")}]])
