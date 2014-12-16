@@ -103,7 +103,7 @@
    (play/key-code :F)             (fn [system]
                                     (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
                                                 :player (fn [c-player]
-                                                          (update-in c-player [:show-world?]
+                                                          (update-in c-player [:fog-of-war?]
                                                                      (fn [prev]
                                                                        (not prev))))))
    (play/key-code :E)             (fn [system]

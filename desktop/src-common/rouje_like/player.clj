@@ -5,7 +5,8 @@
             [play-clj.ui :refer :all]
 
             [rouje-like.components :as rj.c :refer [can-attack? attack
-                                                    can-move? move]]
+                                                    can-move? move
+                                                    ->3DPoint]]
             [rouje-like.rendering :as rj.r]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u :refer [?]]
@@ -40,16 +41,13 @@
                                (- prev sight-decline-rate)
                                prev))
 
-        c-position (rj.e/get-c-on-e system e-this :position)
-        x-pos (:x c-position)
-        y-pos (:y c-position)
-        z-pos (:z c-position)
-        e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
-        world (nth levels z-pos)
+        {:keys [x y z]} (rj.e/get-c-on-e system e-this :position)
 
-        target-coords (rj.u/coords+offset [x-pos y-pos]
+        e-world (first (rj.e/all-e-with-c system :world))
+        {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+        world (nth levels z)
+
+        target-coords (rj.u/coords+offset [x y]
                                           (rj.u/direction->offset
                                             direction))
         target-tile (get-in world target-coords nil)]
@@ -73,12 +71,9 @@
         (rj.e/upd-c system e-this :playersight
                     (fn [c-playersight]
                       (update-in c-playersight [:distance] dec-sight)))
-        (let [c-position (rj.e/get-c-on-e system e-this :position)
-              this-pos [(:z c-position) (:x c-position) (:y c-position)]
+        (let [this-pos (->3DPoint (rj.e/get-c-on-e system e-this :position))
               this-tile (get-in levels this-pos)
 
-              ;;TODO: There might be multiple items & user might want to choose
-              ;;to not pickup
               item (first (filter #(rj.e/get-c-on-e system (:id %) :item)
                                   (:entities this-tile)))]
           (if item
@@ -95,7 +90,7 @@
   [system {:keys [n r c] :or {n "the player"} :as user}]
   (let [e-player (br.e/create-entity)
 
-        [z-pos x-pos y-pos] rj.cfg/player-init-pos
+        [z x y] rj.cfg/player-init-pos
         {:keys [distance decline-rate
                 lower-bound upper-bound
                 torch-multiplier]} rj.cfg/player-sight
@@ -103,7 +98,6 @@
         valid-class? (into #{} (keys rj.cfg/class->stats))
         player-class (if (valid-class? (keyword c))
                        (keyword c) (rand-nth (keys rj.cfg/class->stats)))
-        _ (? player-class)
 
         valid-race? (into #{} (keys rj.cfg/race->stats))
         player-race (if (valid-race? (keyword r))
@@ -131,15 +125,15 @@
     (rj.e/system<<components
       system e-player
       [[:player {:name n
-                 :show-world? false}]
+                 :fog-of-war? true}]
        [:klass {:class player-class}]
        [:race {:race player-race}]
        [:experience {:experience 1
                      :level 1
                      :level-up-fn rj.exp/level-up}]
-       [:position {:x x-pos
-                   :y y-pos
-                   :z z-pos
+       [:position {:x x
+                   :y y
+                   :z z
                    :type :player}]
        [:equipment {:weapon nil
                     :armor nil}]

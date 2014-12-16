@@ -335,7 +335,7 @@
         c-player-pos (rj.e/get-c-on-e system e-player :position)
         player-pos [(:x c-player-pos)
                     (:y c-player-pos)]
-        show-world? (:show-world? (rj.e/get-c-on-e system e-player :player))
+        fog-of-war? (:fog-of-war? (rj.e/get-c-on-e system e-player :player))
 
         c-sight (rj.e/get-c-on-e system e-player :playersight)
         sight (math/ceil (:distance c-sight))
@@ -365,7 +365,7 @@
     (doseq [x (range start-x end-x)
             y (range start-y end-y)
             :let [tile (get-in levels [(:z c-player-pos) x y])]]
-      (when (or show-world?
+      (when (or (not fog-of-war?)
                 (rj.u/can-see? world sight player-pos [x y]))
         (let [top-entity (rj.u/tile->top-entity tile)
               texture-entity (-> top-entity
