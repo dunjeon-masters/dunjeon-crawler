@@ -414,32 +414,32 @@
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system)
             (do (? "core::add-mimic " (not (nil? system))) system))
-:cave (as-> system system
-        ;; Spawn Lichen
-        (nth (iterate rj.lc/add-lichen {:system system :z z})
-             (* (/ (:lichen rj.cfg/mob->init-spawn%)
-                   100)
-                (apply * (vals rj.cfg/world-sizes))))
-        (:system system)
-        (do (? "core::add-lichen " (not (nil? system))) system)
-        ;; Spawn Bats
-        (nth (iterate rj.bt/add-bat {:system system :z z})
-             (* (/ (:bat rj.cfg/mob->init-spawn%)
-                   100)
-                (apply * (vals rj.cfg/world-sizes))))
-        (:system system)
-        (do (? "core::add-bat " (not (nil? system))) system)
-        ;; Spawn Drakes
-        (nth (iterate rj.dr/add-drake {:system system :z z})
-             (* (max 0
-                     (min 0.05
-                          (/ (+ (:drake rj.cfg/mob->init-spawn%)
-                                (* 0.2 (- z (:drake rj.cfg/mob->init-floor))))
-                             100)))
-                (apply * (vals rj.cfg/world-sizes))))
-        (:system system)
-        (do (? "core::add-drake " (not (nil? system))) system))
-system))
+    :cave (as-> system system
+            ;; Spawn Lichen
+            (nth (iterate rj.lc/add-lichen {:system system :z z})
+                 (* (/ (:lichen rj.cfg/mob->init-spawn%)
+                       100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            (do (? "core::add-lichen " (not (nil? system))) system)
+            ;; Spawn Bats
+            (nth (iterate rj.bt/add-bat {:system system :z z})
+                 (* (/ (:bat rj.cfg/mob->init-spawn%)
+                       100)
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            (do (? "core::add-bat " (not (nil? system))) system)
+            ;; Spawn Drakes
+            (nth (iterate rj.dr/add-drake {:system system :z z})
+                 (* (max 0
+                         (min 0.05
+                              (/ (+ (:drake rj.cfg/mob->init-spawn%)
+                                    (* 0.2 (- z (:drake rj.cfg/mob->init-floor))))
+                                 100)))
+                    (apply * (vals rj.cfg/world-sizes))))
+            (:system system)
+            (do (? "core::add-drake " (not (nil? system))) system))
+    system))
 
 (defn- add-portal
   [system z]

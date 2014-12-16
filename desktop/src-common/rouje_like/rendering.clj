@@ -149,170 +149,170 @@
   (let [grim-tile-sheet "grim_12x12.png"
         darkond-tile-sheet "DarkondDigsDeeper_16x16.png"
         bisasam-tile-sheet "Bisasam_20x20.png"]
-    {:player   {:x 0 :y 4
-                :width 12 :height 12
-                :color {:r 255 :g 255 :b 255 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :wall     {:x 3 :y 2
-                :width 12 :height 12
-                :color {:r 255 :g 255 :b 255 :a 128}
-                :tile-sheet grim-tile-sheet}
-     :temple-wall {:x 3 :y 2
-                   :width 12 :height 12
-                   :color {:r 218 :g 165 :b 32 :a 128}
-                   :tile-sheet grim-tile-sheet}
-     :door     {:x 11 :y 2
-                :width 12 :height 12
-                :color {:r 255 :g 255 :b 255 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :open-door {:x 12 :y 5
-                 :width 12 :height 12
-                 :color {:r 255 :g 255 :b 255 :a 128}
-                 :tile-sheet grim-tile-sheet}
-     :hidden-spike-trap {:x 14 :y 2
-                         :width 12 :height 12
-                         :color {:r 255 :g 140 :b 0 :a 255}
-                         :tile-sheet grim-tile-sheet}
-     :spike-trap {:x 4 :y 14
-                  :width 16 :height 16
-                  :color {:r 218 :g 165 :b 32 :a 255}
-                  :tile-sheet darkond-tile-sheet}
-     :arrow-trap {:x 3 :y 2
-                  :width 12 :height 12
-                  :color {:r 218 :g 165 :b 32 :a 255}
-                  :tile-sheet grim-tile-sheet}
-     :maze-wall {:x 8 :y 5
-                 :width 12 :height 12
-                 :color {:r 0 :g 82 :b 3 :a 255}
-                 :tile-sheet grim-tile-sheet}
-     :gold     {:x 1 :y 9
-                :width 12 :height 12
-                :color {:r 255 :g 255 :b 0 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :lichen   {:x 15 :y 0
-                :width 12 :height 12
-                :color {:r 0 :g 255 :b 0 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :floor    {:x 14 :y 2
-                :width 12 :height 12
-                :color {:r 255 :g 255 :b 255 :a 64}
-                :tile-sheet grim-tile-sheet}
-     :forest-floor    {:x 14 :y 2
-                       :width 12 :height 12
-                       :color {:r 103 :g 133 :b 81 :a 64}
-                       :tile-sheet grim-tile-sheet}
-     :merchant {:x 13 :y 4
-                :width 12 :height 12
-                :color {:r 0 :g 0 :b 255 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :torch    {:x 1 :y 2
-                :width 12 :height 12
-                :color {:r 255 :g 0 :b 0 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :tree     {:x 5 :y 0
-                :width 20 :height 20
-                :color {:r 21 :g 54 :b 21 :a 255}
-                :tile-sheet bisasam-tile-sheet}
-     :portal   {:x 4 :y 9
-                :width 12 :height 12
-                :color {:r 102 :g 0 :b 102 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :m-portal {:x 4 :y 9
-                :width 12 :height 12
-                :color {:r 0 :g 0 :b 255 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :equipment {:x 2 :y 9
-                 :width 12 :height 12
-                 :color {:r 255 :g 255 :b 255 :a 255}
-                 :tile-sheet grim-tile-sheet}
-     :purchasable {:x 2 :y 9
-                   :width 12 :height 12
-                   :color {:r 255 :g 255 :b 0 :a 255}
-                   :tile-sheet grim-tile-sheet}
-     :bat      {:x 14 :y 5
-                :width 12 :height 12
-                :color {:r 255 :g 255 :b 255 :a 128}
-                :tile-sheet grim-tile-sheet}
-     :skeleton {:x 3 :y 5
-                :width 16 :height 16
-                :color {:r 255 :g 255 :b 255 :a 255}
-                :tile-sheet darkond-tile-sheet}
-     :dune     {:x 14 :y 2
-                :width 12 :height 12
-                :color {:r 255 :g 140 :b 0 :a 255}
-                :tile-sheet grim-tile-sheet}
-     :health-potion {:x 13 :y 10
-                     :width 12 :height 12
-                     :color {:r 255 :g 0 :b 0 :a 255}
-                     :tile-sheet grim-tile-sheet}
-     :snake    {:x 3 :y 7
-                :width 16 :height 16
-                :color {:r 1 :g 255 :b 1 :a 255}
-                :tile-sheet darkond-tile-sheet}
-     :troll    {:x 4 :y 5
-                :width 12 :height 12
-                :color {:r 255 :g 140 :b 1 :a 255}
-                :tile-sheet grim-tile-sheet}
-:mimic    {:x 15 :y 8
-           :width 12 :height 12
-           :color {:r 255 :g 241 :b 36 :a 255}
-           :tile-sheet grim-tile-sheet}
-:hidden-mimic {:x 1 :y 9
-               :width 12 :height 12
-               :color {:r 128 :g 255 :b 1 :a 255}
-               :tile-sheet grim-tile-sheet}
-:spider   {:x 14 :y 9
-           :width 16 :height 16
-           :color {:r 183 :g 21 :b 3 :a 255}
-           :tile-sheet darkond-tile-sheet}
-:slime   {:x 7 :y 15
-          :width 16 :height 16
-          :color {:r 72 :g 223 :b 7 :a 125}
-          :tile-sheet darkond-tile-sheet}
-:drake   {:x 13 :y 0
-          :width 16 :height 16
-          :color {:r 222 :g 5 :b 48 :a 255}
-          :tile-sheet darkond-tile-sheet}
-:necromancer   {:x 10 :y 14
-                :width 12 :height 12
-                :color {:r 116 :g 84 :b 141 :a 255}
-                :tile-sheet grim-tile-sheet}
-:colossal_amoeba  {:x 7 :y 12
-                   :width 16 :height 16
-                   :color {:r 111 :g 246 :b 255 :a 125}
-                   :tile-sheet darkond-tile-sheet}
-:giant_amoeba  {:x 7 :y 12
-                :width 16 :height 16
-                :color {:r 111 :g 246 :b 255 :a 125}
-                :tile-sheet darkond-tile-sheet}
-:large_amoeba  {:x 7 :y 12
-                :width 16 :height 16
-                :color {:r 175 :g 251 :b 255 :a 125}
-                :tile-sheet darkond-tile-sheet}
-:willow-wisp  {:x 10 :y 2
-               :width 20 :height 20
-               :color {:r 210 :g 138 :b 181 :a 125}
-               :tile-sheet bisasam-tile-sheet}
-:hydra-head  {:x 6 :y 2
-              :width 16 :height 16
-              :color {:r 40 :g 156 :b 23 :a 255}
-              :tile-sheet darkond-tile-sheet}
-:hydra-neck  {:x 12 :y 1 ;;Alt: 14,7
-              :width 16 :height 16
-              :color {:r 40 :g 156 :b 23 :a 255}
-              :tile-sheet darkond-tile-sheet}
-:hydra-tail  {:x 12 :y 1
-              :width 16 :height 16
-              :color {:r 40 :g 156 :b 23 :a 255}
-              :tile-sheet darkond-tile-sheet}
-:hydra-rear  {:x 12 :y 1
-              :width 16 :height 16
-              :color {:r 40 :g 156 :b 23 :a 255}
-              :tile-sheet darkond-tile-sheet}
-:magic-potion {:x 13 :y 10
-               :width 12 :height 12
-               :color {:r 0 :g 0 :b 255 :a 255}
-               :tile-sheet grim-tile-sheet}}))
+    {:arrow-trap                {:x 3 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 218 :g 165 :b 32 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :bat                       {:x 14 :y 5
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 255 :a 128}
+                                 :tile-sheet grim-tile-sheet}
+     :colossal-amoeba           {:x 7 :y 12
+                                 :width 16 :height 16
+                                 :color {:r 111 :g 246 :b 255 :a 125}
+                                 :tile-sheet darkond-tile-sheet}
+     :door                      {:x 11 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 255 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :drake                     {:x 13 :y 0
+                                 :width 16 :height 16
+                                 :color {:r 222 :g 5 :b 48 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :dune                      {:x 14 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 140 :b 0 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :equipment                 {:x 2 :y 9
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 255 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :floor                     {:x 14 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 255 :a 64}
+                                 :tile-sheet grim-tile-sheet}
+     :forest-floor              {:x 14 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 103 :g 133 :b 81 :a 64}
+                                 :tile-sheet grim-tile-sheet}
+     :giant-amoeba              {:x 7 :y 12
+                                 :width 16 :height 16
+                                 :color {:r 111 :g 246 :b 255 :a 125}
+                                 :tile-sheet darkond-tile-sheet}
+     :gold                      {:x 1 :y 9
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 0 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :health-potion             {:x 13 :y 10
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 0 :b 0 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :hidden-mimic              {:x 1 :y 9
+                                 :width 12 :height 12
+                                 :color {:r 128 :g 255 :b 1 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :hidden-spike-trap         {:x 14 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 140 :b 0 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :hydra-head                {:x 6 :y 2
+                                 :width 16 :height 16
+                                 :color {:r 40 :g 156 :b 23 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :hydra-neck                {:x 12 :y 1
+                                 :width 16 :height 16
+                                 :color {:r 40 :g 156 :b 23 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :hydra-rear                {:x 12 :y 1
+                                 :width 16 :height 16
+                                 :color {:r 40 :g 156 :b 23 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :hydra-tail                {:x 12 :y 1
+                                 :width 16 :height 16
+                                 :color {:r 40 :g 156 :b 23 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :large-amoeba              {:x 7 :y 12
+                                 :width 16 :height 16
+                                 :color {:r 175 :g 251 :b 255 :a 125}
+                                 :tile-sheet darkond-tile-sheet}
+     :lichen                    {:x 15 :y 0
+                                 :width 12 :height 12
+                                 :color {:r 0 :g 255 :b 0 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :m-portal                  {:x 4 :y 9
+                                 :width 12 :height 12
+                                 :color {:r 0 :g 0 :b 255 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :magic-potion              {:x 13 :y 10
+                                 :width 12 :height 12
+                                 :color {:r 0 :g 0 :b 255 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :maze-wall                 {:x 8 :y 5
+                                 :width 12 :height 12
+                                 :color {:r 0 :g 82 :b 3 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :merchant                  {:x 13 :y 4
+                                 :width 12 :height 12
+                                 :color {:r 0 :g 0 :b 255 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :mimic                     {:x 15 :y 8
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 241 :b 36 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :necromancer               {:x 10 :y 14
+                                 :width 12 :height 12
+                                 :color {:r 116 :g 84 :b 141 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :open-door                 {:x 12 :y 5
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 255 :a 128}
+                                 :tile-sheet grim-tile-sheet}
+     :portal                    {:x 4 :y 9
+                                 :width 12 :height 12
+                                 :color {:r 102 :g 0 :b 102 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :purchasable               {:x 2 :y 9
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 0 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :skeleton                  {:x 3 :y 5
+                                 :width 16 :height 16
+                                 :color {:r 255 :g 255 :b 255 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :slime                     {:x 7 :y 15
+                                 :width 16 :height 16
+                                 :color {:r 72 :g 223 :b 7 :a 125}
+                                 :tile-sheet darkond-tile-sheet}
+     :snake                     {:x 3 :y 7
+                                 :width 16 :height 16
+                                 :color {:r 1 :g 255 :b 1 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :spider                    {:x 14 :y 9
+                                 :width 16 :height 16
+                                 :color {:r 183 :g 21 :b 3 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :spike-trap                {:x 4 :y 14
+                                 :width 16 :height 16
+                                 :color {:r 218 :g 165 :b 32 :a 255}
+                                 :tile-sheet darkond-tile-sheet}
+     :temple-wall               {:x 3 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 218 :g 165 :b 32 :a 128}
+                                 :tile-sheet grim-tile-sheet}
+     :torch                     {:x 1 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 0 :b 0 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :tree                      {:x 5 :y 0
+                                 :width 20 :height 20
+                                 :color {:r 21 :g 54 :b 21 :a 255}
+                                 :tile-sheet bisasam-tile-sheet}
+     :troll                     {:x 4 :y 5
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 140 :b 1 :a 255}
+                                 :tile-sheet grim-tile-sheet}
+     :wall                      {:x 3 :y 2
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 255 :a 128}
+                                 :tile-sheet grim-tile-sheet}
+     :willow-wisp               {:x 10 :y 2
+                                 :width 20 :height 20
+                                 :color {:r 210 :g 138 :b 181 :a 125}
+                                 :tile-sheet bisasam-tile-sheet}
+     :player                    {:x 0 :y 4
+                                 :width 12 :height 12
+                                 :color {:r 255 :g 255 :b 255 :a 255}
+                                 :tile-sheet grim-tile-sheet}}))
 
 (def ^:private type->texture
   (memoize
