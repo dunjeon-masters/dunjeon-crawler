@@ -1,4 +1,4 @@
-(ns rouje-like.t_hydra_head
+(ns rouje-like.t-hydra-head
   (:use [midje.sweet]
         [rouje-like.hydra-head])
   (:require [rouje-like.core :as rj.core]

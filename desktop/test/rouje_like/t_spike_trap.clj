@@ -1,4 +1,4 @@
-(ns rouje-like.t_spike_Trap
+(ns rouje-like.t-spike-trap
               (:use [midje.sweet]
                     [rouje-like.spike-trap])
               (:require [rouje-like.core :as rj.core]

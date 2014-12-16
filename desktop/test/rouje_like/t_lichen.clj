@@ -1,4 +1,4 @@
-(ns rouje-like.t_lichen
+(ns rouje-like.t-lichen
   (:use [midje.sweet]
         [rouje-like.lichen])
   (:require [rouje-like.core :as rj.core]

@@ -1,4 +1,4 @@
-(ns rouje-like.t-arrow_trap
+(ns rouje-like.t-arrow-trap
   (:use [midje.sweet]
         [rouje-like.arrow-trap])
   (:require [rouje-like.core :as rj.core]

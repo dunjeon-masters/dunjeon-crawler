@@ -1,4 +1,4 @@
-(ns rouje-like.t_player
+(ns rouje-like.t-player
   (:use [midje.sweet]
         [rouje-like.player])
   (:require [rouje-like.core :as rj.core]

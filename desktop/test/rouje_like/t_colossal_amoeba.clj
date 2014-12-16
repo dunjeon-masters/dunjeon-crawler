@@ -1,6 +1,6 @@
-(ns rouje-like.t_colossal_amoeba
+(ns rouje-like.t-colossal-amoeba
   (:use [midje.sweet]
-        [rouje-like.colossal_amoeba])
+        [rouje-like.colossal-amoeba])
   (:require [rouje-like.core :as rj.core]
             [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]
@@ -15,8 +15,8 @@
           (rj.core/init-entities {})))))
 
 (let [system (get-system)]
-  (fact "add-colossal_amoeba"
+  (fact "add-colossal-amoeba"
         (as-> system system
-              (:system (add-colossal_amoeba {:system system :z 1}))
-              (nil? (rj.e/get-c-on-e system (first (rj.e/all-e-with-c system :colossal_amoeba)) :position)))
+              (:system (add-colossal-amoeba {:system system :z 1}))
+              (nil? (rj.e/get-c-on-e system (first (rj.e/all-e-with-c system :colossal-amoeba)) :position)))
         => false))
