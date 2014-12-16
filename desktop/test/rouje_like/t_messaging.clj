@@ -1,14 +1,9 @@
 (ns rouje-like.t-messaging
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.messaging])
   (:require [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]))
-
-(defn start []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (init-relay)))))
 
 ;; ========= ADD-MSG =========
 (let [system (start)

@@ -1,5 +1,6 @@
 (ns rouje-like.t-experience
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.experience])
   (:require [rouje-like.core :as rj.core]
             [brute.entity :as br.e]
@@ -8,13 +9,7 @@
             [rouje-like.components :as rj.c :refer [->3DPoint]]
             [rouje-like.world :as rj.w]))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
-
-(let [system (get-system)
+(let [system (start)
       system (#'rouje-like.world/init-themed-entities system 1 :maze)
       e-player (first (rj.e/all-e-with-c system :player))
       c-attacker (rj.e/get-c-on-e system e-player :attacker)

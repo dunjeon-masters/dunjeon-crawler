@@ -1,5 +1,6 @@
 (ns rouje-like.t-attacker
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.attacker])
   (:require [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.core :as rj.core]
@@ -7,13 +8,8 @@
             [rouje-like.skeleton :refer [add-skeleton]]
             [rouje-like.entity-wrapper :as rj.e]))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
 
-(let [system (get-system)
+(let [system (start)
       system (:system
                (add-skeleton {:system system
                               :z 1}))

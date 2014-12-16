@@ -1,5 +1,6 @@
 (ns rouje-like.t-items
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.items])
   (:require [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.core :as rj.core]
@@ -8,13 +9,7 @@
             [rouje-like.components :as rj.c]
             [rouje-like.world :as rj.w]))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
-
-(let [system (get-system)
+(let [system (start)
       e-world (first (rj.e/all-e-with-c system :world))
       {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
       world (nth levels 1)

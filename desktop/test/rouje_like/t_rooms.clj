@@ -1,5 +1,6 @@
 (ns rouje-like.t-rooms
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.rooms])
   (:require [rouje-like.utils :as rj.u :refer [?]]))
 

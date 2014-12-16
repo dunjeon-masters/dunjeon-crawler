@@ -1,5 +1,6 @@
 (ns rouje-like.t-core
-  (:use midje.sweet)
+  (:use [midje.sweet]
+        [rouje-like.test-utils])
   (:require [rouje-like.core :as rj.core]))
 
 (fact "about `core`"

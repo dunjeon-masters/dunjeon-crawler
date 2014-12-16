@@ -1,5 +1,6 @@
 (ns rouje-like.t-utils
-  (:use midje.sweet)
+  (:use [midje.sweet]
+        [rouje-like.test-utils])
   (:require [rouje-like.core :as rj.core]
             [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]
@@ -14,7 +15,7 @@
                            conj wall-e))
 
 (fact "taxicab-dist"
-      (taxicab-dist [0 0] [1 1]) => 2)
+      (taxicab-dist [0 0] [1 2]) => 3)
 
 (fact "tile->top-entity"
       (let [entities [(rj.c/map->Entity {:type :player})
@@ -24,9 +25,9 @@
                                      :type :player})
 
 (fact "points->line"
-      (points->line [0 0] [2 3]) => [[0 0] [0 1]
-                                     [1 1]
-                                     [1 2] [2 3]])
+      (points->line [0 0] [3 5]) => [[0 0] [0 1]
+                                     [1 2] [2 3]
+                                     [2 4] [3 5]])
 
 (fact "can-see?"
       (can-see? level+wall 3 [0 0] [2 1]) => true
@@ -34,10 +35,12 @@
       (can-see? level+wall 3 [0 0] [1 2]) => false)
 
 (fact "coords+offset"
-      (coords+offset [0 0] [1 3]) => [1 3])
+      (coords+offset [0 0] [1 3]) => [1 3]
+      (coords+offset [-1 3] [4 -2]) => [3 1])
 
 (fact "get-neighbors-coords"
-      (get-neighbors-coords [1 1]) => [[1 0] [1 2] [2 1] [0 1]])
+      (get-neighbors-coords [1 1]) => [[1 0] [1 2]
+                                       [2 1] [0 1]])
 
 (facts "get-neighbors"
        (get-neighbors level [1 1])
@@ -97,17 +100,12 @@
                            %)))))
 
 (fact "rand-rng"
-      (take 100 (repeatedly #(rand-rng 1 10)))
-      => (has every? (roughly 5 5)))
+      (* 1/10000 (apply + (take 10000 (repeatedly #(rand-rng 1 10)))))
+      => (roughly 5 1))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
 
 (fact "update-in-world"
-      (let [system (get-system)
+      (let [system (start)
             e-world (first (rj.e/all-e-with-c system :world))
             e-player (first (rj.e/all-e-with-c system :player))
             system (update-in-world system e-world [1 3 3];[z x y]
@@ -122,7 +120,7 @@
            (= (:type (first es)) :fact)))
 
 (fact "change-type"
-      (let [system (get-system)
+      (let [system (start)
             e-player (first (rj.e/all-e-with-c system :player))
             system (change-type system e-player :player :reyalp)
             c-position (rj.e/get-c-on-e system e-player :position)

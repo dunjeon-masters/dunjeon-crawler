@@ -1,5 +1,6 @@
 (ns rouje-like.t-snake
-  (:use midje.sweet)
+  (:use [midje.sweet]
+        [rouje-like.test-utils])
   (:require [brute.entity :as br.e]
             [rouje-like.components :as rj.c :refer [can-move? move]]
             [rouje-like.entity-wrapper :as rj.e]
@@ -11,14 +12,7 @@
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.snake :as rj.sn]))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
-
-(let [system (get-system)]
-
+(let [system (start)]
   (fact "add-snake"
         (as-> system system
               (:system (rj.sn/add-snake {:system system :z 1}))

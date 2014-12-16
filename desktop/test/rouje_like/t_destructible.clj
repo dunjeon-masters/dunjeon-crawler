@@ -1,17 +1,12 @@
 (ns rouje-like.t-destructible
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.destructible])
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.core :as rj.core]
             [rouje-like.snake :as rj.snk]
             [rouje-like.utils :refer [?]]
             [brute.entity :as br.e]))
-
-(defn start []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
 
 (facts "add-effects & apply-effects"
        (let [system (as-> (start) system
@@ -49,12 +44,15 @@
 
 (facts "take-damage"
        (let [system (start)
+             system (:system
+                      (rj.snk/add-snake {:system system
+                                         :z 1}))
              e-player (first (rj.e/all-e-with-c system :player))
              c-destructible (rj.e/get-c-on-e system e-player :destructible)
-             e-attacker (first (remove #(#{:player}
-                                   (:type (rj.e/get-c-on-e system % :positions)))
-                                (rj.e/all-e-with-c system :attacker)))
-             damage (inc (:atk (rj.e/get-c-on-e system e-attacker :attacker)))
+             e-attacker (first (rj.e/all-e-with-c system :snake))
+             c-attacker (rj.e/get-c-on-e system e-attacker :attacker)
+
+             damage (inc (:atk c-attacker))
              system (take-damage c-destructible e-player damage e-attacker system)
              {:keys [hp max-hp]} (rj.e/get-c-on-e system e-player :destructible)]
          (fact "take-damage: lose hp"

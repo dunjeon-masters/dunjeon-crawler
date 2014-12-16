@@ -1,5 +1,7 @@
 (ns rouje-like.t-portal
-  (:use [rouje-like.portal] [midje.sweet])
+  (:use [midje.sweet]
+        [rouje-like.test-utils]
+        [rouje-like.portal])
   (:require [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u :refer [?]]
@@ -7,13 +9,7 @@
             [rouje-like.config :as rj.cfg]
             [rouje-like.core :as rj.core]))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
-
-(let [system (get-system)
+(let [system (start)
       system (:system (add-portal {:system system :z 1}))
       e-world (first (rj.e/all-e-with-c system :world))
       c-world (rj.e/get-c-on-e system e-world :world)

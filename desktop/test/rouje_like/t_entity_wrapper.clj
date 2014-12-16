@@ -1,5 +1,6 @@
 (ns rouje-like.t-entity-wrapper
-  (:use midje.sweet)
+  (:use [midje.sweet]
+        [rouje-like.test-utils])
   (:require [rouje-like.entity-wrapper :refer :all]))
 
 (fact "->CamelCase"

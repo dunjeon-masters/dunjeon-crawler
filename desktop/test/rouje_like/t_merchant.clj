@@ -1,5 +1,6 @@
 (ns rouje-like.t-merchant
-  (:use midje.sweet)
+  (:use [midje.sweet]
+        [rouje-like.test-utils])
   (:require [brute.entity :as br.e]
             [rouje-like.world :as rj.w]
             [rouje-like.components :as rj.c]
@@ -9,13 +10,7 @@
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.core :as rj.core]))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
-
-(let [system (get-system)
+(let [system (start)
       e-world (first (rj.e/all-e-with-c system :world))
       c-world (rj.e/get-c-on-e system e-world :world)
       levels (:levels c-world)

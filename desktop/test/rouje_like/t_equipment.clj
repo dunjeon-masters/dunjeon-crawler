@@ -1,15 +1,10 @@
 (ns rouje-like.t-equipment
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.equipment])
   (:require [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.core :as rj.core]))
-
-(defn start []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
 
 (def arm {:type :armor, :stats {:max-hp 3 :def 2}, :name :chainmail})
 

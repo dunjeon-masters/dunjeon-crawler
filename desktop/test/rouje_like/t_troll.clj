@@ -1,5 +1,6 @@
 (ns rouje-like.t-troll
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.troll])
   (:require [brute.entity :as br.e]
             [rouje-like.components :as rj.c :refer [can-move? move]]
@@ -12,13 +13,7 @@
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.troll :as rj.tr]))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
-
-(let [system (get-system)]
+(let [system (start)]
   (fact "add-troll"
         (as-> system system
               (:system (add-troll {:system system :z 1}))

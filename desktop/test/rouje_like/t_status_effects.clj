@@ -1,5 +1,6 @@
 (ns rouje-like.t-status-effects
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.status-effects])
   (:require [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.core :as rj.core]
@@ -8,18 +9,12 @@
             [rouje-like.components :as rj.c]
             [rouje-like.world :as rj.w]))
 
-(defn get-system []
-  (with-open [w (clojure.java.io/writer "NUL")]
-    (binding [*out* w]
-      (-> (br.e/create-system)
-          (rj.core/init-entities {})))))
-
 (defn check-status-duration
   [system e-this status-effect]
   (seq (filter #(= status-effect (:type %))
                (:status-effects (rj.e/get-c-on-e system e-this :destructible)))))
 
-(let [system (get-system)
+(let [system (start)
       system (#'rouje-like.world/init-themed-entities system 1 :maze)
       e-player (first (rj.e/all-e-with-c system :player))]
 
