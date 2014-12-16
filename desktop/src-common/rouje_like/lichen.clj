@@ -94,13 +94,11 @@
         z (:z c-position)
 
         e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
+        {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
         world (nth levels z)
 
-        c-lichen (rj.e/get-c-on-e system e-this :lichen)
-        grow-chance% (:grow-chance% c-lichen)
-        max-blob-size (:max-blob-size c-lichen)
+        {:keys [grow-chance
+                max-blob-size]} (rj.e/get-c-on-e system e-this :lichen)
 
         empty-neighbors (rj.u/get-neighbors-of-type world [x y]
                                                     rj.cfg/<empty>)]
@@ -108,5 +106,6 @@
              (< (rand 100) grow-chance%)
              (< (get-size-of-lichen-blob world [x y])
                 max-blob-size))
-      (:system (add-lichen system (rand-nth empty-neighbors)))system)))
+      (:system (add-lichen system (rand-nth empty-neighbors)))
+      system)))
 
