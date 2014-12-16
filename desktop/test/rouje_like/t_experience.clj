@@ -10,7 +10,7 @@
             [rouje-like.world :as rj.w]))
 
 (let [system (start)
-      system (#'rouje-like.world/init-themed-entities system 1 :maze)
+      system (upgrade system :maze)
       e-player (first (rj.e/all-e-with-c system :player))
       c-attacker (rj.e/get-c-on-e system e-player :attacker)
       e-slime (first (rj.e/all-e-with-c system :slime))

@@ -25,12 +25,14 @@
    (with-open [w (clojure.java.io/writer dev-null)]
      (binding [*out* w]
        (-> system
-           (rj.core/init-entities {})))))
-  ([system world-type]
-   (with-open [w (clojure.java.io/writer "NUL")]
+           (rj.core/init-entities {}))))))
+
+(defn upgrade
+  [system world-type]
+  (with-open [w (clojure.java.io/writer dev-null)]
      (binding [*out* w]
        (-> system
-           (rj.core/init-entities {}))))))
+           (#'rouje-like.world/init-themed-entities 1 world-type)))))
 
 (fact "init"
       (init) => {:entity-component-types {}

@@ -15,7 +15,7 @@
                (:status-effects (rj.e/get-c-on-e system e-this :destructible)))))
 
 (let [system (start)
-      system (#'rouje-like.world/init-themed-entities system 1 :maze)
+      system (upgrade system :maze)
       e-player (first (rj.e/all-e-with-c system :player))]
 
   (facts "apply-paralysis"
