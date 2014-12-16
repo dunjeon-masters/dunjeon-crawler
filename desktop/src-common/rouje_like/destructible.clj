@@ -58,21 +58,21 @@
   (let [c-destructible (rj.e/get-c-on-e system e-this :destructible)
         statuses (:status-effects c-destructible)
         dec-status-effects (fn [status-effects]
-                               (vec (filter identity
-                                            (map (fn [status]
-                                                   (let [status- (update-in status [:duration]
-                                                                            dec)]
-                                                     (if (neg? (:duration status-))
-                                                       nil
-                                                       status-)))
-                                                 status-effects))))]
+                             (vec (filter identity
+                                          (map (fn [status]
+                                                 (let [status- (update-in status [:duration]
+                                                                          dec)]
+                                                   (if (neg? (:duration status-))
+                                                     nil
+                                                     status-)))
+                                               status-effects))))]
     (reduce (fn [system status]
               (as-> (rj.e/upd-c system e-this :destructible
                                 (fn [c-destructible]
                                   (update-in c-destructible [:status-effects]
                                              dec-status-effects))) system
                 (if-let [status (seq (filter #(#{(:type status)} (:type %))
-                                        (:status-effects (rj.e/get-c-on-e system e-this :destructible))))]
+                                             (:status-effects (rj.e/get-c-on-e system e-this :destructible))))]
                   ((:apply-fn (first status)) system e-this (first status))
                   system)))
             system statuses)))

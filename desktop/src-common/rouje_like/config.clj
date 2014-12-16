@@ -303,23 +303,24 @@
 (def init-gold% 5)
 (def init-health-potion% 1)
 (def init-magic-potion% 1)
-(def init-lichen% 1)
-(def init-bat% 1)
 (def init-equip% 1)
 
 ;; ===== MONSTER CONFIG =====
-(def init-skeleton% 0.1)
-(def init-snake% 0.3)
-(def init-troll% 0.1)
-(def init-mimic% 0.1)
-(def init-spider% 0.5)
-(def init-slime% 0.1)
-(def init-drake% 0.01)
-(def init-necro% 0.1)
-(def init-colossal_amoeba% 1)
-(def init-giant_amoeba% 0.1)
-(def init-willowisp% 0.1)
-(def init-boss% 0.3)
+(def mob->init-spawn%
+  {:willowisp       0.1
+   :giant_amoeba    0.1
+   :colossal_amoeba 1
+   :bat             1
+   :lichen          1
+   :necro           0.1
+   :drake           0.01
+   :slime           0.1
+   :spider          0.5
+   :boss            0.3
+   :mimic           0.1
+   :troll           0.1
+   :snake           0.3
+   :skeleton        0.1})
 
 ;; ===== STARTING FLOOR FOR MOBS =====
 (def init-skeleton-floor 2)

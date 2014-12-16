@@ -154,7 +154,6 @@
     (let [action (keycode->action keycode)]
       (if (not (nil? action))
         (action system)
-        ;;TODO change this code to accept different spells per class
         (let [e-this (first (rj.e/all-e-with-c system :player))
               c-energy (rj.e/get-c-on-e system e-this :energy)
               energy (:energy c-energy)

@@ -97,7 +97,7 @@
         {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
         world (nth levels z)
 
-        {:keys [grow-chance
+        {:keys [grow-chance%
                 max-blob-size]} (rj.e/get-c-on-e system e-this :lichen)
 
         empty-neighbors (rj.u/get-neighbors-of-type world [x y]
