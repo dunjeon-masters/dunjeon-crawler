@@ -13,7 +13,7 @@
 
 (declare process-input-tick)
 
-(defn add-willowisp
+(defn add-willow-wisp
   ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          c-world (rj.e/get-c-on-e system e-world :world)
@@ -25,25 +25,25 @@
                                         (rand-int (count (first world)))]))]
      (loop [target-tile (get-rand-tile world)]
        (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
-         (add-willowisp system target-tile)
+         (add-willow-wisp system target-tile)
          (recur (get-rand-tile world))))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-willowisp (br.e/create-entity)
+         e-willow-wisp (br.e/create-entity)
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
-                                            (rj.c/map->Entity {:id   e-willowisp
+                                            (rj.c/map->Entity {:id   e-willow-wisp
                                                                :type :willowisp})))))]
      {:system (rj.e/system<<components
-                system e-willowisp
-                [[:willowisp {}]
+                system e-willow-wisp
+                [[:willow-wisp {}]
                  [:position {:x    (:x target-tile)
                              :y    (:y target-tile)
                              :z    (:z target-tile)
-                             :type :willowisp}]
+                             :type :willow-wisp}]
                  [:mobile {:can-move?-fn rj.m/can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
@@ -53,7 +53,7 @@
                              :status-effects   [{:type :burn
                                                  :duration 2
                                                  :value 1
-                                                 :e-from e-willowisp
+                                                 :e-from e-willow-wisp
                                                  :apply-fn rj.stef/apply-burn}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  rj.cfg/willowisp-stats)

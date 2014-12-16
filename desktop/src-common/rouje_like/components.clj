@@ -173,7 +173,7 @@
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(defrecord Willowisp [])
+(defrecord WillowWisp [])
 
 (defrecord World [levels
                   add-level-fn])
@@ -295,5 +295,5 @@
    :trap             (type (->Trap))
    :troll            (type (->Troll))
    :wallet           (type (->Wallet nil))
-   :willowisp        (type (->Willowisp))
+   :willow-wisp      (type (->WillowWisp))
    :world            (type (->World nil nil))})

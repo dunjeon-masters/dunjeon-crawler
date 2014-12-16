@@ -289,7 +289,7 @@
                 :width 16 :height 16
                 :color {:r 175 :g 251 :b 255 :a 125}
                 :tile-sheet darkond-tile-sheet}
-:willowisp  {:x 10 :y 2
+:willow-wisp  {:x 10 :y 2
              :width 20 :height 20
              :color {:r 210 :g 138 :b 181 :a 125}
              :tile-sheet bisasam-tile-sheet}

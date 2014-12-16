@@ -298,11 +298,11 @@
     :desert (as-> system system
               ;; Spawn Will-o-Wisps
               (do (println "core::add-willowisp " (not (nil? system))) system)
-              (nth (iterate rj.ww/add-willowisp {:system system :z z})
+              (nth (iterate rj.ww/add-willow-wisp {:system system :z z})
                    (* (max 0
                            (min 0.05
-                                (/ (+ (:willowisp rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z rj.cfg/init-willowisp-floor)))
+                                (/ (+ (:willow-wisp rj.cfg/mob->init-spawn%)
+                                      (* 0.2 (- z (:willow-wisp rj.cfg/mob->init-floor))))
                                    100)))
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system)
@@ -312,7 +312,7 @@
                    (* (max 0
                            (min 0.05
                                 (/ (+ (:snake rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z rj.cfg/init-snake-floor)))
+                                      (* 0.2 (- z (:snake rj.cfg/mob->init-floor))))
                                    100)))
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system)
@@ -322,7 +322,7 @@
                    (* (max 0
                            (min 0.05
                                 (/ (+ (:necro rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z rj.cfg/init-necro-floor)))
+                                      (* 0.2 (- z (:necro rj.cfg/mob->init-floor))))
                                    100)))
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system))
@@ -354,7 +354,7 @@
                    (* (max 0
                            (min 0.05
                                 (/ (+ (:troll rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z rj.cfg/init-troll-floor)))
+                                      (* 0.2 (- z (:troll rj.cfg/mob->init-floor))))
                                    100)))
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system)
@@ -364,7 +364,7 @@
                    (* (max 0
                            (min 0.05
                                 (/ (+ (:spider rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z rj.cfg/init-spider-floor)))
+                                      (* 0.2 (- z (:spider rj.cfg/mob->init-floor))))
                                    100)))
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system)
@@ -374,7 +374,7 @@
                    (* (max 0
                            (min 0.05
                                 (/ (+ (:giant_amoeba rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z rj.cfg/init-giant_amoeba-floor)))
+                                      (* 0.2 (- z (:giant_amoeba rj.cfg/mob->init-floor))))
                                    100)))
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system))
@@ -385,7 +385,7 @@
                  (* (max 0
                          (min 0.05
                               (/ (+ (:slime rj.cfg/mob->init-spawn%)
-                                    (* 0.2 (- z rj.cfg/init-slime-floor)))
+                                    (* 0.2 (- z (:slime rj.cfg/mob->init-floor))))
                                  100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system)
@@ -395,7 +395,7 @@
                  (* (max 0
                          (min 0.05
                               (/ (+ (:skeleton rj.cfg/mob->init-spawn%)
-                                    (* 0.2 (- z rj.cfg/init-skeleton-floor)))
+                                    (* 0.2 (- z (:skeleton rj.cfg/mob->init-floor))))
                                  100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system)
@@ -405,7 +405,7 @@
                  (* (max 0
                          (min
                            0.05 (/ (+ (:mimic rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z rj.cfg/init-mimic-floor)))
+                                      (* 0.2 (- z (:mimic rj.cfg/mob->init-floor))))
                                    100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))
@@ -430,7 +430,7 @@
                  (* (max 0
                          (min 0.05
                               (/ (+ (:drake rj.cfg/mob->init-spawn%)
-                                    (* 0.2 (- z rj.cfg/init-drake-floor)))
+                                    (* 0.2 (- z (:drake rj.cfg/mob->init-floor))))
                                  100)))
                     (apply * (vals rj.cfg/world-sizes))))
             (:system system))

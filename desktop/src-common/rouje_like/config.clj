@@ -307,7 +307,7 @@
 
 ;; ===== MONSTER CONFIG =====
 (def mob->init-spawn%
-  {:willowisp       0.1
+  {:willow-wisp     0.1
    :giant_amoeba    0.1
    :colossal_amoeba 1
    :bat             1
@@ -323,16 +323,17 @@
    :skeleton        0.1})
 
 ;; ===== STARTING FLOOR FOR MOBS =====
-(def init-skeleton-floor 2)
-(def init-snake-floor 1)
-(def init-troll-floor 4)
-(def init-mimic-floor 4)
-(def init-spider-floor 1)
-(def init-slime-floor 3)
-(def init-drake-floor 8)
-(def init-necro-floor 6)
-(def init-giant_amoeba-floor 5)
-(def init-willowisp-floor 3)
+(def mob->init-floor
+  {:skeleton      2
+   :willow-wisp   3
+   :giant_amoeba  5
+   :necro         6
+   :drake         8
+   :slime         3
+   :spider        1
+   :mimic         4
+   :troll         4
+   :snake         1})
 
 ;; ===== MERCHANT CONFIG =====
 (def merchant-pos
