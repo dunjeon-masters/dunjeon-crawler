@@ -8,11 +8,10 @@
 #_(use 'rouje-like.attacker :reload)
 
 (defn can-attack?
-  [c-this _ e-target system]
-  (let [is-valid-target? (:is-valid-target? c-this)
-        target-type (:type (rj.e/get-c-on-e system e-target :position))]
-    (and (not (nil? (rj.e/get-c-on-e system e-target :destructible)))
-            (is-valid-target? target-type))))
+  [{:keys [is-valid-target?]} _ e-target system]
+  (let [target-type (:type (rj.e/get-c-on-e system e-target :position))]
+    (and (rj.e/get-c-on-e system e-target :destructible)
+         (is-valid-target? target-type))))
 
 (defn attack
   [c-this e-this e-target system]

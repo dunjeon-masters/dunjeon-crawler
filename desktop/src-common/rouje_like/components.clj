@@ -130,9 +130,9 @@
 (defrecord Position [x y z
                      ^Keyword type]
   IPoint
-  (->3DPoint [{:keys [x y z]}]
+  (->3DPoint [this]
     [z x y])
-  (->2DPoint [{:keys [x y]}]
+  (->2DPoint [this]
     [x y]))
 
 (defrecord Purchasable [value])

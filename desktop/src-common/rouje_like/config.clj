@@ -4,7 +4,7 @@
 
 #_(use 'rouje-like.config :reload)
 
-(def block-size 27) ;; To see start screen, revert to 36
+(def block-size 36)
 ;; ===== WORLD CONFIG =====
 (def padding-sizes {:top   3
                     :btm   2
