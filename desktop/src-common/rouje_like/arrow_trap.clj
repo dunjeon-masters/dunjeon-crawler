@@ -44,9 +44,9 @@
 
   ([system target-tile e-trap]
    (let [dir ({:down :up
-                 :up   :down
-                 :left :left
-                 :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
+               :up   :down
+               :left :left
+               :right :right} (:dir (:extra (rj.u/tile->top-entity target-tile))))]
        (rj.e/system<<components
          system e-trap
          [[:arrow-trap {:dir dir
@@ -56,7 +56,7 @@
                       :z    (:z target-tile)
                       :type :arrow-trap}]
           [:sight {:distance 4}]
-          [:attacker {:atk              (:atk (:arrow-trap rj.cfg/trap->stats))
+          [:attacker {:atk              (:atk (rj.cfg/entity->stats :arrow-trap))
                       :can-attack?-fn   rj.atk/can-attack?
                       :attack-fn        rj.atk/attack
                       :status-effects   []

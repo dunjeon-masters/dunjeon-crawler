@@ -50,7 +50,7 @@
                       :y    (:y target-tile)
                       :z    (:z target-tile)
                       :type :hidden-spike-trap}]
-          [:attacker {:atk              (:atk (:spike-trap rj.cfg/trap->stats))
+          [:attacker {:atk              (:atk (rj.cfg/entity->stats :spike-trap))
                       :can-attack?-fn   rj.atk/can-attack?
                       :attack-fn        rj.atk/attack
                       :status-effects   []
