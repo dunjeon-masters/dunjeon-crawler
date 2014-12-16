@@ -26,8 +26,9 @@
         world (nth levels (:z c-position))
 
         ring-coords (rj.u/get-ring-around world this-pos 1)]
-    ;; spawn giant amoebas at the first rj.cfg/colossal-amoeba-split-rate open
-    ;; spots around the colossal amoeba
+    ;; spawn giant amoebas at the first
+    ;; (:split-rate (rj.cfg/entity->stats :colossal-amoeba))
+    ;; open spots around the colossal amoeba
     (loop [ring-tiles ring-coords
            amoebas 0
            spawn-tiles nil]
@@ -35,7 +36,7 @@
         (cond (empty? ring-tiles)
               system
 
-              (= amoebas rj.cfg/colossal-amoeba-split-rate)
+              (= amoebas (:split-rate (rj.cfg/entity->stats :colossal-amoeba)))
               (as-> system system
                     (rj.msg/add-msg system :static (format "the colossal amoeba split into %d giant amoebas"
                                                            amoebas))

@@ -187,9 +187,6 @@
                   :value 1}})
 
 ;; ===== CREATURE CONFIG =====
-(def colossal-amoeba-split-rate 3)
-(def giant-amoeba-split-rate 2)
-
 (def entity->stats
   {:wall            {:hp 2}
    :tree            {:hp 1}
@@ -239,11 +236,13 @@
    :colossal-amoeba {:hp 6
                      :def 1
                      :atk 3
-                     :exp 0}
+                     :exp 0
+                     :split-rate 3}
    :giant-amoeba    {:hp 4
                      :def 1
                      :atk 2
-                     :exp 0}
+                     :exp 0
+                     :split-rate 2}
    :large-amoeba    {:hp 2
                      :def 1
                      :atk 1
