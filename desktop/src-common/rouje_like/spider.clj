@@ -61,6 +61,7 @@
                                  :def        (:def (:spider rj.cfg/entity->stats))
                                  :can-retaliate? false
                                  :status-effects []
+                                 :on-death-fn nil
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp (:spider rj.cfg/entity->stats))}]
                  [:tickable {:tick-fn process-input-tick

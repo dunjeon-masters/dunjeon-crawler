@@ -60,6 +60,7 @@
                                  :max-hp     (:hp  (rj.cfg/entity->stats :slime))
                                  :def        (:def (rj.cfg/entity->stats :slime))
                                  :can-retaliate? false
+                                 :on-death-fn nil
                                  :take-damage-fn rj.d/take-damage
                                  :status-effects []}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :slime))}]

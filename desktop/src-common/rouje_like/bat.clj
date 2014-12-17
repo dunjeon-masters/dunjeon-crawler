@@ -49,6 +49,7 @@
                                  :def (:def (:bat rj.cfg/entity->stats))
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
+                                 :on-death-fn nil
                                  :status-effects []}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]

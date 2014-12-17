@@ -180,6 +180,9 @@
                      [:destructible {:hp hp
                                      :max-hp hp
                                      :def 0
+                                     :can-retaliate? false
+                                     :status-effects nil
+                                     :on-death-fn nil
                                      :take-damage-fn (if (rj.cfg/<indestructible-walls> wall-type)
                                                        (fn [c e _ f s]
                                                          (rj.d/take-damage c e 0 f s))
@@ -239,8 +242,10 @@
                      [:destructible {:hp 1
                                      :max-hp 1
                                      :def 0
-                                     :take-damage-fn
-                                     door-take-damage-fn}]]))
+                                     :can-retaliate? false
+                                     :status-effects nil
+                                     :on-death-fn nil
+                                     :take-damage-fn door-take-damage-fn}]]))
                 system)))]
     (let [e-world (first (rj.e/all-e-with-c system :world))
           c-world (rj.e/get-c-on-e system e-world :world)

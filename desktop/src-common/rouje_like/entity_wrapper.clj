@@ -2,7 +2,13 @@
   (:import [clojure.lang Keyword])
   (:require [brute.entity :as br.e]
             [rouje-like.components :as rj.c]
+            [schema.core :as s.c]
             [clojure.string :as s]))
+
+(def >?system
+  {:entity-components             {s.c/Any s.c/Any}
+   :entity-component-types        {s.c/Any s.c/Any}
+   (s.c/optional-key :system-fns) [s.c/Any]})
 
 (defn all-e-with-c
   [system ^Keyword component]
@@ -39,7 +45,7 @@
 
 (defmacro keyword->new-component
   [k#]
-  (symbol "rouje-like.components" (str "map->" (->CamelCase (name k#)))))
+  (symbol "rouje-like.components" (str "strict-map->" (->CamelCase (name k#)))))
 
 (defmacro partition->add-c
   [s# e-this# k-component# m-component#]

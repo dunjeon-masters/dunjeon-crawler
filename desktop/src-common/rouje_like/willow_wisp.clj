@@ -36,7 +36,7 @@
                                           (conj
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-willow-wisp
-                                                               :type :willowisp})))))]
+                                                               :type :willow-wisp})))))]
      {:system (rj.e/system<<components
                 system e-willow-wisp
                 [[:willow-wisp {}]
@@ -57,9 +57,10 @@
                                                  :apply-fn rj.stef/apply-burn}]
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  (rj.cfg/entity->stats :willow-wisp))
-                                 :max-hp     (:hp (rj.cfg/entity->stats :willow-wisp))
+                                 :max-hp     (:hp  (rj.cfg/entity->stats :willow-wisp))
                                  :def        (:def (rj.cfg/entity->stats :willow-wisp))
                                  :can-retaliate? false
+                                 :on-death-fn nil
                                  :status-effects []
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :willow-wisp))}]

@@ -95,32 +95,35 @@
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-skeleton
                                                                :type :skeleton})))))]
-     {:system (rj.e/system<<components
-                system e-skeleton
-                [[:skeleton {}]
-                 [:position {:x    (:x target-tile)
-                             :y    (:y target-tile)
-                             :z    (:z target-tile)
-                             :type :skeleton}]
-                 [:mobile {:can-move?-fn (fn [c-mobile e-this t-tile system]
-                                           (and (< (rand-int 100) 80)
-                                                (rj.m/can-move? c-mobile e-this t-tile system)))
-                           :move-fn      rj.m/move}]
-                 [:sight {:distance 4}]
-                 [:attacker {:atk              (:atk (rj.cfg/entity->stats :skeleton))
-                             :can-attack?-fn   rj.atk/can-attack?
-                             :attack-fn        rj.atk/attack
-                             :status-effects   []
-                             :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         hp
-                                 :max-hp     hp
-                                 :def        (:def (rj.cfg/entity->stats :skeleton))
-                                 :can-retaliate? false
-                                 :take-damage-fn rj.d/take-damage
-                                 :status-effects []}]
-                 [:killable {:experience (:exp (rj.cfg/entity->stats :skeleton))}]
-                 [:tickable {:tick-fn rj.t/process-input-tick
-                             :target-tile-fn get-target-tile
-                             :pri 0}]
-                 [:broadcaster {:name-fn (constantly "the skeleton")}]])
+     {:system (-> (rj.e/system<<components
+                    system e-skeleton
+                    [[:skeleton {}]
+                     [:position {:x    (:x target-tile)
+                                 :y    (:y target-tile)
+                                 :z    (:z target-tile)
+                                 :type :skeleton}]
+                     [:mobile {:can-move?-fn (fn [c-mobile e-this t-tile system]
+                                               (and (< (rand-int 100) 80)
+                                                    (rj.m/can-move? c-mobile e-this t-tile system)))
+                               :move-fn      rj.m/move}]
+                     [:sight {:distance 4}]
+                     [:attacker {:atk              (:atk (rj.cfg/entity->stats :skeleton))
+                                 :can-attack?-fn   rj.atk/can-attack?
+                                 :attack-fn        rj.atk/attack
+                                 :status-effects   []
+                                 :is-valid-target? (partial #{:player})}]
+                     [:destructible {:hp         hp
+                                     :max-hp     hp
+                                     :def        (:def (rj.cfg/entity->stats :skeleton))
+                                     :can-retaliate? false
+                                     :take-damage-fn rj.d/take-damage
+                                     :on-death-fn nil
+                                     :status-effects []}]
+                     [:killable {:experience (:exp (rj.cfg/entity->stats :skeleton))}]
+                     [:tickable {:tick-fn rj.t/process-input-tick
+                                 :pri 0}]
+                     [:broadcaster {:name-fn (constantly "the skeleton")}]])
+                  (rj.e/upd-c e-skeleton :tickable
+                              (fn [c-tickable]
+                                (assoc c-tickable :target-tile-fn get-target-tile))))
       :z (:z target-tile)})))

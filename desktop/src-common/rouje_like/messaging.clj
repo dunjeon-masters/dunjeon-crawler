@@ -52,7 +52,8 @@
                       :blocking []}]
              [:tickable {:tick-fn process-input-tick
                          :pri -1}]
-             [:renderable {:render-fn rj.r/render-messages}]]) system
+             [:renderable {:render-fn rj.r/render-messages
+                           :args {}}]]) system
       (rj.e/system<<components
         system e-counter
         [[:counter {:turn 1}]
@@ -62,4 +63,3 @@
                                             (fn [c-counter]
                                               (update-in c-counter [:turn]
                                                          inc))))}]]))))
-
