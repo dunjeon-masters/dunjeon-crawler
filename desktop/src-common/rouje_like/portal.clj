@@ -34,28 +34,29 @@
   ([system portal-tile target-tile p-type]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-portal (br.e/create-entity)
-         system (rj.u/update-in-world system e-world [(:z portal-tile) (:x portal-tile) (:y portal-tile)]
+         system (rj.u/update-in-world system e-world (rj.c/->3DPoint portal-tile)
                                       (fn [entities]
                                         (vec
                                           (conj
-                                            (remove #(#{:wall} (:type %)) entities)
+                                            (remove #(rj.cfg/<walls> (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-portal
                                                                :type p-type})))))]
      {:system (rj.e/system<<components
-               system e-portal
-               [[:portal {:x (:x target-tile)
-                          :y (:y target-tile)
-                          :z (:z target-tile)}]
-                [:position {:x (:x portal-tile)
-                            :y (:y portal-tile)
-                            :z (:z portal-tile)
-                            :type p-type}]])
-      :z (:z target-tile)})))
+                      system e-portal
+                      [[:portal {:x (:x target-tile)
+                                 :y (:y target-tile)
+                                 :z (:z target-tile)}]
+                       [:position {:x (:x portal-tile)
+                                   :y (:y portal-tile)
+                                   :z (:z portal-tile)
+                                   :type p-type}]])
+      :z (:z portal-tile)})))
 
 (defn portal-target-pos [system portal]
   (let [target-pos portal]
     [(:z target-pos) (:x target-pos) (:y target-pos)]))
 
 (defn is-portal? [entity]
-  (or (= (:type entity) :portal) (= (:type entity) :m-portal)))
+  (or (= (:type entity) :portal)
+      (= (:type entity) :m-portal)))
 
