@@ -11,67 +11,88 @@
   (->3DPoint [this])
   (->2DPoint [this]))
 
-(s/defrecord ArrowTrap [dir    :- s/Keyword
-                        ready? :- s/Bool])
+(s/defrecord ^:always-validate
+  ArrowTrap [dir    :- s/Keyword
+             ready? :- s/Bool])
 
-(s/defrecord Bat [])
+(s/defrecord ^:always-validate
+  Bat [])
 
-(s/defrecord Broadcaster [name-fn :- Fn])
+(s/defrecord ^:always-validate
+  Broadcaster [name-fn :- Fn])
 
-(s/defrecord ColossalAmoeba [])
+(s/defrecord ^:always-validate
+  ColossalAmoeba [])
 
-(s/defrecord Counter [turn :- s/Num])
+(s/defrecord ^:always-validate
+  Counter [turn :- s/Num])
 
-(s/defrecord Digger [can-dig?-fn :- Fn
-                     dig-fn      :- Fn])
+(s/defrecord ^:always-validate
+  Digger [can-dig?-fn :- Fn
+          dig-fn      :- Fn])
 
-(s/defrecord Energy [energy :- s/Num]
+(s/defrecord ^:always-validate
+  Energy [energy :- s/Num]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(s/defrecord Drake [])
+(s/defrecord ^:always-validate
+  Drake [])
 
-(s/defrecord Door [])
+(s/defrecord ^:always-validate
+  Door [])
 
+(s/defrecord ^:always-validate
+  Entity [id    :- (s/maybe java.util.UUID)
+          type  :- s/Keyword
+          extra :- (s/maybe {s/Keyword s/Keyword})])
 
-(s/defrecord Entity [id   :- java.util.UUID
-                     type :- s/Keyword])
-
-(s/defrecord Equipment [weapon :- s/Any
-                        armor  :- s/Any]
+(s/defrecord ^:always-validate
+  Equipment [weapon :- s/Any
+             armor  :- s/Any]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(s/defrecord Experience [experience  :- s/Num
-                         level       :- s/Num
-                         level-up-fn :- Fn]
+(s/defrecord ^:always-validate
+  Experience [experience  :- s/Num
+              level       :- s/Num
+              level-up-fn :- Fn]
   ISaveState
   (->save-state [this]
     (let [this (dissoc this :level-up-fn)]
       (zipmap (keys this) (vals this)))))
 
-(s/defrecord Fireball [])
+(s/defrecord ^:always-validate
+  Fireball [])
 
-(s/defrecord GiantAmoeba [])
+(s/defrecord ^:always-validate
+  GiantAmoeba [])
 
-(s/defrecord Gold [value :- s/Num])
+(s/defrecord ^:always-validate
+  Gold [value :- s/Num])
 
-(s/defrecord HydraHead [])
+(s/defrecord ^:always-validate
+  HydraHead [])
 
-(s/defrecord HydraNeck [])
+(s/defrecord ^:always-validate
+  HydraNeck [])
 
-(s/defrecord HydraTail [])
+(s/defrecord ^:always-validate
+  HydraTail [])
 
-(s/defrecord HydraRear [])
+(s/defrecord ^:always-validate
+  HydraRear [])
 
-(s/defrecord Inspectable [msg :- [String]])
+(s/defrecord ^:always-validate
+  Inspectable [msg :- [String]])
 
-(s/defrecord Inventory [slot      :- Equipment
-                        junk      :- [Equipment]
-                        hp-potion :- s/Num
-                        mp-potion :- s/Num]
+(s/defrecord ^:always-validate
+  Inventory [slot      :- Equipment
+             junk      :- [Equipment]
+             hp-potion :- s/Num
+             mp-potion :- s/Num]
   ISaveState
   (->save-state [this]
     (let [saved-slot (:slot this)
@@ -83,121 +104,153 @@
        :hp-potion (:hp-potion this)
        :slot saved-slot})))
 
-(s/defrecord Item [pickup-fn :- Fn])
+(s/defrecord ^:always-validate
+  Item [pickup-fn :- Fn])
 
-(s/defrecord Killable [experience])
+(s/defrecord ^:always-validate
+  Killable [experience])
 
-(s/defrecord Klass [class]
+(s/defrecord ^:always-validate
+  Klass [class]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(s/defrecord Lichen [grow-chance%  :- s/Num
-                     max-blob-size :- s/Num])
+(s/defrecord ^:always-validate
+  Lichen [grow-chance%  :- s/Num
+          max-blob-size :- s/Num])
 
-(s/defrecord Magic [mp     :- s/Num
-                    max-mp :- s/Num
-                    spells :- s/Num])
+(s/defrecord ^:always-validate
+  Magic [mp     :- s/Num
+         max-mp :- s/Num
+         spells :- s/Num])
 
-(s/defrecord LargeAmoeba [])
+(s/defrecord ^:always-validate
+  LargeAmoeba [])
 
-(s/defrecord Mimic [])
+(s/defrecord ^:always-validate
+  Mimic [])
 
-(s/defrecord Necromancer [])
+(s/defrecord ^:always-validate
+  Necromancer [])
 
-(s/defrecord MPortal [x :- s/Num
-                      y :- s/Num
-                      z :- s/Num])
+(s/defrecord ^:always-validate
+  MPortal [x :- s/Num
+           y :- s/Num
+           z :- s/Num])
 
-(s/defrecord Merchant [])
+(s/defrecord ^:always-validate
+  Merchant [])
 
-(s/defrecord Player [name        :- String
-                     fog-of-war? :- s/Bool]
+(s/defrecord ^:always-validate
+  Player [name        :- String
+          fog-of-war? :- s/Bool]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(s/defrecord PlayerSight [distance         :- s/Num
-                          decline-rate     :- s/Num
-                          lower-bound      :- s/Int
-                          upper-bound      :- s/Int
-                          torch-multiplier :- s/Num]
+(s/defrecord ^:always-validate
+  PlayerSight [distance         :- s/Num
+               decline-rate     :- s/Num
+               lower-bound      :- s/Int
+               upper-bound      :- s/Int
+               torch-multiplier :- s/Num]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(s/defrecord Portal [x :- s/Num
-                     y :- s/Num
-                     z :- s/Num])
+(s/defrecord ^:always-validate
+  Portal [x :- s/Num
+          y :- s/Num
+          z :- s/Num])
 
-(s/defrecord Position [x    :- s/Num
-                       y    :- s/Num
-                       z    :- s/Num
-                       type :- s/Keyword]
+(s/defrecord ^:always-validate
+  Position [x    :- s/Num
+            y    :- s/Num
+            z    :- s/Num
+            type :- s/Keyword]
   IPoint
   (->3DPoint [this]
     [z x y])
   (->2DPoint [this]
     [x y]))
 
-(s/defrecord Purchasable [value :- s/Num])
+(s/defrecord ^:always-validate
+  Purchasable [value :- s/Num])
 
-(s/defrecord Race [race :- s/Keyword]
+(s/defrecord ^:always-validate
+  Race [race :- s/Keyword]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(s/defrecord Receiver [])
+(s/defrecord ^:always-validate
+  Receiver [])
 
-(s/defrecord Relay [static   :- [s/Any]
-                    blocking :- [s/Any]])
+(s/defrecord ^:always-validate
+  Relay [static   :- [s/Any]
+         blocking :- [s/Any]])
 
-(s/defrecord Sight [distance :- s/Num])
+(s/defrecord ^:always-validate
+  Sight [distance :- s/Num])
 
-(s/defrecord Skeleton [])
+(s/defrecord ^:always-validate
+  Skeleton [])
 
-(s/defrecord Slime [])
+(s/defrecord ^:always-validate
+  Slime [])
 
-(s/defrecord Snake [])
+(s/defrecord ^:always-validate
+  Snake [])
 
-(s/defrecord Spider [])
+(s/defrecord ^:always-validate
+  Spider [])
 
-(s/defrecord Troll [])
+(s/defrecord ^:always-validate
+  Troll [])
 
-(s/defrecord SpikeTrap [visible? :- s/Bool])
+(s/defrecord ^:always-validate
+  SpikeTrap [visible? :- s/Bool])
 
-(s/defrecord Tile [x        :- s/Num
-                   y        :- s/Num
-                   z        :- s/Num
-                   entities :- [Entity]]
+(s/defrecord ^:always-validate
+  Tile [x        :- s/Num
+        y        :- s/Num
+        z        :- (s/maybe s/Num)
+        entities :- [Entity]]
   IPoint
   (->3DPoint [this]
     [z x y])
   (->2DPoint [this]
     [x y]))
 
-(s/defrecord Torch [brightness :- s/Num])
+(s/defrecord ^:always-validate
+  Torch [brightness :- s/Num])
 
-(s/defrecord Trap [])
+(s/defrecord ^:always-validate
+  Trap [])
 
-(s/defrecord Wallet [gold :- s/Num]
+(s/defrecord ^:always-validate
+  Wallet [gold :- s/Num]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(s/defrecord WillowWisp [])
+(s/defrecord ^:always-validate
+  WillowWisp [])
 
-(s/defrecord World [levels       :- [[Tile]]
-                    add-level-fn :- Fn])
+(s/defrecord ^:always-validate
+  World [levels       :- [[Tile]]
+         add-level-fn :- Fn])
 
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
   (attack      [this e-this e-target system]))
-(s/defrecord Attacker [atk              :- s/Num
-                       status-effects   :- [s/Any]
-                       attack-fn        :- Fn
-                       can-attack?-fn   :- Fn
-                       is-valid-target? :- Fn]
+(s/defrecord ^:always-validate
+  Attacker [atk              :- s/Num
+            status-effects   :- [s/Any]
+            attack-fn        :- Fn
+            can-attack?-fn   :- Fn
+            is-valid-target? :- Fn]
   ISaveState
   (->save-state [this]
     {:atk (:atk this)})
@@ -209,13 +262,15 @@
 
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
-(s/defrecord Destructible [hp             :- s/Num
-                           max-hp         :- s/Num
-                           def            :- s/Num
-                           status-effects :- [s/Any]
-                           can-retaliate? :- s/Bool
-                           take-damage-fn :- Fn
-                           on-death-fn    :- Fn]
+(s/defrecord ^:always-validate
+  ^:always-validate
+  Destructible [hp             :- s/Num
+                max-hp         :- s/Num
+                def            :- s/Num
+                status-effects :- [s/Any]
+                can-retaliate? :- s/Bool
+                take-damage-fn :- Fn
+                on-death-fn    :- Fn]
   ISaveState
   (->save-state [this]
     (let [this (dissoc this :take-damage-fn)]
@@ -227,8 +282,9 @@
 (defprotocol IMobile
   (can-move? [this e-this target-tile system])
   (move      [this e-this target-tile system]))
-(s/defrecord Mobile [can-move?-fn :- Fn
-                     move-fn      :- Fn]
+(s/defrecord ^:always-validate
+  Mobile [can-move?-fn :- Fn
+          move-fn      :- Fn]
   IMobile
   (can-move?     [this e-this target-tile system]
     (can-move?-fn this e-this target-tile system))
@@ -237,16 +293,18 @@
 
 (defprotocol IRenderable
   (render [this e-this args system]))
-(s/defrecord Renderable [render-fn :- Fn
-                         args      :- {s/Keyword s/Any}]
+(s/defrecord ^:always-validate
+  Renderable [render-fn :- Fn
+              args      :- {s/Keyword s/Any}]
   IRenderable
   (render     [this e-this argz system]
     (render-fn this e-this argz system)))
 
 (defprotocol ITickable
   (tick [this e-this system]))
-(s/defrecord Tickable [tick-fn :- Fn
-                       pri     :- s/Num]
+(s/defrecord ^:always-validate
+  Tickable [tick-fn :- Fn
+            pri     :- s/Num]
   ITickable
   (tick     [this e-this system]
     (tick-fn this e-this system)))
