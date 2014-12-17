@@ -1,6 +1,7 @@
 (ns rouje-like.components
   (:import [com.badlogic.gdx.graphics.g2d TextureRegion]
-           [clojure.lang Atom Fn Keyword PersistentVector]))
+           [clojure.lang Atom Fn Keyword PersistentVector])
+  (:require [schema.core :as s]))
 
 #_(use 'rouje-like.components :reload)
 
