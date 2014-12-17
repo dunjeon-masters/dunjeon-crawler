@@ -699,13 +699,13 @@
              ;; CREATE MAZE
              (generate-maze level [width height]))
 
-     :hydrarena (vec (map vec
+     :hydra-arena (vec (map vec
                           (for [x (range width)]
                             (for [y (range height)]
                               (rj.c/map->Tile {:x x :y y :z z
                                                :entities [(rj.c/map->Entity {:id   nil
                                                                              :type :dune})]})))))
-     :amoebarena (vec (map vec
+     :amoeba-arena (vec (map vec
                            (for [x (range width)]
                              (for [y (range height)]
                                (rj.c/map->Tile {:x x :y y :z z
