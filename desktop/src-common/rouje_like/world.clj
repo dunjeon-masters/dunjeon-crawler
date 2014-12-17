@@ -613,7 +613,7 @@
 
 (defn generate-random-level
   ([level-sizes z]
-   (if (zero? (mod z 5))
+   (if (zero? (mod z (rj.cfg/k->boss-config :every-?-levels)))
      (let [boss-levels [:hydra-arena :amoeba-arena]
            boss-level (rand-nth boss-levels)]
        {:type boss-level
@@ -704,13 +704,13 @@
              ;; CREATE MAZE
              (generate-maze level [width height]))
 
-     :hydrarena (vec (map vec
+     :hydra-arena (vec (map vec
                           (for [x (range width)]
                             (for [y (range height)]
                               (rj.c/map->Tile {:x x :y y :z z
                                                :entities [(rj.c/map->Entity {:id   nil
                                                                              :type :dune})]})))))
-     :amoebarena (vec (map vec
+     :amoeba-arena (vec (map vec
                            (for [x (range width)]
                              (for [y (range height)]
                                (rj.c/map->Tile {:x x :y y :z z

@@ -13,7 +13,6 @@
             [rouje-like.config :as rj.cfg]
             [clojure.set :refer [union]]))
 
-
 (declare process-input-tick)
 
 (defn add-hydra-tail
@@ -64,6 +63,7 @@
                                  :def        (:def (rj.cfg/entity->stats :hydra-tail))
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
+                                 :on-death-fn nil
                                  :status-effects []}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :hydra-tail))}]
                  [:tickable {:tick-fn process-input-tick
