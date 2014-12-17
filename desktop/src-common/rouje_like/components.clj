@@ -162,7 +162,12 @@
 (defrecord SpikeTrap [visible?])
 
 (defrecord Tile [^Number x ^Number y ^Number z
-                 ^PersistentVector entities])
+                 ^PersistentVector entities]
+  IPoint
+  (->3DPoint [this]
+    [z x y])
+  (->2DPoint [this]
+    [x y]))
 
 (defrecord Torch [brightness])
 

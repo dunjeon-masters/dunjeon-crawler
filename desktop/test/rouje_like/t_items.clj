@@ -12,20 +12,19 @@
 (let [system (start)
       e-world (first (rj.e/all-e-with-c system :world))
       {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-      world (nth levels 1)
+      level (nth levels 1)
       e-player (first (rj.e/all-e-with-c system :player))]
 
   (fact "remove-item"
-        (let [e-world (first (rj.e/all-e-with-c system :world))
-              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-              level (nth levels 1)
-              portals (filter (fn [{:keys [entities]}]
-                                (seq (filter #(= :portal %)
-                                             (map :type entities))))
-                              (flatten level))]
-          (:entities (first portals)))
-        => (contains #(#{:portal}
-                        (:type %))))
+        (let [torch-tile (first
+                           (filter #(= :torch (:type (rj.u/tile->top-entity %)))
+                                   (flatten level)))
+              torch-pos (rj.c/->3DPoint torch-tile)
+              system (remove-item system torch-pos :torch)
+              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)]
+          (:entities
+            (get-in levels torch-pos nil)))
+        =not=> (has every? (contains {:type :torch})))
 
   (fact "pickup-item"
         )
@@ -80,7 +79,7 @@
 
   (fact "item>>world"
         (let [system (item>>world system (fn [world [x y]]
-                                           (let [tile (get-in world [x y])]
+                                           (let [tile (get-in level [x y])]
                                              (only-floor? tile)))
                                   0 (fn [entities]
                                       (item>>entities entities :e-torch :torch)))
@@ -89,9 +88,9 @@
               m-level (nth levels 0)
               target-tile (first (flatten m-level))]
           (:entities (first (filter (fn [{:keys [entities]}]
-                    (seq (filter #(= :torch %)
-                                 (map :type entities))))
-                  (flatten m-level)))))
+                                      (seq (filter #(= :torch %)
+                                                   (map :type entities))))
+                                    (flatten m-level)))))
         => (contains #(#{:torch}
                         (:type %))))
 
@@ -175,37 +174,37 @@
         => (contains #(#{:gold}
                         (:type %))))
 
-(fact "add-purchasable"
-      (let [e-world (first (rj.e/all-e-with-c system :world))
-            {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-            m-level (nth levels 0)
-            target-tile (rand-nth (flatten m-level))
-            system (:system
-                     (add-purchasable system target-tile))
+  (fact "add-purchasable"
+        (let [e-world (first (rj.e/all-e-with-c system :world))
+              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+              m-level (nth levels 0)
+              target-tile (rand-nth (flatten m-level))
+              system (:system
+                       (add-purchasable system target-tile))
 
-            {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-            m-level (nth levels 0)]
-        (:entities
-          (first
-            (filter (fn [{:keys [entities]}]
-                      (seq (filter #(= :purchasable %)
-                                   (map :type entities))))
-                    (flatten m-level)))))
-      => (contains #(#{:purchasable}
-                      (:type %))))
+              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+              m-level (nth levels 0)]
+          (:entities
+            (first
+              (filter (fn [{:keys [entities]}]
+                        (seq (filter #(= :purchasable %)
+                                     (map :type entities))))
+                      (flatten m-level)))))
+        => (contains #(#{:purchasable}
+                        (:type %))))
 
-(fact "add-equipment"
-      (let [system (:system
-                     (add-equipment {:system system
-                                     :z 0}))
-            e-world (first (rj.e/all-e-with-c system :world))
-            {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-            m-level (nth levels 0)]
-        (:entities
-          (first
-            (filter (fn [{:keys [entities]}]
-                      (seq (filter #(= :equipment %)
-                                   (map :type entities))))
-                    (flatten m-level)))))
-      => (contains #(#{:equipment}
-                      (:type %)))))
+  (fact "add-equipment"
+        (let [system (:system
+                       (add-equipment {:system system
+                                       :z 0}))
+              e-world (first (rj.e/all-e-with-c system :world))
+              {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
+              m-level (nth levels 0)]
+          (:entities
+            (first
+              (filter (fn [{:keys [entities]}]
+                        (seq (filter #(= :equipment %)
+                                     (map :type entities))))
+                      (flatten m-level)))))
+        => (contains #(#{:equipment}
+                        (:type %)))))
