@@ -12,14 +12,16 @@
 (let [system (start)
       system (:system (add-portal {:system system :z 1}))
       e-world (first (rj.e/all-e-with-c system :world))
-      c-world (rj.e/get-c-on-e system e-world :world)
+      {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
       e-portal (first (rj.e/all-e-with-c system :portal))
       c-portal-pos (rj.e/get-c-on-e system e-portal :position)
       portal-pos (portal-target-pos system c-portal-pos)]
   (fact "add-portal"
-      e-portal => truthy)
-  (fact "portal-target-pos"portal-pos => (rj.c/->3DPoint c-portal-pos))
+        e-portal => truthy)
+  (fact "portal-target-pos"
+        portal-pos => (rj.c/->3DPoint c-portal-pos))
   (fact "is-portal?"
-        (is-portal? (rj.u/tile->top-entity
-                      (get-in (:levels c-world) (rj.c/->3DPoint c-portal-pos)))) => true))
+        (rj.u/tile->top-entity
+          (get-in levels (rj.c/->3DPoint c-portal-pos)))
+        => (contains {:type :portal})))
 

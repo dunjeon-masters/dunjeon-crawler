@@ -441,14 +441,6 @@
             (do (? "core::add-drake " (not (nil? system))) system))
     system))
 
-(defn- add-portal
-  [system z]
-  ;; Add portal
-  (as-> system system
-    (rj.p/add-portal {:system system :z z})
-    (:system system))
-    (do (? "core::add-portal " (not (nil? system))) system))
-
 (def ^:private maze:direction8->offset
   {:left  [-1  0]
    :right [ 1  0]
@@ -774,7 +766,7 @@
 (defn init-world
   [system]
   (let [z 1
-        e-world  (br.e/create-entity)
+        e-world (br.e/create-entity)
         merch-level (generate-merchant-level)
         level1 (generate-random-level
                 rj.cfg/world-sizes z)
@@ -784,21 +776,23 @@
                 rj.cfg/world-sizes (inc z))
         type2 (:type level2)
         level2 (:level level2)]
-    (-> system
-        (rj.e/add-e e-world)
-        (rj.e/add-c e-world (rj.c/map->World {:levels [merch-level level1 level2]
-                                              :add-level-fn add-level
-                                              :merchant-level-fn reset-merch-level}))
-        (rj.merch/init-merchant 0)
-        (init-entities z)
-        (init-themed-entities z type1)
-        (add-portal z)
-        (add-merch-portal z)
-        (init-entities (inc z))
-        (init-themed-entities (inc z) type2)
+    (as-> system system
+      (rj.e/add-e system e-world)
+      (rj.e/add-c system e-world (rj.c/map->World {:levels [merch-level level1 level2]
+                                            :add-level-fn add-level
+                                            :merchant-level-fn reset-merch-level}))
+      (rj.merch/init-merchant system 0)
+      (init-entities system z)
+      (init-themed-entities system z type1)
+      (:system
+        (rj.p/add-portal {:system system
+                          :z z}))
+      (add-merch-portal system z)
+      (init-entities system (inc z))
+      (init-themed-entities system (inc z) type2)
 
-        (rj.e/add-c e-world (rj.c/map->Renderable {:render-fn rj.r/render-world
-                                                   :args      {:view-port-sizes rj.cfg/view-port-sizes}})))))
+      (rj.e/add-c system e-world (rj.c/map->Renderable {:render-fn rj.r/render-world
+                                                        :args      {:view-port-sizes rj.cfg/view-port-sizes}})))))
 
 (defn add-level
   [system z]
@@ -813,15 +807,16 @@
       (let [new-level (generate-random-level rj.cfg/world-sizes z)
             newtype (:type new-level)
             new-level (:level new-level)]
-        (-> system
-            (rj.e/upd-c e-world :world
+        (as-> system system
+            (rj.e/upd-c system e-world :world
                         (fn [c-world]
                           (update-in c-world [:levels]
                                      (fn [levels]
                                        (conj levels
                                              new-level)))))
-            (init-entities z)
-            (init-themed-entities z newtype)
-            (add-merch-portal (dec z))
-            (add-portal (dec z))))
+            (init-entities system z)
+            (init-themed-entities system z newtype)
+            (add-merch-portal system (dec z))
+            (:system (rj.p/add-portal {:system system
+                                       :z (dec z)}))))
       system)))
