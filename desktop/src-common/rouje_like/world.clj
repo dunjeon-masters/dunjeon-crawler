@@ -613,7 +613,7 @@
 
 (defn generate-random-level
   ([level-sizes z]
-   (if (zero? (mod z 5))
+   (if (zero? (mod z (rj.cfg/k->boss-config :every-?-levels)))
      (let [boss-levels [:hydra-arena :amoeba-arena]
            boss-level (rand-nth boss-levels)]
        {:type boss-level

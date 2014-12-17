@@ -315,6 +315,9 @@
    :troll         1;4
    :snake         1})
 
+(def k->boss-config
+  {:every-?-levels 2})
+
 ;; ===== MERCHANT CONFIG =====
 (def merchant-pos
   {:x 10

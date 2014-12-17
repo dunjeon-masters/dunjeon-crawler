@@ -49,12 +49,14 @@
                  [:attacker {:atk              (:atk (rj.cfg/entity->stats :large-amoeba))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
+                             :status-effects   []
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  (rj.cfg/entity->stats :large-amoeba))
                                  :max-hp     (:hp  (rj.cfg/entity->stats :large-amoeba))
                                  :def        (:def (rj.cfg/entity->stats :large-amoeba))
                                  :can-retaliate? false
                                  :status-effects []
+                                 :on-death-fn nil
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :large-amoeba))}]
                  [:tickable {:tick-fn process-input-tick

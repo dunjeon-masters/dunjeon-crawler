@@ -13,7 +13,6 @@
             [rouje-like.config :as rj.cfg]
             [clojure.set :refer [union]]))
 
-
 (declare process-input-tick)
 
 (defn add-hydra-head
@@ -33,7 +32,7 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-hydra-head (br.e/create-entity)
-         hp (:hp (rj.cfg/entity->stats :hydra-head) )
+         hp (:hp (rj.cfg/entity->stats :hydra-head))
          system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
@@ -59,6 +58,7 @@
                  [:destructible {:hp         hp
                                  :max-hp     hp
                                  :def        (:def (rj.cfg/entity->stats :hydra-head))
+                                 :on-death-fn nil
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
                                  :status-effects []}]

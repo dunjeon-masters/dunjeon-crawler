@@ -64,6 +64,7 @@
                                  :def        (:def(rj.cfg/entity->stats :hydra-rear))
                                  :can-retaliate? false
                                  :take-damage-fn rj.d/take-damage
+                                 :on-death-fn nil
                                  :status-effects []}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :hydra-rear))}]
                  [:tickable {:tick-fn process-input-tick
