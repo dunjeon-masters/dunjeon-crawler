@@ -142,8 +142,6 @@
       system) system
           (let [c-destructible (rj.e/get-c-on-e system e-this :destructible)
                 hp (:hp c-destructible)]
-            (if (< hp 8)
-              (println hp))
             (rj.e/upd-c system e-this :destructible
                         (fn [c-destr]
                           (update-in c-destr [:hp]
