@@ -94,6 +94,7 @@
         {:keys [distance decline-rate
                 lower-bound upper-bound
                 torch-multiplier]} rj.cfg/player-sight
+        _ (? torch-multiplier)
 
         valid-class? (into #{} (keys rj.cfg/class->stats))
         player-class (if (valid-class? (keyword c))
@@ -121,7 +122,6 @@
                           :type (:type cfg-spell-effect)
                           :atk-reduction (:atk-reduction cfg-spell-effect)})
                 [])]
-
     (rj.e/system<<components
       system e-player
       [[:player {:name n
@@ -137,7 +137,8 @@
                    :type :player}]
        [:equipment {:weapon nil
                     :armor nil}]
-       [:inventory {:slot nil :junk [] :hp-potion 0 :mp-potion 0}]
+       [:inventory {:slot nil :junk []
+                    :hp-potion 0 :mp-potion 0}]
        [:energy {:energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]
@@ -163,7 +164,8 @@
                        :def (:def rj.cfg/player-stats)
                        :can-retaliate? false
                        :take-damage-fn rj.d/take-damage
-                       :status-effects []}]
+                       :status-effects []
+                       :on-death-fn (fn [_ _ s] s)}]
        [:magic {:max-mp max-mp
                 :mp max-mp
                 :spells spell}]

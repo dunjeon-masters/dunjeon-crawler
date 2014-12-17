@@ -93,14 +93,14 @@
                                                  :e-from e-giant-amoeba
                                                  :apply-fn rj.stef/apply-paralysis}]
                              :is-valid-target? (partial #{:player})}]
-                 [:destructible {:hp         (:hp  rj.cfg/entity->stats :giant-amoeba)
-                                 :max-hp     (:hp  rj.cfg/entity->stats :giant-amoeba)
-                                 :def        (:def rj.cfg/entity->stats :giant-amoeba)
+                 [:destructible {:hp         (:hp  (rj.cfg/entity->stats :giant-amoeba))
+                                 :max-hp     (:hp  (rj.cfg/entity->stats :giant-amoeba))
+                                 :def        (:def (rj.cfg/entity->stats :giant-amoeba))
                                  :can-retaliate? false
                                  :status-effects []
                                  :take-damage-fn rj.d/take-damage
                                  :on-death-fn on-death}]
-                 [:killable {:experience (:exp rj.cfg/entity->stats :giant-amoeba)}]
+                 [:killable {:experience (:exp (rj.cfg/entity->stats :giant-amoeba))}]
                  [:tickable {:tick-fn process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the giant-amoeba")}]])

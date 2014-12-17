@@ -47,6 +47,7 @@
                            :move-fn      rj.m/move}]
                  [:sight {:distance 7}]
                  [:attacker {:atk              (:atk (rj.cfg/entity->stats :troll))
+                             :status-effects []
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
@@ -54,6 +55,8 @@
                                  :max-hp     (:hp  (rj.cfg/entity->stats :troll))
                                  :def        (:def (rj.cfg/entity->stats :troll))
                                  :can-retaliate? false
+                                 :status-effects []
+                                 :on-death-fn nil
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :troll))}]
                  [:tickable {:tick-fn process-input-tick

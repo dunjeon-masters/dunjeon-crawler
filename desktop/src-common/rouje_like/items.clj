@@ -30,20 +30,17 @@
                                       ((:name-fn by-c-broadcaster) system e-by))
                                     ((:name-fn c-broadcaster) system e-this)))))]
     (case item-type
-      :torch (let [c-playersight (rj.e/get-c-on-e system e-by :playersight)
-                   sight-upper-bound (:upper-bound c-playersight)
-                   sight-torch-multiplier (:torch-multiplier c-playersight)
+      :torch (let [{:keys [upper-bound torch-multiplier]} (rj.e/get-c-on-e system e-by :playersight)
+                   {:keys [brightness]} (rj.e/get-c-on-e system e-this :torch)
 
-                   c-torch (rj.e/get-c-on-e system e-this :torch)
-                   torch-brightness (:brightness c-torch)
-
-                   inc-sight (fn [prev] (if (<= prev (- sight-upper-bound torch-brightness))
-                                          (+ prev (* torch-brightness sight-torch-multiplier))
-                                          prev))]
+                   inc-sight-fn (fn [prev] (if (<= prev (- upper-bound brightness))
+                                             (+ prev (* brightness torch-multiplier))
+                                             prev))]
                (-> system
                    (rj.e/upd-c e-by :playersight
                                (fn [c-playersight]
-                                 (update-in c-playersight [:distance] inc-sight)))
+                                 (update-in c-playersight [:distance]
+                                            inc-sight-fn)))
                    (remove-item [z x y] item-type)
                    (broadcast-pickup)))
 
@@ -282,20 +279,23 @@
         e-purchasable (br.e/create-entity)
         item (rj.eq/generate-random-equipment) ; right now just use equipment
         item-type (:type item)
+        !item-type ({:weapon :armor
+                     :armor  :weapon} item-type)
         system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
                                      (fn [entities]
                                        (vec
-                                        (conj
-                                         (remove #(#{:wall} (:type %)) entities)
-                                         (rj.c/map->Entity {:id   e-purchasable
-                                                            :type :purchasable})))))]
+                                         (conj
+                                           (remove #(#{:wall} (:type %)) entities)
+                                           (rj.c/map->Entity {:id   e-purchasable
+                                                              :type :purchasable})))))]
     {:system (rj.e/system<<components
               system e-purchasable
               [[:item {:pickup-fn pickup-item}]
                [:purchasable {:value (rj.eq/equipment-value item)}]
                [:inspectable {:msg (format "you see a %s that costs %d gold"
                                            (rj.eq/equipment-name item) (rj.eq/equipment-value item))}]
-               [:equipment {item-type item}]
+               [:equipment {item-type item
+                            !item-type nil}]
                [:broadcaster {:name-fn (fn [system e-this]
                                          (let [value (:value (rj.e/get-c-on-e system e-this :purchasable))
                                                c-eq (rj.e/get-c-on-e system e-this :equipment)
@@ -310,6 +310,8 @@
         ;; generate a random equipment piece
         eq (rj.eq/generate-random-equipment)
         eq-type (:type eq)
+        !eq-type ({:weapon :armor
+                   :armor  :weapon} eq-type)
 
         is-valid-tile? (fn [world [x y]]
                          (only-floor? (get-in world [x y])))
@@ -322,7 +324,8 @@
     {:system (rj.e/system<<components
               system e-eq
               [[:item {:pickup-fn pickup-item}]
-               [:equipment {eq-type eq}]
+               [:equipment {eq-type eq
+                            !eq-type nil}]
                [:broadcaster {:name-fn
                               (fn [system e-this]
                                 (let [eq-name (rj.eq/equipment-name (eq-type (rj.e/get-c-on-e system e-this :equipment)))]

@@ -47,6 +47,7 @@
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
                  [:attacker {:atk              (:atk (rj.cfg/entity->stats :mimic))
+                             :status-effects []
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
@@ -55,6 +56,7 @@
                                  :def        (:def (rj.cfg/entity->stats :mimic))
                                  :can-retaliate? false
                                  :status-effects []
+                                 :on-death-fn nil
                                  :take-damage-fn (fn [c-this e-this damage e-from system]
                                                    (as-> (rj.d/take-damage c-this e-this damage e-from system) system
                                                        (if (rj.e/get-c-on-e system e-this :mimic)

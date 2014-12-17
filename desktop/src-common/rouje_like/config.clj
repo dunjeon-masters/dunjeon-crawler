@@ -247,7 +247,7 @@
                      :def 1
                      :atk 1
                      :exp 2}
-   :willowisp       {:hp 3
+   :willow-wisp       {:hp 3
                      :def 0
                      :atk 0
                      :exp 1}
@@ -286,32 +286,33 @@
 
 ;; ===== MONSTER CONFIG =====
 (def mob->init-spawn%
-  {:willow-wisp     0.1
-   :giant-amoeba    0.1
+  {:willow-wisp     0.4;0.1
+   :giant-amoeba    0.4;0.1
    :colossal-amoeba 1
    :bat             1
    :lichen          1
-   :necro           0.1
-   :drake           0.01
-   :slime           0.1
-   :spider          0.5
-   :boss            0.3
-   :mimic           0.1
-   :troll           0.1
-   :snake           0.3
-   :skeleton        0.1})
+   :necro           0.4;0.1
+   :drake           0.4;0.01
+   :slime           0.4;0.1
+   :spider          0.4;0.5
+   :boss            0.4;0.3
+   :mimic           0.4;0.1
+   :troll           0.4;0.1
+   :snake           0.4;0.3
+   :skeleton        0.4;0.1
+   })
 
 ;; ===== STARTING FLOOR FOR MOBS =====
 (def mob->init-floor
-  {:skeleton      2
-   :willow-wisp   3
-   :giant-amoeba  5
-   :necro         6
-   :drake         8
-   :slime         3
+  {:skeleton      1;2
+   :willow-wisp   1;3
+   :giant-amoeba  1;5
+   :necro         1;6
+   :drake         1;8
+   :slime         1;3
    :spider        1
-   :mimic         4
-   :troll         4
+   :mimic         1;4
+   :troll         1;4
    :snake         1})
 
 ;; ===== MERCHANT CONFIG =====

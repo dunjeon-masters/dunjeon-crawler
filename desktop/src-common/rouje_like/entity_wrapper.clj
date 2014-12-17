@@ -39,7 +39,7 @@
 
 (defmacro keyword->new-component
   [k#]
-  (symbol "rouje-like.components" (str "map->" (->CamelCase (name k#)))))
+  (symbol "rouje-like.components" (str "strict-map->" (->CamelCase (name k#)))))
 
 (defmacro partition->add-c
   [s# e-this# k-component# m-component#]

@@ -64,6 +64,7 @@
                                  :def        (:def (rj.cfg/entity->stats :snake))
                                  :can-retaliate? false
                                  :status-effects []
+                                 :on-death-fn nil
                                  :take-damage-fn rj.d/take-damage}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :snake))}]
                  [:tickable {:tick-fn process-input-tick

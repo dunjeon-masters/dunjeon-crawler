@@ -54,6 +54,8 @@
                                  :max-hp hp
                                  :def (:def (rj.cfg/entity->stats :lichen))
                                  :can-retaliate? true
+                                 :on-death-fn nil
+                                 :status-effects nil
                                  :take-damage-fn rj.d/take-damage}]
                  [:attacker {:atk (:atk (rj.cfg/entity->stats :lichen))
                              :can-attack?-fn   rj.atk/can-attack?

@@ -11,69 +11,67 @@
   (->3DPoint [this])
   (->2DPoint [this]))
 
-(defrecord ArrowTrap [dir
-                      ready?])
+(s/defrecord ArrowTrap [dir    :- s/Keyword
+                        ready? :- s/Bool])
 
-(defrecord Bat [])
+(s/defrecord Bat [])
 
-(defrecord Broadcaster [name-fn])
+(s/defrecord Broadcaster [name-fn :- Fn])
 
-(defrecord ColossalAmoeba [])
+(s/defrecord ColossalAmoeba [])
 
-(defrecord Counter [turn])
+(s/defrecord Counter [turn :- s/Num])
 
-(defrecord Digger [^Fn can-dig?-fn
-                   ^Fn dig-fn])
+(s/defrecord Digger [can-dig?-fn :- Fn
+                     dig-fn      :- Fn])
 
-(defrecord Energy [energy]
+(s/defrecord Energy [energy :- s/Num]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(defrecord Drake [])
+(s/defrecord Drake [])
 
-(defrecord Door [])
+(s/defrecord Door [])
 
 
-(defrecord Entity [^Keyword id
-                   ^Keyword type])
+(s/defrecord Entity [id   :- java.util.UUID
+                     type :- s/Keyword])
 
-(defrecord Equipment [weapon
-                      armor]
+(s/defrecord Equipment [weapon :- s/Any
+                        armor  :- s/Any]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(defrecord Experience [experience
-                       level
-                       level-up-fn]
+(s/defrecord Experience [experience  :- s/Num
+                         level       :- s/Num
+                         level-up-fn :- Fn]
   ISaveState
   (->save-state [this]
     (let [this (dissoc this :level-up-fn)]
       (zipmap (keys this) (vals this)))))
 
-(defrecord Fireball [])
+(s/defrecord Fireball [])
 
-(defrecord GiantAmoeba [])
+(s/defrecord GiantAmoeba [])
 
-(defrecord Gold [value])
+(s/defrecord Gold [value :- s/Num])
 
-(defrecord HydraHead [])
+(s/defrecord HydraHead [])
 
-(defrecord HydraNeck [])
+(s/defrecord HydraNeck [])
 
-(defrecord HydraTail [])
+(s/defrecord HydraTail [])
 
-(defrecord HydraRear [])
+(s/defrecord HydraRear [])
 
-(defrecord Inventory [slot junk])
+(s/defrecord Inspectable [msg :- [String]])
 
-(defrecord Inspectable [msg])
-
-(defrecord Inventory [slot
-                      junk
-                      hp-potion
-                      mp-potion]
+(s/defrecord Inventory [slot      :- Equipment
+                        junk      :- [Equipment]
+                        hp-potion :- s/Num
+                        mp-potion :- s/Num]
   ISaveState
   (->save-state [this]
     (let [saved-slot (:slot this)
@@ -85,113 +83,121 @@
        :hp-potion (:hp-potion this)
        :slot saved-slot})))
 
-(defrecord Item [pickup-fn])
+(s/defrecord Item [pickup-fn :- Fn])
 
-(defrecord Killable [experience])
+(s/defrecord Killable [experience])
 
-(defrecord Klass [class]
+(s/defrecord Klass [class]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(defrecord Lichen [grow-chance%
-                   max-blob-size])
+(s/defrecord Lichen [grow-chance%  :- s/Num
+                     max-blob-size :- s/Num])
 
-(defrecord Magic [mp
-                  max-mp
-                  spells])
+(s/defrecord Magic [mp     :- s/Num
+                    max-mp :- s/Num
+                    spells :- s/Num])
 
-(defrecord LargeAmoeba [])
+(s/defrecord LargeAmoeba [])
 
-(defrecord Mimic [])
+(s/defrecord Mimic [])
 
-(defrecord Necromancer [])
+(s/defrecord Necromancer [])
 
-(defrecord MPortal [^Number x ^Number y ^Number z])
+(s/defrecord MPortal [x :- s/Num
+                      y :- s/Num
+                      z :- s/Num])
 
-(defrecord Merchant [])
+(s/defrecord Merchant [])
 
-(defrecord Player [name
-                   show-world?]
+(s/defrecord Player [name        :- String
+                     fog-of-war? :- s/Bool]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(defrecord PlayerSight [distance
-                        decline-rate
-                        lower-bound
-                        upper-bound
-                        torch-power]
+(s/defrecord PlayerSight [distance         :- s/Num
+                          decline-rate     :- s/Num
+                          lower-bound      :- s/Int
+                          upper-bound      :- s/Int
+                          torch-multiplier :- s/Num]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(defrecord Portal [^Number x ^Number y ^Number z])
+(s/defrecord Portal [x :- s/Num
+                     y :- s/Num
+                     z :- s/Num])
 
-(defrecord Position [x y z
-                     ^Keyword type]
+(s/defrecord Position [x    :- s/Num
+                       y    :- s/Num
+                       z    :- s/Num
+                       type :- s/Keyword]
   IPoint
   (->3DPoint [this]
     [z x y])
   (->2DPoint [this]
     [x y]))
 
-(defrecord Purchasable [value])
+(s/defrecord Purchasable [value :- s/Num])
 
-(defrecord Race [race]
+(s/defrecord Race [race :- s/Keyword]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(defrecord Receiver [])
+(s/defrecord Receiver [])
 
-(defrecord Relay [static
-                  blocking])
+(s/defrecord Relay [static   :- [s/Any]
+                    blocking :- [s/Any]])
 
-(defrecord Sight [distance])
+(s/defrecord Sight [distance :- s/Num])
 
-(defrecord Skeleton [])
+(s/defrecord Skeleton [])
 
-(defrecord Slime [])
+(s/defrecord Slime [])
 
-(defrecord Snake [])
+(s/defrecord Snake [])
 
-(defrecord Spider [])
+(s/defrecord Spider [])
 
-(defrecord Troll [])
+(s/defrecord Troll [])
 
-(defrecord SpikeTrap [visible?])
+(s/defrecord SpikeTrap [visible? :- s/Bool])
 
-(defrecord Tile [^Number x ^Number y ^Number z
-                 ^PersistentVector entities]
+(s/defrecord Tile [x        :- s/Num
+                   y        :- s/Num
+                   z        :- s/Num
+                   entities :- [Entity]]
   IPoint
   (->3DPoint [this]
     [z x y])
   (->2DPoint [this]
     [x y]))
 
-(defrecord Torch [brightness])
+(s/defrecord Torch [brightness :- s/Num])
 
-(defrecord Trap [])
+(s/defrecord Trap [])
 
-(defrecord Wallet [^Number gold]
+(s/defrecord Wallet [gold :- s/Num]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
 
-(defrecord WillowWisp [])
+(s/defrecord WillowWisp [])
 
-(defrecord World [levels
-                  add-level-fn])
+(s/defrecord World [levels       :- [[Tile]]
+                    add-level-fn :- Fn])
 
 (defprotocol IAttacker
   (can-attack? [this e-this e-target system])
   (attack      [this e-this e-target system]))
-(defrecord Attacker [^Number atk
-                     status-effects
-                     ^Fn attack-fn
-                     ^Fn can-attack?-fn
-                     ^Fn is-valid-target?]
+(s/defrecord Attacker [atk              :- s/Num
+                       status-effects   :- [s/Any]
+                       attack-fn        :- Fn
+                       can-attack?-fn   :- Fn
+                       is-valid-target? :- Fn]
   ISaveState
   (->save-state [this]
     {:atk (:atk this)})
@@ -203,13 +209,13 @@
 
 (defprotocol IDestructible
   (take-damage [this e-this damage from system]))
-(defrecord Destructible [^Number hp
-                         ^Number max-hp
-                         ^Number def
-                         status-effects
-                         can-retaliate?
-                         ^Fn take-damage-fn
-                         on-death-fn]
+(s/defrecord Destructible [hp             :- s/Num
+                           max-hp         :- s/Num
+                           def            :- s/Num
+                           status-effects :- [s/Any]
+                           can-retaliate? :- s/Bool
+                           take-damage-fn :- Fn
+                           on-death-fn    :- Fn]
   ISaveState
   (->save-state [this]
     (let [this (dissoc this :take-damage-fn)]
@@ -221,8 +227,8 @@
 (defprotocol IMobile
   (can-move? [this e-this target-tile system])
   (move      [this e-this target-tile system]))
-(defrecord Mobile [^Fn can-move?-fn
-                   ^Fn move-fn]
+(s/defrecord Mobile [can-move?-fn :- Fn
+                     move-fn      :- Fn]
   IMobile
   (can-move?     [this e-this target-tile system]
     (can-move?-fn this e-this target-tile system))
@@ -231,75 +237,76 @@
 
 (defprotocol IRenderable
   (render [this e-this args system]))
-(defrecord Renderable [^Fn render-fn
-                       args]
+(s/defrecord Renderable [render-fn :- Fn
+                         args      :- {s/Keyword s/Any}]
   IRenderable
   (render     [this e-this argz system]
     (render-fn this e-this argz system)))
 
 (defprotocol ITickable
   (tick [this e-this system]))
-(defrecord Tickable [^Fn tick-fn pri]
+(s/defrecord Tickable [tick-fn :- Fn
+                       pri     :- s/Num]
   ITickable
   (tick     [this e-this system]
     (tick-fn this e-this system)))
 
 (def get-type
   "Workaround for not being able to get record's type 'statically'"
-  {:arrow-trap       (type (->ArrowTrap nil nil))
-   :attacker         (type (->Attacker nil nil nil nil nil))
-   :bat              (type (->Bat))
-   :broadcaster      (type (->Broadcaster nil))
-   :class            (type (->Klass nil))
-   :colossal-amoeba  (type (->ColossalAmoeba))
-   :counter          (type (->Counter nil))
-   :destructible     (type (->Destructible nil nil nil nil nil nil nil))
-   :digger           (type (->Digger nil nil))
-   :door             (type (->Door))
-   :drake            (type (->Drake))
-   :energy           (type (->Energy nil))
-   :entity           (type (->Entity nil nil))
-   :equipment        (type (->Equipment nil nil))
-   :experience       (type (->Experience nil nil nil))
-   :fireball         (type (->Fireball))
-   :gold             (type (->Gold nil))
-   :giant-amoeba     (type (->GiantAmoeba))
-   :hydra-head       (type (->HydraHead))
-   :hydra-neck       (type (->HydraNeck))
-   :hydra-tail       (type (->HydraTail))
-   :hydra-rear       (type (->HydraRear))
-   :inventory        (type (->Inventory nil nil nil nil))
-   :inspectable      (type (->Inspectable nil))
-   :item             (type (->Item nil))
-   :killable         (type (->Killable nil))
-   :large-amoeba     (type (->LargeAmoeba))
-   :lichen           (type (->Lichen nil nil))
-   :magic            (type (->Magic nil nil nil))
-   :m-portal         (type (->MPortal nil nil nil))
-   :merchant         (type (->Merchant))
-   :mobile           (type (->Mobile nil nil))
-   :mimic            (type (->Mimic))
-   :necromancer      (type (->Necromancer))
-   :player           (type (->Player nil nil))
-   :playersight      (type (->PlayerSight nil nil nil nil nil))
-   :portal           (type (->Portal nil nil nil))
-   :position         (type (->Position nil nil nil nil))
-   :purchasable      (type (->Purchasable nil))
-   :race             (type (->Race nil))
-   :receiver         (type (->Receiver))
-   :relay            (type (->Relay nil nil))
-   :renderable       (type (->Renderable nil nil))
-   :sight            (type (->Sight nil))
-   :skeleton         (type (->Skeleton))
-   :slime            (type (->Slime))
-   :spider           (type (->Spider))
-   :spike-trap       (type (->SpikeTrap nil))
-   :snake            (type (->Snake))
-   :tickable         (type (->Tickable nil nil))
-   :tile             (type (->Tile nil nil nil nil))
-   :torch            (type (->Torch nil))
-   :trap             (type (->Trap))
-   :troll            (type (->Troll))
-   :wallet           (type (->Wallet nil))
-   :willow-wisp      (type (->WillowWisp))
-   :world            (type (->World nil nil))})
+  {:arrow-trap       (type (map->ArrowTrap {}))
+   :attacker         (type (map->Attacker {}))
+   :bat              (type (map->Bat {}))
+   :broadcaster      (type (map->Broadcaster {}))
+   :class            (type (map->Klass {}))
+   :colossal-amoeba  (type (map->ColossalAmoeba {}))
+   :counter          (type (map->Counter {}))
+   :destructible     (type (map->Destructible {}))
+   :digger           (type (map->Digger {}))
+   :door             (type (map->Door {}))
+   :drake            (type (map->Drake {}))
+   :energy           (type (map->Energy {}))
+   :entity           (type (map->Entity {}))
+   :equipment        (type (map->Equipment {}))
+   :experience       (type (map->Experience {}))
+   :fireball         (type (map->Fireball {}))
+   :gold             (type (map->Gold {}))
+   :giant-amoeba     (type (map->GiantAmoeba {}))
+   :hydra-head       (type (map->HydraHead {}))
+   :hydra-neck       (type (map->HydraNeck {}))
+   :hydra-tail       (type (map->HydraTail {}))
+   :hydra-rear       (type (map->HydraRear {}))
+   :inventory        (type (map->Inventory {}))
+   :inspectable      (type (map->Inspectable {}))
+   :item             (type (map->Item {}))
+   :killable         (type (map->Killable {}))
+   :large-amoeba     (type (map->LargeAmoeba {}))
+   :lichen           (type (map->Lichen {}))
+   :magic            (type (map->Magic {}))
+   :m-portal         (type (map->MPortal {}))
+   :merchant         (type (map->Merchant {}))
+   :mobile           (type (map->Mobile {}))
+   :mimic            (type (map->Mimic {}))
+   :necromancer      (type (map->Necromancer {}))
+   :player           (type (map->Player {}))
+   :playersight      (type (map->PlayerSight {}))
+   :portal           (type (map->Portal {}))
+   :position         (type (map->Position {}))
+   :purchasable      (type (map->Purchasable {}))
+   :race             (type (map->Race {}))
+   :receiver         (type (map->Receiver {}))
+   :relay            (type (map->Relay {}))
+   :renderable       (type (map->Renderable {}))
+   :sight            (type (map->Sight {}))
+   :skeleton         (type (map->Skeleton {}))
+   :slime            (type (map->Slime {}))
+   :spider           (type (map->Spider {}))
+   :spike-trap       (type (map->SpikeTrap {}))
+   :snake            (type (map->Snake {}))
+   :tickable         (type (map->Tickable {}))
+   :tile             (type (map->Tile {}))
+   :torch            (type (map->Torch {}))
+   :trap             (type (map->Trap {}))
+   :troll            (type (map->Troll {}))
+   :wallet           (type (map->Wallet {}))
+   :willow-wisp      (type (map->WillowWisp {}))
+   :world            (type (map->World {}))})
