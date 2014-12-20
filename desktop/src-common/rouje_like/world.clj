@@ -386,19 +386,17 @@
         merch-level (generate-random-level
                       rj.cfg/world-sizes 0
                       :merchant)
-        level1 (generate-random-level
-                rj.cfg/world-sizes z)
-        type1 (:type level1)
-        level1 (:level level1)
-        level2 (generate-random-level
-                rj.cfg/world-sizes (inc z))
-        type2 (:type level2)
-        level2 (:level level2)]
+        {type1 :type
+         level1 :level} (generate-random-level
+                          rj.cfg/world-sizes z)
+        {type2 :type
+         level2 :level} (generate-random-level
+                          rj.cfg/world-sizes (inc z))]
     (as-> system system
       (rj.e/add-e system e-world)
       (rj.e/add-c system e-world (rj.c/map->World {:levels [merch-level level1 level2]
-                                            :add-level-fn add-level
-                                            :merchant-level-fn rj.merch/reset-merch-level}))
+                                                   :add-level-fn add-level
+                                                   :merchant-level-fn rj.merch/reset-merch-level}))
       (rj.merch/init-merchant system 0)
       (init-entities system z)
       (init-themed-entities system z type1)
@@ -422,18 +420,16 @@
         levels (:levels (rj.e/get-c-on-e system e-world :world))
         n-levels (count levels)]
     (if (= player-z (dec n-levels))
-      (let [new-level (generate-random-level rj.cfg/world-sizes z)
-            newtype (:type new-level)
-            new-level (:level new-level)]
+      (let [{:keys [type level]} (generate-random-level rj.cfg/world-sizes z)]
         (as-> system system
             (rj.e/upd-c system e-world :world
                         (fn [c-world]
                           (update-in c-world [:levels]
                                      (fn [levels]
                                        (conj levels
-                                             new-level)))))
+                                             level)))))
             (init-entities system z)
-            (init-themed-entities system z newtype)
+            (init-themed-entities system z type)
             (rj.merch/add-merch-portal system (dec z))
             (:system (rj.p/add-portal {:system system
                                        :z (dec z)}))))
