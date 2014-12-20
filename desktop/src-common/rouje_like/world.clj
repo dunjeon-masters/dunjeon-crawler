@@ -378,60 +378,14 @@
                                                   :entities [(rj.c/map->Entity {:id   nil
                                                                                 :type :dune})]}))))))))
 
-;;;; MERCHANT LEVEL CODE
-(defn generate-merchant-level []
-  (generate-random-level
-    rj.cfg/world-sizes 0 :merchant))
-
-(defn add-merch-items
-  [system]
-  (reduce (fn [sys tile]
-            (:system (rj.items/add-purchasable sys tile)))
-          system
-          (rj.merch/merchant-item-tiles system)))
-
-(defn remove-merch-items
-  [system]
-  (reduce (fn [sys {x :x y :y}]
-            (rj.items/remove-item sys [0 x y] :purchasable))
-          system
-          rj.cfg/merchant-item-pos))
-
-(defn reset-merch-level
-  [system [z x y]]
-  (let [e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
-        level (nth levels z)
-        target-tile (get-in level [x y])]
-    (as-> system system
-          (remove-merch-items system)
-          (add-merch-items system)
-          (:system (rj.p/add-portal system (rj.merch/merchant-portal-tile system) target-tile :portal)))))
-
-(defn add-merch-portal
-  [system z]
-  (let [e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
-        level (nth levels z)
-        merch-level (nth levels 0)
-
-        merch-player-tile (rj.merch/merchant-player-tile system)
-        get-rand-tile (fn [level]
-                        (get-in level [(rand-int (count level))
-                                       (rand-int (count (first level)))]))]
-    (loop [portal-tile (get-rand-tile level)]
-      (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity portal-tile)))
-        (:system (rj.p/add-portal system portal-tile merch-player-tile :m-portal))
-        (recur (get-rand-tile level))))))
-
 (declare add-level)
 (defn init-world
   [system]
   (let [z 1
         e-world (br.e/create-entity)
-        merch-level (generate-merchant-level)
+        merch-level (generate-random-level
+                      rj.cfg/world-sizes 0
+                      :merchant)
         level1 (generate-random-level
                 rj.cfg/world-sizes z)
         type1 (:type level1)
@@ -444,14 +398,14 @@
       (rj.e/add-e system e-world)
       (rj.e/add-c system e-world (rj.c/map->World {:levels [merch-level level1 level2]
                                             :add-level-fn add-level
-                                            :merchant-level-fn reset-merch-level}))
+                                            :merchant-level-fn rj.merch/reset-merch-level}))
       (rj.merch/init-merchant system 0)
       (init-entities system z)
       (init-themed-entities system z type1)
       (:system
         (rj.p/add-portal {:system system
                           :z z}))
-      (add-merch-portal system z)
+      (rj.merch/add-merch-portal system z)
       (init-entities system (inc z))
       (init-themed-entities system (inc z) type2)
 
@@ -480,7 +434,7 @@
                                              new-level)))))
             (init-entities system z)
             (init-themed-entities system z newtype)
-            (add-merch-portal system (dec z))
+            (rj.merch/add-merch-portal system (dec z))
             (:system (rj.p/add-portal {:system system
                                        :z (dec z)}))))
       system)))

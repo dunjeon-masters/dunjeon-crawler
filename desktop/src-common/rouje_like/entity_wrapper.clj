@@ -57,4 +57,3 @@
      (as-> s# ~'s
        ~@(for [p partitions]
            `(partition->add-c ~'s ~e-this ~(p 0) ~(p 1))))))
-
