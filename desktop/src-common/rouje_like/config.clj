@@ -268,9 +268,6 @@
                      :atk 0
                      :exp 0}})
 
-(def trap-types
-  [:arrow])
-
 (def potion-stats
   {:health 5
    :magic 3})
@@ -283,6 +280,8 @@
    :hp    1
    :mp    1
    :eq    1})
+
+(def maze:wall->floor% 20)
 
 ;; ===== MONSTER CONFIG =====
 (def mob->init-spawn%
