@@ -8,6 +8,8 @@
             [rouje-like.components :as rj.c :refer [->3DPoint]]
             [rouje-like.world :as rj.w]))
 
+(clojure.core.typed/check-ns 'rouje-like.utils)
+
 (def level (rj.w/generate-random-level
              {:width 3 :height 3} 1 :merchant))
 (def wall-e (rj.c/map->Entity {:type :wall}))

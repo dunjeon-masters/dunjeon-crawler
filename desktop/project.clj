@@ -17,6 +17,7 @@
 
                  [play-clj "0.3.11"]
 
+                 [org.clojure/core.typed "0.2.72"]
                  [org.clojure/tools.trace "0.7.8"]
                  [org.clojure/math.numeric-tower "0.0.4"]]
   :profiles {:dev {:dependencies [[midje "1.6.3"]]}}

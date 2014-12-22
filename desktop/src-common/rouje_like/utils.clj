@@ -1,18 +1,26 @@
 (ns rouje-like.utils
   (:require [clojure.math.numeric-tower :as math]
             [clojure.pprint :refer [pprint]]
+            [clojure.core.typed :refer [ann ann-form Kw Seqable Num]]
 
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.config :as rj.cfg]
-            [rouje-like.components :as rj.c]))
+            [rouje-like.components :as rj.c])
+  (:import [rouje_like.components Entity Tile]))
 
 #_(in-ns 'rouje-like.utils)
 #_(use 'rouje-like.utils :reload)
+#_(check-ns)
 
 (def cli (atom ""))
 (def cli? (atom false))
 
-(def get-default-pri
+(ann get-type [Entity -> Kw])
+(defn get-type
+  [entity]
+  (:type entity))
+
+(def ^:no-check get-default-pri
   {:floor 0
    :forest-floor 0
    :dune 0
@@ -31,7 +39,7 @@
    :else 99
    :player 100})
 
-(defn- sort-by-type
+(defn- ^:no-check sort-by-type
   [entities get-pri]
   (sort (fn [arg1 arg2]
           (let [t1 (:type arg1)
@@ -44,7 +52,7 @@
                       (get get-pri :else 1))))))
         entities))
 
-(defn tile->top-entity
+(defn ^:no-check tile->top-entity
   ([target-tile]
    (tile->top-entity target-tile get-default-pri))
   ([target-tile get-pri]
@@ -53,12 +61,12 @@
        (sort-by-type get-pri)
        (first))))
 
-(defn taxicab-dist
+(defn ^:no-check taxicab-dist
   [[x y] [i j]]
   (+ (math/abs (- i x))
      (math/abs (- j y))))
 
-(defn points->line
+(defn ^:no-check points->line
   [[x y] [i j]]
   (let [dx (math/abs (- i x))
         dy (math/abs (- j y))
@@ -88,7 +96,7 @@
                      (+ err dx)
                      err))))))))
 
-(defn can-see?
+(defn ^:no-check can-see?
   [level sight [x y] [i j]]
   (let [result (if (< sight
                       (taxicab-dist [x y] [i j]))
@@ -104,19 +112,19 @@
                            line)))]
     result))
 
-(def direction->offset
+(def ^:no-check direction->offset
   {:left  [-1 0]
    :right [1  0]
    :up    [0  1]
    :down  [0 -1]})
 
-(defn coords+offset
+(defn ^:no-check coords+offset
   "Offset the first coordinate by the second,
   returning the result coordinate."
   [[x y] [dx dy]]
   [(+ x dx) (+ y dy)])
 
-(defn get-neighbors-coords
+(defn ^:no-check get-neighbors-coords
   "Return the coordinates of all neighboring
   (ie: up/down/left/right)
   squares of the given [x y] pos."
@@ -124,29 +132,29 @@
   (map coords+offset
        (repeat origin) (vals direction->offset)))
 
-(defn get-neighbors
+(defn ^:no-check get-neighbors
   [world origin]
   (map (fn [v] (get-in world v nil))
        (get-neighbors-coords origin)))
 
-(defn get-neighbors-of-type
+(defn ^:no-check get-neighbors-of-type
   [world origin type]
   (->> (get-neighbors world origin)
        (filter #(and (not (nil? %))
                      ((into #{} type) (:type (tile->top-entity %)))))))
 
-(defn radial-distance
+(defn ^:no-check radial-distance
   [[x1 y1] [x2 y2]]
   (max (math/abs (- x1 x2))
        (math/abs (- y1 y2))))
 
-(defn get-entities-radially
+(defn ^:no-check get-entities-radially
   [world origin within-range?]
   (->> (flatten world)
        (filter #(within-range?
                   (radial-distance origin [(:x %) (:y %)])))))
 
-(defn get-neighbors-of-type-within
+(defn ^:no-check get-neighbors-of-type-within
   [world origin type dist-fn]
   (filter #(and (dist-fn (radial-distance origin [(:x %) (:y %)]))
                 ((into #{} type) (:type (tile->top-entity %
@@ -156,7 +164,7 @@
                                                                         1))))))
           (flatten world)))
 
-(defn not-any-radially-of-type
+(defn ^:no-check not-any-radially-of-type
   [world origin dist-fn type]
   (not-any? (fn [tile]
               ((into #{} type) (:type (tile->top-entity tile
@@ -166,7 +174,7 @@
                                                                     1))))))
             (get-entities-radially world origin dist-fn)))
 
-(defn ring-coords
+(defn ^:no-check ring-coords
   [[x y] dist]
   (let [∆x|y (vec (range (- 0 dist) (inc dist)))]
     (for [dx ∆x|y
@@ -177,7 +185,7 @@
                     (= dist (math/abs dy)))]
       [(+ x dx) (+ y dy)])))
 
-(defn get-ring-around
+(defn ^:no-check get-ring-around
   [tiles origin dist]
   (map (fn [[x y]]
          (get-in tiles [x y]
@@ -186,11 +194,11 @@
                                                                 :type :wall})]})))
        (ring-coords origin dist)))
 
-(defn rand-rng
+(defn ^:no-check rand-rng
   [start end]
   (+ (rand-int (- (inc end) start)) start))
 
-(defmacro ?
+(defmacro ^:no-check ?
   ([x]
    (let [line (:line (meta &form))
          file *file*]
@@ -211,7 +219,7 @@
                       "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
         x#))))
 
-(defn update-in-world
+(defn ^:no-check update-in-world
   [system e-world [z x y] fn<-entities]
   (rj.e/upd-c system e-world :world
               (fn [c-world]
@@ -223,7 +231,7 @@
                                                      (fn [entities]
                                                        (fn<-entities entities))))))))))
 
-(defn change-type
+(defn ^:no-check change-type
   [system e-this old-type new-type]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-position (rj.e/get-c-on-e system e-this :position)
@@ -239,7 +247,7 @@
                   (fn [c-position]
                     (assoc c-position :type new-type))))))
 
-(defn update-gold
+(defn ^:no-check update-gold
   [system e-this value]
   "Update the amount of gold on E-THIS by VALUE."
   (rj.e/upd-c system e-this :wallet
@@ -247,14 +255,18 @@
                             (update-in c-wallet [:gold]
                                        (partial + value)))))
 
-(defn inspectable?
+(defn ^:no-check inspectable?
   [entity]
   (let [type (:type entity)]
     (some #(= type %) rj.cfg/inspectables)))
 
+(ann entities-at-pos [(Seqable (Seqable Tile))
+                      (Seqable Num)
+                      -> (Seqable Entity)])
 (defn entities-at-pos
   [level pos]
   "Return the entities of the tile at [Z X Y]."
-  (let [target-tile (get-in level pos :err)]
+  (let [target-tile ((ann-form #(get-in level % :err)
+                              [(Seqable Num) -> Tile]) pos)]
     (assert (not= :err target-tile))
     (:entities target-tile)))
