@@ -110,4 +110,3 @@
                 max-blob-size))
       (:system (add-lichen system (rand-nth empty-neighbors)))
       system)))
-

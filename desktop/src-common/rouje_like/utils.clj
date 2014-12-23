@@ -6,7 +6,8 @@
             [rouje-like.entity-wrapper :as rj.e
              :refer [>?system]]
             [rouje-like.config :as rj.cfg]
-            [rouje-like.components :as rj.c])
+            [rouje-like.components :as rj.c
+             :refer [->2DPoint]])
   (:import [rouje_like.components Entity Tile]
            [clojure.lang Fn]
            [java.util UUID]))
@@ -333,3 +334,41 @@
   (let [target-tile (get-in level pos :err)]
     (assert (not= :err target-tile))
     (:entities target-tile)))
+
+(s/defn ^:always-validate
+  get-closest-tile-to
+  [level :- >?level
+   this-pos :- (s/both >?2DVec [s/Num])
+   target-tile :- Tile]
+  (let [target-pos (->2DPoint target-tile)
+        dist-from-target (taxicab-dist this-pos target-pos)
+
+        this-pos+dir-offset (fn [this-pos dir]
+                              (coords+offset this-pos (direction->offset dir)))
+        shuffled-directions (shuffle [:up :down :left :right])
+        offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
+                                        shuffled-directions)
+
+        is-valid-target-tile? rj.cfg/<valid-mob-targets>
+
+        nth->offset-pos (fn [index]
+                          (nth offset-shuffled-directions index))
+        isa-closer-tile? (fn [target-pos+offset]
+                           (and (< (taxicab-dist target-pos+offset target-pos)
+                                   dist-from-target)
+                                (is-valid-target-tile?
+                                  (:type (tile->top-entity (get-in level target-pos+offset))))))]
+    (cond
+      (isa-closer-tile? (nth->offset-pos 0))
+      (get-in level (nth->offset-pos 0))
+
+      (isa-closer-tile? (nth->offset-pos 1))
+      (get-in level (nth->offset-pos 1))
+
+      (isa-closer-tile? (nth->offset-pos 2))
+      (get-in level (nth->offset-pos 2))
+
+      (isa-closer-tile? (nth->offset-pos 3))
+      (get-in level (nth->offset-pos 3))
+
+      :else nil)))

@@ -10,48 +10,13 @@
             [rouje-like.mobile :as rj.m]
             [rouje-like.messaging :as rj.msg]
             [rouje-like.destructible :as rj.d]
+            [rouje-like.utils :as rj.u]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.status-effects :as rj.stef]
             [rouje-like.config :as rj.cfg]
             [clojure.set :refer [union]]))
 
 #_(use 'rouje-like.skeleton :reload)
-
-(defn get-closest-tile-to
-  [level this-pos target-tile]
-  (let [target-pos [(:x target-tile) (:y target-tile)]
-        dist-from-target (rj.u/taxicab-dist this-pos target-pos)
-
-        this-pos+dir-offset (fn [this-pos dir]
-                                 (rj.u/coords+offset this-pos (rj.u/direction->offset dir)))
-        shuffled-directions (shuffle [:up :down :left :right])
-        offset-shuffled-directions (map #(this-pos+dir-offset this-pos %)
-                                        shuffled-directions)
-
-        is-valid-target-tile? rj.cfg/<valid-mob-targets>
-
-        nth->offset-pos (fn [index]
-                            (nth offset-shuffled-directions index))
-        isa-closer-tile? (fn [target-pos+offset]
-                           (and (< (rj.u/taxicab-dist target-pos+offset target-pos)
-                                   dist-from-target)
-                                (is-valid-target-tile?
-                                  (:type (rj.u/tile->top-entity
-                                           (get-in level target-pos+offset))))))]
-    (cond
-      (isa-closer-tile? (nth->offset-pos 0))
-      (get-in level (nth->offset-pos 0))
-
-      (isa-closer-tile? (nth->offset-pos 1))
-      (get-in level (nth->offset-pos 1))
-
-      (isa-closer-tile? (nth->offset-pos 2))
-      (get-in level (nth->offset-pos 2))
-
-      (isa-closer-tile? (nth->offset-pos 3))
-      (get-in level (nth->offset-pos 3))
-
-      :else nil)))
 
 (defn get-target-tile
   [e-this e-player e-world system]
@@ -65,7 +30,7 @@
                 neighbor-tiles (rj.u/get-neighbors level this-pos)]
             (if (and (rj.u/can-see? level distance this-pos [x y])
                      is-player-within-range?)
-              (get-closest-tile-to level this-pos (first is-player-within-range?))
+              (rj.u/get-closest-tile-to level this-pos (first is-player-within-range?))
               (if (seq neighbor-tiles)
                 (rand-nth (conj neighbor-tiles nil))
                 nil))))
