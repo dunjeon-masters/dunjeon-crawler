@@ -35,21 +35,31 @@
 (defn tick-entities
   [system]
   {:pre [(not (nil? system))]}
-  (let [entities (rj.e/all-e-with-c system :tickable)
-        e-player (first (rj.e/all-e-with-c system :player))
-        c-position (rj.e/get-c-on-e system e-player :position)
-        z (:z c-position)
-        entities (filter #(if-let [c-position (rj.e/get-c-on-e system % :position)]
-                            (= z (:z c-position))
-                            true) ;(This is for the relay and the counter)
-                         entities)
-        entities (reverse (sort-by (fn [e]
-                                     (:pri (rj.e/get-c-on-e system e :tickable)))
-                                   entities)) #_(SORT in decreasing order)]
-    (reduce (fn [system entity]
-              (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
-                (tick c-tickable entity system)))
-            system entities)))
+  (as-> (let [entities (rj.e/all-e-with-c system :tickable)
+              e-player (first (rj.e/all-e-with-c system :player))
+              c-position (rj.e/get-c-on-e system e-player :position)
+              z (:z c-position)
+              entities (filter #(if-let [c-position (rj.e/get-c-on-e system % :position)]
+                                  (= z (:z c-position))
+                                  true) ;(This is for the relay and the counter)
+                               entities)
+              entities (reverse (sort-by (fn [e]
+                                           (:pri (rj.e/get-c-on-e system e :tickable)))
+                                         entities)) #_(SORT in decreasing order)]
+          (reduce (fn [system entity]
+                    (let [c-tickable (rj.e/get-c-on-e system entity :tickable)]
+                      (tick c-tickable entity system)))
+                  system entities)) system
+    (let [energetic-entities (rj.e/all-e-with-c system :energy)]
+      (reduce (fn [system entity]
+                (rj.e/upd-c system entity :energy
+                            (fn [{:keys [default-energy]
+                                  :or {default-energy 1}
+                                  :as c-energy}]
+                              (update-in c-energy [:energy]
+                                         #(if (< % default-energy)
+                                            default-energy %)))))
+              system energetic-entities))))
 
 ;Temporary, will eventually be used to execute cmdl actions
 (defn cmds->action
@@ -243,17 +253,7 @@
                        system))
                    (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
                      (tick-entities system)
-                     system)
-                   (let [energetic-entities (rj.e/all-e-with-c system :energy)]
-                     (reduce (fn [system entity]
-                               (rj.e/upd-c system entity :energy
-                                           (fn [c-energy]
-                                             (update-in c-energy [:energy]
-                                                        (fn [energy]
-                                                          (if (< energy 1)
-                                                            (inc energy)
-                                                            energy))))))
-                             system energetic-entities))))
+                     system)))
             system))))))
 
 (defn process-fling-input

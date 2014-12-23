@@ -94,7 +94,6 @@
         {:keys [distance decline-rate
                 lower-bound upper-bound
                 torch-multiplier]} rj.cfg/player-sight
-        _ (? torch-multiplier)
 
         valid-class? (into #{} (keys rj.cfg/class->stats))
         player-class (if (valid-class? (keyword c))
@@ -139,7 +138,8 @@
                     :armor nil}]
        [:inventory {:slot nil :junk []
                     :hp-potion 0 :mp-potion 0}]
-       [:energy {:energy 1}]
+       [:energy {:energy 1
+                 :default-energy 1}]
        [:mobile {:can-move?-fn rj.m/can-move?
                  :move-fn      rj.m/move}]
        [:digger {:can-dig?-fn can-dig?

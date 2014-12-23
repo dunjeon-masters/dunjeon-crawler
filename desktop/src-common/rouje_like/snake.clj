@@ -146,5 +146,4 @@
               (attack c-attacker e-this e-target system)
 
               :else system)
-            system)))
-  )
+            system))))

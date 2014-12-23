@@ -32,7 +32,8 @@
           dig-fn      :- Fn])
 
 (s/defrecord ^:always-validate
-  Energy [energy :- s/Num]
+  Energy [energy         :- s/Num
+          default-energy :- s/Num]
   ISaveState
   (->save-state [this]
     (zipmap (keys this) (vals this))))
