@@ -11,19 +11,21 @@
 (defn get-target-tile
   [e-this e-target e-world system]
   (let [{:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-        {:keys [x y z type]} (rj.e/get-c-on-e system e-target :position)
+        {:keys [x y z]
+         target-type :type} (rj.e/get-c-on-e system e-target :position)
         level (nth levels z)
         {:keys [distance]
          :or {distance 0}} (rj.e/get-c-on-e system e-this :sight)
         this-pos (->2DPoint (rj.e/get-c-on-e system e-this :position))
-        is-target-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [type]
-                                                                        #(<= % distance)))
+        is-target-within-range? (seq (rj.u/get-neighbors-of-type-within
+                                       level this-pos [target-type]
+                                       #(<= % distance)))
         neighbor-tiles (rj.u/get-neighbors level this-pos)]
     (if (and (rj.u/can-see? level distance this-pos [x y])
              is-target-within-range?)
       (rj.u/get-closest-tile-to level this-pos (first is-target-within-range?))
       (when (seq neighbor-tiles)
-        (rand-nth (conj neighbor-tiles nil))))))
+        (rand-nth neighbor-tiles)))))
 
 (defn process-input-tick
   [{:keys [target-tile-fn
