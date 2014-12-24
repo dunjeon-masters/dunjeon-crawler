@@ -140,9 +140,7 @@
                     :hp-potion 0 :mp-potion 0}]
        [:energy {:energy 1
                  :default-energy 1}]
-       [:mobile {:can-move?-fn (fn [_ _ target-tile _]
-                                 (rj.cfg/<valid-move-targets>
-                                   (:type (rj.u/tile->top-entity target-tile))))
+       [:mobile {:can-move?-fn rj.m/-can-move?
                  :move-fn      rj.m/move}]
        [:digger {:can-dig?-fn can-dig?
                  :dig-fn      dig}]

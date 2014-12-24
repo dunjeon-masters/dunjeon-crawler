@@ -8,10 +8,14 @@
 
 #_(use 'rouje-like.mobile :reload)
 
-(defn can-move?
+(defn -can-move?
   [_ _ target-tile _]
+  (rj.cfg/<valid-move-targets> (:type (rj.u/tile->top-entity target-tile))))
+
+(defn can-move?
+  [c e target-tile s]
   (and (> 80 (rand-int 100))
-       (rj.cfg/<valid-move-targets> (:type (rj.u/tile->top-entity target-tile)))))
+       (-can-move? c e target-tile s)))
 
 (defn add-entity [system e-world entity target-pos]
   "Add ENTITY to the tile at TARGET-POS."

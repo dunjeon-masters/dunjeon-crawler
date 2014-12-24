@@ -7,12 +7,12 @@
                                                     can-attack? attack]]
             [rouje-like.mobile :as rj.m]
             [rouje-like.messaging :as rj.msg]
+            [rouje-like.tickable :as rj.t]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.status-effects :as rj.stef]
             [rouje-like.config :as rj.cfg]
             [clojure.set :refer [union]]))
-
 
 (declare process-input-tick)
 
@@ -51,7 +51,7 @@
                              :y    (:y target-tile)
                              :z    (:z target-tile)
                              :type :hydra-rear}]
-                 [:mobile {:can-move?-fn rj.m/can-move?
+                 [:mobile {:can-move?-fn rj.m/-can-move?
                            :move-fn      rj.m/move}]
                  [:sight {:distance 100}]                     ;;4
                  [:attacker {:atk              (:atk (rj.cfg/entity->stats :hydra-rear))
@@ -67,89 +67,26 @@
                                  :on-death-fn nil
                                  :status-effects []}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :hydra-rear))}]
+                 [:energy {:energy 2
+                           :default-energy 2}]
                  [:tickable {:tick-fn process-input-tick
                              :pri -2}]
                  [:broadcaster {:name-fn (constantly "the hydra's tail")}]])
       :z (:z target-tile)})))
 
 (defn process-input-tick
-  [_ e-this system]
-  (as-> (let [c-position (rj.e/get-c-on-e system e-this :position)
-              this-pos [(:x c-position) (:y c-position)]
-              c-mobile (rj.e/get-c-on-e system e-this :mobile)
-              e-world (first (rj.e/all-e-with-c system :world))
-              e-player (first (rj.e/all-e-with-c system :hydra-tail))]
-          (if (nil? e-player)
-            (as-> system system
-                  (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
-                                        (fn [entities]
-                                          (vec
-                                            (remove
-                                              #(#{e-this} (:id %))
-                                              entities))))
-                  (rj.e/kill-e system e-this))
-            (let [c-player-pos (rj.e/get-c-on-e system e-player :position)
-                  player-pos [(:x c-player-pos) (:y c-player-pos)]
-
-                  e-world (first (rj.e/all-e-with-c system :world))
-                  c-world (rj.e/get-c-on-e system e-world :world)
-                  levels (:levels c-world)
-                  level (nth levels (:z c-position))
-
-                  neighbor-tiles (rj.u/get-neighbors level [(:x c-position) (:y c-position)])
-
-                  c-sight (rj.e/get-c-on-e system e-this :sight)
-                  is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:hydra-tail]
-                                                                                  #(<= %  (:distance c-sight))))
-
-
-                  target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
-                                       is-player-within-range?)
-                                (rj.u/get-closest-tile-to level this-pos (first is-player-within-range?))
-                                (if (seq neighbor-tiles)
-                                  (rand-nth (conj neighbor-tiles nil))
-                                  nil))]
-              (if (not (nil? target-tile))
-                (cond
-                  (can-move? c-mobile e-this target-tile system)
-                  (move c-mobile e-this target-tile system)
-
-                  :else system)
-                system)))
-          ) system
-        (let [c-position (rj.e/get-c-on-e system e-this :position)
-              this-pos [(:x c-position) (:y c-position)]
-              c-mobile (rj.e/get-c-on-e system e-this :mobile)
-              e-player (first (rj.e/all-e-with-c system :hydra-tail))]
-          (if (nil? e-player)
-            system
-            (let [c-player-pos (rj.e/get-c-on-e system e-player :position)
-                  player-pos [(:x c-player-pos) (:y c-player-pos)]
-
-                  e-world (first (rj.e/all-e-with-c system :world))
-                  c-world (rj.e/get-c-on-e system e-world :world)
-                  levels (:levels c-world)
-                  level (nth levels (:z c-position))
-
-                  neighbor-tiles (rj.u/get-neighbors level [(:x c-position) (:y c-position)])
-
-                  c-sight (rj.e/get-c-on-e system e-this :sight)
-                  is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:hydra-tail]
-                                                                                  #(<= %  (:distance c-sight))))
-
-
-                  target-tile (if (and (rj.u/can-see? level (:distance c-sight) this-pos player-pos)
-                                       is-player-within-range?)
-                                (rj.u/get-closest-tile-to level this-pos (first is-player-within-range?))
-                                (if (seq neighbor-tiles)
-                                  (rand-nth (conj neighbor-tiles nil))
-                                  nil))]
-              (if (not (nil? target-tile))
-                (cond
-                  (can-move? c-mobile e-this target-tile system)
-                  (move c-mobile e-this target-tile system)
-                  :else system)
-                system)))
-          )
-        system))
-
+  [c-this e-this system]
+  (if-let [_ (first (rj.e/all-e-with-c system :hydra-tail))]
+    (rj.t/process-input-tick
+      (assoc c-this :target-e :hydra-tail) e-this system)
+    (as-> system system
+      (let [e-world (first (rj.e/all-e-with-c system :world))
+            c-position (rj.e/get-c-on-e system e-this :position)]
+        (rj.u/update-in-world system e-world
+                              [(:z c-position) (:x c-position) (:y c-position)]
+                              (fn [entities]
+                                (vec
+                                  (remove
+                                    #(#{e-this} (:id %))
+                                    entities)))))
+      (rj.e/kill-e system e-this))))

@@ -9,37 +9,38 @@
                      ->2DPoint]]))
 
 (defn get-target-tile
-  [e-this e-player e-world system]
+  [e-this e-target e-world system]
   (let [{:keys [levels]} (rj.e/get-c-on-e system e-world :world)
-        {:keys [x y z]} (rj.e/get-c-on-e system e-player :position)
+        {:keys [x y z type]} (rj.e/get-c-on-e system e-target :position)
         level (nth levels z)
         {:keys [distance]
          :or {distance 0}} (rj.e/get-c-on-e system e-this :sight)
         this-pos (->2DPoint (rj.e/get-c-on-e system e-this :position))
-        is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
+        is-target-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [type]
                                                                         #(<= % distance)))
         neighbor-tiles (rj.u/get-neighbors level this-pos)]
     (if (and (rj.u/can-see? level distance this-pos [x y])
-             is-player-within-range?)
-      (rj.u/get-closest-tile-to level this-pos (first is-player-within-range?))
-      (if (seq neighbor-tiles)
-        (rand-nth (conj neighbor-tiles nil))
-        nil))))
+             is-target-within-range?)
+      (rj.u/get-closest-tile-to level this-pos (first is-target-within-range?))
+      (when (seq neighbor-tiles)
+        (rand-nth (conj neighbor-tiles nil))))))
 
 (defn process-input-tick
   [{:keys [target-tile-fn
-           extra-tick-fn]
-    :or {target-tile-fn get-target-tile}}
+           extra-tick-fn
+           target-e]
+    :or {target-tile-fn get-target-tile
+         target-e :player}}
    e-this system]
   (let [c-energy (rj.e/get-c-on-e system e-this :energy)
         {:keys [energy] :or {energy 1}} c-energy]
     (loop [system system
            energy energy]
       (if (pos? energy)
-        (recur (let [e-player (first (rj.e/all-e-with-c system :player))
+        (recur (let [e-target (first (rj.e/all-e-with-c system target-e))
                      e-world (first (rj.e/all-e-with-c system :world))
 
-                     target-tile (target-tile-fn e-this e-player e-world system)
+                     target-tile (target-tile-fn e-this e-target e-world system)
                      e-target (:id (rj.u/tile->top-entity target-tile))]
                  (if target-tile
                    (as-> (let [c-mobile (rj.e/get-c-on-e system e-this :mobile)
