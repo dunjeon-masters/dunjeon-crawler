@@ -3,6 +3,7 @@
 
             [rouje-like.components :as rj.c :refer [can-move? move]]
             [rouje-like.entity-wrapper :as rj.e]
+            [rouje-like.tickable :as rj.t]
             [rouje-like.utils :as rj.u]
             [rouje-like.destructible :as rj.d]
             [rouje-like.mobile :as rj.m]
@@ -51,30 +52,7 @@
                                  :take-damage-fn rj.d/take-damage
                                  :on-death-fn nil
                                  :status-effects []}]
-                 [:tickable {:tick-fn process-input-tick
+                 [:tickable {:tick-fn rj.t/process-input-tick
                              :pri 0}]
                  [:broadcaster {:name-fn (constantly "the bat")}]])
       :z (:z target-tile)})))
-
-(defn process-input-tick
-  [_ e-this system]
-  (let [c-position (rj.e/get-c-on-e system e-this :position)
-        c-mobile (rj.e/get-c-on-e system e-this :mobile)
-
-        e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
-        world (nth levels (:z c-position))
-
-        neighbor-tiles (rj.u/get-neighbors world [(:x c-position) (:y c-position)])
-
-        target-tile (if (seq neighbor-tiles)
-                      (rand-nth (conj neighbor-tiles nil))
-                      nil)]
-    (if (not (nil? target-tile))
-      (cond
-        (can-move? c-mobile e-this target-tile system)
-        (move c-mobile e-this target-tile system)
-
-        :else system)
-      system)))

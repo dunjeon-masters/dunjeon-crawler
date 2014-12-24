@@ -32,11 +32,10 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-lichen (br.e/create-entity)
-         hp (:hp  (rj.cfg/entity->stats :lichen))
+         hp (:hp (rj.cfg/entity->stats :lichen))
 
          system (rj.u/update-in-world system e-world
                                       [(:z target-tile) (:x target-tile) (:y target-tile)]
-
                                       (fn [entities]
                                         (vec (conj (remove #(#{:wall} (:type %)) entities)
                                                    (rj.c/map->Entity {:id   e-lichen

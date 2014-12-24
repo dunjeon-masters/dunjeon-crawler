@@ -13,7 +13,8 @@
   (let [{:keys [levels]} (rj.e/get-c-on-e system e-world :world)
         {:keys [x y z]} (rj.e/get-c-on-e system e-player :position)
         level (nth levels z)
-        {:keys [distance]} (rj.e/get-c-on-e system e-this :sight)
+        {:keys [distance]
+         :or {distance 0}} (rj.e/get-c-on-e system e-this :sight)
         this-pos (->2DPoint (rj.e/get-c-on-e system e-this :position))
         is-player-within-range? (seq (rj.u/get-neighbors-of-type-within level this-pos [:player]
                                                                         #(<= % distance)))
