@@ -61,8 +61,9 @@
                      (if-let [c-destructible (rj.e/get-c-on-e system e-this :destructible)]
                        (rj.d/apply-effects system e-this)
                        system)
-                     (if extra-tick-fn
-                       (extra-tick-fn e-this e-player e-world system)
+                     (if (and extra-tick-fn
+                              (rj.e/get-c-on-e system e-this :tickable))
+                       (extra-tick-fn e-this e-target e-world system)
                        system)
                      (if-let [c-energy (rj.e/get-c-on-e system e-this :energy)]
                        (rj.e/upd-c system e-this :energy

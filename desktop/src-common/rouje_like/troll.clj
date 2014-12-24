@@ -35,7 +35,7 @@
                                             (remove #(#{:wall} (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-troll
                                                                :type :troll})))))
-         heal-fn (fn [e-this e-player e-world system]
+         heal-fn (fn [e-this _ _ system]
                    (let [c-destructible (rj.e/get-c-on-e system e-this :destructible)
                          hp (:hp c-destructible)]
                      (rj.e/upd-c system e-this :destructible
@@ -44,8 +44,7 @@
                                               (fn [hp]
                                                 (if (< hp 4)
                                                   (inc hp)
-                                                  hp)))))))
-         _ (? heal-fn)]
+                                                  hp)))))))]
      {:system (-> (rj.e/system<<components
                     system e-troll
                     [[:troll {}]
