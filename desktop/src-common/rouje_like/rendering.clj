@@ -371,7 +371,8 @@
           (let [color-values (:color texture-entity)
                 color-values (update-in color-values [:a]
                                         (fn [alpha]
-                                          (if-let [c-destr (rj.e/get-c-on-e system (:id top-entity) :destructible)]
+                                          (if-let [c-destr (rj.e/get-c-on-e system (:id top-entity)
+                                                                            :destructible)]
                                             (let [hp (:hp c-destr)
                                                   max-hp (:max-hp c-destr)]
                                               (max 75 (* (/ hp max-hp) alpha)))

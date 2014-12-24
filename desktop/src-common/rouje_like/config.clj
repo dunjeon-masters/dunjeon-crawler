@@ -34,7 +34,7 @@
 (def <walls>
   #{:temple-wall
     :door :wall
-    :tree :maze-wall})
+    :tree})
 
 (def <indestructible-walls>
   #{:temple-wall :maze-wall})
@@ -51,7 +51,9 @@
   (union <floors> <items>))
 
 (def <sight-blockers>
-  (union <walls> #{:arrow-trap :lichen}))
+  (union <walls>
+         <indestructible-walls>
+         #{:arrow-trap :lichen}))
 
 (def <valid-move-targets>
   (union <empty> #{:portal
@@ -247,7 +249,7 @@
                      :def 1
                      :atk 1
                      :exp 2}
-   :willow-wisp       {:hp 3
+   :willow-wisp     {:hp 3
                      :def 0
                      :atk 0
                      :exp 1}

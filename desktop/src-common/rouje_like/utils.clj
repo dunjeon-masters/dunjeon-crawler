@@ -143,19 +143,18 @@
    sight :- s/Num
    XY :- (s/both >?2DVec [s/Num])
    IJ :- (s/both >?2DVec [s/Num])]
-  (let [result (if (< sight
-                      (taxicab-dist XY IJ))
-                 false
-                 (as-> (points->line XY IJ) line
-                   (filter (fn [[x y]]
-                             (-> (get-in level XY)
-                                 (tile->top-entity)
-                                 (:type)
-                                 (rj.cfg/<sight-blockers>)))
-                           line)
-                   (every? (partial = IJ)
-                           line)))]
-    result))
+  (if (< sight
+         (taxicab-dist XY IJ))
+    false
+    (as-> (points->line XY IJ) line
+      (filter (fn [[x y]]
+                (-> (get-in level [x y])
+                    (tile->top-entity)
+                    (:type)
+                    (rj.cfg/<sight-blockers>)))
+              line)
+      (every? (partial = IJ)
+              line))))
 
 (def direction->offset
   {:left  [-1 0]
