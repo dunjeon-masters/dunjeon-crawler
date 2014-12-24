@@ -10,7 +10,8 @@
 
 (defn can-move?
   [_ _ target-tile _]
-  (rj.cfg/<valid-move-targets> (:type (rj.u/tile->top-entity target-tile))))
+  (and (> 80 (rand-int 100))
+       (rj.cfg/<valid-move-targets> (:type (rj.u/tile->top-entity target-tile)))))
 
 (defn add-entity [system e-world entity target-pos]
   "Add ENTITY to the tile at TARGET-POS."
