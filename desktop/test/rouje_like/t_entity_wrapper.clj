@@ -9,9 +9,11 @@
 
 (fact "keyword->new-component"
       (keyword->new-component :energy)
-      =expands-to=> rouje-like.components/map->Energy
-      ((keyword->new-component :energy) {:energy 1})
-      => (contains {:energy 1}))
+      =expands-to=> rouje-like.components/strict-map->Energy
+      ((keyword->new-component :energy) {:energy 1
+                                         :default-energy 1})
+      => (contains {:energy 1
+                    :default-energy 1}))
 
 (fact "partition->add-c"
       (let [system :system

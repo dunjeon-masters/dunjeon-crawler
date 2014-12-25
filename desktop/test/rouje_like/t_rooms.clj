@@ -24,7 +24,12 @@
                     "  (0 1 2)\r\n0 (_ _ _)\r\n1 (_ _ _)\r\n2 (_ _ _)\r\n")))
 
 (facts "flatten-level"
-       (flatten-level (gen-level 3 3)) =future=> falsey)
+       (flatten-level (gen-level 3 3 :w))
+       => (fn [level]
+            (and (= (count level)
+                    9)
+                 (= (first level)
+                    [0 0 :w {}]))))
 
 (facts "valid-door-locs"
        (fact "odd dimensions"
@@ -33,7 +38,8 @@
              (valid-door-locs 1 1 4 4) => [[1 3] [3 1] [3 4] [4 3]]))
 
 (fact "create-room"
-      (create-room [1 1] [3 3]) => (contains {:height 3, :width 3, :x 1, :y 1}))
+      (create-room [1 1] [3 3])
+      => (contains {:height 3, :width 3, :x 1, :y 1}))
 
 (fact "change-in-level"
       (vec (change-in-level [1 2 :f {}]

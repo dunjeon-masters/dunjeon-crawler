@@ -39,7 +39,7 @@
 (def cli (atom ""))
 (def cli? (atom false))
 
-(def -get-pri-
+(def >?get-pri
   {s/Keyword s/Num})
 (def get-default-pri
   {:floor 0
@@ -63,7 +63,7 @@
 (s/defn ^{:private true
           :always-validate true} sort-by-type
   [entities :- [Entity]
-   get-pri :- -get-pri-]
+   get-pri :- >?get-pri]
   (sort (fn [arg1 arg2]
           (let [t1 (:type arg1)
                 t2 (:type arg2)]
@@ -80,7 +80,7 @@
   ([target-tile :- (s/maybe Tile)]
    (tile->top-entity target-tile get-default-pri))
   ([target-tile :- (s/maybe Tile)
-    get-pri :- -get-pri-]
+    get-pri :- >?get-pri]
    (-> target-tile
        (:entities)
        (sort-by-type get-pri)
@@ -325,12 +325,16 @@
   (let [type (:type entity)]
     (some #(= type %) rj.cfg/inspectables)))
 
+(def >?levels
+  (s/pred #(= (rj.c/get-type :tile)
+                (type (first (first (first %)))))
+            '>?levels))
 (s/defn ^:always-validate
   entities-at-pos
-  [level :- >?level
-   pos   :- >?2DVec]
+  [levels :- >?levels
+   pos    :- >?3DVec]
   "Return the entities of the tile at [Z X Y]."
-  (let [target-tile (get-in level pos :err)]
+  (let [target-tile (get-in levels pos :err)]
     (assert (not= :err target-tile))
     (:entities target-tile)))
 
