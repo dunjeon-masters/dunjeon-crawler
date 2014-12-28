@@ -3,15 +3,16 @@
         [rouje-like.test-utils]
         [rouje-like.troll])
   (:require [brute.entity :as br.e]
-            [rouje-like.components :as rj.c :refer [can-move? move]]
+            [rouje-like.components :as rj.c
+             :refer [can-move? move]]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.destructible :as rj.d]
             [rouje-like.mobile :as rj.m]
             [rouje-like.config :as rj.cfg]
             [rouje-like.core :as rj.core]
-            [rouje-like.utils :as rj.u :refer [?]]
-            [rouje-like.troll :as rj.tr]))
+            [rouje-like.utils :as rj.u
+             :refer [?]]))
 
 (let [system (start)]
   (fact "add-troll"
