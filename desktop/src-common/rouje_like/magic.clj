@@ -31,12 +31,12 @@
 (defn use-fireball
   "E-THIS shoots a fireball in DIRECTION"
   [system e-this spell direction]
-  (let [c-position (rj.e/get-c-on-e system e-this :position)
-        e-this-pos  [(:x c-position) (:y c-position)]
+  (let [{z :z :as c-position} (rj.e/get-c-on-e system e-this :position)
+        e-this-pos (rj.c/->2DPoint c-position)
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels (:z c-position))
+        world (nth levels z)
         distance (:distance spell)
         damage (:value spell)]
 
@@ -87,12 +87,12 @@
 (defn use-powerattack
   "E-THIS has increased attack in DIRECTION for 1 turn"
   [system e-this spell direction]
-  (let [c-position (rj.e/get-c-on-e system e-this :position)
-        e-this-pos  [(:x c-position) (:y c-position)]
+  (let [{z :z :as c-position} (rj.e/get-c-on-e system e-this :position)
+        e-this-pos (rj.c/->2DPoint c-position)
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels (:z c-position))
+        world (nth levels z)
         distance (:distance spell)
         damage (:value spell)]
 
@@ -116,12 +116,12 @@
 (defn use-pickpocket
   "E-THIS steals gold from entity to DIRECTION"
   [system e-this spell direction]
-  (let [c-position (rj.e/get-c-on-e system e-this :position)
-        e-this-pos  [(:x c-position) (:y c-position)]
+  (let [{z :z :as c-position} (rj.e/get-c-on-e system e-this :position)
+        e-this-pos  (rj.c/->2DPoint c-position)
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels (:z c-position))
+        world (nth levels z)
         damage-reduction (:atk-reduction spell)
         additional-gold (:value spell)
         distance (:distance spell)]

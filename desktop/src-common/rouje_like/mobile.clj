@@ -1,7 +1,8 @@
 (ns rouje-like.mobile
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
-            [rouje-like.components :as rj.c]
+            [rouje-like.components :as rj.c
+             :refer [->3DPoint]]
             [rouje-like.portal :as rj.p]
             [rouje-like.config :as rj.cfg]
             [clojure.set :refer [union]]))
@@ -17,45 +18,44 @@
   (and (> 80 (rand-int 100))
        (-can-move? c e target-tile s)))
 
-(defn add-entity [system e-world entity target-pos]
+(defn add-entity
+  [system e-world entity target-pos]
   "Add ENTITY to the tile at TARGET-POS."
-  (let [c-position (rj.e/get-c-on-e system entity :position)
-        this-type (:type c-position)]
+  (let [{:keys [type]} (rj.e/get-c-on-e system entity :position)]
     (rj.u/update-in-world system e-world target-pos
                           (fn [entities]
                             (vec
                               (conj entities
-                                    (rj.c/map->Entity {:type this-type
+                                    (rj.c/map->Entity {:type type
                                                        :id   entity})))))))
 
-(defn remove-entity [system e-world entity target-pos]
+(defn remove-entity
+  [system e-world entity target-pos]
   "Remove ENTITY from the tile at TARGET-POS."
-  (let [c-position (rj.e/get-c-on-e system entity :position)
-        this-type (:type c-position)]
+  (let [{:keys [type]} (rj.e/get-c-on-e system entity :position)]
     (rj.u/update-in-world system e-world target-pos
                           (fn [entities]
                             (vec
                               (remove
-                                #(#{this-type} (:type %))
+                                #(#{type} (:type %))
                                 entities))))))
 
-(defn update-position [system entity target-tile]
+(defn update-position
+  [system entity {:keys [x y z]}]
   "Update the position of ENTITY to the position of TARGET-TILE."
   (rj.e/upd-c system entity :position
-              (fn [c-position]
-                (-> c-position
-                    (assoc-in [:x] (:x target-tile))
-                    (assoc-in [:y] (:y target-tile))
-                    (assoc-in [:z] (:z target-tile))))))
+              #(merge % {:x x, :y y, :z z})))
 
-(defn move-entity [system e-world entity to-pos from-pos tile]
+(defn move-entity
+  [system e-world entity to-pos from-pos tile]
   "Move ENTITY from FROM-POS to TO-POS at TILE."
   (-> system
       (add-entity e-world entity to-pos)
       (remove-entity e-world entity from-pos)
       (update-position entity tile)))
 
-(defn port-entity [system e-world entity from-pos e-portal portal-pos p-type]
+(defn port-entity
+  [system e-world entity from-pos e-portal portal-pos p-type]
   "Teleport ENTITY from FROM-POS through PORTAL."
   (let [portal (rj.e/get-c-on-e system e-portal :portal)
         [z x y] (rj.p/portal-target-pos system portal)
@@ -73,14 +73,13 @@
 
 (defn move
   [_ e-this target-tile system]
-  (let [c-position (rj.e/get-c-on-e system e-this :position)
+  (let [{:keys [type] :as c-position} (rj.e/get-c-on-e system e-this :position)
         e-world (first (rj.e/all-e-with-c system :world))
-        this-pos [(:z c-position) (:x c-position) (:y c-position)]
-        target-pos [(:z target-tile) (:x target-tile) (:y target-tile)]
-        this-type (:type c-position)
+        this-pos (->3DPoint c-position)
+        target-pos (->3DPoint target-tile)
 
         portal (first (filter rj.p/is-portal? (:entities target-tile)))
         e-portal (:id portal)]
-    (if (and (= this-type :player) portal)
+    (if (and (= type :player) portal)
       (port-entity system e-world e-this this-pos e-portal target-pos (:type portal))
       (move-entity system e-world e-this target-pos this-pos target-tile))))

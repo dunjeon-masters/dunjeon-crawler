@@ -11,7 +11,8 @@
             [rouje-like.bat :as rj.bt]
             [rouje-like.cave :as rj.cave]
             [rouje-like.colossal-amoeba :as rj.ca]
-            [rouje-like.components :as rj.c]
+            [rouje-like.components :as rj.c
+             :refer [->3DPoint]]
             [rouje-like.config :as rj.cfg]
             [rouje-like.desert :as rj.desert]
             [rouje-like.destructible :as rj.d]
@@ -98,7 +99,7 @@
                 (let [c-position (rj.e/get-c-on-e system e-this :position)
                       e-world (first (rj.e/all-e-with-c system :world))]
                   (rj.u/update-in-world system e-world
-                                        [(:z c-position) (:x c-position) (:y c-position)]
+                                        (->3DPoint c-position)
                                         (fn [entities]
                                           (map
                                             #(if (#{e-this} (:id %))
@@ -114,12 +115,12 @@
                 (let [door (first door)
                       door-type (:type door)
                       e-door (:id door)
-                      target-tile tile]
+                      {:keys [x y]} tile]
                   (rj.e/system<<components
                     system e-door
                     [[:door {}]
-                     [:position {:x (:x tile)
-                                 :y (:y tile)
+                     [:position {:x x
+                                 :y y
                                  :z z
                                  :type :door}]
                      [:destructible {:hp 1

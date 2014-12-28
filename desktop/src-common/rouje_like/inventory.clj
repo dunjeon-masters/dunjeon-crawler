@@ -23,8 +23,7 @@
 (defn junk-value
   [system e-this]
   "Return the value of the junk E-THIS carries."
-  (let [c-inv (rj.e/get-c-on-e system e-this :inventory)
-        junk (:junk c-inv)]
+  (let [{:keys [junk]} (rj.e/get-c-on-e system e-this :inventory)]
     (reduce (fn [v i]
               (+ v (rj.eq/equipment-value i)))
             0 junk)))
@@ -34,7 +33,7 @@
   "Sell the junk E-THIS carries and add it to their wallet."
   (let [junk-value (junk-value system e-this)]
     (as-> system system
-      (update-junk system e-this (fn [junk] nil))
+      (update-junk system e-this (constantly nil))
       (update-gold system e-this junk-value))))
 
 (defn switch-slot-item
@@ -43,7 +42,8 @@
    there if ITEM is not passed."
   (rj.e/upd-c system e-this :inventory
               (fn [inv-comp]
-                (assoc-in inv-comp [:slot] item))))
+                (assoc-in inv-comp [:slot]
+                          item))))
 
 (defn pickup-slot-item
   [system e-this item]
@@ -59,19 +59,21 @@
 (defn equip-slot-item
   [system e-this]
   "Equip the item E-THIS is currently holding in their inventory slot."
-  (let [slot (:slot (rj.e/get-c-on-e system e-this :inventory))
+  (let [{:keys [slot]} (rj.e/get-c-on-e system e-this :inventory)
         item (or (:weapon slot) (:armor slot))
         c-equip (rj.e/get-c-on-e system e-this :equipment)]
     (if item
-      (do (as-> system system
-            (rj.eq/switch-equipment system e-this item)
-            (rj.e/upd-c system e-this :attacker
-                        (fn [c-attacker]
-                          (update-in c-attacker [:status-effects]
-                                     (fn [status-effects]
-                                       (map #(assoc % :apply-fn ((:type %) rj.stef/effect-type->apply-fn)) status-effects)))))
-            (if ((:type item) c-equip)
-              (add-junk system e-this item)
-              system)
-            (switch-slot-item system e-this)))
+      (as-> system system
+        (rj.eq/switch-equipment system e-this item)
+        (rj.e/upd-c system e-this :attacker
+                    (fn [c-attacker]
+                      (update-in c-attacker [:status-effects]
+                                 (fn [status-effects]
+                                   (map #(assoc % :apply-fn
+                                                ((:type %) rj.stef/effect-type->apply-fn))
+                                        status-effects)))))
+        (if ((:type item) c-equip)
+          (add-junk system e-this item)
+          system)
+        (switch-slot-item system e-this))
       system)))

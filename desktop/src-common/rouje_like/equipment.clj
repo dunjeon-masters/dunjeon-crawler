@@ -64,9 +64,9 @@
   (let [armor (:armor eq)
         wpn (:weapon eq)
         eq-stats (or (:stats armor) (:stats wpn) (:stats eq))]
-    (reduce (fn [a [stat val]] (+ a val))
-            0
-            eq-stats)))
+    (reduce (fn [a [stat val]]
+              (+ a val))
+            0 eq-stats)))
 
 (defn update-stat
   [system e-this stat amount]
@@ -75,12 +75,12 @@
     (rj.e/upd-c system e-this comp-to-update
                 (fn [c-comp]
                   (update-in c-comp [stat]
-                             (partial + amount))))))
+                             + amount)))))
 
 (defn update-stats
   [system e-this stats]
   "Loop over [stat val] pairs in STATS and update them on E-THIS."
-  (if (not (empty? stats))
+  (if (seq stats)
     (reduce (fn [system [stat amount]]
               (update-stat system e-this stat amount))
             system stats)

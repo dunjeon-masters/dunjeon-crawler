@@ -1,5 +1,7 @@
 (ns rouje-like.status-effects
-  (:require [rouje-like.entity-wrapper :as rj.e]
+  (:require [rouje-like.components
+             :refer [->3DPoint]]
+            [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.messaging :as rj.msg]
             [rouje-like.utils :as rj.u :refer [?]]))
 
@@ -18,22 +20,21 @@
       system)))
 
 (defn apply-burn
-  [system e-this status]
-  (let [e-from (:e-from status)
-        e-world (first (rj.e/all-e-with-c system :world))
+  [system e-this {:keys [e-from value]}]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
         c-position (rj.e/get-c-on-e system e-this :position)
-        hp (:hp (rj.e/get-c-on-e system e-this :destructible))
-        damage (:value status)]
-    (if (pos? (- hp damage))
+        hp (:hp (rj.e/get-c-on-e system e-this :destructible))]
+    (if (pos? (- hp value))
       (as-> system system
         (rj.e/upd-c system e-this :destructible
                     (fn [c-destructible]
-                      (update-in c-destructible [:hp] - damage)))
+                      (update-in c-destructible [:hp]
+                                 - value)))
 
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
           (rj.msg/add-msg system :static
                           (format "%s was dealt %s burn damage"
-                                  ((:name-fn c-broadcaster) system e-this) damage))
+                                  ((:name-fn c-broadcaster) system e-this) value))
           system))
 
       (as-> system system
@@ -46,7 +47,7 @@
           system)
 
         (rj.u/update-in-world system e-world
-                              [(:z c-position) (:x c-position) (:y c-position)]
+                              (->3DPoint c-position)
                               (fn [entities]
                                 (vec
                                   (remove
@@ -66,22 +67,21 @@
         (rj.e/kill-e system e-this)))))
 
 (defn apply-poison
-  [system e-this status]
-  (let [e-from (:e-from status)
-        e-world (first (rj.e/all-e-with-c system :world))
+  [system e-this {:keys [e-from value]}]
+  (let [e-world (first (rj.e/all-e-with-c system :world))
         c-position (rj.e/get-c-on-e system e-this :position)
-        hp (:hp (rj.e/get-c-on-e system e-this :destructible))
-        damage (:value status)]
-    (if (pos? (- hp damage))
+        hp (:hp (rj.e/get-c-on-e system e-this :destructible))]
+    (if (pos? (- hp value))
       (as-> system system
         (rj.e/upd-c system e-this :destructible
                     (fn [c-destructible]
-                      (update-in c-destructible [:hp] - damage)))
+                      (update-in c-destructible [:hp]
+                                 - value)))
 
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
           (rj.msg/add-msg system :static
                           (format "%s was dealt %s poison damage"
-                                  ((:name-fn c-broadcaster) system e-this) damage))
+                                  ((:name-fn c-broadcaster) system e-this) value))
           system))
 
       (as-> system system
@@ -94,7 +94,7 @@
           system)
 
         (rj.u/update-in-world system e-world
-                              [(:z c-position) (:x c-position) (:y c-position)]
+                              (->3DPoint c-position)
                               (fn [entities]
                                 (vec
                                   (remove
@@ -114,6 +114,6 @@
         (rj.e/kill-e system e-this)))))
 
 (def effect-type->apply-fn
-  {:fire apply-burn
-   :poison apply-poison
+  {:fire     apply-burn
+   :poison   apply-poison
    :paralyis apply-paralysis})

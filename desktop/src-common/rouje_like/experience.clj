@@ -7,12 +7,12 @@
             [rouje-like.messaging :as rj.msg]))
 
 (defn level->exp
-  "[int level] gets the minimum amount of experience needed to be LEVEL"
+  "level->exp gets the minimum amount of experience needed to be LEVEL"
   [level]
   (* level (:exp rj.cfg/level-exp)))
 
 (defn wrand
-  "[int vector slices] returns a random index chosen with the weights provided in SLICES"
+  "wrand returns a random index chosen with the weights provided in SLICES"
   [slices]
   (let [total (reduce + slices)
         r (rand total)]
@@ -25,16 +25,14 @@
   ([system e-this]
    (let [stat-to-level-up (get (conj (vec (keys rj.cfg/player-stats)) :all)
                                (wrand [3 3 3 3 1]))
-         c-experience (rj.e/get-c-on-e system e-this :experience)
-         c-magic (rj.e/get-c-on-e system e-this :magic)
-         c-class (rj.e/get-c-on-e system e-this :class)
-         player-class (:class c-class)
-         spells (:spells c-magic)
-         level (:level c-experience)]
+         {:keys [level]} (rj.e/get-c-on-e system e-this :experience)
+         {:keys [spells]} (rj.e/get-c-on-e system e-this :magic)
+         {player-class :class} (rj.e/get-c-on-e system e-this :class)]
 
      (as-> system system
        (if (zero? (mod level 5))
          (if (zero? (count spells))
+           ;;gain a spell
            (let [cfg-spell-player-class (rj.cfg/class->spell player-class)
                  spell (rand-nth cfg-spell-player-class)
                  cfg-spell-effect (spell rj.cfg/spell-effects)]
@@ -63,6 +61,7 @@
                                              spells)))))))
          system)
 
+       ;;level up stats of e-this
        (if (= stat-to-level-up :all)
          (-> system
              (level-up-stats e-this :max-hp)
@@ -75,17 +74,16 @@
    (let [comp-to-level-up (rj.cfg/stat->comp stat-to-level-up)]
      (rj.e/upd-c system e-this comp-to-level-up
                  (fn [c-comp]
-                   (update-in c-comp [stat-to-level-up] (partial + (rj.cfg/stat->pointinc stat-to-level-up))))))))
+                   (update-in c-comp [stat-to-level-up]
+                              + (rj.cfg/stat->pointinc stat-to-level-up)))))))
 
 (defn level-up
   [e-this system]
-  (let [c-this (rj.e/get-c-on-e system e-this :experience)
-        level (:level c-this)
-        experience (:experience c-this)]
+  (let [{:keys [level experience]} (rj.e/get-c-on-e system e-this :experience)]
 
     ;Does not handle if player should level up multiple times in one turn
-    ;If player needs 3 exp per level and gains 9 from killing a boss, it will
-    ;only level up once. Perhaps use a loop?
+    ;If player needs 3 exp per level and gains 9 from killing a boss,
+    ;it will only level up once. Perhaps use a loop?
     (if (> experience (level->exp level))
       (-> system
           (rj.e/upd-c e-this :experience

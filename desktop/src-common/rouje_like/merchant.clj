@@ -46,7 +46,7 @@
         levels (:levels c-world)
         merch-level (nth levels 0)
         merch-item-pos rj.cfg/merchant-item-pos]
-    (map (fn [{x :x y :y}]
+    (map (fn [{:keys [x y]}]
            (get-in merch-level [x y]))
          merch-item-pos)))
 
@@ -55,7 +55,8 @@
   (let [target-tile (merchant-tile system)
         e-world (first (rj.e/all-e-with-c system :world))
         e-merchant (br.e/create-entity)
-        system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+        system (rj.u/update-in-world system e-world
+                                     (rj.c/->3DPoint target-tile)
                                      (fn [entities]
                                        (vec
                                         (conj
@@ -82,16 +83,14 @@
 
 (defn remove-merch-items
   [system]
-  (reduce (fn [sys {x :x y :y}]
+  (reduce (fn [sys {:keys [x y]}]
             (rj.i/remove-item sys [0 x y] :purchasable))
-          system
-          rj.cfg/merchant-item-pos))
+          system rj.cfg/merchant-item-pos))
 
 (defn reset-merch-level
   [system [z x y]]
   (let [e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
+        {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
         level (nth levels z)
         target-tile (get-in level [x y])]
     (as-> system system

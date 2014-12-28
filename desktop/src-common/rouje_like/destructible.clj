@@ -1,6 +1,7 @@
 (ns rouje-like.destructible
   (:require [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.components :refer [can-attack? attack]]
+            [rouje-like.components :refer [can-attack? attack
+                                           ->3DPoint]]
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.messaging :as rj.msg]
             [clojure.set :refer [intersection difference]]))
@@ -148,7 +149,7 @@
 
         ;;remove it from the world
         (rj.u/update-in-world system e-world
-                              [(:z c-position) (:x c-position) (:y c-position)]
+                              (->3DPoint c-position)
                               (fn [entities]
                                 (vec
                                   (remove
