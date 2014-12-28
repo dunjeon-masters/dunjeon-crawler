@@ -34,8 +34,8 @@
   "Sell the junk E-THIS carries and add it to their wallet."
   (let [junk-value (junk-value system e-this)]
     (as-> system system
-          (update-junk system e-this (fn [junk] nil))
-          (update-gold system e-this junk-value))))
+      (update-junk system e-this (fn [junk] nil))
+      (update-gold system e-this junk-value))))
 
 (defn switch-slot-item
   [system e-this & [item]]
@@ -64,14 +64,14 @@
         c-equip (rj.e/get-c-on-e system e-this :equipment)]
     (if item
       (do (as-> system system
-              (rj.eq/switch-equipment system e-this item)
-              (rj.e/upd-c system e-this :attacker
-                          (fn [c-attacker]
-                            (update-in c-attacker [:status-effects]
-                                       (fn [status-effects]
-                                         (map #(assoc % :apply-fn ((:type %) rj.stef/effect-type->apply-fn)) status-effects)))))
-              (if ((:type item) c-equip)
-                  (add-junk system e-this item)
-                  system)
-              (switch-slot-item system e-this)))
+            (rj.eq/switch-equipment system e-this item)
+            (rj.e/upd-c system e-this :attacker
+                        (fn [c-attacker]
+                          (update-in c-attacker [:status-effects]
+                                     (fn [status-effects]
+                                       (map #(assoc % :apply-fn ((:type %) rj.stef/effect-type->apply-fn)) status-effects)))))
+            (if ((:type item) c-equip)
+              (add-junk system e-this item)
+              system)
+            (switch-slot-item system e-this)))
       system)))

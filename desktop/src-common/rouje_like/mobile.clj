@@ -21,12 +21,12 @@
   "Add ENTITY to the tile at TARGET-POS."
   (let [c-position (rj.e/get-c-on-e system entity :position)
         this-type (:type c-position)]
-  (rj.u/update-in-world system e-world target-pos
-                        (fn [entities]
-                          (vec
-                           (conj entities
-                                 (rj.c/map->Entity {:type this-type
-                                                    :id   entity})))))))
+    (rj.u/update-in-world system e-world target-pos
+                          (fn [entities]
+                            (vec
+                              (conj entities
+                                    (rj.c/map->Entity {:type this-type
+                                                       :id   entity})))))))
 
 (defn remove-entity [system e-world entity target-pos]
   "Remove ENTITY from the tile at TARGET-POS."
@@ -64,12 +64,12 @@
         target-tile (get-in level [x y])]
     (if (= p-type :m-portal)
       (as-> system system
-            (remove-entity system e-world e-portal portal-pos)
-            (move-entity system e-world entity [z x y] from-pos target-tile)
-            ((:merchant-level-fn c-world) system from-pos))
+        (remove-entity system e-world e-portal portal-pos)
+        (move-entity system e-world entity [z x y] from-pos target-tile)
+        ((:merchant-level-fn c-world) system from-pos))
       (as-> system system
-            (move-entity system e-world entity [z x y] from-pos target-tile)
-            ((:add-level-fn c-world) system (inc z))))))
+        (move-entity system e-world entity [z x y] from-pos target-tile)
+        ((:add-level-fn c-world) system (inc z))))))
 
 (defn move
   [_ e-this target-tile system]

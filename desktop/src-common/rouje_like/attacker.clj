@@ -19,4 +19,3 @@
 
         c-destr (rj.e/get-c-on-e system e-target :destructible)]
     (rj.c/take-damage c-destr e-target damage e-this system)))
-

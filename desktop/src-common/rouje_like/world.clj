@@ -365,18 +365,18 @@
 
      :hydra-arena (vec
                     (map vec
-                            (for [x (range width)]
-                              (for [y (range height)]
-                                (rj.c/map->Tile {:x x :y y :z z
-                                                 :entities [(rj.c/map->Entity {:id   nil
-                                                                               :type :dune})]})))))
+                         (for [x (range width)]
+                           (for [y (range height)]
+                             (rj.c/map->Tile {:x x :y y :z z
+                                              :entities [(rj.c/map->Entity {:id   nil
+                                                                            :type :dune})]})))))
      :amoeba-arena (vec
                      (map vec
-                             (for [x (range width)]
-                               (for [y (range height)]
-                                 (rj.c/map->Tile {:x x :y y :z z
-                                                  :entities [(rj.c/map->Entity {:id   nil
-                                                                                :type :dune})]}))))))))
+                          (for [x (range width)]
+                            (for [y (range height)]
+                              (rj.c/map->Tile {:x x :y y :z z
+                                               :entities [(rj.c/map->Entity {:id   nil
+                                                                             :type :dune})]}))))))))
 
 (declare add-level)
 (defn init-world
@@ -422,15 +422,15 @@
     (if (= player-z (dec n-levels))
       (let [{:keys [type level]} (generate-random-level rj.cfg/world-sizes z)]
         (as-> system system
-            (rj.e/upd-c system e-world :world
-                        (fn [c-world]
-                          (update-in c-world [:levels]
-                                     (fn [levels]
-                                       (conj levels
-                                             level)))))
-            (init-entities system z)
-            (init-themed-entities system z type)
-            (rj.merch/add-merch-portal system (dec z))
-            (:system (rj.p/add-portal {:system system
-                                       :z (dec z)}))))
+          (rj.e/upd-c system e-world :world
+                      (fn [c-world]
+                        (update-in c-world [:levels]
+                                   (fn [levels]
+                                     (conj levels
+                                           level)))))
+          (init-entities system z)
+          (init-themed-entities system z type)
+          (rj.merch/add-merch-portal system (dec z))
+          (:system (rj.p/add-portal {:system system
+                                     :z (dec z)}))))
       system)))

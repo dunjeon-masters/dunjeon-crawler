@@ -89,11 +89,10 @@
     (if (> experience (level->exp level))
       (-> system
           (rj.e/upd-c e-this :experience
-                  (fn [c-level]
-                    (update-in c-level [:level] inc)))
+                      (fn [c-level]
+                        (update-in c-level [:level] inc)))
           (rj.msg/add-msg :static
                           (format "You leveled up! You are now level %d"
                                   (inc level)))
           (level-up-stats e-this))
       system)))
-

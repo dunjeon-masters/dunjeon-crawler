@@ -132,14 +132,14 @@
         old-stats (:stats old-eq)
         new-stats (:stats new-eq)]
     (-> system
-          ;; iterate over old-stats and pass them to update-stat for removal
-          (update-stats e-this (update-values old-stats -))
-          (remove-effects e-this)
-          ;; switch equipment
-          (rj.e/upd-c e-this :equipment
-                      (fn [c-eq]
-                        (assoc-in c-eq [eq-type]
-                                  new-eq)))
-          ;; iterate over new-stats and pass them to update-stat
-          (update-stats e-this new-stats)
-          (add-effect e-this (:effect new-eq)))))
+        ;; iterate over old-stats and pass them to update-stat for removal
+        (update-stats e-this (update-values old-stats -))
+        (remove-effects e-this)
+        ;; switch equipment
+        (rj.e/upd-c e-this :equipment
+                    (fn [c-eq]
+                      (assoc-in c-eq [eq-type]
+                                new-eq)))
+        ;; iterate over new-stats and pass them to update-stat
+        (update-stats e-this new-stats)
+        (add-effect e-this (:effect new-eq)))))

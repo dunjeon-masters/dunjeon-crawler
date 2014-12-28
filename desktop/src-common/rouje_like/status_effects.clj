@@ -26,44 +26,44 @@
         damage (:value status)]
     (if (pos? (- hp damage))
       (as-> system system
-            (rj.e/upd-c system e-this :destructible
-                        (fn [c-destructible]
-                          (update-in c-destructible [:hp] - damage)))
+        (rj.e/upd-c system e-this :destructible
+                    (fn [c-destructible]
+                      (update-in c-destructible [:hp] - damage)))
 
-            (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-              (rj.msg/add-msg system :static
-                              (format "%s was dealt %s burn damage"
-                                      ((:name-fn c-broadcaster) system e-this) damage))
-              system))
+        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+          (rj.msg/add-msg system :static
+                          (format "%s was dealt %s burn damage"
+                                  ((:name-fn c-broadcaster) system e-this) damage))
+          system))
 
       (as-> system system
-            (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-              (rj.msg/add-msg system :static
-                              (format "%s burned %s to death"
-                                      (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                        ((:name-fn atker-c-broadcaster) system e-from))
-                                      ((:name-fn c-broadcaster) system e-this)))
-              system)
+        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+          (rj.msg/add-msg system :static
+                          (format "%s burned %s to death"
+                                  (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
+                                    ((:name-fn atker-c-broadcaster) system e-from))
+                                  ((:name-fn c-broadcaster) system e-this)))
+          system)
 
-            (rj.u/update-in-world system e-world
-                                  [(:z c-position) (:x c-position) (:y c-position)]
-                                  (fn [entities]
-                                    (vec
-                                      (remove
-                                        #(#{e-this} (:id %))
-                                        entities))))
+        (rj.u/update-in-world system e-world
+                              [(:z c-position) (:x c-position) (:y c-position)]
+                              (fn [entities]
+                                (vec
+                                  (remove
+                                    #(#{e-this} (:id %))
+                                    entities))))
 
-            (if-let [c-killable (rj.e/get-c-on-e system e-this :killable)]
-              (let [c-exp (rj.e/get-c-on-e system e-from :experience)
-                    level-up-fn (:level-up-fn c-exp)]
+        (if-let [c-killable (rj.e/get-c-on-e system e-this :killable)]
+          (let [c-exp (rj.e/get-c-on-e system e-from :experience)
+                level-up-fn (:level-up-fn c-exp)]
 
-                (->> (rj.e/upd-c system e-from :experience
-                                 (fn [c-experience]
-                                   (update-in c-experience [:experience]
-                                              #(+ % (:experience c-killable)))))
-                     (level-up-fn e-from)))
-              system)
-            (rj.e/kill-e system e-this)))))
+            (->> (rj.e/upd-c system e-from :experience
+                             (fn [c-experience]
+                               (update-in c-experience [:experience]
+                                          #(+ % (:experience c-killable)))))
+                 (level-up-fn e-from)))
+          system)
+        (rj.e/kill-e system e-this)))))
 
 (defn apply-poison
   [system e-this status]
@@ -113,7 +113,7 @@
           system)
         (rj.e/kill-e system e-this)))))
 
-(def effect-type->apply-fn {:fire apply-burn
-                            :poison apply-poison
-                            :paralyis apply-paralysis})
-
+(def effect-type->apply-fn
+  {:fire apply-burn
+   :poison apply-poison
+   :paralyis apply-paralysis})
