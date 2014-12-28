@@ -52,14 +52,20 @@
                        [[:fireball {}]
                         [:attacker {:status-effects [(assoc (:fireball rj.cfg/status-effects)
                                                             :e-from e-this
-                                                            :apply-fn rj.stef/apply-burn)]}]
+                                                            :apply-fn rj.stef/apply-burn)]
+                                    :atk nil
+                                    :attack-fn nil
+                                    :can-attack?-fn nil
+                                    :is-valid-target? nil}]
                         [:destructible {:hp             1000000
                                         :max-hp         1000000
                                         :status-effects []
                                         :def            10000
                                         :can-retaliate? false
+                                        :on-death-fn    nil
                                         :take-damage-fn rj.d/take-damage}]
-                        [:experience {:experience 0
+                        [:experience {:experience  0
+                                      :level       0
                                       :level-up-fn (fn [e-this system]
                                                      system)}]
                         [:broadcaster {:name-fn (constantly "the fireball")}]]))
