@@ -148,3 +148,39 @@
                                         (update-in c-attacker [:atk] + (- 0 damage-reduction)))))))
             (rj.msg/add-msg system :static (format "you use pickpocket %s, but there was no pocket to pick"
                                                    (name direction)))))))
+
+(defn cast-spell
+  [system direction]
+  (let [e-player (first (rj.e/all-e-with-c system :player))
+        {:keys [spells mp]} (rj.e/get-c-on-e system e-player :magic)
+        fireball (first (filter #(= (:name %) :fireball) spells))
+        powerattack (first (filter #(= (:name %) :powerattack) spells))
+        pickpocket (first (filter #(= (:name %) :pickpocket) spells))]
+    (cond
+      fireball
+      (if (not (neg? (- mp (:fireball rj.cfg/spell->mp-cost))))
+        (as-> system system
+          (use-fireball system e-player fireball direction)
+          (rj.d/apply-effects system e-player))
+        (as-> system system
+          (rj.msg/add-msg system :static "you do not have enough mp to cast fireball")))
+
+      powerattack
+      (if (not (neg? (- mp (:powerattack rj.cfg/spell->mp-cost))))
+        (as-> system system
+          (use-powerattack system e-player powerattack direction)
+          (rj.d/apply-effects system e-player))
+        (as-> system system
+          (rj.msg/add-msg system :static "you do not have enough mp to cast power attack")))
+
+      pickpocket
+      (if (not (neg? (- mp (:pickpocket rj.cfg/spell->mp-cost))))
+        (as-> system system
+          (use-pickpocket system e-player pickpocket direction)
+          (rj.d/apply-effects system e-player))
+        (as-> system system
+          (rj.msg/add-msg system :static "you do not have enough mp to cast pickpocket")))
+
+      :else
+      (as-> system system
+        (rj.msg/add-msg system :static "you do not have a spell to cast")))))

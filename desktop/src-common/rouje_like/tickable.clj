@@ -34,44 +34,46 @@
     :or {target-tile-fn get-target-tile
          target-e :player}}
    e-this system]
-  (let [c-energy (rj.e/get-c-on-e system e-this :energy)
-        {:keys [energy] :or {energy 1}} c-energy]
-    (loop [system system
-           energy energy]
-      (if (pos? energy)
-        (recur (let [e-target (first (rj.e/all-e-with-c system target-e))
-                     e-world (first (rj.e/all-e-with-c system :world))
+  (if-let [_ (rj.e/get-c-on-e system e-this :tickable)]
+    (let [c-energy (rj.e/get-c-on-e system e-this :energy)
+          {:keys [energy] :or {energy 1}} c-energy]
+      (loop [system system
+             energy energy]
+        (if (pos? energy)
+          (recur (let [e-target (first (rj.e/all-e-with-c system target-e))
+                       e-world (first (rj.e/all-e-with-c system :world))
 
-                     target-tile (target-tile-fn e-this e-target e-world system)
-                     e-target (:id (rj.u/tile->top-entity target-tile))]
-                 (if target-tile
-                   (as-> (let [c-mobile (rj.e/get-c-on-e system e-this :mobile)
-                               c-mobile (if c-mobile c-mobile
-                                          (rj.c/map->Mobile
-                                            {:can-move?-fn (constantly false)}))
-                               c-attacker (rj.e/get-c-on-e system e-this :attacker)
-                               c-attacker (if c-attacker c-attacker
-                                            (rj.c/map->Attacker
-                                              {:can-attack?-fn (constantly false)}))]
-                           (cond
-                             (can-move? c-mobile e-this target-tile system)
-                             (move c-mobile e-this target-tile system)
+                       target-tile (target-tile-fn e-this e-target e-world system)
+                       e-target (:id (rj.u/tile->top-entity target-tile))]
+                   (if target-tile
+                     (as-> (let [c-mobile (rj.e/get-c-on-e system e-this :mobile)
+                                 c-mobile (if c-mobile c-mobile
+                                            (rj.c/map->Mobile
+                                              {:can-move?-fn (constantly false)}))
+                                 c-attacker (rj.e/get-c-on-e system e-this :attacker)
+                                 c-attacker (if c-attacker c-attacker
+                                              (rj.c/map->Attacker
+                                                {:can-attack?-fn (constantly false)}))]
+                             (cond
+                               (can-move? c-mobile e-this target-tile system)
+                               (move c-mobile e-this target-tile system)
 
-                             (can-attack? c-attacker e-this e-target system)
-                             (attack c-attacker e-this e-target system)
+                               (can-attack? c-attacker e-this e-target system)
+                               (attack c-attacker e-this e-target system)
 
-                             :else system)) system
-                     (if-let [c-destructible (rj.e/get-c-on-e system e-this :destructible)]
-                       (rj.d/apply-effects system e-this)
-                       system)
-                     (if (and extra-tick-fn
-                              (rj.e/get-c-on-e system e-this :tickable))
-                       (extra-tick-fn e-this e-target e-world system)
-                       system)
-                     (if-let [c-energy (rj.e/get-c-on-e system e-this :energy)]
-                       (rj.e/upd-c system e-this :energy
-                                 #(update-in % [:energy] dec))
-                       system))
-                   system))
-               (dec energy))
-        system))))
+                               :else system)) system
+                       (if-let [c-destructible (rj.e/get-c-on-e system e-this :destructible)]
+                         (rj.d/apply-effects system e-this)
+                         system)
+                       (if (and extra-tick-fn
+                                (rj.e/get-c-on-e system e-this :tickable))
+                         (extra-tick-fn e-this e-target e-world system)
+                         system)
+                       (if-let [c-energy (rj.e/get-c-on-e system e-this :energy)]
+                         (rj.e/upd-c system e-this :energy
+                                     #(update-in % [:energy] dec))
+                         system))
+                     system))
+                 (dec energy))
+          system)))
+    system))
