@@ -36,8 +36,7 @@
                       "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
         x#))))
 
-(def cli (atom ""))
-(def cli? (atom false))
+(def cmdl-buffer (atom ""))
 
 (def >?get-pri
   {s/Keyword s/Num})

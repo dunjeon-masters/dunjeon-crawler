@@ -27,7 +27,7 @@
   []
   (reset! input-manager {}))
 
-(defn assoc-in-input-manager!
+(defn set-input-manager!
   [mode]
   (swap! input-manager
          assoc mode true))
@@ -61,7 +61,6 @@
                                             default-energy %)))))
               system energetic-entities))))
 
-;Temporary, will eventually be used to execute cmdl actions
 (defn cmds->action
   [system cmds]
   (let [cmd->action {"race" (fn [system r]
@@ -85,30 +84,30 @@
         arg (second cmd&arg)]
     (action system arg)))
 
-(def keycode->cli-action
+(def keycode->cmdl-action
   (let
-    [k->cli-fn (fn [k] (fn [system] (swap! rj.u/cli str (name k)) system))
+    [k->cmdl-fn (fn [k] (fn [system] (swap! rj.u/cmdl-buffer str (name k)) system))
      key-codes (range 29 55) ;[a-z]
      alphabet [:a :b :c :d :e :f :g :h :i :j :k :l :m
                :n :o :p :q :r :s :t :u :v :w :x :y :z]]
     (merge {(play/key-code :escape)    (fn [system]
-                                         (reset! rj.u/cli? false)
-                                         (reset! rj.u/cli "")
+                                         (reset-input-manager!)
+                                         (reset! rj.u/cmdl-buffer "")
                                          system)
             (play/key-code :backspace) (fn [system]
-                                         (swap! rj.u/cli #(apply str (drop-last 1 %)))
+                                         (swap! rj.u/cmdl-buffer #(apply str (drop-last 1 %)))
                                          system)
             (play/key-code :enter)     (fn [system]
-                                         (let [cli @rj.u/cli]
-                                           (reset! rj.u/cli? false)
-                                           (reset! rj.u/cli "")
-                                           (cmds->action system cli)))
-            (play/key-code :space)     (fn [system] (swap! rj.u/cli str " ") system)}
-           (zipmap key-codes (map k->cli-fn alphabet)))))
+                                         (let [cmds @rj.u/cmdl-buffer]
+                                           (reset-input-manager!)
+                                           (reset! rj.u/cmdl-buffer "")
+                                           (cmds->action system cmds)))
+            (play/key-code :space)     (fn [system] (swap! rj.u/cmdl-buffer str " ") system)}
+           (zipmap key-codes (map k->cmdl-fn alphabet)))))
 
 (def keycode->action
   {(play/key-code :semicolon)     (fn [system]
-                                    (reset! rj.u/cli? true)
+                                    (set-input-manager! :cmdl-mode)
                                     system)
    (play/key-code :F)             (fn [system]
                                     (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
@@ -121,14 +120,14 @@
                                       (rj.inv/equip-slot-item system e-player)))
    (play/key-code :num-1)         (fn [system]
                                     (reset-input-manager!)
-                                    (assoc-in-input-manager! :spell-mode)
+                                    (set-input-manager! :spell-mode)
                                     system)
 
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
    (play/key-code :I)             (fn [system]
                                     (reset-input-manager!)
-                                    (assoc-in-input-manager! :inspect-mode)
+                                    (set-input-manager! :inspect-mode)
                                     system)
    (play/key-code :H)             (fn [system]
                                     (-> (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player)))
@@ -175,47 +174,46 @@
 
 (defn process-keyboard-input
   [system keycode]
-  (if @rj.u/cli?
-    (let [cli-action (keycode->cli-action keycode)]
-      (if (not (nil? cli-action))
-        (cli-action system)
-        system))
+  (cond
+    (:cmdl-mode @input-manager)
+    (if-let [cmdl-action (keycode->cmdl-action keycode)]
+      (cmdl-action system)
+      system)
+
+    (keycode->action keycode)
     (let [action (keycode->action keycode)]
-      (if (not (nil? action))
-        (action system)
+      (action system))
+
+    :else
+    (if-let [direction (keycode->direction keycode)]
+      (cond
+        (:spell-mode @input-manager)
+        (as-> system system
+          (do (reset-input-manager!) system)
+          (rj.mag/cast-spell system direction)
+          (tick-entities system))
+
+        (:inspect-mode @input-manager)
+        (as-> system system
+          (do (reset-input-manager!) system)
+          (inspect system direction)
+          (tick-entities system))
+
+        :else
         (let [e-this (first (rj.e/all-e-with-c system :player))
-              {:keys [energy]} (rj.e/get-c-on-e system e-this :energy)
-              direction (keycode->direction keycode)]
-          (if (not (nil? direction))
-            (cond
-              ;; are we casting a spell
-              (:spell-mode @input-manager)
-              (as-> system system
-                (do (reset-input-manager!) system)
-                (rj.mag/cast-spell system direction)
-                (tick-entities system))
-
-              ;; are we inspecting something
-              (:inspect-mode @input-manager)
-              (as-> system system
-                (do (reset-input-manager!) system)
-                (inspect system direction)
-                (tick-entities system))
-
-              ;; we must be moving
-              :else
-              (as-> system system
-                (if (pos? energy)
-                  (rj.pl/process-input-tick system direction)
-                  (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-                    (rj.msg/add-msg system :static
-                                    (format "%s was paralyzed, and couldn't move this turn"
-                                            ((:name-fn c-broadcaster) system e-this)))
-                    system))
-                (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
-                  (tick-entities system)
-                  system)))
-            system))))))
+              {:keys [energy]} (rj.e/get-c-on-e system e-this :energy)]
+          (as-> system system
+            (if (pos? energy)
+              (rj.pl/process-input-tick system direction)
+              (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+                (rj.msg/add-msg system :static
+                                (format "%s was paralyzed, and couldn't move this turn"
+                                        ((:name-fn c-broadcaster) system e-this)))
+                system))
+            (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
+              (tick-entities system)
+              system))))
+      system)))
 
 (defn process-fling-input
   [system x-vel y-vel]

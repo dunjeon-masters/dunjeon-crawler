@@ -121,7 +121,7 @@
                         " - Class: [" class "]"
                         "\nExperience: [" experience "]"
                         " - Level: [" level "]"
-                        " - cli: " @rj.u/cli
+                        " - cli: " @rj.u/cmdl-buffer
                         " - Status: " status-effects
                         "\nEnergy: [" energy "]"
                         " - Junk: [" junk "]"
