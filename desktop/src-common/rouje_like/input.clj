@@ -154,6 +154,28 @@
    (play/key-code :dpad-right) :right
    (play/key-code :L)          :right})
 
+(defn inspect
+  [system direction]
+  (let [e-player (first (rj.e/all-e-with-c system :player))
+        e-world (first (rj.e/all-e-with-c system :world))
+        c-world (rj.e/get-c-on-e system e-world :world)
+        levels (:levels c-world)
+        c-pos (rj.e/get-c-on-e system e-player :position)
+        player-pos [(:x c-pos) (:y c-pos)]
+
+        level (nth levels (:z c-pos))
+        target-pos (rj.u/coords+offset player-pos (rj.u/direction->offset direction))
+        target-entities (rj.u/entities-at-pos level target-pos)
+
+        inspectable (first (filter rj.u/inspectable? target-entities))]
+    (if inspectable
+      (let [c-inspectable (rj.e/get-c-on-e system (:id inspectable) :inspectable)
+            msg (:msg c-inspectable)]
+        (as-> system system
+          (rj.msg/add-msg system :static msg)))
+      (as-> system system
+        (rj.msg/add-msg system :static "there is nothing to inspect there")))))
+
 (defn process-keyboard-input
   [system keycode]
   (if @rj.u/cli?
@@ -178,28 +200,10 @@
 
               ;; are we inspecting something
               (:inspect-mode @input-manager)
-              (let [e-player (first (rj.e/all-e-with-c system :player))
-                    e-world (first (rj.e/all-e-with-c system :world))
-                    c-world (rj.e/get-c-on-e system e-world :world)
-                    levels (:levels c-world)
-                    c-pos (rj.e/get-c-on-e system e-player :position)
-                    player-pos [(:x c-pos) (:y c-pos)]
-
-                    level (nth levels (:z c-pos))
-                    target-pos (rj.u/coords+offset player-pos (rj.u/direction->offset direction))
-                    target-entities (rj.u/entities-at-pos level target-pos)
-
-                    inspectable (first (filter rj.u/inspectable? target-entities))]
+              (as-> system system
                 (reset-input-manager!)
-                (if inspectable
-                  (let [c-inspectable (rj.e/get-c-on-e system (:id inspectable) :inspectable)
-                        msg (:msg c-inspectable)]
-                    (as-> system system
-                      (rj.msg/add-msg system :static msg)
-                      (tick-entities system)))
-                  (as-> system system
-                    (rj.msg/add-msg system :static "there is nothing to inspect there")
-                    (tick-entities system))))
+                (inspect system direction)
+                (tick-entities system))
 
               ;; we must be moving
               :else
