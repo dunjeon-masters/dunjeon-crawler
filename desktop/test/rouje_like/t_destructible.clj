@@ -5,8 +5,62 @@
   (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.core :as rj.core]
             [rouje-like.snake :as rj.snk]
-            [rouje-like.utils :refer [?]]
+            [rouje-like.utils
+             :refer [?]]
+
             [brute.entity :as br.e]))
+
+
+(fact "merge-by-with?"
+      (merge-by-with [{:t 1, :v 33}
+                      {:t 1, :v 20} {:t 2, :v 99}]
+                     [{:t 1, :v 35} {:t 3, :v 100}]
+                     :t (pick-by-with
+                          :v >))
+      => (just {:t 3 :v 100}
+               {:t 1 :v 35}
+               {:t 2 :v 99})
+
+      (merge-by-with [{:t "x"} {:t "ab"}]
+                     [{:t "y"} {:t "abc"}]
+                     (comp count :t)
+                     (pick-by-with
+                       :t (fn [a b]
+                            (= "x" a))))
+      => (just {:t "abc"}
+               {:t "x"}
+               {:t "ab"}))
+
+(fact "pick-by-with"
+      ((pick-by-with
+         :t #(> %1 %2))
+       {:t 9} {:t 5})
+      => {:t 9}
+      ((pick-by-with
+         (comp count :t) >)
+       {:t "foo"} {:t "bar"})
+      => {:t "bar"})
+
+(fact "pick-by-with-"
+      ((pick-by-with-
+         :t max)
+       {:t 5} {:t 9})
+      => {:t 9}
+
+      ((pick-by-with-
+         (comp count :t) max)
+       {:t "foo"} {:t "foobar"})
+      => {:t "foobar"}
+
+      ((pick-by-with-
+         :t (constantly 42))
+       {:t 3} {:t 3})
+      => nil
+
+      ((pick-by-with-
+        :t (constantly 42) :dflt)
+       {:t 3} {:t 3})
+      => :dflt)
 
 (facts "add-effects & apply-effects"
        (let [system (as-> (start) system

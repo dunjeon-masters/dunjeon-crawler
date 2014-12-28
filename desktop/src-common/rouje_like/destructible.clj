@@ -7,47 +7,67 @@
             [rouje-like.messaging :as rj.msg]
             [clojure.set :refer [intersection difference]]))
 
+(defn merge-by-with
+  "Merge COLL1 and COLL2 using BY to process each element
+   and WITH to choose between two conflicting elements.
+   See t_destructible.clj for examples."
+  [coll1 coll2 by with]
+  (reduce (fn [acc a]
+            (if-let [b (seq (filter #(= (by a)
+                                        (by %))
+                                    acc))]
+              (conj (remove (set b) acc)
+                    (reduce #(with %1 %2)
+                            a b))
+              (conj acc a)))
+          coll1 coll2))
+
+(defn pick-by-with
+  "Pick between I and J using WITH
+   to compare between (BY I) and (BY J).
+   Note: to pick I, WITH has to return true
+         otherwise it picks J.
+   See t_destructible.clj for examples."
+  [by with]
+  (fn [x y]
+    (if (with
+          (by x)
+          (by y))
+      x y)))
+
+(defn pick-by-with-
+  "Same as pick-by-with, except WITH must
+   return the BY'ed element it prefers,
+   or it will throw an exception,
+   or return a default value.
+   See t_destructible.clj for examples."
+  ([by with]
+   (pick-by-with- by with nil))
+  ([by with dflt]
+   (fn [x y]
+     (let [by-x (by x)
+           by-y (by y)
+           r (with by-x by-y)]
+       (cond
+         (= r by-x) x
+
+         (= r by-y) y
+
+         :else dflt)))))
+
 (defn add-effects
   [system e-this e-from]
   "Adds/merges applicable status effects from e-from to e-this."
   (let [c-attacker (rj.e/get-c-on-e system e-from :attacker)
         attacker-effects (:status-effects c-attacker)
-        {:keys [status-effects]} (rj.e/get-c-on-e system e-this :destructible)
-        status-intersection (fn [a b]
-                              (let [b- (apply hash-set
-                                                 (map :type b))]
-                                (filter #(b- (:type %))
-                                        a)))
-        status-difference (fn [a b]
-                            (let [b- (apply hash-set
-                                               (map :type b))]
-                              (filter #(not
-                                         (b- (:type %)))
-                                      a)))
         status->value (fn [{:keys [value duration]}]
                         (* value duration))]
-    (as-> system system
-      ;; Add/keep the better status effect
-      (if-let [intersection (seq (status-intersection attacker-effects status-effects))]
-        (reduce (fn [system status]
-                  (rj.stef/update-in-status-effects
-                    system e-this
-                    #(vec
-                       (map (fn [my-status]
-                              (if (not= (:type my-status) (:type status))
-                                my-status
-                                (if (< (status->value my-status)
-                                       (status->value status))
-                                  status
-                                  my-status)))
-                            %))))
-                system intersection)
-        system)
-      ;; Add status effects that e-this does not have
-      (if-let [diff (seq (status-difference attacker-effects status-effects))]
-        (rj.stef/update-in-status-effects
-          system e-this #(vec (concat % diff)))
-        system))))
+    (rj.stef/update-in-status-effects
+      system e-this (fn [status-effects]
+                      (merge-by-with
+                        attacker-effects status-effects
+                        :type (pick-by-with
+                                status->value >))))))
 
 (defn apply-effects
   [system e-this]
