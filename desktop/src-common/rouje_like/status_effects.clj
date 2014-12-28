@@ -5,6 +5,14 @@
             [rouje-like.messaging :as rj.msg]
             [rouje-like.utils :as rj.u :refer [?]]))
 
+(defn update-in-status-effects
+  [system e-this -fn-]
+  (rj.e/upd-c system e-this :destructible
+              (fn [c-destructible]
+                (update-in c-destructible [:status-effects]
+                           (fn [status-effects]
+                             (-fn- status-effects))))))
+
 (defn apply-paralysis
   [system e-this status]
   (as-> system system

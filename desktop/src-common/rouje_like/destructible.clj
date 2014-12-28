@@ -3,6 +3,7 @@
             [rouje-like.components :refer [can-attack? attack
                                            ->3DPoint]]
             [rouje-like.utils :as rj.u :refer [?]]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.messaging :as rj.msg]
             [clojure.set :refer [intersection difference]]))
 
@@ -12,44 +13,40 @@
   (let [c-attacker (rj.e/get-c-on-e system e-from :attacker)
         attacker-effects (:status-effects c-attacker)
         {:keys [status-effects]} (rj.e/get-c-on-e system e-this :destructible)
-        status-intersection (fn [my-status-effects incoming-status-effects]
-                              (filter #((apply hash-set
-                                               (map :type incoming-status-effects))
-                                        (:type %))
-                                      my-status-effects))
-        status-difference (fn [my-status-effects incoming-status-effects]
-                            (filter #(not ((apply hash-set
-                                                  (map :type incoming-status-effects))
-                                           (:type %)))
-                                    my-status-effects))
+        status-intersection (fn [a b]
+                              (let [b- (apply hash-set
+                                                 (map :type b))]
+                                (filter #(b- (:type %))
+                                        a)))
+        status-difference (fn [a b]
+                            (let [b- (apply hash-set
+                                               (map :type b))]
+                              (filter #(not
+                                         (b- (:type %)))
+                                      a)))
         status->value (fn [{:keys [value duration]}]
                         (* value duration))]
     (as-> system system
       ;; Add/keep the better status effect
-      (if-let [intersection (seq (vec (status-intersection attacker-effects status-effects)))]
+      (if-let [intersection (seq (status-intersection attacker-effects status-effects))]
         (reduce (fn [system status]
-                  (rj.e/upd-c system e-this :destructible
-                              (fn [c-destructible]
-                                (update-in c-destructible [:status-effects]
-                                           (fn [status-effects]
-                                             (vec (map (fn [my-status]
-                                                         (if (not= (:type my-status) (:type status))
-                                                           my-status
-                                                           (if (< (status->value my-status)
-                                                                  (status->value status))
-                                                             status
-                                                             my-status)))
-                                                       status-effects)))))))
+                  (rj.stef/update-in-status-effects
+                    system e-this
+                    #(vec
+                       (map (fn [my-status]
+                              (if (not= (:type my-status) (:type status))
+                                my-status
+                                (if (< (status->value my-status)
+                                       (status->value status))
+                                  status
+                                  my-status)))
+                            %))))
                 system intersection)
         system)
       ;; Add status effects that e-this does not have
-      (if-let [diff (seq (vec (status-difference attacker-effects status-effects)))]
-        (rj.e/upd-c system e-this :destructible
-                    (fn [c-destructible]
-                      (update-in c-destructible [:status-effects]
-                                 (fn [status-effects]
-                                   (vec (concat status-effects
-                                                diff))))))
+      (if-let [diff (seq (status-difference attacker-effects status-effects))]
+        (rj.stef/update-in-status-effects
+          system e-this #(vec (concat % diff)))
         system))))
 
 (defn apply-effects

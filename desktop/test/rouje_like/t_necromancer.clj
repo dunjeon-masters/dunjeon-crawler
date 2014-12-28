@@ -6,7 +6,8 @@
             [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :refer :all]
-            [rouje-like.components :as rj.c :refer [->3DPoint]]
+            [rouje-like.components :as rj.c
+             :refer [->3DPoint]]
             [rouje-like.world :as rj.w]))
 
 (let [system (start)]
