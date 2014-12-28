@@ -169,7 +169,8 @@
   [XY   :- >?2DVec
    DXDY :- >?2DVec]
   (let [[x  y]  XY
-        [dx dy] DXDY] [(+ x dx) (+ y dy)]))
+        [dx dy] DXDY]
+    [(+ x dx) (+ y dy)]))
 
 (s/defn ^:always-validate
   get-neighbors-coords
@@ -270,7 +271,9 @@
   rand-rng
   [start :- s/Num
    end   :- s/Num]
-  (+ (rand-int (- (inc end) start)) start))
+  (+ (rand-int (- (inc end)
+                  start))
+     start))
 
 (s/defn ^:always-validate
   update-in-world
@@ -315,9 +318,9 @@
    value  :- s/Num]
   "Update the amount of gold on E-THIS by VALUE."
   (rj.e/upd-c system e-this :wallet
-                          (fn [c-wallet]
-                            (update-in c-wallet [:gold]
-                                       (partial + value)))))
+              (fn [c-wallet]
+                (update-in c-wallet [:gold]
+                           (partial + value)))))
 
 (s/defn ^:always-validate
   inspectable?

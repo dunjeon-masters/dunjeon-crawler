@@ -160,21 +160,18 @@
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        c-pos (rj.e/get-c-on-e system e-player :position)
-        player-pos [(:x c-pos) (:y c-pos)]
+        {:keys [x y z]} (rj.e/get-c-on-e system e-player :position)
+        player-pos [x y]
 
-        level (nth levels (:z c-pos))
+        level (nth levels z)
         target-pos (rj.u/coords+offset player-pos (rj.u/direction->offset direction))
-        target-entities (rj.u/entities-at-pos level target-pos)
+        target-tile (get-in level target-pos)
 
-        inspectable (first (filter rj.u/inspectable? target-entities))]
-    (if inspectable
-      (let [c-inspectable (rj.e/get-c-on-e system (:id inspectable) :inspectable)
-            msg (:msg c-inspectable)]
-        (as-> system system
-          (rj.msg/add-msg system :static msg)))
-      (as-> system system
-        (rj.msg/add-msg system :static "there is nothing to inspect there")))))
+        {target-id :id} (rj.u/tile->top-entity target-tile)]
+    (let [{:keys [msg]
+           :or {msg "found nothing to inspect"}}
+          (rj.e/get-c-on-e system target-id :inspectable)]
+        (rj.msg/add-msg system :static msg))))
 
 (defn process-keyboard-input
   [system keycode]
@@ -201,7 +198,7 @@
               ;; are we inspecting something
               (:inspect-mode @input-manager)
               (as-> system system
-                (reset-input-manager!)
+                (do (reset-input-manager!) system)
                 (inspect system direction)
                 (tick-entities system))
 
