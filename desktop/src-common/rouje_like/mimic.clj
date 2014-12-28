@@ -11,6 +11,26 @@
             [rouje-like.attacker :as rj.atk]
             [rouje-like.config :as rj.cfg]))
 
+(defn- mimic:take-damage
+  [c-this e-this damage e-from system]
+  (as-> (rj.d/take-damage c-this e-this damage e-from system) system
+    (if (rj.e/get-c-on-e system e-this :mimic)
+      (as-> system system
+        (rj.e/upd-c system e-this :position
+                    (fn [c-position]
+                      (assoc c-position :type :mimic)))
+        (let [c-position (rj.e/get-c-on-e system e-this :position)]
+          (rj.u/update-in-world system e-world
+                                [(:z c-position) (:x c-position) (:y c-position)]
+                                (fn [entities]
+                                  (vec
+                                    (conj (remove
+                                            #(#{e-this} (:id %))
+                                            entities)
+                                          (rj.c/map->Entity {:id e-this
+                                                             :type :mimic})))))))
+      system)))
+
 (defn add-mimic
   ([{:keys [system z]}]
    (let [e-world (first (rj.e/all-e-with-c system :world))
@@ -56,23 +76,7 @@
                                  :can-retaliate? false
                                  :status-effects []
                                  :on-death-fn nil
-                                 :take-damage-fn (fn [c-this e-this damage e-from system]
-                                                   (as-> (rj.d/take-damage c-this e-this damage e-from system) system
-                                                       (if (rj.e/get-c-on-e system e-this :mimic)
-                                                         (as-> (rj.e/upd-c system e-this :position
-                                                                     (fn [c-position]
-                                                                       (assoc c-position :type :mimic))) system
-                                                               (let [_ (println "updating mimic")
-                                                                     c-position (rj.e/get-c-on-e system e-this :position)]
-                                                                 (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
-                                                                                       (fn [entities]
-                                                                                         (vec
-                                                                                           (conj (remove
-                                                                                                   #(#{e-this} (:id %))
-                                                                                                   entities)
-                                                                                                 (rj.c/map->Entity {:id e-this
-                                                                                                                    :type :mimic})))))))
-                                                         system)))}]
+                                 :take-damage-fn mimic:take-damage}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :mimic))}]
                  [:tickable {:tick-fn rj.t/process-input-tick
                              :pri 0}]
