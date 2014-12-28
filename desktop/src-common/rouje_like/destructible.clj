@@ -76,13 +76,12 @@
 (defn take-damage
   [c-this e-this damage e-from system]
   (let [{:keys [hp def]} c-this
-        damage (if (pos? (- damage def))
-                 (rj.u/rand-rng 1 (- damage def))
-                 (if (zero? damage)
-                   0 1))
+
+        damage (if (zero? damage)
+                 0
+                 (max 1 (rj.u/rand-rng 1 (- damage def))))
 
         c-position (rj.e/get-c-on-e system e-this :position)
-
         e-world (first (rj.e/all-e-with-c system :world))]
     (if (pos? (- hp damage))
       ;;e-this is still alive
@@ -90,7 +89,9 @@
         ;;update its hp, ie: take the damage
         (rj.e/upd-c system e-this :destructible
                     (fn [c-destructible]
-                      (update-in c-destructible [:hp] - damage)))
+                      (update-in c-destructible [:hp]
+                                 - damage)))
+
         ;;recieve any status-effects from e-from
         (add-effects system e-this e-from)
 

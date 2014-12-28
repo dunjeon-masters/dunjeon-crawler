@@ -105,11 +105,13 @@
             (as-> system system
               (rj.e/upd-c system e-this :attacker
                           (fn [c-attacker]
-                            (update-in c-attacker [:atk] + damage)))
+                            (update-in c-attacker [:atk]
+                                       + damage)))
               (rj.c/take-damage c-destructible e-target (:atk (rj.e/get-c-on-e system e-this :attacker)) e-this system)
               (rj.e/upd-c system e-this :attacker
                           (fn [c-attacker]
-                            (update-in c-attacker [:atk] + (- 0 damage)))))))
+                            (update-in c-attacker [:atk]
+                                       + (- 0 damage)))))))
         (rj.msg/add-msg system :static (format "you use power attack %s, but it didn't hit anything"
                                                (name direction)))))))
 
