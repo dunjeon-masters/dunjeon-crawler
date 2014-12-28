@@ -25,12 +25,12 @@
 
 (defn reset-input-manager
   []
-  (swap! input-manager
-         (reduce-kv (fn [m k v] (assoc m k nil)) {} @input-manager)))
+  (reset! input-manager {}))
 
 (defn set-input-state
   [mode]
-  (swap! input-manager assoc mode true))
+  (swap! input-manager
+         assoc mode true))
 
 (defn tick-entities
   [system]
