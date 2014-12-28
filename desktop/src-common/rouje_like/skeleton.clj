@@ -52,8 +52,7 @@
                              :z    (:z target-tile)
                              :type :skeleton}]
                  [:mobile {:can-move?-fn (fn [c-mobile e-this t-tile system]
-                                           (and (< (rand-int 100) 80)
-                                                (rj.m/can-move? c-mobile e-this t-tile system)))
+                                           (rj.m/can-move? c-mobile e-this t-tile system))
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
                  [:attacker {:atk              (:atk (rj.cfg/entity->stats :skeleton))

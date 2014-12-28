@@ -123,4 +123,3 @@
       (rj.e/upd-c system e-this :arrow-trap
                   (fn [c-arrow-trap]
                     (assoc c-arrow-trap :ready? false))))))
-

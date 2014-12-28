@@ -7,49 +7,49 @@
 
 (defn add-effects
   [system e-this e-from]
-  "Adds applicable status effects from e-from to e-this."
-  (let  [c-attacker (rj.e/get-c-on-e system e-from :attacker)
-         attacker-effects (:status-effects c-attacker)
-         c-destructible (rj.e/get-c-on-e system e-this :destructible)
-         status (:status-effects c-destructible)
-         status-intersection (fn [my-status-effects incoming-status-effects]
-                               (filter #((apply hash-set (map (partial :type) incoming-status-effects))
-                                         (:type %))
-                                       my-status-effects))
-         status-difference (fn [my-status-effects incoming-status-effects]
-                             (filter #(not ((apply hash-set (map (partial :type) incoming-status-effects))
-                                            (:type %)))
-                                     my-status-effects))
-         status->value (fn [status]
-                         (* (:value status)
-                            (:duration status)))]
-    (as->
+  "Adds/merges applicable status effects from e-from to e-this."
+  (let [c-attacker (rj.e/get-c-on-e system e-from :attacker)
+        attacker-effects (:status-effects c-attacker)
+        {:keys [status-effects]} (rj.e/get-c-on-e system e-this :destructible)
+        status-intersection (fn [my-status-effects incoming-status-effects]
+                              (filter #((apply hash-set
+                                               (map :type incoming-status-effects))
+                                        (:type %))
+                                      my-status-effects))
+        status-difference (fn [my-status-effects incoming-status-effects]
+                            (filter #(not ((apply hash-set
+                                                  (map :type incoming-status-effects))
+                                           (:type %)))
+                                    my-status-effects))
+        status->value (fn [{:keys [value duration]}]
+                        (* value duration))]
+    (as-> system system
       ;; Add/keep the better status effect
-      (if-let [intersection (seq (vec (status-intersection attacker-effects status)))]
-            (reduce (fn [system status]
-                      (rj.e/upd-c system e-this :destructible
-                                  (fn [c-destructible]
-                                    (update-in c-destructible [:status-effects]
-                                               (fn [status-effects]
-                                                 (vec (map (fn [my-status]
-                                                             (if (not= (:type my-status) (:type status))
-                                                               my-status
-                                                               (if (< (status->value my-status)
-                                                                      (status->value status))
-                                                                 status
-                                                                 my-status)))
-                                                           status-effects)))))))
-                    system intersection)
-            system) system
-          ;; Add status effects that e-this does not have
-          (if-let [diff (seq (vec (status-difference attacker-effects status)))]
-            (rj.e/upd-c system e-this :destructible
-                        (fn [c-destructible]
-                          (update-in c-destructible [:status-effects]
-                                     (fn [status-effects]
-                                       (vec (concat status-effects
-                                                    diff))))))
-            system))))
+      (if-let [intersection (seq (vec (status-intersection attacker-effects status-effects)))]
+        (reduce (fn [system status]
+                  (rj.e/upd-c system e-this :destructible
+                              (fn [c-destructible]
+                                (update-in c-destructible [:status-effects]
+                                           (fn [status-effects]
+                                             (vec (map (fn [my-status]
+                                                         (if (not= (:type my-status) (:type status))
+                                                           my-status
+                                                           (if (< (status->value my-status)
+                                                                  (status->value status))
+                                                             status
+                                                             my-status)))
+                                                       status-effects)))))))
+                system intersection)
+        system)
+      ;; Add status effects that e-this does not have
+      (if-let [diff (seq (vec (status-difference attacker-effects status-effects)))]
+        (rj.e/upd-c system e-this :destructible
+                    (fn [c-destructible]
+                      (update-in c-destructible [:status-effects]
+                                 (fn [status-effects]
+                                   (vec (concat status-effects
+                                                diff))))))
+        system))))
 
 (defn apply-effects
   [system e-this]
