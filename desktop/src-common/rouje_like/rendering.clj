@@ -12,7 +12,8 @@
 
             [clojure.math.numeric-tower :as math]
 
-            [rouje-like.components :refer [render]]
+            [rouje-like.components
+             :refer [render ->2DPoint ->3DPoint]]
 
             [rouje-like.utils :as rj.u :refer [?]]
             [rouje-like.equipment :as rj.eq]
@@ -82,11 +83,13 @@
         y (:y c-position)
         z (:z c-position)
 
-        c-destructible (rj.e/get-c-on-e system e-this :destructible)
-        hp (:hp c-destructible)
-        def (:def c-destructible)
-        status-effects (:status-effects c-destructible)
-        max-hp (:max-hp c-destructible)
+        {:keys [hp max-hp def status-effects]} (rj.e/get-c-on-e system e-this :destructible)
+        status-effects (into []
+                             (map (fn [{:keys [type value duration]}]
+                                    {:type type
+                                     :value value
+                                     :duration duration})
+                                  status-effects))
 
         c-inv (rj.e/get-c-on-e system e-this :inventory)
         junk (count (:junk c-inv))
@@ -110,33 +113,38 @@
 
         renderer (new SpriteBatch)]
     (.begin renderer)
-    (label! (label (str "Name: " player-name
-                        " - Gold: [" gold "]"
-                        " - Position: [" x "," y "," z "]"
-                        " - HP: [" hp  "/" max-hp "]"
-                        " - MP: [" mp "/" max-mp "]"
-                        " - Attack: [" attack "]"
-                        " - Defense: [" def "]"
-                        " - Race: [" race "]"
-                        " - Class: [" class "]"
-                        "\nExperience: [" experience "]"
-                        " - Level: [" level "]"
-                        " - cli: " @rj.u/cmdl-buffer
-                        " - Status: " status-effects
-                        "\nEnergy: [" energy "]"
-                        " - Junk: [" junk "]"
-                        " - Slot: [" slot "]"
-                        " - Armor: [" armor "]"
-                        " - Weapon: [" weapon "]"
-                        " - HP-Potions: [" hp-potions "]"
-                        " - MP-Potions: [" mp-potions "]")
+    (label! (label (str "{"
+                        "Name: " player-name ", "
+                        "Gold: " gold ", "
+                        "Position: [" x "," y "," z "], "
+                        "HP: " hp  "/" max-hp ", "
+                        "MP: " mp "/" max-mp
+                        "}\n{"
+                        "Attack: " attack ", "
+                        "Defense: " def ", "
+                        "Race: " race ", "
+                        "Class: " class
+                        "}\n{"
+                        "Experience: " experience ", "
+                        "Level: " level ", "
+                        "cli: " @rj.u/cmdl-buffer
+                        "}\n{"
+                        "Status: " status-effects
+                        "}\n{"
+                        "Energy: " energy ", "
+                        "Junk: " junk ", "
+                        "Slot: " slot ", "
+                        "Armor: " armor ", "
+                        "Weapon: " weapon ", "
+                        "HP-Potions: " hp-potions ", "
+                        "MP-Potions: " mp-potions
+                        "}")
 
                    (color :green)
                    :set-y (float (* (+ vheight
                                        (- (+ (:top rj.cfg/padding-sizes)
                                              (:btm rj.cfg/padding-sizes))
-                                          2))
-
+                                          3))
                                     (rj.cfg/block-size))))
             :draw renderer 1.0)
     (.end renderer)))
@@ -330,9 +338,9 @@
   [_ e-this {:keys [view-port-sizes]} system]
   (let [e-player (first (rj.e/all-e-with-c system :player))
 
-        c-player-pos (rj.e/get-c-on-e system e-player :position)
-        player-pos [(:x c-player-pos)
-                    (:y c-player-pos)]
+        {:keys [x y]
+         :as c-player-pos} (rj.e/get-c-on-e system e-player :position)
+        player-pos (->2DPoint c-player-pos)
         fog-of-war? (:fog-of-war? (rj.e/get-c-on-e system e-player :player))
 
         c-sight (rj.e/get-c-on-e system e-player :playersight)
@@ -344,10 +352,8 @@
 
         [vp-size-x vp-size-y] view-port-sizes
 
-        start-x (max 0 (- (:x c-player-pos)
-                          (int (/ vp-size-x 2))))
-        start-y (max 0 (- (:y c-player-pos)
-                          (int (/ vp-size-y 2))))
+        start-x (max 0 (- x (int (/ vp-size-x 2))))
+        start-y (max 0 (- y (int (/ vp-size-y 2))))
 
         end-x (+ start-x vp-size-x)
         end-x (min end-x (count world))
@@ -376,7 +382,7 @@
                                             (let [hp (:hp c-destr)
                                                   max-hp (:max-hp c-destr)]
                                               (max 75 (* (/ hp max-hp) alpha)))
-                                           alpha)))]
+                                            alpha)))]
             (.setColor renderer
                        (Color. (float (/ (:r color-values) 255))
                                (float (/ (:g color-values) 255))
