@@ -15,7 +15,7 @@
              e-player (first (rj.e/all-e-with-c system :player))
              e-snake (first (rj.e/all-e-with-c system :snake))
              system (add-effects system e-player e-snake)]
-         (fact "add-effects: clean slate"
+         (fact "add-effects: clean slate, get poison"
                e-snake  => truthy
                e-player => truthy
                (first
@@ -23,12 +23,13 @@
                          (:status-effects
                            (rj.e/get-c-on-e system e-player :destructible))))
                => (contains {:type :poison}))
-         (fact "add-effects: had poison, should upgrade"
+         (fact "add-effects: had poison, should upg poison"
                (let [system (rj.e/upd-c system e-snake :attacker
                                         (fn [c-attacker]
                                           (update-in c-attacker [:status-effects]
-                                                     (fn [status-effects]
-                                                       [(update-in (first status-effects) [:value] + 3)]))))
+                                                     (fn [se]
+                                                       [(update-in (first se) [:value]
+                                                                   + 3)]))))
                      system (add-effects system e-player e-snake)]
                  (first
                    (filter #(#{:poison} (:type %))
@@ -36,6 +37,28 @@
                              (rj.e/get-c-on-e system e-player :destructible))))
                  => (contains {:type :poison
                                :value 5})))
+         (fact "add-effects: had burn, should get poison & upg burn"
+               (let [system (rj.e/upd-c system e-snake :attacker
+                                        (fn [c-attacker]
+                                          (update-in c-attacker [:status-effects]
+                                                     #(conj % {:type :burn
+                                                               :value 3
+                                                               :duration 2}))))
+                     system (rj.e/upd-c system e-player :destructible
+                                        (fn [c-destructible]
+                                          (assoc c-destructible :status-effects
+                                                 [{:type :burn
+                                                   :value 2
+                                                   :duration 1}])))
+                     system (add-effects system e-player e-snake)]
+                 (:status-effects (rj.e/get-c-on-e system e-player :destructible)))
+               => (fn [status-effects]
+                    (let [{burn-v :value
+                           burn-d :duration} (first (filter #(#{:burn} (:type %)) status-effects))
+                          {pois-v :value
+                           pois-d :duration} (first (filter #(#{:poison} (:type %)) status-effects))]
+                      (and (= [burn-v burn-d] [3 2])
+                           (= [pois-v pois-d] [2 4])))))
          (let [system (apply-effects system e-player)
                {:keys [hp max-hp]} (rj.e/get-c-on-e
                                      system e-player :destructible)]
