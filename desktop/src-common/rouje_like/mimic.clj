@@ -19,7 +19,8 @@
         (rj.e/upd-c system e-this :position
                     (fn [c-position]
                       (assoc c-position :type :mimic)))
-        (let [c-position (rj.e/get-c-on-e system e-this :position)]
+        (let [c-position (rj.e/get-c-on-e system e-this :position)
+              e-world (first (rj.e/all-e-with-c system :world))]
           (rj.u/update-in-world system e-world
                                 [(:z c-position) (:x c-position) (:y c-position)]
                                 (fn [entities]
@@ -48,7 +49,8 @@
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-mimic (br.e/create-entity)
-         system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+         system (rj.u/update-in-world system e-world
+                                      [(:z target-tile) (:x target-tile) (:y target-tile)]
                                       (fn [entities]
                                         (vec
                                           (conj
@@ -62,12 +64,22 @@
                              :y    (:y target-tile)
                              :z    (:z target-tile)
                              :type :hidden-mimic}]
-                 [:mobile {:can-move?-fn rj.m/can-move?
+                 [:mobile {:can-move?-fn (fn [c e t s]
+                                           (let [{type :type}
+                                                 (rj.e/get-c-on-e s e :position)]
+                                             (if (#{:mimic} type)
+                                               (rj.m/can-move? c e t s)
+                                               false)))
                            :move-fn      rj.m/move}]
                  [:sight {:distance 4}]
                  [:attacker {:atk              (:atk (rj.cfg/entity->stats :mimic))
                              :status-effects []
-                             :can-attack?-fn   rj.atk/can-attack?
+                             :can-attack?-fn   (fn [c e t s]
+                                                 (let [{type :type}
+                                                       (rj.e/get-c-on-e s e :position)]
+                                                   (if (#{:mimic} type)
+                                                     (rj.atk/can-attack? c e t s)
+                                                     false)))
                              :attack-fn        rj.atk/attack
                              :is-valid-target? (partial #{:player})}]
                  [:destructible {:hp         (:hp  (rj.cfg/entity->stats :mimic))
