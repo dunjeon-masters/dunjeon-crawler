@@ -107,7 +107,7 @@
 
 (def keycode->action
   {(play/key-code :semicolon)     (fn [system]
-                                    (set-input-manager! :cmdl-mode)
+                                    (set-input-manager! :cmdl-mode?)
                                     system)
    (play/key-code :F)             (fn [system]
                                     (rj.e/upd-c system (first (rj.e/all-e-with-c system :player))
@@ -120,14 +120,14 @@
                                       (rj.inv/equip-slot-item system e-player)))
    (play/key-code :num-1)         (fn [system]
                                     (reset-input-manager!)
-                                    (set-input-manager! :spell-mode)
+                                    (set-input-manager! :spell-mode?)
                                     system)
 
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
    (play/key-code :I)             (fn [system]
                                     (reset-input-manager!)
-                                    (set-input-manager! :inspect-mode)
+                                    (set-input-manager! :inspect-mode?)
                                     system)
    (play/key-code :H)             (fn [system]
                                     (-> (rj.item/use-hp-potion system (first (rj.e/all-e-with-c system :player)))
@@ -174,46 +174,43 @@
 
 (defn process-keyboard-input
   [system keycode]
-  (cond
-    (:cmdl-mode @input-manager)
-    (if-let [cmdl-action (keycode->cmdl-action keycode)]
-      (cmdl-action system)
-      system)
+  (let [direction (keycode->direction keycode)]
+    (cond
+      (:cmdl-mode? @input-manager)
+      (if-let [cmdl-action (keycode->cmdl-action keycode)]
+        (cmdl-action system)
+        system)
 
-    (keycode->action keycode)
-    (let [action (keycode->action keycode)]
-      (action system))
+      (keycode->action keycode)
+      (let [action (keycode->action keycode)]
+        (action system))
 
-    :else
-    (if-let [direction (keycode->direction keycode)]
-      (cond
-        (:spell-mode @input-manager)
+      (:spell-mode? @input-manager)
+      (as-> system system
+        (do (reset-input-manager!) system)
+        (rj.mag/cast-spell system direction)
+        (tick-entities system))
+
+      (:inspect-mode? @input-manager)
+      (as-> system system
+        (do (reset-input-manager!) system)
+        (inspect system direction)
+        (tick-entities system))
+
+      :else
+      (let [e-this (first (rj.e/all-e-with-c system :player))
+            {:keys [energy]} (rj.e/get-c-on-e system e-this :energy)]
         (as-> system system
-          (do (reset-input-manager!) system)
-          (rj.mag/cast-spell system direction)
-          (tick-entities system))
-
-        (:inspect-mode @input-manager)
-        (as-> system system
-          (do (reset-input-manager!) system)
-          (inspect system direction)
-          (tick-entities system))
-
-        :else
-        (let [e-this (first (rj.e/all-e-with-c system :player))
-              {:keys [energy]} (rj.e/get-c-on-e system e-this :energy)]
-          (as-> system system
-            (if (pos? energy)
-              (rj.pl/process-input-tick system direction)
-              (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-                (rj.msg/add-msg system :static
-                                (format "%s was paralyzed, and couldn't move this turn"
-                                        ((:name-fn c-broadcaster) system e-this)))
-                system))
-            (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
-              (tick-entities system)
-              system))))
-      system)))
+          (if (pos? energy)
+            (rj.pl/process-input-tick system direction)
+            (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+              (rj.msg/add-msg system :static
+                              (format "%s was paralyzed, and couldn't move this turn"
+                                      ((:name-fn c-broadcaster) system e-this)))
+              system))
+          (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
+            (tick-entities system)
+            system))))))
 
 (defn process-fling-input
   [system x-vel y-vel]
