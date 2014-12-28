@@ -174,16 +174,16 @@
 
 (defn process-keyboard-input
   [system keycode]
-  (let [direction (keycode->direction keycode)]
+  (let [direction (keycode->direction keycode)
+        action (keycode->action keycode)]
     (cond
       (:cmdl-mode? @input-manager)
       (if-let [cmdl-action (keycode->cmdl-action keycode)]
         (cmdl-action system)
         system)
 
-      (keycode->action keycode)
-      (let [action (keycode->action keycode)]
-        (action system))
+      action
+      (action system)
 
       (:spell-mode? @input-manager)
       (as-> system system
