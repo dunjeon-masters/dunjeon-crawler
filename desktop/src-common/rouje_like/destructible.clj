@@ -74,9 +74,7 @@
 
 (defn take-damage
   [c-this e-this damage e-from system]
-  (let [hp (:hp c-this)
-
-        def (:def (rj.e/get-c-on-e system e-this :destructible))
+  (let [{:keys [hp def]} c-this
         damage (if (pos? (- damage def))
                  (rj.u/rand-rng 1 (- damage def))
                  (if (zero? damage)
@@ -86,12 +84,16 @@
 
         e-world (first (rj.e/all-e-with-c system :world))]
     (if (pos? (- hp damage))
+      ;;e-this is still alive
       (as-> system system
+        ;;update its hp, ie: take the damage
         (rj.e/upd-c system e-this :destructible
                     (fn [c-destructible]
                       (update-in c-destructible [:hp] - damage)))
+        ;;recieve any status-effects from e-from
         (add-effects system e-this e-from)
 
+        ;;if it can retaliate & attack, strike back!
         (if-let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
           (if (and (:can-retaliate? c-this)
                    (can-attack? c-attacker e-this e-from system))
@@ -99,6 +101,7 @@
             system)
           system)
 
+        ;;notify of damage taken
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
           (rj.msg/add-msg system :static
                           (format "%s dealt %s damage to %s"
@@ -107,15 +110,9 @@
                                   damage ((:name-fn c-broadcaster) system e-this)))
           system))
 
+      ;;e-this has died
       (as-> system system
-        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-          (rj.msg/add-msg system :static
-                          (format "%s killed %s"
-                                  (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
-                                    ((:name-fn atker-c-broadcaster) system e-from))
-                                  ((:name-fn c-broadcaster) system e-this)))
-          system)
-
+        ;;if it can retaliate, strike back!
         (if-let [c-attacker (rj.e/get-c-on-e system e-this :attacker)]
           (if (and (:can-retaliate? c-this)
                    (can-attack? c-attacker e-this e-from system))
@@ -123,17 +120,12 @@
             system)
           system)
 
-        (rj.u/update-in-world system e-world [(:z c-position) (:x c-position) (:y c-position)]
-                              (fn [entities]
-                                (vec
-                                  (remove
-                                    #(#{e-this} (:id %))
-                                    entities))))
-
+        ;;call the on-death-fn, eg: amoeba splitting
         (if-let [on-death (:on-death-fn c-this)]
           (on-death c-this e-this system)
           system)
 
+        ;;give the attacker exp & maybe lvl it up
         (if-let [c-killable (rj.e/get-c-on-e system e-this :killable)]
           (let [c-exp (rj.e/get-c-on-e system e-from :experience)
                 level-up-fn (:level-up-fn c-exp)]
@@ -144,4 +136,24 @@
                                           #(+ % (:experience c-killable)))))
                  (level-up-fn e-from)))
           system)
+
+        ;;notify of death/kill
+        (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+          (rj.msg/add-msg system :static
+                          (format "%s killed %s"
+                                  (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
+                                    ((:name-fn atker-c-broadcaster) system e-from))
+                                  ((:name-fn c-broadcaster) system e-this)))
+          system)
+
+        ;;remove it from the world
+        (rj.u/update-in-world system e-world
+                              [(:z c-position) (:x c-position) (:y c-position)]
+                              (fn [entities]
+                                (vec
+                                  (remove
+                                    #(#{e-this} (:id %))
+                                    entities))))
+
+        ;;finally remove e-this from system
         (rj.e/kill-e system e-this)))))
