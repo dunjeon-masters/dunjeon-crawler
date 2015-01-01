@@ -15,5 +15,3 @@
               (:system (add-lichen {:system system :z 1}))
               (nil? (rj.e/get-c-on-e system (first (rj.e/all-e-with-c system :lichen)) :position)))
         => false))
-
-

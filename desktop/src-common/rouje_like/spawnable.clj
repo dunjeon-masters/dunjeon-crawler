@@ -33,3 +33,19 @@
             (remove #(#{:wall} (:type %)) entities)
             (rj.c/map->Entity {:id   entity
                                :type type-e})))))))
+
+(defmacro defentity
+  [name arglist components]
+  (let [e-name (symbol (str "e-" name))
+        fn-name (symbol (str "add-" name))]
+    `(defn ~fn-name
+       ~arglist
+       (let [~'tile (rouje-like.spawnable/get-tile ~'system ~'z)
+             ~'entity (rouje-like.spawnable/new-entity)
+             ~'type-e ~(keyword name)]
+         (->>
+           (rj.e/system<<components
+             ~'system ~'entity
+             ~components)
+           (rouje-like.spawnable/put-in-world ~'type-e ~'tile ~'entity ~'z)
+           (assoc {} :z ~'z :system))))))
