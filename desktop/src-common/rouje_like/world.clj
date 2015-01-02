@@ -211,11 +211,11 @@
               (:system system)
               (do (? "core::add-snake " (not (nil? system))) system)
               ;;Spawn Necromancer
-              (nth (iterate rj.ne/add-necro {:system system :z z})
+              (nth (iterate rj.ne/add-necromancer {:system system :z z})
                    (* (max 0
                            (min 0.05
-                                (/ (+ (:necro rj.cfg/mob->init-spawn%)
-                                      (* 0.2 (- z (:necro rj.cfg/mob->init-floor))))
+                                (/ (+ (:necromancer rj.cfg/mob->init-spawn%)
+                                      (* 0.2 (- z (:necromancer rj.cfg/mob->init-floor))))
                                    100)))
                       (apply * (vals rj.cfg/world-sizes))))
               (:system system)

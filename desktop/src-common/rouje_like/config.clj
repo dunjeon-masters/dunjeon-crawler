@@ -231,7 +231,7 @@
                      :def 3
                      :atk 4
                      :exp 5}
-   :necro           {:hp 6
+   :necromancer     {:hp 6
                      :def 3
                      :atk 4
                      :exp 5}
@@ -292,7 +292,7 @@
    :colossal-amoeba 1
    :bat             1
    :lichen          1
-   :necro           0.4;0.1
+   :necromancer     0.4;0.1
    :drake           0.4;0.01
    :slime           0.4;0.1
    :spider          0.4;0.5
@@ -308,7 +308,7 @@
   {:skeleton      1;2
    :willow-wisp   1;3
    :giant-amoeba  1;5
-   :necro         1;6
+   :necromancer   1;6
    :drake         1;8
    :slime         1;3
    :spider        1
