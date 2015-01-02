@@ -10,7 +10,6 @@
             [rouje-like.config :as rj.cfg]))
 
 (defentity snake
-  [{:keys [system z]}]
   [[:snake {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

@@ -36,7 +36,6 @@
       system)))
 
 (defentity mimic
-  [{:keys [system z]}]
   [[:mimic {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

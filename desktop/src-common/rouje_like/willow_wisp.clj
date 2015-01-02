@@ -9,7 +9,6 @@
             [rouje-like.status-effects :as rj.stef]))
 
 (defentity willow-wisp
-  [{:keys [system z]}]
   [[:willow-wisp {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

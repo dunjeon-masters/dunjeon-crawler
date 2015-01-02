@@ -9,7 +9,6 @@
             [rouje-like.status-effects :as rj.stef]))
 
 (defentity slime
-  [{:keys [system z]}]
   [[:slime {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

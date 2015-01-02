@@ -5,7 +5,6 @@
 (fact :spawnable
       "defentity expands to correct code"
       (defentity skeleton
-        [{:keys [system z]}]
         [[:skeleton {}]])
       =expands-to=>
       (clojure.core/defn add-skeleton

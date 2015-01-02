@@ -9,7 +9,6 @@
             [rouje-like.status-effects :as rj.stef]))
 
 (defentity drake
-  [{:keys [system z]}]
   [[:drake {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

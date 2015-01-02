@@ -10,7 +10,6 @@
 #_(use 'rouje-like.skeleton :reload)
 
 (defentity skeleton
-  [{:keys [system z]}]
   [[:skeleton     {}]
    [:position     {:x    (:x tile)
                    :y    (:y tile)

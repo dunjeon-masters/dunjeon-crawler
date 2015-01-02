@@ -35,12 +35,12 @@
                                :type type-e})))))))
 
 (defmacro defentity
-  [name arglist components]
+  [name components]
   (let [fn-name (symbol (str "add-" name))]
     `(defn ~fn-name
-       (~arglist
-         (let [~'tile (rouje-like.spawnable/get-tile ~'system ~'z)]
-           (~fn-name ~'system ~'tile)))
+       ([{:keys [~'system ~'z]}]
+        (let [~'tile (rouje-like.spawnable/get-tile ~'system ~'z)]
+          (~fn-name ~'system ~'tile)))
        ([~'system ~'tile]
         (let [~'e-this  (rouje-like.spawnable/new-entity)
               ~'type-e ~(keyword name)

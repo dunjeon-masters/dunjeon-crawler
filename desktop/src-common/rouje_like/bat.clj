@@ -7,7 +7,6 @@
             [rouje-like.config :as rj.cfg]))
 
 (defentity bat
-  [{:keys [system z]}]
   [[:bat {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

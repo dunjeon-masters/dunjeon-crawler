@@ -8,7 +8,6 @@
             [rouje-like.config :as rj.cfg]))
 
 (defentity large-amoeba
-  [{:keys [system z]}]
   [[:large-amoeba {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

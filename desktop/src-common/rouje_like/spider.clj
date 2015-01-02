@@ -9,7 +9,6 @@
             [rouje-like.status-effects :as rj.stef]))
 
 (defentity spider
-  [{:keys [system z]}]
   [[:spider {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

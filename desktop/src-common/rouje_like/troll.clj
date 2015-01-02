@@ -21,7 +21,6 @@
                                  hp)))))))
 
 (defentity troll
-  [{:keys [system z]}]
   [[:troll {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

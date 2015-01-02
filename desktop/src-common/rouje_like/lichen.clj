@@ -13,7 +13,6 @@
 (declare process-input-tick)
 
 (defentity lichen
-  [{:keys [system z]}]
   [[:lichen {:grow-chance% 4
              :max-blob-size 8}]
    [:position {:x (:x tile)

@@ -9,7 +9,6 @@
              :refer [defentity]]))
 
 (defentity necromancer
-  [{:keys [system z]}]
   [[:necromancer {}]
    [:position {:x    (:x tile)
                :y    (:y tile)

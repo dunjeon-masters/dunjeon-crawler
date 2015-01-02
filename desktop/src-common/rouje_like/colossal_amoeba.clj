@@ -49,7 +49,6 @@
               (recur (rest ring-tiles) amoebas spawn-tiles))))))
 
 (defentity colossal-amoeba
-  [{:keys [system z]}]
   [[:colossal-amoeba {}]
    [:position {:x    (:x tile)
                :y    (:y tile)
