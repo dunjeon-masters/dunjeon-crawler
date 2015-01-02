@@ -303,8 +303,9 @@
 
 (defprotocol ITickable
   (tick [this e-this system]))
-(s/defrecord ^:always-validate
+(s/defrecord
   Tickable [tick-fn :- Fn
+            extra-tick-fn :- (s/maybe Fn)
             pri     :- s/Num]
   ITickable
   (tick     [this e-this system]

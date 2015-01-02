@@ -64,6 +64,7 @@
                                  :status-effects []}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :hydra-head))}]
                  [:tickable {:tick-fn rj.t/process-input-tick
+                             :extra-tick-fn nil
                              :pri 1}]
                  [:broadcaster {:name-fn (constantly "the hydra's head'")}]])
       :z (:z target-tile)})))

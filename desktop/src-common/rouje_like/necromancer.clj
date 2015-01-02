@@ -1,21 +1,14 @@
 (ns rouje-like.necromancer
-  (:require [brute.entity :as br.e]
-
-            [rouje-like.entity-wrapper :as rj.e]
-            [rouje-like.utils :as rj.u :refer [?]]
-            [rouje-like.components :as rj.c :refer [can-move? move
-                                                    can-attack? attack]]
-            [rouje-like.mobile :as rj.m]
+  (:require [rouje-like.mobile :as rj.m]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.config :as rj.cfg]
             [rouje-like.tickable :as rj.t]
+            [rouje-like.status-effects :as rj.stef]
             [rouje-like.spawnable
-             :refer [defentity]]
-            [rouje-like.status-effects :as rj.stef]))
+             :refer [defentity]]))
 
 (defentity necromancer
-  [{:keys [system z]}]
   [[:necromancer {}]
    [:position {:x    (:x tile)
                :y    (:y tile)
@@ -42,5 +35,6 @@
                    :take-damage-fn rj.d/take-damage}]
    [:killable {:experience (:exp (rj.cfg/entity->stats :necromancer))}]
    [:tickable {:tick-fn rj.t/process-input-tick
+               :extra-tick-fn nil
                :pri 0}]
    [:broadcaster {:name-fn (constantly "the necromancer")}]])

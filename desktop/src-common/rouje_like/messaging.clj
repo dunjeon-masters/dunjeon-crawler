@@ -51,6 +51,7 @@
             [[:relay {:static []
                       :blocking []}]
              [:tickable {:tick-fn process-input-tick
+                         :extra-tick-fn nil
                          :pri -1}]
              [:renderable {:render-fn rj.r/render-messages
                            :args {}}]]) system
@@ -58,6 +59,7 @@
         system e-counter
         [[:counter {:turn 1}]
          [:tickable {:pri -2
+                     :extra-tick-fn nil
                      :tick-fn (fn [_ e-this system]
                                 (rj.e/upd-c system e-this :counter
                                             (fn [c-counter]

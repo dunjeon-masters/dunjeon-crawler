@@ -70,6 +70,7 @@
                  [:energy {:energy 2
                            :default-energy 2}]
                  [:tickable {:tick-fn process-input-tick
+                             :extra-tick-fn nil
                              :pri -2}]
                  [:broadcaster {:name-fn (constantly "the hydra's tail")}]])
       :z (:z target-tile)})))
