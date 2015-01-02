@@ -205,7 +205,7 @@
                                  :width 12 :height 12
                                  :color {:r 255 :g 0 :b 0 :a 255}
                                  :tile-sheet grim-tile-sheet}
-     :hidden-mimic              {:x 1 :y 9
+     :mimic                     {:x 1 :y 9
                                  :width 12 :height 12
                                  :color {:r 128 :g 255 :b 1 :a 255}
                                  :tile-sheet grim-tile-sheet}
@@ -253,7 +253,7 @@
                                  :width 12 :height 12
                                  :color {:r 0 :g 0 :b 255 :a 255}
                                  :tile-sheet grim-tile-sheet}
-     :mimic                     {:x 15 :y 8
+     :visible-mimic             {:x 15 :y 8
                                  :width 12 :height 12
                                  :color {:r 255 :g 241 :b 36 :a 255}
                                  :tile-sheet grim-tile-sheet}
