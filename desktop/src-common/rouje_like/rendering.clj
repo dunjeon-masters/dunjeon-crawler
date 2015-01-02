@@ -133,9 +133,9 @@
                         "}\n{"
                         "Energy: " energy ", "
                         "Junk: " junk ", "
-                        "Slot: " slot ", "
-                        "Armor: " armor ", "
-                        "Weapon: " weapon ", "
+                        "Slot: [" slot "], "
+                        "Armor: [" armor "], "
+                        "Weapon: [" weapon "], "
                         "HP-Potions: " hp-potions ", "
                         "MP-Potions: " mp-potions
                         "}")
