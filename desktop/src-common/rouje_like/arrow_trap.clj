@@ -62,6 +62,7 @@
                       :status-effects   []
                       :is-valid-target? (partial #{:player})}]
           [:tickable {:tick-fn process-input-tick
+                      :extra-tick-fn nil
                       :pri 0}]
           [:broadcaster {:name-fn (constantly (str "the "
                                                    (name :arrow-trap)))}]]))))

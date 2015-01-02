@@ -1,74 +1,45 @@
 (ns rouje-like.lichen
   (:import [clojure.lang Atom])
-  (:require [brute.entity :as br.e]
-            [clojure.pprint :refer [pprint]]
-
-            [rouje-like.components :as rj.c]
-            [rouje-like.entity-wrapper :as rj.e]
+  (:require [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u]
             [rouje-like.status-effects :as rj.stef]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
+            [rouje-like.spawnable
+             :refer [defentity]]
             [rouje-like.status-effects :as rj.stef]
             [rouje-like.config :as rj.cfg]))
 
 (declare process-input-tick)
 
-(defn add-lichen
-  ([{:keys [system z]}]
-   (let [e-world (first (rj.e/all-e-with-c system :world))
-         c-world (rj.e/get-c-on-e system e-world :world)
-         levels (:levels c-world)
-         world (nth levels z)
-
-         get-rand-tile (fn [world]
-                         (get-in world [(rand-int (count world))
-                                        (rand-int (count (first world)))]))]
-     (loop [target-tile (get-rand-tile world)]
-       (if (rj.cfg/<floors> (:type (rj.u/tile->top-entity target-tile)))
-         (add-lichen system target-tile)
-         (recur (get-rand-tile world))))))
-
-  ([system target-tile]
-   (let [e-world (first (rj.e/all-e-with-c system :world))
-         e-lichen (br.e/create-entity)
-         hp (:hp (rj.cfg/entity->stats :lichen))
-
-         system (rj.u/update-in-world system e-world
-                                      [(:z target-tile) (:x target-tile) (:y target-tile)]
-                                      (fn [entities]
-                                        (vec (conj (remove #(#{:wall} (:type %)) entities)
-                                                   (rj.c/map->Entity {:id   e-lichen
-                                                                      :type :lichen})))))]
-
-     {:system (rj.e/system<<components
-                system e-lichen
-                [[:lichen {:grow-chance% 4
-                           :max-blob-size 8}]
-                 [:position {:x (:x target-tile)
-                             :y (:y target-tile)
-                             :z (:z target-tile)
-                             :type :lichen}]
-                 [:destructible {:hp  hp
-                                 :max-hp hp
-                                 :def (:def (rj.cfg/entity->stats :lichen))
-                                 :can-retaliate? true
-                                 :on-death-fn nil
-                                 :status-effects nil
-                                 :take-damage-fn rj.d/take-damage}]
-                 [:attacker {:atk (:atk (rj.cfg/entity->stats :lichen))
-                             :can-attack?-fn   rj.atk/can-attack?
-                             :attack-fn        rj.atk/attack
-                             :status-effects [{:type :poison
-                                               :duration 2
-                                               :value 1
-                                               :e-from e-lichen
-                                               :apply-fn rj.stef/apply-poison}]
-                             :is-valid-target? (constantly true)}]
-                 [:tickable {:tick-fn process-input-tick
-                             :pri 0}]
-                 [:broadcaster {:name-fn (constantly "the lichen")}]])
-      :z (:z target-tile)})))
+(defentity lichen
+  [{:keys [system z]}]
+  [[:lichen {:grow-chance% 4
+             :max-blob-size 8}]
+   [:position {:x (:x tile)
+               :y (:y tile)
+               :z (:z tile)
+               :type :lichen}]
+   [:destructible {:hp     (:hp  (rj.cfg/entity->stats :lichen))
+                   :max-hp (:hp  (rj.cfg/entity->stats :lichen))
+                   :def    (:def (rj.cfg/entity->stats :lichen))
+                   :can-retaliate? true
+                   :on-death-fn    nil
+                   :status-effects nil
+                   :take-damage-fn rj.d/take-damage}]
+   [:attacker {:atk (:atk (rj.cfg/entity->stats :lichen))
+               :can-attack?-fn   rj.atk/can-attack?
+               :attack-fn        rj.atk/attack
+               :status-effects [{:type :poison
+                                 :duration 2
+                                 :value 1
+                                 :e-from e-this
+                                 :apply-fn rj.stef/apply-poison}]
+               :is-valid-target? (constantly true)}]
+   [:tickable {:tick-fn process-input-tick
+               :extra-tick-fn nil
+               :pri 0}]
+   [:broadcaster {:name-fn (constantly "the lichen")}]])
 
 (defn get-size-of-lichen-blob
   [world origin]
@@ -90,9 +61,7 @@
 (defn process-input-tick
   [_ e-this system]
   (let [c-position (rj.e/get-c-on-e system e-this :position)
-        x (:x c-position)
-        y (:y c-position)
-        z (:z c-position)
+        {:keys [x y z]} c-position
 
         e-world (first (rj.e/all-e-with-c system :world))
         {:keys [levels]} (rj.e/get-c-on-e system e-world :world)

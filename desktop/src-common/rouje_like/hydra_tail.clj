@@ -70,6 +70,7 @@
                            :default-energy 2}]
                  [:killable {:experience (:exp (rj.cfg/entity->stats :hydra-tail))}]
                  [:tickable {:tick-fn process-input-tick
+                             :extra-tick-fn nil
                              :pri -1}]
                  [:broadcaster {:name-fn (constantly "the hydra's tail")}]])
       :z (:z target-tile)})))
