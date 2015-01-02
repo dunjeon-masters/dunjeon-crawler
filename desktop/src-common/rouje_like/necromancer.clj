@@ -30,7 +30,7 @@
                :status-effects   [{:type :paralysis
                                    :duration 3
                                    :value 1
-                                   :e-from entity
+                                   :e-from e-this
                                    :apply-fn rj.stef/apply-paralysis}]
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :necromancer))

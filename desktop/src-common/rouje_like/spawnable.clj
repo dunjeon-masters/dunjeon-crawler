@@ -41,11 +41,11 @@
     `(defn ~fn-name
        ~arglist
        (let [~'tile (rouje-like.spawnable/get-tile ~'system ~'z)
-             ~'entity (rouje-like.spawnable/new-entity)
+             ~'e-this (rouje-like.spawnable/new-entity)
              ~'type-e ~(keyword name)]
          (->>
            (rj.e/system<<components
-             ~'system ~'entity
+             ~'system ~'e-this
              ~components)
-           (rouje-like.spawnable/put-in-world ~'type-e ~'tile ~'entity ~'z)
+           (rouje-like.spawnable/put-in-world ~'type-e ~'tile ~'e-this ~'z)
            (assoc {} :z ~'z :system))))))
