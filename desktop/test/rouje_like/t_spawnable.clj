@@ -1,6 +1,27 @@
 (ns rouje-like.t-spawnable
   (:use [midje.sweet]
+        [rouje-like.test-utils]
         [rouje-like.spawnable]))
+
+(def system (start))
+
+(facts "get-tile"
+       (fact "returns a tile"
+             (type (get-tile system 0))
+             => rouje_like.components.Tile)
+       (fact "should contain a dune if on lvl 0 (ie: merch-level)"
+             (:entities (get-tile system 0))
+             => (contains {:extra nil
+                           :id    nil
+                           :type  :dune})))
+
+(fact "new-entity"
+      (type (new-entity))
+      => java.util.UUID)
+
+(fact "put-in-world"
+      (put-in-world :type-e "tile" "entity" 0 system)
+      =future=> nil)
 
 (fact :spawnable
       "defentity expands to correct code"
