@@ -39,6 +39,10 @@
 (def <indestructible-walls>
   #{:temple-wall :maze-wall})
 
+(def <indestructibles>
+  (union <indestructible-walls>
+         <floors>))
+
 (def <items>
   #{:torch :gold
     :health-potion

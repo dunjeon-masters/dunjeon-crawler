@@ -177,6 +177,6 @@
         e-world (first (rj.e/all-e-with-c system :world))]
     (rj.u/update-in-world system e-world rj.cfg/player-init-pos
                           (fn [entities]
-                            (vec (conj (filter #(rj.cfg/<indestructible-walls> (:type %)) entities)
+                            (vec (conj (filter #(rj.cfg/<indestructibles> (:type %)) entities)
                                        (rj.c/map->Entity {:id   e-player
                                                           :type :player})))))))
