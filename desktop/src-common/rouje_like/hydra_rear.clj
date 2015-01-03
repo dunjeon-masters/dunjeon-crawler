@@ -3,8 +3,10 @@
 
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u :refer [?]]
-            [rouje-like.components :as rj.c :refer [can-move? move
-                                                    can-attack? attack]]
+            [rouje-like.components :as rj.c
+             :refer [can-move? move
+                     can-attack? attack
+                     ->3DPoint]]
             [rouje-like.mobile :as rj.m]
             [rouje-like.messaging :as rj.msg]
             [rouje-like.tickable :as rj.t]
@@ -37,7 +39,8 @@
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-hydra-rear (br.e/create-entity)
          hp (:hp (rj.cfg/entity->stats :hydra-rear))
-         system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+         system (rj.u/update-in-world system e-world
+                                      (->3DPoint target-tile)
                                       (fn [entities]
                                         (vec
                                           (conj
@@ -84,7 +87,7 @@
       (let [e-world (first (rj.e/all-e-with-c system :world))
             c-position (rj.e/get-c-on-e system e-this :position)]
         (rj.u/update-in-world system e-world
-                              [(:z c-position) (:x c-position) (:y c-position)]
+                              (->3DPoint c-position)
                               (fn [entities]
                                 (vec
                                   (remove

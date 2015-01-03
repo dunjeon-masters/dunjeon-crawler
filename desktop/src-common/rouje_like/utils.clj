@@ -7,7 +7,7 @@
              :refer [>?system]]
             [rouje-like.config :as rj.cfg]
             [rouje-like.components :as rj.c
-             :refer [->2DPoint]])
+             :refer [->2DPoint ->3DPoint]])
   (:import [rouje_like.components Entity Tile]
            [clojure.lang Fn]
            [java.util UUID]))
@@ -298,7 +298,7 @@
    new-type :- s/Keyword]
   (let [e-world (first (rj.e/all-e-with-c system :world))
         c-position (rj.e/get-c-on-e system e-this :position)
-        this-pos [(:z c-position) (:x c-position) (:y c-position)]]
+        this-pos (->3DPoint c-position)]
     (as-> system system
       (update-in-world system e-world this-pos
                        (fn [entities]

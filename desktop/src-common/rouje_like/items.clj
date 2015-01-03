@@ -1,7 +1,8 @@
 (ns rouje-like.items
   (:require [brute.entity :as br.e]
             [rouje-like.utils :as rj.u :refer [? update-gold]]
-            [rouje-like.components :as rj.c]
+            [rouje-like.components :as rj.c
+             :refer [->3DPoint]]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.equipment :as rj.eq]
             [rouje-like.inventory :as rj.inv]
@@ -281,7 +282,8 @@
         item-type (:type item)
         !item-type ({:weapon :armor
                      :armor  :weapon} item-type)
-        system (rj.u/update-in-world system e-world [(:z target-tile) (:x target-tile) (:y target-tile)]
+        system (rj.u/update-in-world system e-world
+                                     (->3DPoint target-tile)
                                      (fn [entities]
                                        (vec
                                          (conj

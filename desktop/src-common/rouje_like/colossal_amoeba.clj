@@ -15,13 +15,13 @@
 
 (defn on-death
   [_ e-this system]
-  (let [c-position (rj.e/get-c-on-e system e-this :position)
-        this-pos [(:x c-position) (:y c-position)]
+  (let [{:keys [x y z]} (rj.e/get-c-on-e system e-this :position)
+        this-pos [x y]
 
         e-world (first (rj.e/all-e-with-c system :world))
         c-world (rj.e/get-c-on-e system e-world :world)
         levels (:levels c-world)
-        world (nth levels (:z c-position))
+        world (nth levels z)
 
         ring-coords (rj.u/get-ring-around world this-pos 1)]
     ;; spawn giant amoebas at the first

@@ -3,8 +3,10 @@
 
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u :refer [?]]
-            [rouje-like.components :as rj.c :refer [can-move? move
-                                                    can-attack? attack]]
+            [rouje-like.components :as rj.c
+             :refer [can-move? move
+                     can-attack? attack
+                     ->3DPoint]]
             [rouje-like.mobile :as rj.m]
             [rouje-like.messaging :as rj.msg]
             [rouje-like.tickable :as rj.t]
@@ -33,7 +35,7 @@
          e-hydra-head (br.e/create-entity)
          hp (:hp (rj.cfg/entity->stats :hydra-head))
          system (rj.u/update-in-world system e-world
-                                      [(:z target-tile) (:x target-tile) (:y target-tile)]
+                                      (->3DPoint target-tile)
                                       (fn [entities]
                                         (vec
                                           (conj

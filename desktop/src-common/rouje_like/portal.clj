@@ -2,7 +2,8 @@
   (:require [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.utils :as rj.u :refer [?]]
-            [rouje-like.components :as rj.c]
+            [rouje-like.components :as rj.c
+             :refer [->3DPoint]]
             [rouje-like.config :as rj.cfg]))
 
 (defn add-portal
@@ -54,7 +55,7 @@
 
 (defn portal-target-pos [system portal]
   (let [target-pos portal]
-    [(:z target-pos) (:x target-pos) (:y target-pos)]))
+    (->3DPoint target-pos)))
 
 (defn is-portal? [entity]
   (or (= (:type entity) :portal)
