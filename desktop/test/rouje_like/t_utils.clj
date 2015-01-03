@@ -131,3 +131,41 @@
                   (seq
                     (filter #(= :reyalp (:type %))
                             entities)))))
+
+(def number 42)
+(def pie 3.14)
+
+(fact "as-?> expands correctly"
+      (as-?> number
+           (+ 2 number)
+           (/ number 2)
+           nil)
+      =expands-to=>
+      (clojure.core/let [rj-utils-temp (+ 2 number)
+                         number (if (clojure.core/nil? rj-utils-temp) number
+                                  rj-utils-temp)
+                         rj-utils-temp (/ number 2)
+                         number (if (clojure.core/nil? rj-utils-temp) number
+                                  rj-utils-temp)
+                         rj-utils-temp nil
+                         number (if (clojure.core/nil? rj-utils-temp) number
+                                  rj-utils-temp)]
+        number)
+      (provided
+        (gensym) => (symbol "rj-utils-temp")))
+
+(fact "as-?> evaluates correctly"
+      (as-?> number
+             nil
+             (+ 2 number)
+             nil
+             (/ number 2)
+             nil)
+      => 22
+
+      ;;Beware, changing type is not prevented
+      (as-?> pie
+             (+ pie 2)
+             ((roughly 5.14) pie)
+             (not pie))
+      => false)

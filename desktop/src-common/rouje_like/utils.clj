@@ -36,6 +36,15 @@
                       "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
         x#))))
 
+(defmacro as-?>
+  [expr & forms]
+  (let [temp (gensym)]
+    `(let [~@(interleave
+               (cycle [temp expr])
+               (interleave forms
+                           (repeat `(if (nil? ~temp) ~expr ~temp))))]
+       ~expr)))
+
 (def cmdl-buffer (atom ""))
 
 (def >?get-pri

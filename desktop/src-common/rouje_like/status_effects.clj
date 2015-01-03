@@ -3,7 +3,7 @@
              :refer [->3DPoint]]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.messaging :as rj.msg]
-            [rouje-like.utils :as rj.u :refer [?]]))
+            [rouje-like.utils :as rj.u :refer [? as-?>]]))
 
 (defn update-in-status-effects
   [system e-this -fn-]
@@ -15,7 +15,7 @@
 
 (defn apply-paralysis
   [system e-this status]
-  (as-> system system
+  (as-?> system
     (rj.e/upd-c system e-this :energy
                 (fn [c-energy]
                   (update-in c-energy [:energy]
@@ -24,8 +24,7 @@
     (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
       (rj.msg/add-msg system :static
                       (format "%s was paralyzed"
-                              ((:name-fn c-broadcaster) system e-this)))
-      system)))
+                              ((:name-fn c-broadcaster) system e-this))))))
 
 (defn- deal-damage
   [system e-to e-from value effect-type]
@@ -35,7 +34,7 @@
         hp (:hp c-destructible)]
     (if (pos? (- hp value))
       ;;e-to is still alive
-      (as-> system system
+      (as-?> system
         ;;deal value damage to e-to
         (rj.e/upd-c system e-to :destructible
                     (fn [c-destructible]
@@ -46,15 +45,13 @@
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-to :broadcaster)]
           (rj.msg/add-msg system :static
                           (format (str "%s was dealt %s " effect-type " damage")
-                                  ((:name-fn c-broadcaster) system e-to) value))
-          system))
+                                  ((:name-fn c-broadcaster) system e-to) value))))
 
       ;;e-to died
-      (as-> system system
+      (as-?> system
         ;;call the on-death-fn, eg: amoeba splitting
         (if-let [on-death (:on-death-fn c-destructible)]
-          (on-death c-destructible e-to system)
-          system)
+          (on-death c-destructible e-to system))
 
         ;;exp/lvl up e-from
         (if-let [c-killable (rj.e/get-c-on-e system e-to :killable)]
@@ -64,8 +61,7 @@
                              (fn [c-experience]
                                (update-in c-experience [:experience]
                                           #(+ % (:experience c-killable)))))
-                 (level-up-fn e-from)))
-          system)
+                 (level-up-fn e-from))))
 
         ;;remove it from the world
         (rj.u/update-in-world system e-world
@@ -82,8 +78,7 @@
                           (format (str "%s " effect-type "ed %s to death")
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
                                     ((:name-fn atker-c-broadcaster) system e-from))
-                                  ((:name-fn c-broadcaster) system e-to)))
-          system)
+                                  ((:name-fn c-broadcaster) system e-to))))
 
         ;;remove e-to from system
         (rj.e/kill-e system e-to)))))
