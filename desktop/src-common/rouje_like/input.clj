@@ -61,8 +61,13 @@
                                   :or {default-energy 1}
                                   :as c-energy}]
                               (update-in c-energy [:energy]
-                                         #(if (< % default-energy)
-                                            default-energy %)))))
+                                         #(cond
+                                            (neg? %) 0
+
+                                            (< % default-energy)
+                                            default-energy
+
+                                            :else %)))))
               system energetic-entities))))
 
 (defn cmds->action

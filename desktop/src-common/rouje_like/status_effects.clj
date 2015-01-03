@@ -19,8 +19,9 @@
     (rj.e/upd-c system e-this :energy
                 (fn [c-energy]
                   (update-in c-energy [:energy]
-                             - (rand-nth [0 (:value status)]))))
-
+                             - (rand-nth [0 (inc (:value status))]))))
+    (do (? (rj.e/get-c-on-e system e-this :energy))
+        system)
     (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
       (rj.msg/add-msg system :static
                       (format "%s was paralyzed"
