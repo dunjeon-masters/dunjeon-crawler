@@ -92,8 +92,9 @@
                                   status-effects))
 
         c-inv (rj.e/get-c-on-e system e-this :inventory)
-        junk (count (:junk c-inv))
-        slot (rj.eq/equipment-name (or (:weapon (:slot c-inv)) (:armor (:slot c-inv))))
+        junk (count (:junk c-inv));;TODO: Issue #23
+        slot (rj.eq/equipment-name (or (:weapon (:slot c-inv))
+                                       (:armor (:slot c-inv))))
         hp-potions (:hp-potion c-inv)
         mp-potions (:mp-potion c-inv)
 

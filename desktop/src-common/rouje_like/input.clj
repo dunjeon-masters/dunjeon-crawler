@@ -215,22 +215,22 @@
         (tick-entities system))
 
       direction
-      (let [e-this (first (rj.e/all-e-with-c system :player))
-            {:keys [energy]} (rj.e/get-c-on-e system e-this :energy)]
+      (let [e-player (first (rj.e/all-e-with-c system :player))
+            {:keys [energy]} (rj.e/get-c-on-e system e-player :energy)]
         (as-> system system
           ;;If we have energy tick the player,
           ;;otherwise we must have been paralyzed
           (if (pos? energy)
             (rj.pl/process-input-tick system direction)
-            (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
+            (if-let [c-broadcaster (rj.e/get-c-on-e system e-player :broadcaster)]
               (rj.msg/add-msg system :static
                               (format "%s was paralyzed, and couldn't move this turn"
-                                      ((:name-fn c-broadcaster) system e-this)))
+                                      ((:name-fn c-broadcaster) system e-player)))
               system))
           ;;If we have more than 1 energy we should be able to go again
-          (if (>= 1 (:energy (rj.e/get-c-on-e system e-this :energy)))
-            (tick-entities system)
-            system)))
+          (if (<= 1 (:energy (rj.e/get-c-on-e system e-player :energy)))
+            system ;;ie: go again
+            (tick-entities system))))
 
       :else
       system)))
