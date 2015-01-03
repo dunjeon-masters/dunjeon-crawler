@@ -54,6 +54,7 @@
               system entities))
     ;;reset all entities with energy that have less than they should
     ;;which is either their default-energy or 1
+    ;;UNLESS it has negative energy, which indicates paralysis
     (let [energetic-entities (rj.e/all-e-with-c system :energy)]
       (reduce (fn [system entity]
                 (rj.e/upd-c system entity :energy
@@ -72,8 +73,8 @@
 
 (defn cmds->action
   [system cmds]
-  ;;TODO: Either remove "race|class" cmds,
-  ;;  or make them debug & actually affect player stats.
+  ;;TODO: Either remove "race|class" cmds
+  ;;  or make them debug & actually affect player stats
   (let [cmd->action {"race" (fn [system r]
                               (let [e-player (first (rj.e/all-e-with-c system :player))]
                                 (rj.e/upd-c system e-player :race
