@@ -163,7 +163,12 @@
 (s/defrecord ^:always-validate
   Portal [x :- s/Num
           y :- s/Num
-          z :- s/Num])
+          z :- s/Num]
+  IPoint
+  (->3DPoint [this]
+    [z x y])
+  (->2DPoint [this]
+    [x y]))
 
 (s/defrecord ^:always-validate
   Position [x    :- s/Num

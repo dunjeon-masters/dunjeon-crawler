@@ -27,14 +27,10 @@
          e-neck (first (rj.e/all-e-with-c system :hydra-neck))
          c-neck-pos (rj.e/get-c-on-e system e-neck :position)
          neck-pos [(:x c-neck-pos) (:y c-neck-pos)]
-         neck-neighbors (rj.u/get-neighbors-of-type world neck-pos [:dune])
-         n-pos (first neck-neighbors)
-
-         get-neck-tile (fn [world]
-                         (get-in world [(:x n-pos)
-                                        (:y n-pos)]))]
-     (loop [target-tile (get-neck-tile world)]
-       (add-hydra-tail system target-tile))))
+         neck-neighbors (rj.u/get-neighbors-of-type world neck-pos [:dune])]
+     (if-let [valid-targets (seq neck-neighbors)]
+       (add-hydra-tail system (rand-nth valid-targets))
+       (throw (new Error "Couldn't find an empty neighbor")))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-hydra-tail (br.e/create-entity)
@@ -44,7 +40,7 @@
                                       (fn [entities]
                                         (vec
                                           (conj
-                                            (remove #( rj.cfg/<walls> (:type %)) entities)
+                                            (remove #(rj.cfg/<walls> (:type %)) entities)
                                             (rj.c/map->Entity {:id   e-hydra-tail
                                                                :type :hydra-tail})))))]
      {:system (rj.e/system<<components
@@ -61,7 +57,7 @@
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   []
-                             :is-valid-target? (partial #{:hydra-neck})}]
+                             :is-valid-target? #{:hydra-neck}}]
                  [:destructible {:hp         hp
                                  :max-hp     hp
                                  :def        (:def (rj.cfg/entity->stats :hydra-tail))

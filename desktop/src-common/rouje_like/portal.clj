@@ -60,4 +60,3 @@
 (defn is-portal? [entity]
   (or (= (:type entity) :portal)
       (= (:type entity) :m-portal)))
-

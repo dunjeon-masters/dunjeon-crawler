@@ -8,8 +8,8 @@
                      can-attack? attack
                      ->3DPoint]]
             [rouje-like.mobile :as rj.m]
-            [rouje-like.tickable :as rj.t]
             [rouje-like.messaging :as rj.msg]
+            [rouje-like.tickable :as rj.t]
             [rouje-like.destructible :as rj.d]
             [rouje-like.attacker :as rj.atk]
             [rouje-like.status-effects :as rj.stef]
@@ -27,15 +27,10 @@
          e-head (first (rj.e/all-e-with-c system :hydra-head))
          c-head-pos (rj.e/get-c-on-e system e-head :position)
          head-pos [(:x c-head-pos) (:y c-head-pos)]
-         head-neighbors (rj.u/get-neighbors-of-type world head-pos [:dune])
-         n-pos (first head-neighbors)
-
-         get-head-tile (fn [world]
-                         (get-in world [(:x n-pos)
-                                        (:y n-pos)]
-                                 nil))]
-     (loop [target-tile (get-head-tile world)]
-       (add-hydra-neck system target-tile))))
+         head-neighbors (rj.u/get-neighbors-of-type world head-pos [:dune])]
+     (if-let [valid-targets (seq head-neighbors)]
+       (add-hydra-neck system (rand-nth valid-targets))
+       (throw (new Error "Couldn't find an empty neighbor")))))
   ([system target-tile]
    (let [e-world (first (rj.e/all-e-with-c system :world))
          e-hydra-neck (br.e/create-entity)
@@ -62,7 +57,7 @@
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   []
-                             :is-valid-target? (partial #{:hydra-head})}]
+                             :is-valid-target? #{:hydra-head}}]
                  [:destructible {:hp         hp
                                  :max-hp     hp
                                  :def        (:def (rj.cfg/entity->stats :hydra-neck))

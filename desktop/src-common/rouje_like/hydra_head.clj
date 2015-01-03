@@ -56,7 +56,7 @@
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack
                              :status-effects   []
-                             :is-valid-target? (partial #{:player})}]
+                             :is-valid-target? #{:player}}]
                  [:destructible {:hp         hp
                                  :max-hp     hp
                                  :def        (:def (rj.cfg/entity->stats :hydra-head))
