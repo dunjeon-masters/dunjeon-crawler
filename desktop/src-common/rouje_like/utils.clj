@@ -10,7 +10,8 @@
              :refer [->2DPoint ->3DPoint]])
   (:import [rouje_like.components Entity Tile]
            [clojure.lang Fn]
-           [java.util UUID]))
+           [java.util UUID]
+           [java.text SimpleDateFormat]))
 
 #_(in-ns 'rouje-like.utils)
 #_(use 'rouje-like.utils :reload)
@@ -19,9 +20,10 @@
   ([x]
    (let [line (:line (meta &form))
          file *file*]
-     `(let [x#   ~x]
+     `(let [x#   ~x
+            sdf# (new SimpleDateFormat "HH:mm:ss.SSS")]
         (println (str (str "#" "RJ" " ")
-                      "@[" (apply str (drop 5 (str (System/currentTimeMillis))))
+                      "@[" (apply str (. sdf# format (System/currentTimeMillis)))
                       ", " ~file ":" ~line "]:\n"
                       "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
         x#)))
@@ -29,12 +31,17 @@
    (let [line (:line (meta &form))
          file *file*]
      `(let [x#   ~x
-            tag# ~tag]
+            tag# ~tag
+            sdf# (new SimpleDateFormat "HH:mm:ss.SSS")]
         (println (str (str "#" tag# " ")
-                      "@[" (apply str (drop 5 (str (System/currentTimeMillis))))
+                      "@[" (apply str (. sdf# format (System/currentTimeMillis)))
                       ", " ~file ":" ~line "]:\n"
                       "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
         x#))))
+
+(def foo
+  (let [_ (? :foo)]
+    :foo))
 
 (defmacro as-?>
   [expr & forms]
