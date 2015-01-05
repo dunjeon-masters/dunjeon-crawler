@@ -81,7 +81,7 @@
         player-is-adj? (seq (rj.u/get-neighbors-of-type level this-pos [:player]))]
     (as-> system system
       (if player-is-adj?
-        (rj.msg/add-msg system :static
+        (rj.msg/add-msg system
                         (format "%s hears a shuffling noise"
                                 (let [e-player (first (rj.e/all-e-with-c system :player))
                                       player-c-broadcaster (rj.e/get-c-on-e system e-player :broadcaster)]

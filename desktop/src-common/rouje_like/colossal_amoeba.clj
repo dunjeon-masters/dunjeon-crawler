@@ -36,7 +36,7 @@
 
               (= amoebas (:split-rate (rj.cfg/entity->stats :colossal-amoeba)))
               (as-> system system
-                    (rj.msg/add-msg system :static (format "the colossal amoeba split into %d giant amoebas"
+                    (rj.msg/add-msg system (format "the colossal amoeba split into %d giant amoebas"
                                                            amoebas))
                     (reduce (fn [sys tile]
                               (:system (rj.ga/add-giant-amoeba sys tile)))

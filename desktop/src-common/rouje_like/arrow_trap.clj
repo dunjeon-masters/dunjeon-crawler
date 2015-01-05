@@ -119,7 +119,7 @@
           (as-> (rj.e/upd-c system e-this :arrow-trap
                             (fn [c-arrow-trap]
                               (assoc c-arrow-trap :ready? true))) system
-            (rj.msg/add-msg system :static
+            (rj.msg/add-msg system
                             (format "%s hears a ticking noise"
                                     (let [player-c-broadcaster (rj.e/get-c-on-e system e-target :broadcaster)]
                                       ((:name-fn player-c-broadcaster) system e-target)))))))

@@ -194,8 +194,8 @@
   Receiver [])
 
 (s/defrecord ^:always-validate
-  Relay [static   :- [s/Any]
-         blocking :- [s/Any]])
+  Relay [background :- [s/Any]
+         immediate  :- [s/Any]])
 
 (s/defrecord ^:always-validate
   Sight [distance :- s/Num])

@@ -45,7 +45,7 @@
       (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
         (let [c-destructible (rj.e/get-c-on-e system e-target :destructible)]
           (as-> system system
-            (rj.msg/add-msg system :static (format "you shoot a fireball %s" (name direction)))
+            (rj.msg/add-msg system (format "you shoot a fireball %s" (name direction)))
             (let [e-fireball (br.e/create-entity)]
               (rj.e/system<<components
                 system e-fireball
@@ -81,7 +81,7 @@
                        ((:level-up-fn (rj.e/get-c-on-e system e-this :experience)) e-this))
                   system)
                 (rj.e/kill-e system e-fireball)))))
-        (rj.msg/add-msg system :static (format "you shoot a fireball %s, but it didn't hit anything"
+        (rj.msg/add-msg system (format "you shoot a fireball %s, but it didn't hit anything"
                                                (name direction)))))))
 
 (defn use-powerattack
@@ -101,7 +101,7 @@
       (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
         (let [c-destructible (rj.e/get-c-on-e system e-target :destructible)]
           (as-> system system
-            (rj.msg/add-msg system :static (format "you use power attack %s" (name direction)))
+            (rj.msg/add-msg system (format "you use power attack %s" (name direction)))
             (as-> system system
               (rj.e/upd-c system e-this :attacker
                           (fn [c-attacker]
@@ -112,7 +112,7 @@
                           (fn [c-attacker]
                             (update-in c-attacker [:atk]
                                        + (- 0 damage)))))))
-        (rj.msg/add-msg system :static (format "you use power attack %s, but it didn't hit anything"
+        (rj.msg/add-msg system (format "you use power attack %s, but it didn't hit anything"
                                                (name direction)))))))
 
 (defn use-pickpocket
@@ -133,7 +133,7 @@
       (if-let [e-target (get-first-e-in-range system distance direction world e-this-pos)]
         (let [c-destructible (rj.e/get-c-on-e system e-target :destructible)]
           (as-> system system
-            (rj.msg/add-msg system :static (format "you use pickpocket %s" (name direction)))
+            (rj.msg/add-msg system (format "you use pickpocket %s" (name direction)))
             (as-> system system
               ;lower attack
               (rj.e/upd-c system e-this :attacker
@@ -148,7 +148,7 @@
               (rj.e/upd-c system e-this :attacker
                           (fn [c-attacker]
                             (update-in c-attacker [:atk] + (- 0 damage-reduction)))))))
-        (rj.msg/add-msg system :static (format "you use pickpocket %s, but there was no pocket to pick"
+        (rj.msg/add-msg system (format "you use pickpocket %s, but there was no pocket to pick"
                                                (name direction)))))))
 
 (defn cast-spell
@@ -165,7 +165,7 @@
           (use-fireball system e-player fireball direction)
           (rj.d/apply-effects system e-player))
         (as-> system system
-          (rj.msg/add-msg system :static "you do not have enough mp to cast fireball")))
+          (rj.msg/add-msg system "you do not have enough mp to cast fireball")))
 
       powerattack
       (if (not (neg? (- mp (:powerattack rj.cfg/spell->mp-cost))))
@@ -173,7 +173,7 @@
           (use-powerattack system e-player powerattack direction)
           (rj.d/apply-effects system e-player))
         (as-> system system
-          (rj.msg/add-msg system :static "you do not have enough mp to cast power attack")))
+          (rj.msg/add-msg system "you do not have enough mp to cast power attack")))
 
       pickpocket
       (if (not (neg? (- mp (:pickpocket rj.cfg/spell->mp-cost))))
@@ -181,8 +181,8 @@
           (use-pickpocket system e-player pickpocket direction)
           (rj.d/apply-effects system e-player))
         (as-> system system
-          (rj.msg/add-msg system :static "you do not have enough mp to cast pickpocket")))
+          (rj.msg/add-msg system "you do not have enough mp to cast pickpocket")))
 
       :else
       (as-> system system
-        (rj.msg/add-msg system :static "you do not have a spell to cast")))))
+        (rj.msg/add-msg system "you do not have a spell to cast")))))

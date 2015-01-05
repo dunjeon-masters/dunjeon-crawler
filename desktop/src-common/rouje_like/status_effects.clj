@@ -22,7 +22,7 @@
                              - (rand-nth [0 (inc (:value status))]))))
 
     (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-      (rj.msg/add-msg system :static
+      (rj.msg/add-msg system
                       (format "%s was paralyzed"
                               ((:name-fn c-broadcaster) system e-this))))))
 
@@ -43,7 +43,7 @@
 
         ;;notify that it took damage (of effect-type)
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-to :broadcaster)]
-          (rj.msg/add-msg system :static
+          (rj.msg/add-msg system
                           (format (str "%s was dealt %s " effect-type " damage")
                                   ((:name-fn c-broadcaster) system e-to) value))))
 
@@ -74,7 +74,7 @@
 
         ;;broadcast that it died (by effect-type)
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-to :broadcaster)]
-          (rj.msg/add-msg system :static
+          (rj.msg/add-msg system
                           (format (str "%s " effect-type "ed %s to death")
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
                                     ((:name-fn atker-c-broadcaster) system e-from))

@@ -31,4 +31,5 @@
                               (let [saved-comp (k-saved-comp save-state)]
                                 (merge c saved-comp)))))
               system (keys save-state)))
-    (rj.msg/add-msg system :blocking (str "No file called " save-name ".save.edn found"))))
+    (rj.msg/add-msg! system
+      (str "No file called " save-name ".save.edn found"))))

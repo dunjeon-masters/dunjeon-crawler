@@ -35,7 +35,7 @@
   [system user]
   (-> system
       (rj.pl/init-player user)
-      (rj.msg/init-relay)
+      (rj.msg/init-messaging)
       (rj.wr/init-world)
       (rj.pl/add-player)))
 

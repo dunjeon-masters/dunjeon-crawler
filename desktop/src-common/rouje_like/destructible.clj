@@ -120,7 +120,7 @@
 
         ;;notify of damage taken
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-          (rj.msg/add-msg system :static
+          (rj.msg/add-msg system
                           (format "%s dealt %s damage to %s"
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
                                     ((:name-fn atker-c-broadcaster) system e-from))
@@ -151,7 +151,7 @@
 
         ;;notify of death/kill
         (if-let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-          (rj.msg/add-msg system :static
+          (rj.msg/add-msg system
                           (format "%s killed %s"
                                   (let [atker-c-broadcaster (rj.e/get-c-on-e system e-from :broadcaster)]
                                     ((:name-fn atker-c-broadcaster) system e-from))

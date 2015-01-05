@@ -10,57 +10,77 @@
             [rouje-like.components :as rj.c :refer [tick]]
             [rouje-like.utils :as rj.u]))
 
-(defn add-msg
+(defn put-msg-in
   [system k-buffer msg]
+  (let [e-relay (first (rj.e/all-e-with-c system :relay))
+        message {:message msg
+                 :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
+                             c-counter (rj.e/get-c-on-e system e-counter :counter)]
+                         (:turn c-counter))}]
+    (rj.e/upd-c system e-relay :relay
+                (fn [c-relay]
+                  (update-in c-relay [k-buffer]
+                             conj message)))))
+
+(defn add-msg
+  [system msg]
   (let [e-relay (first (rj.e/all-e-with-c system :relay))]
-    (as-> system system
-      (rj.e/upd-c system e-relay :relay
-                  (fn [c-relay]
-                    (update-in c-relay [k-buffer]
-                               conj {:message msg
-                                     :turn (let [e-counter (first (rj.e/all-e-with-c system :counter))
-                                                 c-counter (rj.e/get-c-on-e system e-counter :counter)]
-                                             (:turn c-counter))})))
-      (if (= k-buffer :blocking)
-        (let [c-this (rj.e/get-c-on-e system e-relay :renderable)
-              render-fn (:render-fn c-this)]
-          (render-fn nil e-relay nil system)
-          system)
-        system))))
+    (put-msg-in system :background msg)))
+
+(defn add-msg!
+  [system msg]
+  (let [e-relay (first (rj.e/all-e-with-c system :relay))
+        c-this (rj.e/get-c-on-e system e-relay :renderable)
+        render-fn (:render-fn c-this)]
+    (render-fn nil e-relay nil system)
+    (put-msg-in system :immediate msg)))
+
+(defn clear-immediate
+  [c-relay]
+  (assoc c-relay :immediate []))
+
+(defn clear-background
+  [system c-relay]
+  (update-in
+    c-relay [:background]
+    (fn [background-buffer]
+      (let [e-counter (first (rj.e/all-e-with-c system :counter))
+            c-counter (rj.e/get-c-on-e system e-counter :counter)
+            current-turn (:turn c-counter)]
+        (remove #(< (:turn %)
+                    (dec current-turn))
+                background-buffer)))))
 
 (defn clear-messages!
   [system]
   (let [e-relay (first (rj.e/all-e-with-c system :relay))
         {:keys [render-fn]} (rj.e/get-c-on-e system e-relay :renderable)]
-    (render-fn nil e-relay nil system)
-    (rj.e/upd-c system e-relay :relay
-                (fn [c-relay]
-                  (-> c-relay
-                      (assoc :blocking []))))))
+    (as-> system system
+      (rj.e/upd-c system e-relay :relay
+                  #(->> %
+                        clear-immediate
+                        (clear-background system)))
+      (do (render-fn nil e-relay nil system) system))))
 
 (defn process-input-tick
   [_ e-this system]
   (rj.e/upd-c system e-this :relay
-              (fn [c-relay]
-                (-> c-relay
-                    (update-in [:static]
-                               (fn [static-buffer]
-                                 (let [e-counter (first (rj.e/all-e-with-c system :counter))
-                                       c-counter (rj.e/get-c-on-e system e-counter :counter)
-                                       current-turn (:turn c-counter)]
-                                   (remove #(< (:turn %) (dec current-turn))
-                                           static-buffer))))
-                    (assoc :blocking [])))))
+              #(->> %
+                    (clear-background system)
+                    clear-immediate)))
 
-(defn init-relay
+(defn init-messaging
   [system]
   (let [e-this (br.e/create-entity)
-        e-counter (br.e/create-entity)]
+        e-counter (br.e/create-entity)
+        inc-counter (fn [_ e-this system]
+                      (rj.e/upd-c system e-this :counter
+                                  #(update-in % [:turn] inc)))]
     (as-> system system
       (rj.e/system<<components
         system e-this
-        [[:relay {:static []
-                  :blocking []}]
+        [[:relay {:background []
+                  :immediate []}]
          [:tickable {:tick-fn process-input-tick
                      :extra-tick-fn nil
                      :pri -1}]
@@ -71,8 +91,4 @@
         [[:counter {:turn 1}]
          [:tickable {:pri -2
                      :extra-tick-fn nil
-                     :tick-fn (fn [_ e-this system]
-                                (rj.e/upd-c system e-this :counter
-                                            (fn [c-counter]
-                                              (update-in c-counter [:turn]
-                                                         inc))))}]]))))
+                     :tick-fn inc-counter}]]))))

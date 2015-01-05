@@ -33,8 +33,8 @@
          (fact "use-hp-potion: no potions"
                (let [system (use-hp-potion system e-player)
                      e-relay (first (rj.e/all-e-with-c system :relay))
-                     {:keys [static]} (rj.e/get-c-on-e system e-relay :relay)]
-                 static)
+                     {:keys [background]} (rj.e/get-c-on-e system e-relay :relay)]
+                 background)
                => (contains
                     #(= "You do not have any health potions to drink"
                         (:message %))))
@@ -57,8 +57,8 @@
          (fact "use-mp-potion: no potions"
                (let [system (use-mp-potion system e-player)
                      e-relay (first (rj.e/all-e-with-c system :relay))
-                     {:keys [static]} (rj.e/get-c-on-e system e-relay :relay)]
-                 static)
+                     {:keys [background]} (rj.e/get-c-on-e system e-relay :relay)]
+                 background)
                => (contains
                     #(= "You do not have any mana potions to drink"
                         (:message %))))

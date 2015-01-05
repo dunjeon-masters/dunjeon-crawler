@@ -24,7 +24,7 @@
   (let [broadcast-pickup
         (fn [system]
           (let [c-broadcaster (rj.e/get-c-on-e system e-this :broadcaster)]
-            (rj.msg/add-msg system :static
+            (rj.msg/add-msg system
                             (format "%s picked up %s"
                                     (let [by-c-broadcaster (rj.e/get-c-on-e system e-by
                                                                             :broadcaster)]
@@ -86,14 +86,14 @@
                          (broadcast-pickup system))
                        ;; otherwise broadcast a message saying unable to purchase
                        (as-> system system
-                         (rj.msg/add-msg system :static "you do not have enough gold to purchase that"))))
+                         (rj.msg/add-msg system "you do not have enough gold to purchase that"))))
 
       :merchant (let [junk-value (rj.inv/junk-value system e-by)
                       c-inv (rj.e/get-c-on-e system e-by :inventory)
                       junk (:junk c-inv)
                       njunk (count junk)]
                   (as-> system system
-                    (rj.msg/add-msg system :static (format "you sold %d pieces of junk for %d gold"
+                    (rj.msg/add-msg system (format "you sold %d pieces of junk for %d gold"
                                                            njunk junk-value))
                     (rj.inv/sell-junk system e-by)))
 
@@ -121,7 +121,7 @@
         (rj.e/upd-c system e-by :inventory
                     (fn [c-inventory]
                       (update-in c-inventory [:hp-potion] dec))))
-      (as-> (rj.msg/add-msg system :static
+      (as-> (rj.msg/add-msg system
                             (format "You do not have any health potions to drink")) system
         system))))
 
@@ -147,7 +147,7 @@
         (rj.e/upd-c system e-by :inventory
                     (fn [c-inventory]
                       (update-in c-inventory [:mp-potion] dec))))
-      (as-> (rj.msg/add-msg system :static
+      (as-> (rj.msg/add-msg system
                             (format "You do not have any mana potions to drink")) system
         system))))
 

@@ -89,7 +89,7 @@
           (rj.e/upd-c e-this :experience
                       (fn [c-level]
                         (update-in c-level [:level] inc)))
-          (rj.msg/add-msg :static
+          (rj.msg/add-msg
                           (format "You leveled up! You are now level %d"
                                   (inc level)))
           (level-up-stats e-this))

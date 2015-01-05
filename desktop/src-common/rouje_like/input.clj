@@ -143,8 +143,8 @@
    (play/key-code :X)             (fn [system]
                                     (reset-input-manager!)
                                     (set-input-manager! :inspect-mode?)
-                                    (rj.msg/add-msg system :blocking
-                                                    "Inspecting... Please choose a direction."))
+                                    (rj.msg/add-msg! system
+                                      "Inspecting... Please choose a direction."))
    (play/key-code :H)             (fn [system]
                                     (let [e-player (first (rj.e/all-e-with-c system :player))]
                                       (-> (rj.item/use-hp-potion system e-player)
@@ -187,12 +187,12 @@
     (if-let [c-inspectable (rj.e/get-c-on-e system target-id :inspectable)]
       (let [{:keys [msg]} c-inspectable]
         (-> (rj.msg/clear-messages! system)
-            (rj.msg/add-msg :blocking msg)))
+            (rj.msg/add-msg! msg)))
       (let [{:keys [type]
              :or {type "nothing"}} (rj.e/get-c-on-e system target-id :position)
             msg (str "Found " type)]
         (-> (rj.msg/clear-messages! system)
-            (rj.msg/add-msg :blocking msg))))))
+            (rj.msg/add-msg! msg))))))
 
 (defn process-keyboard-input
   [system keycode]
@@ -227,9 +227,9 @@
           (if (pos? energy)
             (rj.pl/process-input-tick system direction)
             (if-let [c-broadcaster (rj.e/get-c-on-e system e-player :broadcaster)]
-              (rj.msg/add-msg system :static
-                              (format "%s was paralyzed, and couldn't move this turn"
-                                      ((:name-fn c-broadcaster) system e-player)))
+              (rj.msg/add-msg system
+                (format "%s was paralyzed, and couldn't move this turn"
+                        ((:name-fn c-broadcaster) system e-player)))
               system))
           ;;If we have more than 1 energy we should be able to go again
           (if (<= 1 (:energy (rj.e/get-c-on-e system e-player :energy)))
