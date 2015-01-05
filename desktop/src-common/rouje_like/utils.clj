@@ -39,10 +39,6 @@
                       "\t" (pr-str '~x) "=" (pr-str x#) "\n"))
         x#))))
 
-(def foo
-  (let [_ (? :foo)]
-    :foo))
-
 (defmacro as-?>
   [expr & forms]
   (let [temp (gensym)]

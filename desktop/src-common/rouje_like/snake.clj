@@ -26,9 +26,9 @@
                                    :value 2
                                    :e-from e-this
                                    :apply-fn rj.stef/apply-poison}]
-               :is-valid-target? (partial #{:player})}]
-   [:destructible {:hp         (:hp (rj.cfg/entity->stats :snake))
-                   :max-hp     (:hp (rj.cfg/entity->stats :snake))
+               :is-valid-target? #{:player}}]
+   [:destructible {:hp         (:hp  (rj.cfg/entity->stats :snake))
+                   :max-hp     (:hp  (rj.cfg/entity->stats :snake))
                    :def        (:def (rj.cfg/entity->stats :snake))
                    :can-retaliate? false
                    :status-effects []
