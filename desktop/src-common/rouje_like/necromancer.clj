@@ -16,7 +16,7 @@
                :type :necromancer}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
-   [:sight {:distance 5}]
+   [:sight {:distance (:sight (rj.cfg/entity->stats :necromancer))}]
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :necromancer))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack

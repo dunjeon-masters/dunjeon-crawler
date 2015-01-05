@@ -57,7 +57,7 @@
                       :y    (:y target-tile)
                       :z    (:z target-tile)
                       :type :arrow-trap}]
-          [:sight {:distance 4}]
+          [:sight {:distance (:sight (rj.cfg/entity->stats :arrow-trap))}]
           [:attacker {:atk              (:atk (rj.cfg/entity->stats :arrow-trap))
                       :can-attack?-fn   rj.atk/can-attack?
                       :attack-fn        rj.atk/attack

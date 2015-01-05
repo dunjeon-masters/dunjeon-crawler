@@ -16,7 +16,7 @@
                :type :slime}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
-   [:sight {:distance 4}]
+   [:sight {:distance (:sight (rj.cfg/entity->stats :slime))}]
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :slime))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack

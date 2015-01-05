@@ -28,7 +28,7 @@
                :type :troll}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
-   [:sight {:distance 7}]
+   [:sight {:distance (:sight (rj.cfg/entity->stats :troll))}]
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :troll))
                :status-effects []
                :can-attack?-fn   rj.atk/can-attack?

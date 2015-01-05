@@ -199,6 +199,7 @@
    :maze-wall       {:hp 100}
    :temple-wall     {:hp 100}
    :arrow-trap      {:hp 1
+                     :sight 4
                      :atk 2}
    :spike-trap      {:hp 1
                      :atk 2}
@@ -210,68 +211,84 @@
    :skeleton        {:hp 8
                      :def 1
                      :atk 3
+                     :sight 4
                      :exp 1}
    :snake           {:hp  2
                      :def 1
                      :atk 2
+                     :sight 4
                      :exp 1}
    :troll           {:hp  8
                      :def 2
                      :atk 4
+                     :sight 7
                      :exp 4}
    :mimic           {:hp 5
                      :def 2
                      :atk 3
+                     :sight 4
                      :exp 3}
    :spider          {:hp 2
                      :def 0
                      :atk 1
+                     :sight 3
                      :exp 1}
    :slime           {:hp 2
                      :def 0
                      :atk 1
+                     :sight 4
                      :exp 1}
    :drake           {:hp 6
                      :def 3
                      :atk 4
+                     :sight 5
                      :exp 5}
    :necromancer     {:hp 6
                      :def 3
                      :atk 4
+                     :sight 5
                      :exp 5}
    :colossal-amoeba {:hp 6
                      :def 1
                      :atk 3
+                     :sight 3
                      :exp 0
                      :split-rate 3}
    :giant-amoeba    {:hp 4
                      :def 1
                      :atk 2
+                     :sight 3
                      :exp 0
                      :split-rate 2}
    :large-amoeba    {:hp 2
                      :def 1
                      :atk 1
+                     :sight 3
                      :exp 2}
    :willow-wisp     {:hp 3
                      :def 0
                      :atk 0
+                     :sight 4
                      :exp 1}
    :hydra-head      {:hp 25
                      :def 3
                      :atk 5
+                     :sight 99
                      :exp 10}
    :hydra-neck      {:hp 20
                      :def 3
                      :atk 0
+                     :sight 99
                      :exp 0}
    :hydra-tail      {:hp 20
                      :def 1
                      :atk 0
+                     :sight 99
                      :exp 0}
    :hydra-rear      {:hp 20
                      :def 1
                      :atk 0
+                     :sight 99
                      :exp 0}})
 
 (def potion-stats

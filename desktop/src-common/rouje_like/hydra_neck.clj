@@ -52,7 +52,7 @@
                              :type :hydra-neck}]
                  [:mobile {:can-move?-fn rj.m/-can-move?
                            :move-fn      rj.m/move}]
-                 [:sight {:distance 100}]                     ;;4
+                 [:sight {:distance (:sight (rj.cfg/entity->stats :hydra-neck))}]                     ;;4
                  [:attacker {:atk              (:atk (rj.cfg/entity->stats :hydra-neck))
                              :can-attack?-fn   rj.atk/can-attack?
                              :attack-fn        rj.atk/attack

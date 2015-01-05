@@ -18,7 +18,7 @@
    [:mobile       {:can-move?-fn (fn [c-mobile e-this t-tile system]
                                    (rj.m/can-move? c-mobile e-this t-tile system))
                    :move-fn rj.m/move}]
-   [:sight        {:distance 4}]
+   [:sight        {:distance (:sight (rj.cfg/entity->stats :skeleton))}]
    [:attacker     {:atk              (:atk (rj.cfg/entity->stats :skeleton))
                    :can-attack?-fn   rj.atk/can-attack?
                    :attack-fn        rj.atk/attack

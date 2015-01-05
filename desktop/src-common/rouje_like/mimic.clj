@@ -47,7 +47,7 @@
                                (when (#{:visible-mimic} type)
                                  (rj.m/can-move? c e t s))))
              :move-fn      rj.m/move}]
-   [:sight {:distance 4}]
+   [:sight {:distance (:sight (rj.cfg/entity->stats :mimic))}]
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :mimic))
                :status-effects   []
                :can-attack?-fn   (fn [c e t s]

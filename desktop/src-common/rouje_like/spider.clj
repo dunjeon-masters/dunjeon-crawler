@@ -16,7 +16,7 @@
                :type :spider}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
-   [:sight {:distance 3}]
+   [:sight {:distance (:sight (rj.cfg/entity->stats :spider))}]
    [:attacker {:atk              (:atk (:spider rj.cfg/entity->stats))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
