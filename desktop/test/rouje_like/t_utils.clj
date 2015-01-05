@@ -35,7 +35,7 @@
       (can-see? level+wall 3 [0 0] [1 2]) => false)
 
 (fact "coords+offset"
-      (coords+offset [0 0] [1 3]) => [1 3]
+      (coords+offset [0 0]  [1 3]) => [1 3]
       (coords+offset [-1 3] [4 -2]) => [3 1])
 
 (fact "get-neighbors-coords"
@@ -79,22 +79,25 @@
       => true)
 
 (fact "ring-coords"
-      (ring-coords [0 0] 3) => (just
-                                 [-3 -3] [-3 -2] [-3 -1] [-3 0]
-                                 [-3 1]  [-3 2]  [-3 3]  [-2 -3]
-                                 [-2 3]  [-1 -3] [-1 3]  [0 -3]
-                                 [0 3]   [1 -3]  [1 3]   [2 -3]
-                                 [2 3]   [3 -3]  [3 -2]  [3 -1]
-                                 [3 0]   [3 1]   [3 2]   [3 3]))
-
+      (ring-coords [0 0] 3)
+      => (just
+           (for [i (range -3 4)
+                 j (range -3 4)
+                 :when (or (#{3 -3} i)
+                           (#{3 -3} j))]
+             [i j])))
+#_(count
+    (filter (fn [tile]
+              (= :dune (:type (tile->top-entity tile))))
+            %))
 (fact "get-ring-around"
       (get-ring-around level [0 0] 2)
       => (every-checker
            #(= 16 (count %))
-           #(= 5 (count
-                   (filter (fn [tile]
-                             (= :dune (:type (tile->top-entity tile))))
-                           %)))))
+           #(= 5 (->> %
+                     (map (comp :type tile->top-entity))
+                     (filter (fn [type] (= :dune type)))
+                     count))))
 
 (fact "rand-rng"
       (* 1/10000 (apply + (take 10000 (repeatedly #(rand-rng 1 10)))))
