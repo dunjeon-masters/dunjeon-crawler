@@ -140,10 +140,11 @@
 
    (play/key-code :enter)         (fn [system]
                                     (tick-entities system))
-   (play/key-code :I)             (fn [system]
+   (play/key-code :X)             (fn [system]
                                     (reset-input-manager!)
                                     (set-input-manager! :inspect-mode?)
-                                    system)
+                                    (rj.msg/add-msg system :blocking
+                                                    "Inspecting... Please choose a direction."))
    (play/key-code :H)             (fn [system]
                                     (let [e-player (first (rj.e/all-e-with-c system :player))]
                                       (-> (rj.item/use-hp-potion system e-player)
@@ -174,8 +175,7 @@
   [system direction]
   (let [e-player (first (rj.e/all-e-with-c system :player))
         e-world (first (rj.e/all-e-with-c system :world))
-        c-world (rj.e/get-c-on-e system e-world :world)
-        levels (:levels c-world)
+        {:keys [levels]} (rj.e/get-c-on-e system e-world :world)
         {:keys [x y z]} (rj.e/get-c-on-e system e-player :position)
         player-pos [x y]
 
@@ -184,11 +184,15 @@
         target-tile (get-in level target-pos)
 
         {target-id :id} (rj.u/tile->top-entity target-tile)]
-    (let [c-inspectable (rj.e/get-c-on-e system target-id :inspectable)
-          dflt-msg "Found nothing to inspect"
-          {:keys [msg]
-           :or {msg dflt-msg}} c-inspectable]
-        (rj.msg/add-msg system :static msg))))
+    (if-let [c-inspectable (rj.e/get-c-on-e system target-id :inspectable)]
+      (let [{:keys [msg]} c-inspectable]
+        (-> (rj.msg/clear-messages! system)
+            (rj.msg/add-msg :blocking msg)))
+      (let [{:keys [type]
+             :or {type "nothing"}} (rj.e/get-c-on-e system target-id :position)
+            msg (str "Found " type)]
+        (-> (rj.msg/clear-messages! system)
+            (rj.msg/add-msg :blocking msg))))))
 
 (defn process-keyboard-input
   [system keycode]
@@ -212,8 +216,7 @@
       (:inspect-mode? @input-manager)
       (as-> system system
         (do (reset-input-manager!) system)
-        (inspect system direction)
-        (tick-entities system))
+        (inspect system direction))
 
       direction
       (let [e-player (first (rj.e/all-e-with-c system :player))

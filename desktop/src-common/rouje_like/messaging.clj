@@ -28,6 +28,16 @@
           system)
         system))))
 
+(defn clear-messages!
+  [system]
+  (let [e-relay (first (rj.e/all-e-with-c system :relay))
+        {:keys [render-fn]} (rj.e/get-c-on-e system e-relay :renderable)]
+    (render-fn nil e-relay nil system)
+    (rj.e/upd-c system e-relay :relay
+                (fn [c-relay]
+                  (-> c-relay
+                      (assoc :blocking []))))))
+
 (defn process-input-tick
   [_ e-this system]
   (rj.e/upd-c system e-this :relay
@@ -46,15 +56,16 @@
   [system]
   (let [e-this (br.e/create-entity)
         e-counter (br.e/create-entity)]
-    (as-> (rj.e/system<<components
-            system e-this
-            [[:relay {:static []
-                      :blocking []}]
-             [:tickable {:tick-fn process-input-tick
-                         :extra-tick-fn nil
-                         :pri -1}]
-             [:renderable {:render-fn rj.r/render-messages
-                           :args {}}]]) system
+    (as-> system system
+      (rj.e/system<<components
+        system e-this
+        [[:relay {:static []
+                  :blocking []}]
+         [:tickable {:tick-fn process-input-tick
+                     :extra-tick-fn nil
+                     :pri -1}]
+         [:renderable {:render-fn rj.r/render-messages
+                       :args {}}]])
       (rj.e/system<<components
         system e-counter
         [[:counter {:turn 1}]
