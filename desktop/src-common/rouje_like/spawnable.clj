@@ -34,6 +34,28 @@
             (rj.c/map->Entity {:id   entity
                                :type type-e})))))))
 
+(defn give-position
+  [e-this tile system]
+  (let [{:keys [x y z]} (rj.e/get-c-on-e system e-this :position)]
+    (cond-> system
+      (nil? x) (rj.e/upd-c e-this :position
+                    #(assoc % :x (:x tile)))
+      (nil? y) (rj.e/upd-c e-this :position
+                    #(assoc % :y (:y tile)))
+      (nil? z) (rj.e/upd-c e-this :position
+                    #(assoc % :z (:z tile))))))
+
+(defn give-stef-e-from
+  [e-this system]
+  (rj.e/upd-c system e-this :destructible
+              (fn [c-destructible]
+                (update-in c-destructible [:status-effects]
+                           (fn [status-effects]
+                             (->> status-effects
+                                  (map #(assoc %
+                                          :e-from e-this))
+                                  vec))))))
+
 (defmacro defentity
   [name components]
   (let [fn-name (symbol (str "add-" name))]
@@ -41,13 +63,15 @@
        ([{:keys [~'system ~'z]}]
         (let [~'tile (rouje-like.spawnable/get-tile ~'system ~'z)]
           (~fn-name ~'system ~'tile)))
-       ([~'system ~'tile]
-        (let [~'e-this  (rouje-like.spawnable/new-entity)
-              ~'type-e ~(keyword name)
-              ~'z       (:z ~'tile)]
+       ([system# tile#]
+        (let [e-this#  (rouje-like.spawnable/new-entity)
+              type-e# ~(keyword name)
+              z#       (:z tile#)]
           (->>
             (rj.e/system<<components
-              ~'system ~'e-this
+              system# e-this#
               ~components)
-            (rouje-like.spawnable/put-in-world ~'type-e ~'tile ~'e-this ~'z)
-            (assoc {} :z ~'z :system)))))))
+            (rouje-like.spawnable/put-in-world type-e# tile# e-this# z#)
+            (rouje-like.spawnable/give-position e-this# tile#)
+            (rouje-like.spawnable/give-stef-e-from e-this#)
+            (assoc {} :z z# :system)))))))

@@ -1,7 +1,8 @@
 (ns rouje-like.t-spawnable
   (:use [midje.sweet]
         [rouje-like.test-utils]
-        [rouje-like.spawnable]))
+        [rouje-like.spawnable])
+  (:require [rouje-like.entity-wrapper :as rj.e]))
 
 (def system (start))
 
@@ -23,22 +24,31 @@
       (put-in-world :type-e "tile" "entity" 0 system)
       =future=> nil)
 
-(fact :spawnable
-      "defentity expands to correct code"
-      (defentity skeleton
-        [[:skeleton {}]])
-      =expands-to=>
-      (clojure.core/defn add-skeleton
-        ([{:keys [system z]}]
-         (clojure.core/let [tile (rouje-like.spawnable/get-tile system z)]
-           (add-skeleton system tile)))
-        ([system tile]
-         (clojure.core/let [e-this (rouje-like.spawnable/new-entity)
-                            type-e :skeleton
-                            z      (:z tile)]
-           (clojure.core/->>
-             (rouje-like.entity-wrapper/system<<components
-               system e-this
-               [[:skeleton {}]])
-             (rouje-like.spawnable/put-in-world type-e tile e-this z)
-             (clojure.core/assoc {} :z z :system))))))
+(fact "give-position"
+      true =future=> false)
+
+(fact "give-stef-e-from"
+      false =future=> true)
+
+(defentity skeleton
+  [[:skeleton {}]
+   [:position {:x nil
+               :y nil
+               :z nil
+               :type :skeleton}]
+   [:destructible {:status-effects [{:should :be-filled}]
+                   :def nil
+                   :hp nil
+                   :max-hp nil
+                   :can-retaliate? nil
+                   :on-death-fn nil
+                   :take-damage-fn nil}]])
+
+(fact "defentity expands to correct code"
+      (add-skeleton {:system system :z 1})
+      => (fn [{:keys [system z]}]
+           (let [e-skeleton (first (rj.e/all-e-with-c system :skeleton))]
+             (and (let [{:keys [x y z]} (rj.e/get-c-on-e system e-skeleton :position)]
+                    (and x y z))
+                  (let [{:keys [status-effects]} (rj.e/get-c-on-e system e-skeleton :destructible)]
+                    (:e-from (first status-effects)))))))

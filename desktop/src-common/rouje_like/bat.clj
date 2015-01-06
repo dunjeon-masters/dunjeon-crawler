@@ -8,9 +8,9 @@
 
 (defentity bat
   [[:bat {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :bat}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]

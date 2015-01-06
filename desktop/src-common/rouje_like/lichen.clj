@@ -15,9 +15,9 @@
 (defentity lichen
   [[:lichen {:grow-chance% 4
              :max-blob-size 8}]
-   [:position {:x (:x tile)
-               :y (:y tile)
-               :z (:z tile)
+   [:position {:x nil
+               :y nil
+               :z nil
                :type :lichen}]
    [:destructible {:hp     (:hp  (rj.cfg/entity->stats :lichen))
                    :max-hp (:hp  (rj.cfg/entity->stats :lichen))
@@ -32,7 +32,6 @@
                :status-effects [{:type :poison
                                  :duration 2
                                  :value 1
-                                 :e-from e-this
                                  :apply-fn rj.stef/apply-poison}]
                :is-valid-target? (constantly true)}]
    [:tickable {:tick-fn process-input-tick

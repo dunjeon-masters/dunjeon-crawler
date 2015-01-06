@@ -11,12 +11,11 @@
 
 (defentity skeleton
   [[:skeleton     {}]
-   [:position     {:x    (:x tile)
-                   :y    (:y tile)
-                   :z    (:z tile)
+   [:position     {:x    nil
+                   :y    nil
+                   :z    nil
                    :type :skeleton}]
-   [:mobile       {:can-move?-fn (fn [c-mobile e-this t-tile system]
-                                   (rj.m/can-move? c-mobile e-this t-tile system))
+   [:mobile       {:can-move?-fn rj.m/can-move?
                    :move-fn rj.m/move}]
    [:sight        {:distance (:sight (rj.cfg/entity->stats :skeleton))}]
    [:attacker     {:atk              (:atk (rj.cfg/entity->stats :skeleton))

@@ -10,9 +10,9 @@
 
 (defentity spider
   [[:spider {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :spider}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
@@ -23,7 +23,6 @@
                :status-effects   [{:type :poison
                                    :duration 5
                                    :value 1
-                                   :e-from e-this
                                    :apply-fn rj.stef/apply-poison}]
                :is-valid-target? #{:player}}]
    [:destructible {:hp     (:hp  (:spider rj.cfg/entity->stats))

@@ -10,9 +10,9 @@
 
 (defentity willow-wisp
   [[:willow-wisp {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :willow-wisp}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
@@ -23,9 +23,8 @@
                :status-effects   [{:type :burn
                                    :duration 2
                                    :value 1
-                                   :e-from e-this
                                    :apply-fn rj.stef/apply-burn}]
-               :is-valid-target? (partial #{:player})}]
+               :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :willow-wisp))
                    :max-hp     (:hp  (rj.cfg/entity->stats :willow-wisp))
                    :def        (:def (rj.cfg/entity->stats :willow-wisp))

@@ -9,9 +9,9 @@
 
 (defentity large-amoeba
   [[:large-amoeba {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :large-amoeba}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]

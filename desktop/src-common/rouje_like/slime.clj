@@ -10,9 +10,9 @@
 
 (defentity slime
   [[:slime {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :slime}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
@@ -23,7 +23,6 @@
                :status-effects   [{:type :poison
                                    :duration 3
                                    :value 2
-                                   :e-from e-this
                                    :apply-fn rj.stef/apply-poison}]
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :slime))

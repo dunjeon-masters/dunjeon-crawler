@@ -86,10 +86,7 @@
                  :when (or (#{3 -3} i)
                            (#{3 -3} j))]
              [i j])))
-#_(count
-    (filter (fn [tile]
-              (= :dune (:type (tile->top-entity tile))))
-            %))
+
 (fact "get-ring-around"
       (get-ring-around level [0 0] 2)
       => (every-checker

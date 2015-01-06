@@ -50,9 +50,9 @@
 
 (defentity giant-amoeba
   [[:giant-amoeba {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :giant-amoeba}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
@@ -63,7 +63,6 @@
                :status-effects   [{:type :paralysis
                                    :duration 2
                                    :value 1
-                                   :e-from e-this
                                    :apply-fn rj.stef/apply-paralysis}]
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :giant-amoeba))

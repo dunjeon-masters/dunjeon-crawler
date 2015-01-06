@@ -37,9 +37,9 @@
 
 (defentity mimic
   [[:mimic {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :mimic}]
    [:mobile {:can-move?-fn (fn [c e t s]
                              (let [{type :type}

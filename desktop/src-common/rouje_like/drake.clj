@@ -10,9 +10,9 @@
 
 (defentity drake
   [[:drake {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :drake}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
@@ -23,7 +23,6 @@
                :status-effects   [{:type :burn
                                    :duration 6
                                    :value 3
-                                   :e-from e-this
                                    :apply-fn rj.stef/apply-burn}]
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :drake))

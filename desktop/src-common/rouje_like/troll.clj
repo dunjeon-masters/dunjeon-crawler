@@ -22,9 +22,9 @@
 
 (defentity troll
   [[:troll {}]
-   [:position {:x    (:x tile)
-               :y    (:y tile)
-               :z    (:z tile)
+   [:position {:x    nil
+               :y    nil
+               :z    nil
                :type :troll}]
    [:mobile {:can-move?-fn rj.m/can-move?
              :move-fn      rj.m/move}]
@@ -33,7 +33,7 @@
                :status-effects []
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
-               :is-valid-target? (partial #{:player})}]
+               :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :troll))
                    :max-hp     (:hp  (rj.cfg/entity->stats :troll))
                    :def        (:def (rj.cfg/entity->stats :troll))
