@@ -1,10 +1,12 @@
 (ns rouje-like.spawnable
   (:require [rouje-like.utils :as rj.u]
+            [rouje-like.utils :refer [?]]
             [brute.entity :as br.e]
             [rouje-like.entity-wrapper :as rj.e]
             [rouje-like.config :as rj.cfg]
             [rouje-like.components :as rj.c
-             :refer [->3DPoint]]))
+             :refer [->3DPoint]]
+            [rouje-like.status-effects :as rj.stef]))
 
 (defn get-tile
   [system z]
@@ -56,6 +58,17 @@
                                           :e-from e-this))
                                   vec))))))
 
+(defn give-stef-apply-fn
+  [e-this system]
+  (rj.e/upd-c system e-this :attacker
+              (fn [c-attacker]
+                (update-in c-attacker [:status-effects]
+                           (fn [status-effects]
+                             (->> status-effects
+                                  (map #(assoc %
+                                               :apply-fn (rj.stef/effect-type->apply-fn (:type %))))
+                                  vec))))))
+
 (defmacro defentity
   [name components]
   (let [fn-name (symbol (str "add-" name))]
@@ -74,4 +87,5 @@
             (rouje-like.spawnable/put-in-world type-e# tile# e-this# z#)
             (rouje-like.spawnable/give-position e-this# tile#)
             (rouje-like.spawnable/give-stef-e-from e-this#)
+            (rouje-like.spawnable/give-stef-apply-fn e-this#)
             (assoc {} :z z# :system)))))))

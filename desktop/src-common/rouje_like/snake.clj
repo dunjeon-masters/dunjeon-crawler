@@ -21,10 +21,7 @@
    [:attacker     {:atk            (:atk (rj.cfg/entity->stats :snake))
                    :can-attack?-fn rj.atk/can-attack?
                    :attack-fn      rj.atk/attack
-                   :status-effects [{:type :poison
-                                     :duration 4
-                                     :value 2
-                                     :apply-fn rj.stef/apply-poison}]
+                   :status-effects (rj.cfg/mob->stefs :snake)
                    :is-valid-target? #{:player}}]
    [:destructible {:hp     (:hp  (rj.cfg/entity->stats :snake))
                    :max-hp (:hp  (rj.cfg/entity->stats :snake))

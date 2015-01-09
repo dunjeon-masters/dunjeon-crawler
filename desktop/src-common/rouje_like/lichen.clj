@@ -29,10 +29,7 @@
    [:attacker {:atk (:atk (rj.cfg/entity->stats :lichen))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
-               :status-effects [{:type :poison
-                                 :duration 2
-                                 :value 1
-                                 :apply-fn rj.stef/apply-poison}]
+               :status-effects  (rj.cfg/mob->stefs :lichen)
                :is-valid-target? (constantly true)}]
    [:tickable {:tick-fn process-input-tick
                :extra-tick-fn nil

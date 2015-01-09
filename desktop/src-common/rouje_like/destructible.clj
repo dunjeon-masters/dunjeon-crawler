@@ -74,7 +74,7 @@
   "Applies status effects from e-this's destructible status-effects to e-this"
   (let [dec-status-effects (fn [status-effects]
                              (vec
-                               (->> status-effects
+                               (->> (? status-effects)
                                     (map #(update-in % [:duration] dec))
                                     (filter (comp #(not (neg? %))
                                                   :duration)))))]

@@ -93,5 +93,6 @@
 
 (def effect-type->apply-fn
   {:fire     apply-burn
+   :burn     apply-burn
    :poison   apply-poison
-   :paralyis apply-paralysis})
+   :paralysis apply-paralysis})

@@ -20,10 +20,7 @@
    [:attacker {:atk              (:atk (:spider rj.cfg/entity->stats))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
-               :status-effects   [{:type :poison
-                                   :duration 5
-                                   :value 1
-                                   :apply-fn rj.stef/apply-poison}]
+               :status-effects   (rj.cfg/mob->stefs :spider)
                :is-valid-target? #{:player}}]
    [:destructible {:hp     (:hp  (:spider rj.cfg/entity->stats))
                    :max-hp (:hp  (:spider rj.cfg/entity->stats))

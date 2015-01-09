@@ -20,10 +20,7 @@
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :slime))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
-               :status-effects   [{:type :poison
-                                   :duration 3
-                                   :value 2
-                                   :apply-fn rj.stef/apply-poison}]
+               :status-effects   (rj.cfg/mob->stefs :slime)
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :slime))
                    :max-hp     (:hp  (rj.cfg/entity->stats :slime))

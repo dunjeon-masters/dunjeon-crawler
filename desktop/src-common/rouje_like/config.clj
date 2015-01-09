@@ -324,6 +324,36 @@
    :skeleton        0.4;0.1
    })
 
+(def mob->stefs
+  {:colossal-amoeba [{:type :paralysis
+                      :duration 2
+                      :value 1}]
+   :drake        [{:type :burn
+                   :duration 6
+                   :value 3}]
+   :giant-amoeba [{:type :paralysis
+                   :duration 2
+                   :value 1}]
+   :lichen       [{:type :poison
+                   :duration 2
+                   :value 1}]
+   :necromancer [{:type :paralysis
+                  :duration 3
+                  :value 1}]
+   :slime [{:type :poison
+            :duration 3
+            :value 2}]
+   :snake [{:type :poison
+            :duration 4
+            :value 2}]
+   :spider [{:type :poison
+             :duration 5
+             :value 1}]
+   :willow-wisp [{:type :burn
+                  :duration 2
+                  :value 1}]
+   })
+
 ;; ===== STARTING FLOOR FOR MOBS =====
 (def mob->init-floor
   {:skeleton      1;2

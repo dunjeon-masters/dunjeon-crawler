@@ -20,10 +20,7 @@
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :necromancer))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
-               :status-effects   [{:type :paralysis
-                                   :duration 3
-                                   :value 1
-                                   :apply-fn rj.stef/apply-paralysis}]
+               :status-effects   (rj.cfg/mob->stefs :necromancer)
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :necromancer))
                    :max-hp     (:hp  (rj.cfg/entity->stats :necromancer))

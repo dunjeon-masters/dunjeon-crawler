@@ -20,10 +20,7 @@
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :willow-wisp))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
-               :status-effects   [{:type :burn
-                                   :duration 2
-                                   :value 1
-                                   :apply-fn rj.stef/apply-burn}]
+               :status-effects   (rj.cfg/mob->stefs :willow-wisp)
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :willow-wisp))
                    :max-hp     (:hp  (rj.cfg/entity->stats :willow-wisp))

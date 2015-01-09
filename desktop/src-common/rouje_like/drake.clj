@@ -20,10 +20,7 @@
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :drake))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
-               :status-effects   [{:type :burn
-                                   :duration 6
-                                   :value 3
-                                   :apply-fn rj.stef/apply-burn}]
+               :status-effects   (rj.cfg/mob->stefs :drake)
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :drake))
                    :max-hp     (:hp  (rj.cfg/entity->stats :drake))

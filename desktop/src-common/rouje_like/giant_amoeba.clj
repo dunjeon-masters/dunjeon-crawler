@@ -60,10 +60,7 @@
    [:attacker {:atk              (:atk (rj.cfg/entity->stats :giant-amoeba))
                :can-attack?-fn   rj.atk/can-attack?
                :attack-fn        rj.atk/attack
-               :status-effects   [{:type :paralysis
-                                   :duration 2
-                                   :value 1
-                                   :apply-fn rj.stef/apply-paralysis}]
+               :status-effects   (rj.cfg/mob->stefs :giant-amoeba)
                :is-valid-target? #{:player}}]
    [:destructible {:hp         (:hp  (rj.cfg/entity->stats :giant-amoeba))
                    :max-hp     (:hp  (rj.cfg/entity->stats :giant-amoeba))
